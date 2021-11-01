@@ -10,6 +10,7 @@ class Services(db.Model):
     id = db.Column(db.Integer, primary_key=True, index=True, unique=True)
     name = db.Column(db.String(128))
     price = db.Column(db.Integer)
+    category = db.Column(db.String(64))
 
 
 class Personal(db.Model):
