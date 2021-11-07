@@ -4,24 +4,35 @@ from time import time
 from flask import current_app
 from sqlalchemy import event, DDL
 from app import db
+from app import db, login
+from flask_login import UserMixin
 
 
 class Service(db.Model):
     id = db.Column(db.Integer, primary_key=True, index=True, unique=True)
     name = db.Column(db.String(128))
     price = db.Column(db.Integer)
+    short_description = db.Column(db.String(512))  # краткое описание
+    description = db.Column(db.Text)  # полное описание
     number = db.Column(db.Integer, index=True)  # порядковый номер
-    category = db.Column(db.String(64))
     status = db.Column(db.BOOLEAN())  # on/off
+    categories = db.relationship('ServiceCategory', backref='service', lazy='dynamic')
 
 
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True, index=True, unique=True)
     name = db.Column(db.String(128))
     status = db.Column(db.BOOLEAN())  # on/off
+    services = db.relationship('ServiceCategory', backref='category', lazy='dynamic')
 
 
-class Personal(db.Model):
+class ServiceCategory(db.Model):
+    id = db.Column(db.Integer, primary_key=True, index=True, unique=True)
+    service_id = db.Column(db.ForeignKey('service.id'))
+    category_id = db.Column(db.ForeignKey('category.id'))
+
+
+class Employee(db.Model):
     id = db.Column(db.Integer, primary_key=True, index=True, unique=True)
     photo = db.Column(db.String(1024))
     name = db.Column(db.String(128))
@@ -30,11 +41,27 @@ class Personal(db.Model):
 
 class Text(db.Model):
     id = db.Column(db.Integer, primary_key=True, index=True, unique=True)
-    title = db.Column(db.String(64))  # название текста
+    title = db.Column(db.String(64), unique=True)  # название текста
     text = db.Column(db.Text)  # содержание
 
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True, index=True, unique=True)
+    name = db.Column(db.String(128))  # имя комментатора
+    text = db.Column(db.Text)  # содержание
+
+
+class Admin(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True, index=True, unique=True)
     name = db.Column(db.String(128))
-    text = db.Column(db.Text)
+    email = db.Column(db.String(128))
+    password = db.Column(db.String(64))
+
+    def check_password(self, password):
+        return self.password == password
+
+
+@login.user_loader
+def load_user(id):
+    return Admin.query.get(int(id))
+
