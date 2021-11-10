@@ -2,9 +2,34 @@
 
 .upper {
     width: 100%;
-    height: 20%;
-    background-color:red;
+    height:100px;
+    background-color: #ffa200;
+    position: sticky;
+    justify-content: space-between;
+    vertical-align: middle;
+    align-items: center;
+    color: black;
+    margin-bottom: 20px;
+    display: flex;
+}
+
+
+.footer {
+    max-height: 50px;
+    display: flex;
+    justify-content: space-evenly;
+    vertical-align: middle;
+    align-items: center;
+    text-align: center;
     position: fixed;
+    clear: both;
+    height: 10%;
+    width: 100%;
+    background-color: #1c1919;
+    color: #ffffff;
+    right: 0;
+    bottom: 0;
+    margin-top: 10px;
 }
 
 .main_block {
@@ -12,20 +37,17 @@
     width: 100%;
     height: 100%;
     z-index: 0.9;
+
 }
 
-.footer {
-    position:relative;
-    height: 20%;
-    width: 100%;
-    background-color: black;
-}
 
 .block_buttons {
     display: flex;
-
-
-
+    justify-content: space-around;
+    max-width: 50%;
+    margin:  0 auto;
+    position:relative;
+    background-color: white;
 }
 
 .button_main {
@@ -33,8 +55,35 @@
     border-radius:5px;
     width: 100px;
     height: 50px;
+    position:relative;
+    color: black;
 
+}
+.block_logo {
+    display: flex;
+    justify-content: center;
+    max-width: 200px;
+    max-height: 150px;
+}
 
+.block_info {
+    display: flex;
+    position: relative;
+    width: 40%;
+    justify-content: space-around;
 
 }
 
+.block_content {
+    justify-content: center;
+    width: 100%;
+    height: 30%;
+    margin-top: 20px;
+}
+
+.img_logo {
+    max-width: 200px;
+    max-height: 100px;
+
+
+}

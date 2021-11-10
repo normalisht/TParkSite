@@ -3,8 +3,8 @@ from app.main import bp
 from app import db
 
 
-@bp.route('/', methods=['GET', 'POST'])
-@bp.route('/TPark', methods=['GET', 'POST'])
+@bp.route('/')
+@bp.route('/TPark')
 def index():
 
-    return render_template('main/base.html')
+    return render_template('main/main.html')

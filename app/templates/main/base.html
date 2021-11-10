@@ -13,13 +13,23 @@
         <title>Т-Парк</title>
     {% endif %}
 
-
 </head>
+
 <body id="body">
-<div class="upper"></div>
+<div class="upper">
+    <div class="block_logo">
+    <img id="logo" class="img_logo" src="{{ url_for('static', filename='logo.png') }}" alt="">
+    </div>
+    <div class="block_info">
+    <h2>Трекинг-Парк Дмитрия Сергеева</h2>
+    <h4>+79999999999</h4>
+    </div>
+</div>
 
 <div class="main_block">
+
 {% block app_content %}{% endblock %}
+
 </div>
 
 <div class="footer"></div>
