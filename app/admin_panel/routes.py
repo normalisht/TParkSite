@@ -2,7 +2,7 @@ from flask import render_template, flash, redirect, url_for, request, jsonify, c
 from app.admin_panel import bp
 from app import db
 from flask_login import login_user, logout_user, current_user, login_required
-from app.models import Admin, Category, Service, Employee, Text, Comment, ServiceCategory
+from app.models import Admin, Category, Service, Employee, Text, Comment, ServiceCategory, Event
 from werkzeug.urls import url_parse
 import json
 
@@ -247,5 +247,4 @@ def update_category():
         setattr(category, 'status', bool(int(request.form['status'])))
 
     return jsonify({'result': 'success'})
-
 

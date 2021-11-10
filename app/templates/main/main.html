@@ -1,28 +1,8 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
-    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename="favicon.ico") }}" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
-    {% if title %}
-        <title>{{ title }}</title>
-    {% else %}
-        <title>ТПарк</title>
-    {% endif %}
+{% extends "main/main.html" %}
 
+{% block app_content %}
 
-</head>
-<body id="body">
+    <h1>TPark</h1>
 
+{% endblock %}
 
-    {% block app_content %}{% endblock %}
-
-
-</body>
-
-{% block scripts %}{% endblock %}
-
-</html>
