@@ -10,16 +10,20 @@
     {% if title %}
         <title>{{ title }}</title>
     {% else %}
-        <title>ТПарк</title>
+        <title>Т-Парк</title>
     {% endif %}
 
 
 </head>
 <body id="body">
 
+<div class="upper"></div>
 
+<div class="main_block">
 {% block app_content %}{% endblock %}
+</div>
 
+<div class="footer"></div>
 
 </body>
 
