@@ -107,6 +107,7 @@ def comments():
 
 # обновляет данные об услуге
 @bp.route('/update_service', methods=['POST'])
+@login_required
 def update_service():
     service = Service.query.filter_by(id=request.form['id']).first()
 
@@ -133,6 +134,7 @@ def update_service():
 
 # добавляет услугу к категории
 @bp.route('/add_category_for_service', methods=['POST'])
+@login_required
 def add_category_for_service():
     service_category = ServiceCategory(
         service_id=request.form['service_id'],
@@ -146,6 +148,7 @@ def add_category_for_service():
 
 # удаляет услугу из категории
 @bp.route('/remove_category_for_service', methods=['POST'])
+@login_required
 def remove_category_for_service():
     service_category = ServiceCategory.query.filter_by(
         service_id=request.form['service_id'],
@@ -159,6 +162,7 @@ def remove_category_for_service():
 
 # добавляет услугу
 @bp.route('/add_new_service', methods=['POST'])
+@login_required
 def add_new_service():
     service = Service(name=request.form['name'], price=request.form['price'],
                       short_description=request.form['short_description'],
@@ -178,6 +182,7 @@ def add_new_service():
 
 # удаляет услугу
 @bp.route('/remove_service', methods=['POST'])
+@login_required
 def remove_service():
     service = Service.query.filter_by(id=request.form['id'])
 
@@ -196,6 +201,7 @@ def remove_service():
 
 # добавляет новую категорию
 @bp.route('/add_new_category', methods=['POST'])
+@login_required
 def add_new_category():
     category = Category(name=request.form['name'], status=True,
                         description=request.form['description'])
@@ -208,6 +214,7 @@ def add_new_category():
 
 # удаляет категорию
 @bp.route('/remove_category', methods=['POST'])
+@login_required
 def remove_category():
     category = Category.query.filter_by(id=request.form['id'])
 
@@ -223,6 +230,7 @@ def remove_category():
 
 # обновляет данные о категории
 @bp.route('/update_category', methods=['POST'])
+@login_required
 def update_category():
     category = Category.query.filter_by(id=request.form['id'])
 

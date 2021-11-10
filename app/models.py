@@ -15,6 +15,7 @@ class Service(db.Model):
     description = db.Column(db.Text)  # полное описание
     number = db.Column(db.Integer, index=True)  # порядковый номер
     status = db.Column(db.BOOLEAN())  # on/off
+    next = db.Column(db.BOOLEAN())  # on/off  # есть ли переход на дальнейшую страницу
     categories = db.relationship('ServiceCategory', backref='service', lazy='dynamic')
 
 
