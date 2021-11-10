@@ -21,7 +21,9 @@ class Service(db.Model):
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True, index=True, unique=True)
     name = db.Column(db.String(128))
+    description = db.Column(db.Text)
     status = db.Column(db.BOOLEAN())  # on/off
+    number = db.Column(db.Integer, index=True)  # порядковый номер
     services = db.relationship('ServiceCategory', backref='category', lazy='dynamic')
 
 

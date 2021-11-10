@@ -4,6 +4,7 @@ from app import db
 from flask_login import login_user, logout_user, current_user, login_required
 from app.models import Admin, Category, Service, Employee, Text, Comment, ServiceCategory
 from werkzeug.urls import url_parse
+import json
 
 
 # авторизация админа
@@ -50,6 +51,15 @@ def texts():
                            texts=texts)
 
 
+@bp.route('/events', methods=['GET'])
+@login_required
+def events():
+    events = Event.query.all()
+
+    return render_template('admin_panel/events.html', title='Мероприятия',
+                           events=events)
+
+
 @bp.route('/employees', methods=['GET'])
 @login_required
 def employees():
@@ -90,8 +100,12 @@ def comments():
     return render_template('admin_panel/comments.html', title='Отзывы', comments=comments)
 
 
-# далее json запросы
+'''json запросы'''
 
+'''услуги'''
+
+
+# обновляет данные об услуге
 @bp.route('/update_service', methods=['POST'])
 def update_service():
     service = Service.query.filter_by(id=request.form['id']).first()
@@ -99,8 +113,8 @@ def update_service():
     if getattr(service, 'name') != request.form['name']:
         setattr(service, 'name', request.form['name'])
 
-    if getattr(service, 'price') != request.form['price']:
-        setattr(service, 'price', request.form['price'])
+    if getattr(service, 'price') != int(request.form['price']):
+        setattr(service, 'price', int(request.form['price']))
 
     if getattr(service, 'short_description') != request.form['short_description']:
         setattr(service, 'short_description', request.form['short_description'])
@@ -108,15 +122,16 @@ def update_service():
     if getattr(service, 'description') != request.form['description']:
         setattr(service, 'description', request.form['description'])
 
-    if getattr(service, 'number') != request.form['number']:
-        setattr(service, 'number', request.form['number'])
+    if getattr(service, 'number') != int(request.form['number']):
+        setattr(service, 'number', int(request.form['number']))
 
-    if getattr(service, 'status') != request.form['status']:
-        setattr(service, 'status', request.form['status'])
+    if getattr(service, 'status') != bool(int(request.form['status'])):
+        setattr(service, 'status', bool(int(request.form['status'])))
 
     return jsonify({'result': 'success'})
 
 
+# добавляет услугу к категории
 @bp.route('/add_category_for_service', methods=['POST'])
 def add_category_for_service():
     service_category = ServiceCategory(
@@ -129,6 +144,7 @@ def add_category_for_service():
     return jsonify({'result': 'success'})
 
 
+# удаляет услугу из категории
 @bp.route('/remove_category_for_service', methods=['POST'])
 def remove_category_for_service():
     service_category = ServiceCategory.query.filter_by(
@@ -139,3 +155,89 @@ def remove_category_for_service():
     db.session.commit()
 
     return jsonify({'result': 'success'})
+
+
+# добавляет услугу
+@bp.route('/add_new_service', methods=['POST'])
+def add_new_service():
+    service = Service(name=request.form['name'], price=request.form['price'],
+                      short_description=request.form['short_description'],
+                      description=request.form['description'],
+                      status=True)
+    db.session.add(service)
+    db.session.commit()
+
+    for category_id in list(json.loads(request.form['categories'])):
+        service_category = ServiceCategory(
+            service=service.id, category_id=category_id)
+        db.session.add(service_category)
+        db.session.commit()
+
+    return jsonify({'result': 'success'})
+
+
+# удаляет услугу
+@bp.route('/remove_service', methods=['POST'])
+def remove_service():
+    service = Service.query.filter_by(id=request.form['id'])
+
+    for category in service.categories.all():
+        db.session.delete(category)
+        db.session.commit()
+
+    db.session.delete(service)
+    db.session.commit()
+
+    return jsonify({'result': 'success'})
+
+
+'''категории'''
+
+
+# добавляет новую категорию
+@bp.route('/add_new_category', methods=['POST'])
+def add_new_category():
+    category = Category(name=request.form['name'], status=True,
+                        description=request.form['description'])
+
+    db.session.add(category)
+    db.session.commit()
+
+    return jsonify({'result': 'success'})
+
+
+# удаляет категорию
+@bp.route('/remove_category', methods=['POST'])
+def remove_category():
+    category = Category.query.filter_by(id=request.form['id'])
+
+    for service in category.services.all():
+        db.session.delete(service)
+        db.session.commit()
+
+    db.session.delete(category)
+    db.session.commit()
+
+    return jsonify({'result': 'success'})
+
+
+# обновляет данные о категории
+@bp.route('/update_category', methods=['POST'])
+def update_category():
+    category = Category.query.filter_by(id=request.form['id'])
+
+    if getattr(category, 'name') != request.form['name']:
+        setattr(category, 'name', request.form['name'])
+
+    if getattr(category, 'description') != request.form['description']:
+        setattr(category, 'description', request.form['description'])
+
+    if getattr(category, 'number') != int(request.form['number']):
+        setattr(category, 'number', int(request.form['number']))
+
+    if getattr(category, 'status') != bool(int(request.form['status'])):
+        setattr(category, 'status', bool(int(request.form['status'])))
+
+    return jsonify({'result': 'success'})
+
+
