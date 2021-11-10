@@ -7,4 +7,6 @@ from app import db
 @bp.route('/TPark', methods=['GET', 'POST'])
 def index():
 
-    return render_template('main.html')
+
+    return render_template('main/base.html')
+
