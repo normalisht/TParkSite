@@ -2,7 +2,7 @@ from flask import render_template, flash, redirect, url_for, request, jsonify, c
 from app.admin_panel import bp
 from app import db
 from flask_login import login_user, logout_user, current_user, login_required
-from app.models import Admin, Category, Service, Employee, Text, Comment, ServiceCategory
+from app.models import Admin, Category, Service, Employee, Text, Comment, ServiceCategory, Event
 from werkzeug.urls import url_parse
 import json
 
@@ -249,3 +249,110 @@ def update_category():
     return jsonify({'result': 'success'})
 
 
+'''сотрудники'''
+
+
+# добавляет сотрудника
+@bp.route('/add_employee', methods=['POST'])
+@login_required
+def add_employee():
+    employee = Employee(name=request.form['name'], position=request.form['position'],
+                        phone=request.form['photo'])
+
+    db.session.add(employee)
+    db.session.commit()
+
+    return jsonify({'result': 'success'})
+
+
+# удаляет сотрудника
+@bp.route('/remove_employee', methods=['POST'])
+@login_required
+def remove_employee():
+    employee = Employee.query.filter_by(id=request.form['id']).first()
+
+    db.session.delete(employee)
+    db.session.commit()
+
+    return jsonify({'result': 'success'})
+
+
+# обновляет данные о сотруднике
+@bp.route('/update_employee', methods=['POST'])
+@login_required
+def update_employee():
+    employee = Employee.query.filter_by(id=request.form['id']).first()
+
+    if getattr(employee, 'name') != request.form['name']:
+        setattr(employee, 'name', request.form['name'])
+
+    if getattr(employee, 'position') != request.form['position']:
+        setattr(employee, 'position', request.form['position'])
+
+    if getattr(employee, 'photo') != request.form['photo']:
+        setattr(employee, 'photo', request.form['photo'])
+
+    return jsonify({'result': 'success'})
+
+
+'''Тексты'''
+
+
+# обновляет текст
+@bp.route('/update_text', methods=['POST'])
+@login_required
+def update_employee():
+    text = Text.query.filter_by(id=request.form['id']).first()
+
+    if getattr(text, 'title') != request.form['title']:
+        setattr(text, 'title', request.form['title'])
+
+    if getattr(text, 'text') != request.form['text']:
+        setattr(text, 'text', request.form['text'])
+
+    if getattr(text, 'photo') != request.form['photo']:
+        setattr(text, 'photo', request.form['photo'])
+
+    return jsonify({'result': 'success'})
+
+
+'''отзывы'''
+
+
+# добавляет отзыв
+@bp.route('/add_comment', methods=['POST'])
+@login_required
+def add_comment():
+    comment = Comment(name=request.form['name'], text=request.form['text'])
+
+    db.session.add(comment)
+    db.session.commit()
+
+    return jsonify({'result': 'success'})
+
+
+# удаляет отзыв
+@bp.route('/remove_comment', methods=['POST'])
+@login_required
+def remove_comment():
+    comment = Comment.query.filter_by(id=request.form['id']).first()
+
+    db.session.delete(comment)
+    db.session.commit()
+
+    return jsonify({'result': 'success'})
+
+
+# обновляет отзыв
+@bp.route('/update_comment', methods=['POST'])
+@login_required
+def update_comment():
+    comment = Comment.query.filter_by(id=request.form['id']).first()
+
+    if getattr(comment, 'name') != request.form['name']:
+        setattr(comment, 'name', request.form['name'])
+
+    if getattr(comment, 'text') != request.form['text']:
+        setattr(comment, 'text', request.form['text'])
+
+    return jsonify({'result': 'success'})
