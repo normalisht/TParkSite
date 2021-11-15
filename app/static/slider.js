@@ -3,7 +3,13 @@
  * Copyright 2020 - 2021 Alexander Maltsev
  * Licensed under MIT (https://github.com/itchief/ui-components/blob/master/LICENSE)
  */
-
+document.addEventListener('DOMContentLoaded', function() {
+    var elms = document.querySelectorAll('.slider');
+    for (var i = 0, len = elms.length; i < len; i++) {
+        // инициализация elms[i] в качестве слайдера
+        new ChiefSlider(elms[i]);
+    }
+});
 (function() {
     if (typeof window.CustomEvent === 'function' ) return false;
     function CustomEvent(event, params) {
@@ -519,3 +525,11 @@ ChiefSlider.prototype.moveTo = function(index) {
 ChiefSlider.prototype.refresh = function() {
     this._refresh();
 };
+
+document.addEventListener('DOMContentLoaded', function() {
+    var elms = document.querySelectorAll('.slider');
+    for (var i = 0, len = elms.length; i < len; i++) {
+        // инициализация elms[i] в качестве слайдера
+        new ChiefSlider(elms[i]);
+    }
+});

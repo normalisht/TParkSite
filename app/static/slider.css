@@ -6,6 +6,11 @@
 * Copyright 2018-2021 Alexander Maltsev
 * Licensed under MIT (https://github.com/itchief/ui-components/blob/master/LICENSE)
 */
+.block_slider {
+    max-width: 400px;
+    max-height:200px;
+    margin: 0 auto;
+}
 
 .slider {
     position: relative;
@@ -28,12 +33,28 @@
     transition: none;
 }
 
-.slider__item {
-    flex: 0 0 100%;
-    max-width: 100%;
-    user-select: none;
+@media (min-width: 768px) {
+    .slider__item {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
 }
 
+/* на больших экранах (ширина больше 1200px) – 3 слайда */
+@media (max-width: 768px) {
+    .slider__item {
+        flex: 0 0 33.3333333333%;
+        max-width: 33.3333333333%;
+    }
+}
+
+
+.slider_img {
+    background-color: red;
+    max-height:80px;
+
+
+}
 /* кнопки влево и вправо */
 
 .slider__control {
