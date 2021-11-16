@@ -2,7 +2,8 @@
 
 {% block app_content %}
 
-    </script>
+    <script type="text/javascript>" src="{{ url_for('static', filename='slider.js') }}"></script>
+
     <div class="block_buttons">
         <input type="button" value="Услуги" class="button_main">
         <input type="button" value="Контакты" class="button_main">
@@ -12,21 +13,21 @@
     <div class="block_slider">
         <div class="slider">
             <div class="slider__container">
-            <div class="slider_wrapper">
-                <div class="slider_items">
-                    <div class="slider_item">
+            <div class="slider__wrapper">
+                <div class="slider__items">
+                    <div class="slider__item">
                         <!-- Контент 1 слайда -->
                         1
                     </div>
-                    <div class="slider_item">
+                    <div class="slider__item">
                         <!-- Контент 2 слайда -->
                         2
                     </div>
-                    <div class="slider_item">
+                    <div class="slider__item">
                         <!-- Контент 3 слайда -->
                         3
                     </div>
-                    <div class="slider_item">
+                    <div class="slider__item">
                         <!-- Контент 4 слайда -->
                         4
                     </div>
