@@ -1,8 +1,7 @@
+@charset "UTF-8";
 
-.body {
+body {
     margin:  0;
-
-
 }
 
 
@@ -90,6 +89,4 @@
 .img_logo {
     max-width: 200px;
     max-height: 100px;
-
-
 }
