@@ -4,3 +4,5 @@
 /venv
 /migrations
 /logs
+test.*
+*.log

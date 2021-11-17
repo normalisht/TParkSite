@@ -8,7 +8,7 @@
 */
 .block_slider {
     max-width: 400px;
-    max-height:200px;
+    max-height: 200px;
     margin: 0 auto;
 }
 
@@ -51,10 +51,11 @@
 
 .slider_img {
     background-color: red;
-    max-height:80px;
+    max-height: 80px;
 
 
 }
+
 /* кнопки влево и вправо */
 
 .slider__control {
