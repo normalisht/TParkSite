@@ -96,7 +96,6 @@ body {
     max-height: 100px;
 }
 
-<!--Модальное окно дя услуг-->
 
 .modal {
     position: fixed;
@@ -156,5 +155,3 @@ body {
 .btn-close:hover {
     opacity: 1;
 }
-
-<!--Конец модального для услуг-->
