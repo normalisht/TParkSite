@@ -4,6 +4,10 @@ body {
     margin: 0;
 }
 
+img {
+    user-select: none; /* чтобы картини не выделялись при выделении текста */
+}
+
 
 .upper {
     width: 100%;
