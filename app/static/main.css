@@ -99,7 +99,9 @@ img {
     max-height: 100px;
 }
 
+
 /* Модальное окно дя услуг */
+
 
 .modal {
     position: fixed;
@@ -159,5 +161,3 @@ img {
 .btn-close:hover {
     opacity: 1;
 }
-
-<!--Конец модального для услуг-->
