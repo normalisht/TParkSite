@@ -87,5 +87,29 @@
         </div>
     </div>
 
+    <div class="events">
+        <div class="block_slider">
+            <div class="slider">
+                <div class="slider__container">
+                    <div class="slider__wrapper">
+                        <div class="slider__items">
+                            {% for i in events %}
+                                {% set path = "static/images/events/{i}.jpg" %}
+                                <div class="slider__item">
+                                    <!-- Контент 1 слайда -->
+                                    <img class="slider__img" src="{{ url_for('static',filename='path' ) }}">
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Стрелки для перехода к предыдущему и следующему слайду -->
+                <a class="slider__control slider__control_prev" href="#" role="button" data-slide="prev"></a>
+                <a class="slider__control slider__control_next" href="#" role="button" data-slide="next"></a>
+            </div>
+        </div>
+
+    </div>
 
 {% endblock %}

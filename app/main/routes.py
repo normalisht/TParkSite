@@ -1,7 +1,7 @@
 from flask import render_template, flash, redirect, url_for, request, jsonify, current_app
 from app.main import bp
 from app import db
-from app.models import Text
+from app.models import Text, Event
 
 
 @bp.route('/', methods=['GET'])
@@ -9,8 +9,9 @@ from app.models import Text
 def index():
 
     main_text = Text.query.filter_by(title="main_text").first().text
+    events = Event.query.all()
 
-    return render_template('main/main.html', main_text=main_text)
+    return render_template('main/main.html', main_text=main_text, events=events)
 
 
 
