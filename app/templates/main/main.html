@@ -42,22 +42,12 @@
             <div class="slider__container">
                 <div class="slider__wrapper">
                     <div class="slider__items">
-                        <div class="slider__item">
-                            <!-- Контент 1 слайда -->
-                            1
-                        </div>
-                        <div class="slider__item">
-                            <!-- Контент 2 слайда -->
-                            2
-                        </div>
-                        <div class="slider__item">
-                            <!-- Контент 3 слайда -->
-                            3
-                        </div>
-                        <div class="slider__item">
-                            <!-- Контент 4 слайда -->
-                            4
-                        </div>
+                        {% for i in range(4) %}
+                            <div class="slider__item">
+                                <!-- Контент 1 слайда -->
+                                <img class="slider__img" src="{{ url_for('static',filename='/images/staff/1.png' ) }}">
+                            </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -69,7 +59,7 @@
     </div>
 
     <div class="block_content">
-        {{ text }}
+        {{ main_text }}
     </div>
 
 
@@ -78,22 +68,12 @@
             <div class="slider__container">
                 <div class="slider__wrapper">
                     <div class="slider__items">
+                        {% for i in range(4) %}
                         <div class="slider__item">
                             <!-- Контент 1 слайда -->
-                            1
+                            <img class="slider__img" src="{{ url_for('static',filename='/images/staff/1.png' ) }}">
                         </div>
-                        <div class="slider__item">
-                            <!-- Контент 2 слайда -->
-                            2
-                        </div>
-                        <div class="slider__item">
-                            <!-- Контент 3 слайда -->
-                            3
-                        </div>
-                        <div class="slider__item">
-                            <!-- Контент 4 слайда -->
-                            4
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -103,6 +83,6 @@
             <a class="slider__control slider__control_next" href="#" role="button" data-slide="next"></a>
         </div>
     </div>
-    
+
 
 {% endblock %}
