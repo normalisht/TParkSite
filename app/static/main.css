@@ -51,7 +51,7 @@ img {
 
 .block_buttons {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     max-width: 50%;
     margin: 0 auto;
     position: relative;
@@ -65,6 +65,7 @@ img {
     height: 50px;
     position: relative;
     color: black;
+
 }
 
 .block_logo {
