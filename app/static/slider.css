@@ -1,17 +1,9 @@
-/*!
-* chiefSlider
-*   site: https://itchief.ru/javascript/slider
-*   github: https://github.com/itchief/ui-components
-*
-* Copyright 2018-2021 Alexander Maltsev
-* Licensed under MIT (https://github.com/itchief/ui-components/blob/master/LICENSE)
-*/
-
 @charset "UTF-8";
 
 .block_slider {
     max-width: 100%;
     max-height: 400px;
+
     margin: 0 auto;
 }
 
@@ -66,10 +58,11 @@
 
 .slider_img {
     background-color: red;
-    max-height:80px;
+    max-height: 80px;
 
 
 }
+
 /* кнопки влево и вправо */
 
 .slider__control {

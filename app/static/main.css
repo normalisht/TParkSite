@@ -4,10 +4,14 @@ body {
     margin: 0;
 }
 
+img {
+    user-select: none; /* чтобы картини не выделялись при выделении текста */
+}
+
 
 .upper {
     width: 100%;
-    height:100px;
+    height: 100px;
     background-color: #ffa200;
     position: sticky;
     justify-content: space-between;
@@ -20,7 +24,6 @@ body {
 
 
 .footer {
-    max-height: 50px;
     display: flex;
     justify-content: space-evenly;
     vertical-align: middle;
@@ -28,8 +31,8 @@ body {
     text-align: center;
     position: fixed;
     clear: both;
-    height: 10%;
-    width: 100%;
+    height: min(10vh, 60px);
+    width: 100vh;
     background-color: #1c1919;
     color: #ffffff;
     right: 0;
@@ -38,11 +41,10 @@ body {
 }
 
 .main_block {
-    background-color:white;
-    width: 100%;
-    height: 100%;
-    z-index: 0.9;
-
+    background-color: white;
+    width: 100vh;
+    height: 100vh;
+    z-index: 1;
 }
 
 
@@ -50,20 +52,20 @@ body {
     display: flex;
     justify-content: space-around;
     max-width: 50%;
-    margin:  0 auto;
-    position:relative;
+    margin: 0 auto;
+    position: relative;
     background-color: white;
 }
 
 .button_main {
-    background-color:blue;
-    border-radius:5px;
+    background-color: blue;
+    border-radius: 5px;
     width: 100px;
     height: 50px;
-    position:relative;
+    position: relative;
     color: black;
-
 }
+
 .block_logo {
     display: flex;
     justify-content: center;
@@ -76,7 +78,6 @@ body {
     position: relative;
     width: 40%;
     justify-content: space-around;
-
 }
 
 .block_content {
