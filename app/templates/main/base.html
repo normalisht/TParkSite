@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
     <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename="favicon.ico") }}"/>
     <link rel="stylesheet" href="{{ url_for('static', filename='slider.css') }}">
-    <script src="{{ url_for('static', filename='slider.js') }}"></script>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
     {% if title %}
@@ -35,25 +35,12 @@
 
 <div id="footer" class="footer"></div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const slider = new ChiefSlider('.slider', {
-            loop: true,
-            autoplay: true,
-            interval: 5000
-        });
-        const slider_2 = new ChiefSlider('.slider', {
-            loop: true,
-            autoplay: true,
-            interval: 5000
-        });
-    });
-</script>
 
 <script>
     let footer = document.getElementById('footer')
     footer.offsetTop = document.offsetTop + document.documentElement.clientHeight
 </script>
+
 </body>
 
 {% block scripts %}{% endblock %}
