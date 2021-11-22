@@ -1,13 +1,18 @@
 @charset "UTF-8";
 
 body {
-    margin:  0;
+    margin: 0;
+    width: 100vw;
+}
+
+img {
+    user-select: none; /* чтобы картини не выделялись при выделении текста */
 }
 
 
 .upper {
     width: 100%;
-    height:100px;
+    height: 100px;
     background-color: #ffa200;
     position: sticky;
     justify-content: space-between;
@@ -20,50 +25,52 @@ body {
 
 
 .footer {
-    max-height: 50px;
     display: flex;
     justify-content: space-evenly;
     vertical-align: middle;
     align-items: center;
     text-align: center;
-    position: fixed;
+    position: relative;
     clear: both;
-    height: 10%;
-    width: 100%;
+    height: min(10vh, 60px);
+    width: 100vw;
     background-color: #1c1919;
     color: #ffffff;
     right: 0;
     bottom: 0;
     margin-top: 10px;
+
 }
 
 .main_block {
-    background-color:white;
-    width: 100%;
-    height: 100%;
-    z-index: 0.9;
-
+    background-color: white;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
 }
 
 
 .block_buttons {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     max-width: 50%;
-    margin:  0 auto;
-    position:relative;
+    margin: 0 auto;
+    position: relative;
     background-color: white;
 }
 
 .button_main {
-    background-color:blue;
-    border-radius:5px;
+    background-color: blue;
+    border-radius: 5px;
     width: 100px;
     height: 50px;
-    position:relative;
+    position: relative;
     color: black;
-
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
+
 .block_logo {
     display: flex;
     justify-content: center;
@@ -76,7 +83,6 @@ body {
     position: relative;
     width: 40%;
     justify-content: space-around;
-
 }
 
 .block_content {
@@ -90,3 +96,139 @@ body {
     max-width: 200px;
     max-height: 100px;
 }
+
+
+.button_menu {
+    display: inline-block;
+    position: relative;
+}
+
+
+
+/* Модальное окно для услуг */
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    visibility: hidden;
+    z-index: -1;
+}
+
+.show_modal_window {
+    visibility: visible;
+    z-index: 1000;
+    opacity: 1;
+}
+
+.modal .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    opacity: 0.7;
+    z-index: 0;
+}
+
+.modal-window {
+    position: relative;
+    z-index: 2;
+    width: 90vw;
+    height:90vh;
+    border-radius: 10px;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, .4);
+    background-color: white;
+    padding: 30px;
+    margin-top: -40px;
+    transition: inherit;
+}
+
+.show_modal_window .modal-window {
+    margin-top: 0;
+}
+
+.btn-close-modal-window {
+    border: none;
+    background: none;
+    opacity: 0.7;
+    position: absolute;
+    right: 20px;
+    top: 20px;
+}
+
+.btn-close-modal-window:hover {
+    opacity: 1;
+}
+
+
+
+.submenu {
+    position: absolute;
+    z-index: 4;
+    left: 50%;
+    top: 100%;
+    width: 150px;
+    padding: 15px 0 15px;
+    margin-top: 5px;
+    background: white;
+    border-radius: 5px;
+    box-shadow: 0 0 30px rgba(0,0,0,.2);
+    box-sizing: border-box;
+    visibility: hidden;
+    opacity: 0;
+    transform: translate(-50%, 20px);
+    transition: .3s;
+}
+
+.submenu div {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 11px;
+    letter-spacing: 1px;
+    padding: 5px 10px;
+    transition: .3s linear;
+}
+
+.next_menu {
+    position: relative;
+    padding: 10px 15px;
+    font-family: 'Kaushan Script', cursive;
+    font-size: 1.5em;
+    line-height: 1;
+    letter-spacing: 3px;
+}
+
+
+.next_menu:before {
+    content: "";
+}
+
+
+.btn-close {
+    border: none;
+    background: none;
+    position: absolute;
+    z-index: 5;
+    left: 50%;
+    top: 100%;
+    width: 10px;
+    height: 10px;
+    background: white;
+    border-radius: 50%;
+    transform: translate(-50%, 20px);
+    opacity: 0.7;
+    transition: .3s;
+}
+.next_menu:hover:before {
+    transform: translate(-50%, 0);
+    opacity: 1;
+}
+
+
+.submenu div:hover {background: #e8e8e8;}

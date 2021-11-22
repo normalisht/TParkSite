@@ -83,7 +83,7 @@ function ChiefSlider(selector, config) {
     this._config = {
         loop: true,
         autoplay: false,
-        interval: 5000,
+        interval: 4000,
         refresh: true,
         swipe: true,
     };

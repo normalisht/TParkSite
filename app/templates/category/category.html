@@ -1,0 +1,48 @@
+{% extends "main/base.html" %}
+
+
+{% block app_content %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='category.css') }}">
+    <div class="container">
+        <div class="data">
+            <table id="table" style="margin: 2px;" class="table">
+                <tr>
+                    <td><h1>{{ category.name }}</h1></td>
+                </tr>
+                <tr>
+                    <td><img id="img" style="width: 300px; height: 300px" src=path alt=""></td>
+                    <td>
+                        <h2>ОПИСАНИЕ</h2>
+                        <div class="text">
+                        <span>{{ category.description }}</span>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="buttons">
+        {% for ids in service %}
+            <table id="button" style="margin-right: 10vw;" class="button">
+                <tr style="border: 2px solid black;">
+                    <td>{{ ids.name }}</td>
+                </tr>
+                <tr style="border: 2px solid black;">
+                    <td>
+<!--                        <div style="height: 0px"> # Высота 0-->
+<!--                            Цена: {{ ids.price }}-->
+<!--                        </div>-->
+                        <div style="height: 15vw">
+                            Цена: {{ ids.price }}
+                            <br>Краткое описание: {{ ids.short_description }}
+                            {% if ids.status == true %}
+                                <br> Ссылка на полное описание
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        {% endfor %}
+    </div>
+
+{% endblock %}

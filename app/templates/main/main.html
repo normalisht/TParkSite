@@ -2,12 +2,41 @@
 
 {% block app_content %}
 
+    <script type="text/javascript" src="{{ url_for('static', filename='slider.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='modal.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const slider = new ChiefSlider('.slider', {
+                loop: true,
+                autoplay: true,
+                interval: 4000,
+            });
+            const slider_2 = new ChiefSlider('.slider', {
+                loop: true,
+            });
+        });
+
     </script>
-    <div class="block_buttons">
-        <input type="button" value="Услуги" class="button_main">
-        <input type="button" value="Контакты" class="button_main">
-        <input type="button" value="О Нас" class="button_main">
+
+    <div id='navigation_buttons' class="block_buttons">
+        <!--Модальное окно для Услуг-->
+        <div id="modalWin" class="modal" data-modal-window-toggle="#modalWin">
+            <div class="modal-window">
+                <h1>Категория услуг</h1>
+
+                <button class="btn-close-modal-window">X</button>
+            </div>
+
+            <div class="overlay"></div>
+        </div>
+        <!--конец модального окна услуг-->
+
+        <div class="button_main" data-modal-window-toggle="#modalWin">Услуги</div>
+        <div class="button_main">О нас</div>
+        <div class="button_main">Контакты</div>
+
     </div>
+
     <!--Слайдер-->
     <div class="block_slider">
         <div class="slider">
@@ -58,9 +87,38 @@
         texttexttexttexttexttexttexttexttexttext
         texttexttexttexttexttexttexttexttexttext
         texttexttexttexttexttexttexttexttexttext
-
     </div>
 
 
-{% endblock %}
+    <div class="block_slider">
+        <div class="slider">
+            <div class="slider__container">
+                <div class="slider__wrapper">
+                    <div class="slider__items">
+                        <div class="slider__item">
+                            <!-- Контент 1 слайда -->
+                            1
+                        </div>
+                        <div class="slider__item">
+                            <!-- Контент 2 слайда -->
+                            2
+                        </div>
+                        <div class="slider__item">
+                            <!-- Контент 3 слайда -->
+                            3
+                        </div>
+                        <div class="slider__item">
+                            <!-- Контент 4 слайда -->
+                            4
+                        </div>
+                    </div>
+                </div>
+            </div>
 
+            <!-- Стрелки для перехода к предыдущему и следующему слайду -->
+            <a class="slider__control slider__control_prev" href="#" role="button" data-slide="prev"></a>
+            <a class="slider__control slider__control_next" href="#" role="button" data-slide="next"></a>
+        </div>
+    </div>
+
+{% endblock %}

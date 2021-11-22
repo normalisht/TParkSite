@@ -1,0 +1,56 @@
+@charset "UTF-8";
+
+
+.container{
+    position: relative;
+    justify-content: center;
+    align-items: center;
+}
+
+.data {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.text{
+    position: static;
+}
+
+.table{
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    border-collapse: collapse;
+    table-layout: auto;
+    width: 80vw;
+    word-break: break-all;
+}
+
+td{
+    position: static;
+    vertical-align: top;
+    padding-right: 2vw;
+}
+
+h2{
+    text-align:center;
+}
+
+.button{
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    word-break: break-all;
+    border-collapse: collapse;
+    table-layout: fixed;
+    position: relative;
+    align-items: center;
+}
+
+.buttons{
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    white-space: normal;
+}
