@@ -1,10 +1,13 @@
 {% extends "main/base.html" %}
 
-{% block app_content %}<!---->
+{% block app_content %}<!--Шаблон страницы конкретной услуги-->
 
-    <div><img src="{{}}"></div> <!--Фото услуги-->
-    <div class></div><!--Описание услуги-->
-    <div class></div><!--Подробное описание с подкатегориями-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+
+    {% set path = "static/images/service" + service.id + ".jpg"%}
+    <div><img src="{{ url_for("static", filename="path") }}"></div> <!--Фото услуги-->
+    <div class="block_text">{{ service.short_description }}</div><!--Описание услуги-->
+    <div class="block_text">{{ service.description }}</div><!--Подробное описание с подкатегориями-->
     <div class>
         <!--Слайдер-->
         <div class="block_slider">
@@ -14,19 +17,19 @@
                         <div class="slider__items">
                             <div class="slider__item">
                                 <!-- Контент 1 слайда -->
-                                {% set path = "static/images/service/" + service.id + ".jpg" %}
+                                <img src="{{ url_for('static/images/staff/', filename="1.jpg") }}">
                             </div>
                             <div class="slider__item">
                                 <!-- Контент 2 слайда -->
-
+                                <img src="{{ url_for('static/images/staff/', filename="1.jpg") }}">
                             </div>
                             <div class="slider__item">
                                 <!-- Контент 3 слайда -->
-
+                                <img src="{{ url_for('static/images/staff/', filename="1.jpg") }}">
                             </div>
                             <div class="slider__item">
                                 <!-- Контент 4 слайда -->
-
+                                <img src="{{ url_for('static/images/staff/', filename="1.jpg") }}">
                             </div>
                         </div>
                     </div>
@@ -37,7 +40,7 @@
                 <a class="slider__control slider__control_next" href="#" role="button" data-slide="next"></a>
             </div>
         </div>
-    </div><!--Слайдер-->
+    </div>
 
 
 
