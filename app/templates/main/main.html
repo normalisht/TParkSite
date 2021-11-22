@@ -4,19 +4,20 @@
 
     <script type="text/javascript>" src="{{ url_for('static', filename='slider.js') }}"></script>
 
-    <div class="block_buttons">
-        <input type="button" value="Услуги" class="button_main">
-        <div>
-        <input type="button" value="Контакты" class="button_menu">
-            <li><a href="" class="down">Контакты</a>
-                <ul class="submenu">
-                    <li><div class="text_menu">Text</div></li>
 
-                </ul>
+    <div id='navigation_buttons' class="block_buttons">
+        <!--Модальное окно для Услуг-->
+        <div id="modalWin" class="modal" data-modal-window-toggle="#modalWin">
+            <div class="modal-window">
+                <h1>Категория услуг</h1>
+            </div>
+            <!--конец модального окна услуг-->
+
+            <input type="button" value="Услуги" class="button_main" data-modal-window-toggle="#modalWin">
+            <input type="button" value="Контакты" class="button_main">
+            <input type="button" value="О Нас" class="button_main">
         </div>
-        <input type="button" value="О Нас" class="button_main">
     </div>
-
     <!--Слайдер-->
     <div class="block_slider">
         <div class="slider">
@@ -71,4 +72,3 @@
 
 
 {% endblock %}
-
