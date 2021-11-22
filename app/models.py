@@ -75,6 +75,8 @@ class Event(db.Model):
         if self.date < datetime.now():
             db.session.delete(self)
             db.session.commit()
+            return True
+        return False
 
 
 @login.user_loader
