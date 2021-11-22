@@ -298,10 +298,10 @@ def update_employee():
 '''Тексты'''
 
 
-# обновляет текст
+# обновляет данные тексте
 @bp.route('/update_text', methods=['POST'])
 @login_required
-def update_employee():
+def update_text():
     text = Text.query.filter_by(id=request.form['id']).first()
 
     if getattr(text, 'title') != request.form['title']:
