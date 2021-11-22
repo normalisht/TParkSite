@@ -23,16 +23,16 @@
     transition: transform 0.5s ease;
 }
 .slider__img {
-    width: 100%;
+    overflow: hidden;
+    object-fit: cover;
     height: 100%;
-
 }
 
 .slider_disable-transition {
     transition: none;
 }
 
-@media (min-width: 768px) {
+@media (max-width: 768px) {
     .slider__item {
         flex: 0 0 50%;
         max-width: 50%;
@@ -48,8 +48,8 @@
 /* на больших экранах (ширина больше 1200px) – 3 слайда */
 @media (min-width: 768px) {
     .slider__item {
-        flex: 0 0 33.3333333333%;
-        max-width: 33.3333333333%;
+        flex: 0 0 calc(100% / 3);
+        max-width: calc(100% / 3);
         height: 250px;
         display: flex;
         justify-content: center;
