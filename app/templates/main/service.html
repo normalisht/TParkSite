@@ -6,42 +6,41 @@
 
     {% set path = "static/images/service" + service.id + ".jpg"%}
     <div><img src="{{ url_for("static", filename="path") }}"></div> <!--Фото услуги-->
-    <div class="block_text">{{ service.short_description }}</div><!--Описание услуги-->
-    <div class="block_text">{{ service.description }}</div><!--Подробное описание с подкатегориями-->
+    <div class="block_text">{{ service.description }}</div><!--Описание услуги-->
     <div class>
-        <!--Слайдер-->
+        <!--Слайдер
         <div class="block_slider">
             <div class="slider">
                 <div class="slider__container">
                     <div class="slider__wrapper">
                         <div class="slider__items">
                             <div class="slider__item">
-                                <!-- Контент 1 слайда -->
-                                <img src="{{ url_for('static/images/staff/', filename="1.jpg") }}">
+                                 Контент 1 слайда
+                                <img src="{ url_for('static/images/staff/', filename="1.jpg") }}">
                             </div>
                             <div class="slider__item">
-                                <!-- Контент 2 слайда -->
-                                <img src="{{ url_for('static/images/staff/', filename="1.jpg") }}">
+                                 Контент 2 слайда
+                                <img src="{ url_for('static/images/staff/', filename="1.jpg") }}">
                             </div>
                             <div class="slider__item">
-                                <!-- Контент 3 слайда -->
-                                <img src="{{ url_for('static/images/staff/', filename="1.jpg") }}">
+                                 Контент 3 слайда
+                                <img src="{ url_for('static/images/staff/', filename="1.jpg") }}">
                             </div>
                             <div class="slider__item">
-                                <!-- Контент 4 слайда -->
+                                 Контент 4 слайда
                                 <img src="{{ url_for('static/images/staff/', filename="1.jpg") }}">
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Стрелки для перехода к предыдущему и следующему слайду -->
+                 Стрелки для перехода к предыдущему и следующему слайду
                 <a class="slider__control slider__control_prev" href="#" role="button" data-slide="prev"></a>
                 <a class="slider__control slider__control_next" href="#" role="button" data-slide="next"></a>
             </div>
         </div>
     </div>
 
-
+    -->
 
 {% endblock %}
