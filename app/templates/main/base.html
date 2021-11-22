@@ -33,7 +33,7 @@
 
 </div>
 
-<div class="footer"></div>
+<div id="footer" class="footer"></div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -48,6 +48,11 @@
             interval: 5000
         });
     });
+</script>
+
+<script>
+    let footer = document.getElementById('footer')
+    footer.offsetTop = document.offsetTop + document.documentElement.clientHeight
 </script>
 </body>
 

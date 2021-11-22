@@ -29,14 +29,11 @@ img {
     vertical-align: middle;
     align-items: center;
     text-align: center;
-    position: fixed;
     clear: both;
     height: min(10vh, 60px);
     width: 100vw;
     background-color: #1c1919;
     color: #ffffff;
-    right: 0;
-    bottom: 0;
     margin-top: 10px;
 }
 
