@@ -2,7 +2,6 @@
 
 body {
     margin: 0;
-    width: 100vw;
 }
 
 img {
@@ -30,7 +29,6 @@ img {
     vertical-align: middle;
     align-items: center;
     text-align: center;
-    position: relative;
     clear: both;
     height: min(10vh, 60px);
     width: 100vw;
