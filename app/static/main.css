@@ -147,8 +147,6 @@ img {
 .btn-close {
     border: none;
     background: none;
-    opacity: 0.7;
-
     position: absolute;
     z-index: 5;
     left: 50%;
@@ -161,7 +159,7 @@ img {
     opacity: 0;
     transition: .3s;
 }
-.next_menu hover:before {
+.next_menu:hover:before {
     transform: translate(-50%, 0);
     opacity: 1;
 }
