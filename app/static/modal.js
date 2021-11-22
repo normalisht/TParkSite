@@ -1,24 +1,22 @@
-
-
 (function(){
-    'use strict';
 
     document.addEventListener('DOMContentLoaded', function() {
 
         let modal_win = document.getElementById('navigation_buttons')
 
-        modal_win.addEventListener('click', EasyTogglerHandler);
+        modal_win.addEventListener('click', modal_window_toggle);
     })
 
-    function EasyTogglerHandler(event) {
+    function modal_window_toggle(event) {
 
-        let EY_BTN=event.target.closest('[data-easy-toggle]');
+        let modal_window_btn=event.target.closest('[data-modal-window-toggle]');
 
-        if(!EY_BTN) return;
+
+        if(!modal_window_btn) return;
 
         event.preventDefault();
-        let ey_target=EY_BTN.getAttribute('data-easy-toggle');
-        let ey_class=EY_BTN.getAttribute('data-easy-class');
-        document.querySelector(ey_target).classList.toggle(ey_class)
+        let modal_window_target=modal_window_btn.getAttribute('data-modal-window-toggle');
+
+        document.querySelector(modal_window_target).classList.toggle('show_modal_window')
     }
 })()

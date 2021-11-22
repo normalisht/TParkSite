@@ -94,8 +94,7 @@ img {
 }
 
 
-/* Модальное окно дя услуг */
-
+/* Модальное окно для услуг */
 
 .modal {
     position: fixed;
@@ -110,7 +109,7 @@ img {
     z-index: -1;
     }
 
-.modal.show {
+.show_modal_window {
     visibility: visible;
     z-index: 1000;
     opacity: 1;
@@ -139,7 +138,7 @@ img {
     transition: inherit;
 }
 
-.modal.show .modal-window {
+.show_modal_window .modal-window {
     margin-top: 0;
 }
 
