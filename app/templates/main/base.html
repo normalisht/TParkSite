@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 <html lang="ru">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
@@ -28,10 +28,9 @@
 </div>
 
 <div class="main_block">
-
     {% block app_content %}{% endblock %}
-
 </div>
+
 
 <div id="footer" class="footer"></div>
 
@@ -41,10 +40,13 @@
     window.addEventListener("DOMContentLoaded", top_footer)
 
     function top_footer() {
-        let footer = document.getElementById('footer')
+        let footer = $('#footer')
         if (!footer) return
 
-        footer.style.top = document.documentElement.clientHeight + 'px'
+        footer.css('top', document.documentElement.scrollHeight - footer.outerHeight()
+            - footer.css('margin-top').slice(0, 2) + 'px' )
+
+
 
     }
 

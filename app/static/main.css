@@ -24,12 +24,13 @@ img {
 
 
 .footer {
+    position: absolute;
     justify-content: space-evenly;
     vertical-align: middle;
     align-items: center;
     text-align: center;
     height: min(10vh, 60px);
-    width: 100vw;
+    width: 100%;
     background-color: #1c1919;
     color: #ffffff;
     margin-top: 10px;
@@ -37,10 +38,9 @@ img {
 
 .main_block {
     background-color: white;
-    width: 100vw;
+    width: 100%;
     z-index: 1;
 }
-
 
 .block_buttons {
     display: flex;
