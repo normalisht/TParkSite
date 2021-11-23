@@ -45,7 +45,8 @@
                         {% for i in range(4) %}
                             <div class="slider__item">
                                 <!-- Контент 1 слайда -->
-                                <img class="slider__img" src="{{ url_for('static',filename='/images/staff/1.png' ) }}">
+                                <img class="slider__img" alt=""
+                                     src="{{ url_for('static',filename='/images/staff/1.png' ) }}">
                             </div>
                         {% endfor %}
                     </div>
@@ -62,17 +63,17 @@
         {{ main_text }}
     </div>
 
-
     <div class="block_slider">
         <div class="slider">
             <div class="slider__container">
                 <div class="slider__wrapper">
                     <div class="slider__items">
                         {% for i in range(4) %}
-                        <div class="slider__item">
-                            <!-- Контент 1 слайда -->
-                            <img class="slider__img" src="{{ url_for('static',filename='/images/staff/1.png' ) }}">
-                        </div>
+                            <div class="slider__item">
+                                <!-- Контент 1 слайда -->
+                                <img class="slider__img" alt=""
+                                     src="{{ url_for('static',filename='/images/staff/1.png' ) }}">
+                            </div>
                         {% endfor %}
                     </div>
                 </div>
