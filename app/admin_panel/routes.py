@@ -88,7 +88,7 @@ def service():
 
     service = Service.query.filter_by(id=id).first()
 
-    return render_template('admin_panel/category.html', title='{}'.format(category.name),
+    return render_template('admin_panel/service.html', title='{}'.format(category.name),
                            category=category, service=service)
 
 
