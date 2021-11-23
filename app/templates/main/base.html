@@ -35,10 +35,20 @@
 
 <div id="footer" class="footer"></div>
 
-
 <script>
-    let footer = document.getElementById('footer')
-    footer.offsetTop = document.offsetTop + document.documentElement.clientHeight
+
+    window.addEventListener("orientationchange", top_footer)
+    window.addEventListener("DOMContentLoaded", top_footer)
+
+    function top_footer() {
+        let footer = document.getElementById('footer')
+        if (!footer) return
+
+        footer.style.top = document.documentElement.clientHeight + 'px'
+
+    }
+
+
 </script>
 
 </body>

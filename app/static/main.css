@@ -24,24 +24,20 @@ img {
 
 
 .footer {
-    display: flex;
     justify-content: space-evenly;
     vertical-align: middle;
     align-items: center;
     text-align: center;
-    clear: both;
     height: min(10vh, 60px);
     width: 100vw;
     background-color: #1c1919;
     color: #ffffff;
     margin-top: 10px;
-
 }
 
 .main_block {
     background-color: white;
     width: 100vw;
-    height: 100vh;
     z-index: 1;
 }
 
