@@ -1,5 +1,9 @@
 @charset "UTF-8";
 
+:root {
+    
+}
+
 body {
     margin: 0;
 }
@@ -7,7 +11,6 @@ body {
 img {
     user-select: none; /* чтобы картини не выделялись при выделении текста */
 }
-
 
 .upper {
     width: 100%;
@@ -136,12 +139,12 @@ img {
     overflow: hidden;
     position: relative;
     z-index: 2;
-    width: 100vw;
+    width: calc(var(--vw, 1vw) * 100);  /* подключается из js */
     border-radius: 10px;
     box-shadow: 0 10px 15px rgba(0, 0, 0, .4);
     background-color: white;
     transition: inherit;
-    padding: clamp(10px, max(2vw, 2vh), 20px)
+    padding: clamp(10px, 2vw, 20px)
 }
 
 .show_modal_window .modal-window {
@@ -153,8 +156,8 @@ img {
     background: none;
     opacity: 0.7;
     position: absolute;
-    right: 20px;
-    top: 20px;
+    right: clamp(30px, 8vw, 60px);
+    top: 15px;
 }
 
 .btn-close-modal-window:hover {

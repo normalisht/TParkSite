@@ -22,20 +22,20 @@
         </div>
     </div>
     <div class="buttons">
-        {% for ids in service %}
+        {% for service in services %}
             <table id="button" style="margin-right: 10vw;" class="button">
                 <tr style="border: 2px solid black;">
-                    <td>{{ ids.name }}</td>
+                    <td>{{ service.name }}</td>
                 </tr>
                 <tr style="border: 2px solid black;">
                     <td>
 <!--                        <div style="height: 0px"> # Высота 0-->
-<!--                            Цена: {{ ids.price }}-->
+<!--                            Цена: {{ service.price }}-->
 <!--                        </div>-->
                         <div style="height: 15vw">
-                            Цена: {{ ids.price }}
-                            <br>Краткое описание: {{ ids.short_description }}
-                            {% if ids.status == true %}
+                            Цена: {{ service.price }}
+                            <br>Краткое описание: {{ service.short_description }}
+                            {% if service.status == true %}
                                 <br> Ссылка на полное описание
                             {% endif %}
                         </div>
