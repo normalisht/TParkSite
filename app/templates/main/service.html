@@ -5,9 +5,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
 
     {% set path = "static/images/service" + service.id + ".jpg"%}
-    <div><img src="{{ url_for("static", filename="path") }}"></div> <!--Фото услуги-->
+    <div><img src="{{ url_for("static", filename="path") }}" alt=""></div> <!--Фото услуги-->
     <div class="block_text">{{ service.description }}</div><!--Описание услуги-->
-    <div class>
+    <div class="">
         <!--Слайдер
         <div class="block_slider">
             <div class="slider">

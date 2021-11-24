@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 <html lang="ru">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
@@ -9,6 +9,20 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+    {% block scripts %}{% endblock %}
+    <script>
+        window.addEventListener("orientationchange", top_footer)
+        window.addEventListener("DOMContentLoaded", top_footer)
+
+        function top_footer() {
+            let footer = $('#footer')
+            if (!footer) return
+
+            footer.css('top', document.documentElement.scrollHeight - footer.outerHeight()
+                - footer.css('margin-top').slice(0, 2) + 'px' )
+        }
+    </script>
+
     {% if title %}
         <title>{{ title }}</title>
     {% else %}
@@ -16,7 +30,7 @@
     {% endif %}
 </head>
 
-<body id="body" style="margin: 0px">
+<body id="body">
 <div class="upper">
     <div class="block_logo">
         <img id="logo" class="img_logo" src="{{ url_for('static', filename='logo.png') }}" alt="">
@@ -27,22 +41,11 @@
     </div>
 </div>
 
-<div class="main_block">
-
+<div id="main_block" class="main_block">
     {% block app_content %}{% endblock %}
-
 </div>
 
 <div id="footer" class="footer"></div>
 
-
-<script>
-    let footer = document.getElementById('footer')
-    footer.offsetTop = document.offsetTop + document.documentElement.clientHeight
-</script>
-
 </body>
-
-{% block scripts %}{% endblock %}
-
 </html>

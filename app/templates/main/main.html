@@ -1,7 +1,6 @@
 {% extends "main/base.html" %}
 
-{% block app_content %}
-
+{% block scripts %}
     <script type="text/javascript" src="{{ url_for('static', filename='slider.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='modal.js') }}"></script>
     <script>
@@ -15,25 +14,37 @@
                 loop: true,
             });
         });
-
     </script>
+{% endblock %}
 
+{% block app_content %}
     <div id='navigation_buttons' class="block_buttons">
-        <!--Модальное окно для Услуг-->
-        <div id="modalWin" class="modal" data-modal-window-toggle="#modalWin">
+        <!--Модальные окна для -->
+        <div id="services-modal-win" class="modal">
             <div class="modal-window">
-                <h1>Категория услуг</h1>
-
-                <button class="btn-close-modal-window">X</button>
+                {% for i in range(100) %}
+                    <div>Категория услуг {{ i }}</div>
+                {% endfor %}
+                <button class="btn-close-modal-window" data-modal-window-toggle="#services-modal-win">X</button>
             </div>
 
             <div class="overlay"></div>
         </div>
-        <!--конец модального окна услуг-->
+        <div id="contacts-modal-win" class="modal">
+            <div class="modal-window">
+                {% for i in range(100) %}
+                    <div>Категория услуг {{ i }}</div>
+                {% endfor %}
+                <button class="btn-close-modal-window" data-modal-window-toggle="#contacts-modal-win">X</button>
+            </div>
 
-        <div class="button_main" data-modal-window-toggle="#modalWin">Услуги</div>
+            <div class="overlay"></div>
+        </div>
+        <!--конец модальных окон-->
+
+        <div class="button_main" data-modal-window-toggle="#services-modal-win">Услуги</div>
         <div class="button_main">О нас</div>
-        <div class="button_main">Контакты</div>
+        <div class="button_main" data-modal-window-toggle="#contacts-modal-win">Контакты</div>
 
     </div>
 
@@ -46,7 +57,8 @@
                         {% for i in range(4) %}
                             <div class="slider__item">
                                 <!-- Контент 1 слайда -->
-                                <img class="slider__img" src="{{ url_for('static',filename='/images/staff/1.png' ) }}">
+                                <img class="slider__img" alt=""
+                                     src="{{ url_for('static',filename='/images/staff/1.png' ) }}">
                             </div>
                         {% endfor %}
                     </div>
@@ -60,11 +72,8 @@
     </div>
 
     <div class="block_content">
-
         {{ main_text }}
-
     </div>
-
 
     <div class="block_slider">
         <div class="slider">
@@ -72,10 +81,11 @@
                 <div class="slider__wrapper">
                     <div class="slider__items">
                         {% for i in range(4) %}
-                        <div class="slider__item">
-                            <!-- Контент 1 слайда -->
-                            <img class="slider__img" src="{{ url_for('static',filename='/images/staff/1.png' ) }}">
-                        </div>
+                            <div class="slider__item">
+                                <!-- Контент 1 слайда -->
+                                <img class="slider__img" alt=""
+                                     src="{{ url_for('static',filename='/images/staff/1.png' ) }}">
+                            </div>
                         {% endfor %}
                     </div>
                 </div>
@@ -86,7 +96,7 @@
             <a class="slider__control slider__control_next" href="#" role="button" data-slide="next"></a>
         </div>
     </div>
-
+    
     <div class="events">
         <div class="block_slider">
             <div class="slider">
