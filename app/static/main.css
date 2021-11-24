@@ -139,7 +139,7 @@ img {
     overflow: hidden;
     position: relative;
     z-index: 2;
-    width: calc(var(--vw, 1vw) * 100);  /* подключается из js */
+    width: calc(var(--vw, 1vw) * 100);  /* vw подключается из js */
     box-shadow: 0 10px 15px rgba(0, 0, 0, .4);
     background-color: white;
     transition: inherit;

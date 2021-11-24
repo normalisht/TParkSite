@@ -32,7 +32,6 @@
             window.location.hash += modal_window.modal_window_name
         else
             history.back()
-
     }
 
     window.addEventListener('hashchange', function (event) {
@@ -42,7 +41,5 @@
                 .toggle('show_modal_window')
             modal_window.change_status()
         }
-
     })
-
 })()
