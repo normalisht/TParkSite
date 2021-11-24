@@ -9,6 +9,20 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+    {% block scripts %}{% endblock %}
+    <script>
+        window.addEventListener("orientationchange", top_footer)
+        window.addEventListener("DOMContentLoaded", top_footer)
+
+        function top_footer() {
+            let footer = $('#footer')
+            if (!footer) return
+
+            footer.css('top', document.documentElement.scrollHeight - footer.outerHeight()
+                - footer.css('margin-top').slice(0, 2) + 'px' )
+        }
+    </script>
+
     {% if title %}
         <title>{{ title }}</title>
     {% else %}
@@ -31,26 +45,7 @@
     {% block app_content %}{% endblock %}
 </div>
 
-
 <div id="footer" class="footer"></div>
 
-
-<script>
-    window.addEventListener("orientationchange", top_footer)
-    window.addEventListener("DOMContentLoaded", top_footer)
-
-    function top_footer() {
-        let footer = $('#footer')
-        if (!footer) return
-
-        footer.css('top', document.documentElement.scrollHeight - footer.outerHeight()
-            - footer.css('margin-top').slice(0, 2) + 'px' )
-    }
-</script>
-
-
 </body>
-
-{% block scripts %}{% endblock %}
-
 </html>
