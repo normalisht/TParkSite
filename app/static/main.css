@@ -1,7 +1,7 @@
 @charset "UTF-8";
 
 :root {
-    
+
 }
 
 body {
@@ -140,7 +140,6 @@ img {
     position: relative;
     z-index: 2;
     width: calc(var(--vw, 1vw) * 100);  /* подключается из js */
-    border-radius: 10px;
     box-shadow: 0 10px 15px rgba(0, 0, 0, .4);
     background-color: white;
     transition: inherit;
