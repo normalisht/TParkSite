@@ -1,10 +1,11 @@
 from flask import render_template, flash, redirect, url_for, request, jsonify, current_app
 from app.main import bp
 from app import db
-from app.models import Text, Category, ServiceCategory, Service
+from app.models import Text, Event, Category, ServiceCategory, Service
 from sqlalchemy import create_engine
 
 engine = create_engine("sqlite:///T_Park.db")
+
 
 
 @bp.route('/', methods=['GET'])
@@ -12,8 +13,9 @@ engine = create_engine("sqlite:///T_Park.db")
 def index():
 
     main_text = Text.query.filter_by(title="main_text").first().text
+    events = Event.query.all()
 
-    return render_template('main/main.html', main_text=main_text)
+    return render_template('main/main.html', main_text=main_text, events=events)
 
 
 @bp.route('/category/<category_id>', methods=['GET'])
