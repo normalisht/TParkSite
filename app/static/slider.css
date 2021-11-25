@@ -26,7 +26,7 @@
 .slider__img {
     overflow: hidden;
     object-fit: cover;
-    height: clamp(100px, 25vh, 300px);
+    height: clamp(200px, 33vh, 500px);
     width: 100%;
 }
 
@@ -49,8 +49,8 @@
 /* на больших экранах (ширина больше 1200px) – 3 слайда */
 @media (min-width: 768px) {
     .slider__item {
-        flex: 0 0 calc(100% / 3);
-        max-width: calc(100% / 3);
+        flex: 0 0 calc(100% / 2);
+        max-width: calc(100% / 2);
         display: flex;
         justify-content: center;
         align-items: center;
