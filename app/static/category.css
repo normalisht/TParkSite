@@ -1,7 +1,7 @@
 @charset "UTF-8";
 
 
-.container{
+.container {
     position: relative;
     justify-content: center;
     align-items: center;
@@ -14,11 +14,11 @@
     align-items: center;
 }
 
-.text{
+.text {
     position: static;
 }
 
-.table{
+.table {
     font-family: 'Roboto', sans-serif;
     font-size: 14px;
     border-collapse: collapse;
@@ -27,17 +27,17 @@
     word-break: break-all;
 }
 
-td{
+td {
     position: static;
     vertical-align: top;
     padding-right: 2vw;
 }
 
-h2{
-    text-align:center;
+h2 {
+    text-align: center;
 }
 
-.button{
+.button {
     font-family: 'Roboto', sans-serif;
     font-size: 14px;
     word-break: break-all;
@@ -47,7 +47,7 @@ h2{
     align-items: center;
 }
 
-.buttons{
+.buttons {
     position: relative;
     justify-content: center;
     align-items: center;
