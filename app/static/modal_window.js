@@ -20,6 +20,9 @@
 
         let modal_win = document.getElementById('navigation_buttons')
         modal_win.addEventListener('click', modal_window_toggle);
+
+        if (!current_modal_window.status)
+            window.location.hash = ''
     })
 
     function modal_window_toggle(event) {
@@ -54,7 +57,7 @@
     })
 
     document.addEventListener('DOMContentLoaded', function () {
-
+        // возможность закрыть модальное окно свайпом
         let modal_windows = document.getElementsByClassName('modal')
 
         for (let modal_window of modal_windows) {
