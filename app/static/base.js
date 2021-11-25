@@ -7,7 +7,6 @@
     function set_vw() {
         let vw = document.documentElement.clientWidth / 100
         document.documentElement.style.setProperty('--vw', `${vw}px`)
-        console.log(vw)
     }
 })()
 
