@@ -1,6 +1,8 @@
 @charset "UTF-8";
 
 :root {
+    --background-color: #ffa200;
+    --primary-color: #0871D3FF;
 
 }
 
@@ -33,7 +35,8 @@ img {
     text-align: center;
     height: min(10vh, 60px);
     width: 100%;
-    background-color: #1c1919;
+    --background-color:#1c1919;
+    background-color:var(--background-color);
     color: #ffffff;
     margin-top: 10px;
 
@@ -56,7 +59,7 @@ img {
 
 .button_main {
     user-select: none;
-    background-color: blue;
+    background-color: var(--primary-color);
     border-radius: 5px;
     width: 100px;
     height: 50px;
@@ -98,6 +101,16 @@ img {
     position: relative;
 }
 
+/*Стили для шаблона "конкретная услуга"(service.html)*/
+.block_img {
+
+}
+
+.block_text {
+
+
+
+}
 
 /* Модальное окно для услуг */
 

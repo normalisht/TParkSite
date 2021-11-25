@@ -7,11 +7,9 @@ from sqlalchemy import create_engine
 engine = create_engine("sqlite:///T_Park.db")
 
 
-
 @bp.route('/', methods=['GET'])
 @bp.route('/TPark', methods=['GET'])
 def index():
-
     main_text = Text.query.filter_by(title="main_text").first().text
     events = Event.query.all()
 
@@ -28,3 +26,7 @@ def test(category_id):
     except:
         return render_template('errors/500.html')
 
+
+@bp.route('/category/service/<service_id>?category_id=<category_id>', methods=['GET'])
+def service(service_id):
+    service = Service.query.filter_by(id=service_id).first()
