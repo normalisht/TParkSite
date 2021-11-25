@@ -22,7 +22,7 @@ def test(category_id):
         category = Category.query.filter_by(id=category_id).first()
         services = category.services.all()
 
-        return render_template('category/category.html', category=category, category_id=category_id, services=services)
+        return render_template('main/category.html', category=category, category_id=category_id, services=services)
     except:
         return render_template('errors/500.html')
 
