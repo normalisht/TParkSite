@@ -27,6 +27,9 @@ def test(category_id):
         return render_template('errors/500.html')
 
 
-@bp.route('/category/service/<service_id>?category_id=<category_id>', methods=['GET'])
-def service(service_id):
+@bp.route('/category/service', methods=['GET'])
+def service():
+    service_id = request.args.get('service_id')
     service = Service.query.filter_by(id=service_id).first()
+
+    return render_template('')
