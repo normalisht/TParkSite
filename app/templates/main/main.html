@@ -42,7 +42,7 @@
         </div>
         <!--конец модальных окон-->
 
-        <div class="button_main" data-modal-window-toggle="#services-modal-win">Услуги</div>
+        <div id="services-button" class="button_main" data-modal-window-toggle="#services-modal-win">Услуги</div>
         <div class="button_main">О нас</div>
         <div class="button_main" data-modal-window-toggle="#contacts-modal-win">Контакты</div>
 
@@ -56,7 +56,6 @@
                     <div class="slider__items">
                         {% for i in range(3) %}
                             <div class="slider__item">
-                                <!-- Контент 1 слайда -->
                                 <img class="slider__img" alt=""
                                      src="{{ url_for('static',filename='/images/staff/1.png' ) }}">
                             </div>
@@ -86,8 +85,8 @@
                 <div class="slider__container">
                     <div class="slider__wrapper">
                         <div class="slider__items">
-                            {% for i in events %}
-                                {% set path = "static/images/events/{i}.jpg" %}
+                            {% for event in events %}
+                                {% set path = "static/images/events/" + event.id + ".jpg" %}
                                 <div class="slider__item">
                                     <!-- Контент 1 слайда -->
                                     <img class="slider__img" alt="" src="{{ url_for('static',filename='path') }}">
@@ -102,7 +101,6 @@
                 <a class="slider__control slider__control_next" href="#" role="button" data-slide="next"></a>
             </div>
         </div>
-
     </div>
 
 {% endblock %}
