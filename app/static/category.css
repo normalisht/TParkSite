@@ -1,7 +1,7 @@
 @charset "UTF-8";
 
 
-.container{
+.container {
     position: relative;
     justify-content: center;
     align-items: center;
@@ -14,43 +14,65 @@
     align-items: center;
 }
 
-.text{
+.text {
     position: static;
 }
 
-.table{
+.table {
     font-family: 'Roboto', sans-serif;
     font-size: 14px;
     border-collapse: collapse;
     table-layout: auto;
     width: 80vw;
     word-break: break-all;
+    table-layout: fixed;
 }
 
-td{
+td {
     position: static;
     vertical-align: top;
     padding-right: 2vw;
 }
 
-h2{
-    text-align:center;
+h2 {
+    text-align: center;
 }
 
-.button{
+.button {
     font-family: 'Roboto', sans-serif;
     font-size: 14px;
-    word-break: break-all;
     border-collapse: collapse;
     table-layout: fixed;
     position: relative;
     align-items: center;
 }
 
-.buttons{
-    position: relative;
+.buttons {
+    position: static;
     justify-content: center;
     align-items: center;
     display: flex;
     white-space: normal;
+}
+
+.description{
+    max-height: 0;
+    overflow: hidden;
+
+    transition: max-height 2s cubic-bezier(0, 1, 0, 1);
+}
+
+.content{
+    max-height: 30vw;
+    max-width:  90vw
+
+}
+
+.description.active{
+    max-height: 90vw;
+    transition: max-height 2s ease-out;
+}
+
+.content:hover {
+    cursor: pointer;
 }

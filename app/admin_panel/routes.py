@@ -88,7 +88,7 @@ def service():
 
     service = Service.query.filter_by(id=id).first()
 
-    return render_template('admin_panel/category.html', title='{}'.format(category.name),
+    return render_template('admin_panel/service.html', title='{}'.format(category.name),
                            category=category, service=service)
 
 
@@ -298,10 +298,10 @@ def update_employee():
 '''Тексты'''
 
 
-# обновляет текст
+# обновляет данные тексте
 @bp.route('/update_text', methods=['POST'])
 @login_required
-def update_employee():
+def update_text():
     text = Text.query.filter_by(id=request.form['id']).first()
 
     if getattr(text, 'title') != request.form['title']:

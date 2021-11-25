@@ -10,7 +10,7 @@ from flask_login import UserMixin
 class Service(db.Model):
     id = db.Column(db.Integer, primary_key=True, index=True, unique=True)
     name = db.Column(db.String(128))
-    price = db.Column(db.Integer)
+    price = db.Column(db.String(128))
     short_description = db.Column(db.String(512))  # краткое описание
     description = db.Column(db.Text)  # полное описание
     number = db.Column(db.Integer, index=True)  # порядковый номер
@@ -75,6 +75,8 @@ class Event(db.Model):
         if self.date < datetime.now():
             db.session.delete(self)
             db.session.commit()
+            return True
+        return False
 
 
 @login.user_loader
