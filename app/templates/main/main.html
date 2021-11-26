@@ -18,34 +18,6 @@
 {% endblock %}
 
 {% block app_content %}
-    <div id='navigation_buttons' class="block_buttons">
-        <!--Модальные окна для -->
-        <div id="services-modal-win" class="modal">
-            <div class="modal-window">
-                {% for i in range(100) %}
-                    <div>Категория услуг {{ i }}</div>
-                {% endfor %}
-                <button class="btn-close-modal-window" data-modal-window-toggle="#services-modal-win">X</button>
-            </div>
-
-            <div class="overlay"></div>
-        </div>
-        <div id="contacts-modal-win" class="modal">
-            <div class="modal-window">
-                {% for i in range(100) %}
-                    <div>Категория услуг {{ i }}</div>
-                {% endfor %}
-                <button class="btn-close-modal-window" data-modal-window-toggle="#contacts-modal-win">X</button>
-            </div>
-
-            <div class="overlay"></div>
-        </div>
-        <!--конец модальных окон-->
-
-        <div id="services-button" class="button_main" data-modal-window-toggle="#services-modal-win">Услуги</div>
-        <div class="button_main">О нас</div>
-        <div class="button_main" data-modal-window-toggle="#contacts-modal-win">Контакты</div>
-    </div>
 
     <!--Слайдер-->
     <div class="block_slider">

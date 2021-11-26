@@ -32,4 +32,4 @@ def service():
     service_id = request.args.get('service_id')
     service = Service.query.filter_by(id=service_id).first()
 
-    return render_template('')
+    return render_template('main/service.html', service=service)
