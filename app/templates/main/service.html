@@ -3,7 +3,7 @@
 {% block app_content %}<!--Шаблон страницы конкретной услуги-->
 
     <link rel="stylesheet" href="{{ url_for('static', filename='service/service.css') }}">
-
+    
     <h2 style="margin: 0 auto;">{{ service.name }}</h2>
 
     {% set path = "static/images/service" + service.id + ".jpg" %}
