@@ -148,6 +148,7 @@ img {
     left: -1px;
     width: 102%;
     height: 102%;
+    opacity: 0;
     background-color: #000;
     transition: var(--modal_window_time, 500ms) linear;
 }

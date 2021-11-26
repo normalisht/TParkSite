@@ -42,7 +42,7 @@
                     overlay.zIndex = '1'
                     overlay.opacity = '1'                }
                 else {
-                    modal_window.firstElementChild.style.left = -modal_window.offsetWidth + 'px'
+                    modal_window.firstElementChild.style.left = -modal_window.offsetWidth * 1.05 + 'px'
                     overlay.opacity = '0'
                     setTimeout(() => {
                         overlay.zIndex = '-1'
