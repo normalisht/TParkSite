@@ -33,11 +33,20 @@
             try {
                 if (!modal_window_name) return
 
-                let name = modal_window_name.slice(0)
-                document.querySelector(name).firstElementChild
-                    .classList.toggle('open_modal_window')
-                document.querySelector(name).lastElementChild
-                    .classList.toggle('open_overlay')
+                let name = modal_window_name.slice(0),
+                    modal_window = document.querySelector(name),
+                    overlay = modal_window.lastElementChild.style
+
+                if (this.status) {
+                    modal_window.firstElementChild.style.left = '0'
+                    overlay.zIndex = '1'
+                    overlay.opacity = '1'                }
+                else {
+                    modal_window.firstElementChild.style.left = -modal_window.offsetWidth + 'px'
+                    overlay.opacity = '0'
+                    setTimeout(() => {
+                        overlay.zIndex = '-1'
+                    }, time_animation_modal_window)                }
             }
             catch (e) {
                 console.error('Modal window: animation error')
