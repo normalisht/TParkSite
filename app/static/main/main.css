@@ -142,8 +142,12 @@ img {
     width: calc(var(--vw, 1vw) * 100);  /* vw подключается из js */
     box-shadow: 0 10px 15px rgba(0, 0, 0, .4);
     background-color: white;
-    transition: inherit;
+    transition: var(--modal_window_time, 500ms) ease; /* подключается из js */
     padding: clamp(10px, 2vw, 20px)
+}
+
+.open_modal_window {
+    transform: translateX(calc(var(--vw) * 100));
 }
 
 .show_modal_window .modal-window {
