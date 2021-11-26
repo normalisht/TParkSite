@@ -2,7 +2,17 @@
 
 
 {% block app_content %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.0/jquery.min.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='slider.js') }}"></script>
+    <script>    /*Этот скрипт был написан только для теста развертки и работает не совсем правильно*/
+        $(function() {
+            $(".content").click(function() {
+                $(".description").toggleClass('active')
+            });
+        });
+    </script>
     <link rel="stylesheet" href="{{ url_for('static', filename='category.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='slider_1.css') }}">
     <div class="container">
         <div class="data">
             <table id="table" style="margin: 2px;" class="table">
@@ -10,7 +20,33 @@
                     <td><h1>{{ category.name }}</h1></td>
                 </tr>
                 <tr>
-                    <td><img id="img" style="width: 300px; height: 300px" src=path alt=""></td>
+                    <td>
+                        <div class="block_slider">
+                            <div class="slider">
+                                <div class="slider__container">
+                                    <div class="slider__wrapper">
+                                        <div class="slider__items">
+                                            <div class="slider__item">
+                                                <img src="{ url_for('static/images/staff/', filename='1.jpg') }">
+                                            </div>
+                                            <div class="slider__item">
+                                                <img src="{ url_for('static/images/staff/', filename='1.jpg') }">
+                                            </div>
+                                            <div class="slider__item">
+                                                <img src="{ url_for('static/images/staff/', filename='1.jpg') }">
+                                            </div>
+                                            <div class="slider__item">
+                                                <img src="{ url_for('static/images/staff/', filename='1.jpg') }">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <a class="slider__control slider__control_prev" href="#" role="button" data-slide="prev"></a>
+                                <a class="slider__control slider__control_next" href="#" role="button" data-slide="next"></a>
+                            </div>
+                        </div>
+                    </td>
                     <td>
                         <h2>ОПИСАНИЕ</h2>
                         <div class="text">
@@ -23,26 +59,31 @@
     </div>
     <div class="buttons">
         {% for service in services %}
-            <table id="button" style="margin-right: 10vw;" class="button">
-                <tr style="border: 2px solid black;">
-                    <td>{{ service.name }}</td>
-                </tr>
-                <tr style="border: 2px solid black;">
-                    <td>
-<!--                        <div style="height: 0px"> # Высота 0-->
-<!--                            Цена: {{ service.price }}-->
-<!--                        </div>-->
-                        <div style="height: 15vw">
-                            Цена: {{ service.price }}
-                            <br>Краткое описание: {{ service.short_description }}
-                            {% if service.status == true %}
-                                <br> Ссылка на полное описание
-                            {% endif %}
-                        </div>
-                    </td>
-                </tr>
-            </table>
+
+            {% if service.status == true %}
+                <table id="button" style="margin-right: 3vw;" class="button">
+                    <tr style="border: 2px solid black;">
+                        <td>{{ service.name }}</td>
+                    </tr>
+                    <tr style="border: 2px solid black;">
+                        <td>
+                            <div class="content">
+                                Цена: {{ service.price }}
+                                <div class="description">
+                                    {% if service.short_description != None %}
+                                        <br>Краткое описание: {{ service.short_description }}
+                                    {% endif %}
+                                    {% if service.next == true %}
+                                           <br> Ссылка на полное описание
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            {% endif %}
         {% endfor %}
     </div>
+
 
 {% endblock %}

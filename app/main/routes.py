@@ -19,10 +19,15 @@ def index():
 @bp.route('/category/<category_id>', methods=['GET'])
 def test(category_id):
     try:
-        category = Category.query.filter_by(id=category_id).first()
-        services = category.services.all()
+        a = engine.execute("SELECT service_id FROM service_category WHERE category_id = ?", category.id)
+        a = a.fetchall()
+        f = []
+        for row in a:
+            f.append(row[0])
+        service = Service.query.filter(Service.id.in_(f)).all()
 
-        return render_template('category/category.html', category=category, category_id=category_id, services=services)
+        return render_template('category/category.html', category=category, category_id=category_id, services=service)
+
     except:
         return render_template('errors/500.html')
 
