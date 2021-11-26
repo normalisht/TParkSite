@@ -3,12 +3,54 @@
 :root {
     --background-color: #ffa200;
     --primary-color: #0871D3FF;
-    --primary-big-font:clamp(12px, 3vh, 20px);
+    --primary-big-font:clamp(12px, 4vh, 20px);
     --primary-font-family: Times New Roman, serif;
 }
 
+@media (min-width: 562px) { /*Desktop*/
+
+    .img_logo {
+        max-width: 200px;
+        max-height: 100px;
+        margin-left: 5vw;
+
+    }
+    .block_buttons {
+        max-width: 50%; !important;
+
+    }
+
+
+}
+
+@media (max-width: 562px) { /*Phone*/
+
+    .img_logo {
+        max-width: 150px;
+        max-height: 100px;
+
+
+    }
+    .block_info {
+        --primary-big-font:clamp(8px, 4vh, 14px);
+    }
+
+    .block_numbers {
+        --primary-big-font:clamp(8px, 4vh, 14px);
+    }
+
+    .block_buttons {
+        max-width: 90%; !important;
+
+    }
+
+
+}
+
+
 body {
     margin: 0;
+    font-size: 16px;
 }
 
 img {
@@ -53,9 +95,7 @@ img {
 .block_buttons {
     display: flex;
     justify-content: space-between;
-    max-width: 50%;
-    margin: 0 auto;
-    margin-bottom: 2vh;
+    margin: 0 auto 2vh;
     position: relative;
     background-color: white;
 }
@@ -83,7 +123,6 @@ img {
 .block_info {
     display: flex; !important;
     position: relative;
-    width: 40%;
     justify-content: space-around;
     align-items: center;
     font-size: var(--primary-big-font);
@@ -95,6 +134,7 @@ img {
     padding: 2vh;
     flex-direction: column;
     justify-content: center;
+    --primary-big-font:clamp(0.5em, 1.15em, 20px);
     font-size: var(--primary-big-font);
     font-family: var(--primary-font-family);
 }
@@ -108,8 +148,7 @@ img {
 }
 
 .img_logo {
-    max-width: 200px;
-    max-height: 100px;
+    display:block;
 }
 
 .button_menu {
