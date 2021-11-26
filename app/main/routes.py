@@ -18,6 +18,7 @@ def index():
 
 @bp.route('/category/<category_id>', methods=['GET'])
 def test(category_id):
+    category = Category.query.filter_by(id=category_id).first()
     try:
         a = engine.execute("SELECT service_id FROM service_category WHERE category_id = ?", category.id)
         a = a.fetchall()

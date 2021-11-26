@@ -1,5 +1,12 @@
 @charset "UTF-8";
 
+:root {
+    --primary-width:calc(100%/3);
+    --primary-flex: 0 0 calc(100% / 3);
+
+}
+
+
 .block_slider {
     width: min(100vw, 1400px);
     margin: 0 auto;
@@ -49,8 +56,8 @@
 /* на больших экранах (ширина больше 1200px) – 3 слайда */
 @media (min-width: 768px) {
     .slider__item {
-        flex: 0 0 calc(100% / 3);
-        max-width: calc(100% / 3);
+        flex: var(--primary-flex);
+        max-width: var(--primary-width);
         display: flex;
         justify-content: center;
         align-items: center;
