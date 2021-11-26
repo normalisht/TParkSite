@@ -3,8 +3,15 @@
 :root {
     --background-color: #ffa200;
     --primary-color: #0871D3FF;
-    --primary-big-font:clamp(12px, 3vh, 20px);
+    --primary-big-font: clamp(12px, 3vh, 20px);
+    /* лучше использовать размер текста в rem, em и т.д.
+       было в гайде про еденицы измерения, посмотри ещё раз*/
     --primary-font-family: Times New Roman, serif;
+}
+
+* {
+    appearance: none;
+    -webkit-appearance: none;
 }
 
 body {
@@ -36,8 +43,8 @@ img {
     text-align: center;
     height: min(10vh, 60px);
     width: 100%;
-    --background-color:#1c1919;
-    background-color:var(--background-color);
+    --background-color: #1c1919;
+    background-color: var(--background-color);
     margin-top: 10px;
     color: #a8a8a8;
     font-size: 14px;
@@ -81,7 +88,7 @@ img {
 }
 
 .block_info {
-    display: flex; !important;
+    display: flex;
     position: relative;
     width: 40%;
     justify-content: space-around;
@@ -125,7 +132,6 @@ img {
 .block_text {
 
 
-
 }
 
 /* Модальное окно для услуг */
@@ -166,7 +172,7 @@ img {
     overflow: hidden;
     position: relative;
     z-index: 2;
-    width: calc(var(--vw, 1vw) * 100);  /* vw подключается из js */
+    width: calc(var(--vw, 1vw) * 100); /* vw подключается из js */
     box-shadow: 0 10px 15px rgba(0, 0, 0, .4);
     background-color: white;
     transition: var(--modal_window_time, 500ms) ease; /* подключается из js */
@@ -201,7 +207,7 @@ img {
     margin-top: 5px;
     background: white;
     border-radius: 5px;
-    box-shadow: 0 0 30px rgba(0,0,0,.2);
+    box-shadow: 0 0 30px rgba(0, 0, 0, .2);
     box-sizing: border-box;
     visibility: hidden;
     opacity: 0;
@@ -251,4 +257,6 @@ img {
     opacity: 1;
 }
 
-.submenu div:hover {background: #e8e8e8;}
+.submenu div:hover {
+    background: #e8e8e8;
+}
