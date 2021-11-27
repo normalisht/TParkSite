@@ -4,9 +4,9 @@
     --background-color: #ffa200;
     --primary-color: #0871D3FF;
     --primary-big-font: clamp(12px, 3vh, 20px);
-    /* лучше использовать размер текста в rem, em и т.д.
-       было в гайде про еденицы измерения, посмотри ещё раз*/
     --primary-font-family: Times New Roman, serif;
+    --vw: none;
+    --modal_window_time: none;
 }
 
 * {
@@ -48,7 +48,44 @@ img {
     margin-top: 10px;
     color: #a8a8a8;
     font-size: 14px;
+}
 
+@media (min-width: 562px) {
+    /*Desktop*/
+    .img_logo {
+        max-width: 200px;
+        max-height: 100px;
+        margin-left: 5vw;
+
+    }
+    .block_buttons {
+        max-width: 50%; !important;
+
+    }
+
+
+}
+
+@media (max-width: 562px) {
+    /*Phone*/
+    .img_logo {
+        max-width: 150px;
+        max-height: 100px;
+    }
+
+    .block_info {
+        --primary-big-font: clamp(8px, 4vh, 14px);
+    }
+
+    .block_numbers {
+        --primary-big-font: clamp(8px, 4vh, 14px);
+    }
+
+    .block_buttons {
+        max-width: 90%;
+    !important;
+
+    }
 }
 
 .main_block {
