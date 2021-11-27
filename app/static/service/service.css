@@ -6,12 +6,20 @@
 }
 
 .block_img {
-
+    display:block;
 
 
 }
 
 .block_text {
+    display:block;
+    max-width: 45vw;
+
+}
+
+.block_price {
+    display:block;
+    float:right;
 
 
 

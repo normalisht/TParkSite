@@ -5,8 +5,9 @@
     --primary-color: #0871D3FF;
     --primary-big-font: clamp(12px, 3vh, 20px);
     --primary-font-family: Times New Roman, serif;
-    --vw: none;
     --modal_window_time: none;
+    --vw: none;
+
 }
 
 * {
