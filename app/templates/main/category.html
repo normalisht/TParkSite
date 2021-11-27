@@ -47,7 +47,7 @@
                     <td>
                         <h2>ОПИСАНИЕ</h2>
                         <div class="text">
-                        <span>{{ category.description }}</span>
+                            <span>{{ category.description }}</span>
                         </div>
                     </td>
                 </tr>
@@ -55,7 +55,8 @@
         </div>
     </div>
     <div class="buttons">
-        {% for service in services %}
+        {% for element in services %}
+            {% set service = element.service %}
             {% if service.status == true %}
                 <table id="button" style="margin-right: 3vw;" class="button">
                     <tr style="border: 2px solid black;">

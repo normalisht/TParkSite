@@ -12,8 +12,6 @@
     <script defer src="https://ajax.googleapis.com/ajax/libs/hammerjs/2.0.8/hammer.min.js"></script>
     <script defer src="{{ url_for('static', filename='base.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='modal_window.js') }}"></script>
-
-
     {% block scripts %}{% endblock %}
     <script>
         window.addEventListener("orientationchange", top_footer)
@@ -25,7 +23,28 @@
 
             footer.css('top', document.documentElement.scrollHeight - footer.outerHeight()
                 - footer.css('margin-top').slice(0, 2) + 'px')
+        }
+    </script>
 
+    <script>
+        /* Когда пользователь нажимает на кнопку, переключаться между скрытием и отображением раскрывающегося содержимого */
+        function myFunction() {
+            document.getElementById("myDropdown").classList.toggle("show");
+        }
+
+        // Закрытие раскрывающегося списка, при нажатии за его пределами
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropbtn')) {
+
+                var dropdowns = document.getElementsByClassName("dropdown-content");
+                var i;
+                for (i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
         }
     </script>
 
@@ -43,9 +62,9 @@
     </div>
     <div class="block_info">
         <div>Тренинг-Парк Дмитрия Сергеева</div>
-        <div  class="block_numbers">
-        <div>+79999999999</div>
-        <div>+79999999999</div>
+        <div class="block_numbers">
+            <div>+79999999999</div>
+            <div>+79999999999</div>
         </div>
     </div>
 </div>
@@ -73,18 +92,26 @@
         <div class="overlay"></div>
     </div>
     <!--конец модальных окон-->
-
+    <div class="dropdown">
     <div id="services-button" class="button_main" data-modal-window-toggle="#services-modal-win">Услуги</div>
+        <div id="myDropdown" class="dropdown-content">
+            <a href="">Услуга 1</a>
+            <a href="">Услуга 2</a>
+            <a href="">Услуга 3</a>
+        </div>
+    </div>
+
     <div class="button_main">О нас</div>
     <div class="button_main" data-modal-window-toggle="#contacts-modal-win">Контакты</div>
-
 </div>
+
+
 
 <div id="main_block" class="main_block">
     {% block app_content %}{% endblock %}
 </div>
 
-<div id="footer" class="footer">© 2021 </div>
+<div id="footer" class="footer">© 2021</div>
 
 </body>
 </html>
