@@ -56,11 +56,10 @@ img {
         max-width: 200px;
         max-height: 100px;
         margin-left: 5vw;
-
     }
-    .block_buttons {
-        max-width: 50%; !important;
 
+    .block_buttons {
+        max-width: 50%;
     }
 
 
@@ -172,7 +171,6 @@ img {
 }
 
 /* Модальное окно для услуг */
-
 .modal {
     position: fixed;
     top: -1px;

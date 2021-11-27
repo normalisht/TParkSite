@@ -2,12 +2,15 @@
 
 {% block app_content %}<!--Шаблон страницы конкретной услуги-->
 
+
     <link rel="stylesheet" href="{{ url_for('static', filename='service/service.css') }}">
+
 
     <h2 style="margin: 0 auto;">{{ service.name }}</h2>
 
     {% set path = "static/images/service" + service.id + ".jpg" %}
     <div class="block_img"><img src="{{ url_for("static", filename="path") }}" alt=""></div> <!--Фото услуги-->
+    <div>Ценники</div>
     <div class="block_text">{{ service.description }}</div><!--Описание услуги-->
     <div class="block_price">{{ service.price }}</div>
 

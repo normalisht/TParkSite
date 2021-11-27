@@ -35,4 +35,3 @@ def service():
     service = Service.query.filter_by(id=service_id).first()
 
     return render_template('main/service.html', service=service)
-
