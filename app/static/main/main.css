@@ -234,45 +234,94 @@ img {
     opacity: 1;
 }
 
-.submenu div:hover {
-    background: #e8e8e8;
-}
 
 
 /* Выпад.список */
-.button_main:hover, .button_main:focus {
-    background-color: var(--primary-color);
+ul {
+    list-style: none;
 }
 
-.dropdown {
-    position: relative;
-    display: inline-block;
-}
-
-.dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #f1f1f1;
-    min-width: 160px;
-    overflow: auto;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-    z-index: 1;
-}
-
-.dropdown-content a {
-    color: black;
-    padding: 12px 16px;
+.topmenu a {
     text-decoration: none;
     display: block;
+    transition: .4s ease-in-out;
 }
 
-.dropdown a:hover {
-    background-color: #ddd;
+.topmenu > li > a {
+    padding: 20px;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 1px;
+    font-family: 'Exo 2', sans-serif;
 }
 
-.show {
-    display: block;
+.topmenu li a:hover {
+    color: #c0a97a;
 }
+
+.submenu li a {
+    border-bottom: 1px solid #efefef;
+    font-size: 12px;
+    color: #484848;
+    font-family: 'Kurale', serif;
+}
+
+.topmenu {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.topmenu > li {
+    position: relative;
+}
+
+.topmenu > li:after {
+    content: "";
+    position: absolute;
+    right: 0;
+    width: 1px;
+    height: 12px;
+    background: #d2d2d2;
+    top: 24px;
+    box-shadow: 4px -2px 0 #d2d2d2;
+    transform: rotate(30deg);
+}
+
+.topmenu > li:last-child:after {
+    background: none;
+    box-shadow: none;
+}
+
+.submenu {
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    width: 210px;
+    margin-left: -105px;
+    background: #fafafa;
+    border: 1px solid #ededed;
+    z-index: 5;
+    visibility: hidden;
+    opacity: 0;
+    transform: scale(.8);
+    transition: .4s ease-in-out;
+}
+
+.topmenu > li:hover .submenu {
+    visibility: visible;
+    opacity: 1;
+    transform: scale(1);
+}
+
+.submenu li a {
+    text-align: center;
+    padding: 10px 0;
+    margin: 0 10px;
+}
+
+
+
 
 
 /* Модальное окно для услуг */
@@ -336,4 +385,5 @@ img {
     .btn-close-modal-window:hover {
         opacity: 1;
     }
+
 }
