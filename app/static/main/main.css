@@ -276,7 +276,7 @@ img {
 
 
 /* Модальное окно для услуг */
-@media (max-width: 768px) {
+@media (min-width: 768px) {
     .modal {
         position: fixed;
         top: -1px;
