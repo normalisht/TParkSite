@@ -29,6 +29,7 @@ def test(category_id):
 
         return render_template('category/category.html', category=category, category_id=category_id, services=service)
 
+
     except:
         return render_template('errors/500.html')
 

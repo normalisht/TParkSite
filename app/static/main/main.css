@@ -45,6 +45,11 @@
     }
 
 
+
+
+* {
+    appearance: none;
+    -webkit-appearance: none;
 }
 
 
@@ -80,8 +85,8 @@ img {
     text-align: center;
     height: min(10vh, 60px);
     width: 100%;
-    --background-color:#1c1919;
-    background-color:var(--background-color);
+    --background-color: #1c1919;
+    background-color: var(--background-color);
     margin-top: 10px;
     color: #a8a8a8;
     font-size: 14px;
@@ -123,7 +128,7 @@ img {
 }
 
 .block_info {
-    display: flex; !important;
+    display: flex;
     position: relative;
     justify-content: space-around;
     align-items: center;
@@ -166,7 +171,6 @@ img {
 .block_text {
 
 
-
 }
 
 /* Модальное окно для услуг */
@@ -197,9 +201,9 @@ img {
     left: -1px;
     width: 102%;
     height: 102%;
+    opacity: 0;
     background-color: #000;
-    opacity: 0.7;
-    z-index: 0;
+    transition: var(--modal_window_time, 500ms) linear;
 }
 
 .modal-window {
@@ -207,12 +211,13 @@ img {
     overflow: hidden;
     position: relative;
     z-index: 2;
-    width: calc(var(--vw, 1vw) * 100);  /* vw подключается из js */
+    width: calc(var(--vw, 1vw) * 100); /* vw подключается из js */
     box-shadow: 0 10px 15px rgba(0, 0, 0, .4);
     background-color: white;
-    transition: inherit;
+    transition: var(--modal_window_time, 500ms) ease; /* подключается из js */
     padding: clamp(10px, 2vw, 20px)
 }
+
 
 .show_modal_window .modal-window {
     margin-top: 0;
@@ -241,7 +246,7 @@ img {
     margin-top: 5px;
     background: white;
     border-radius: 5px;
-    box-shadow: 0 0 30px rgba(0,0,0,.2);
+    box-shadow: 0 0 30px rgba(0, 0, 0, .2);
     box-sizing: border-box;
     visibility: hidden;
     opacity: 0;
@@ -291,4 +296,6 @@ img {
     opacity: 1;
 }
 
-.submenu div:hover {background: #e8e8e8;}
+.submenu div:hover {
+    background: #e8e8e8;
+}

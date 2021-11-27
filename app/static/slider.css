@@ -33,7 +33,7 @@
 .slider__img {
     overflow: hidden;
     object-fit: cover;
-    height: clamp(100px, 25vh, 300px);
+    height: clamp(200px, 33vh, 500px);
     width: 100%;
 }
 
