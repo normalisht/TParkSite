@@ -18,15 +18,15 @@ def index():
 
 @bp.route('/category/<category_id>', methods=['GET'])
 def test(category_id):
-        try:
-            category = Category.query.filter_by(id=category_id).first()
-            services = category.services.all()
+    try:
+        category = Category.query.filter_by(id=category_id).first()
+        services = category.services.all()
 
-            return render_template('main/category.html', category=category, category_id=category_id,
-                                   services=services)
+        return render_template('main/category.html', category=category, category_id=category_id,
+                               services=services)
 
-        except:
-            return render_template('errors/500.html')
+    except:
+        return render_template('errors/500.html')
 
 
 @bp.route('/category/service', methods=['GET'])
