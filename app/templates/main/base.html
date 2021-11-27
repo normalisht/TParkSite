@@ -12,8 +12,6 @@
     <script defer src="https://ajax.googleapis.com/ajax/libs/hammerjs/2.0.8/hammer.min.js"></script>
     <script defer src="{{ url_for('static', filename='base.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='modal_window.js') }}"></script>
-
-
     {% block scripts %}{% endblock %}
     <script>
         window.addEventListener("orientationchange", top_footer)
@@ -25,7 +23,6 @@
 
             footer.css('top', document.documentElement.scrollHeight - footer.outerHeight()
                 - footer.css('margin-top').slice(0, 2) + 'px')
-
         }
     </script>
 
