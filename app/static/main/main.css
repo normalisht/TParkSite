@@ -5,7 +5,8 @@
     --primary-color: #0871D3FF;
     --primary-big-font:clamp(12px, 4vh, 20px);
     --primary-font-family: Times New Roman, serif;
-    --modal_window_time: 500ms;
+    --modal_window_time: none;
+    --vw: none;
 }
 
 @media (min-width: 562px) { /*Desktop*/
