@@ -12,6 +12,7 @@
 
 .slider__container {
     overflow: hidden;
+    height: min(20vw, 500px);
 }
 
 .slider__wrapper {
