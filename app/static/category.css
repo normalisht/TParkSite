@@ -51,8 +51,10 @@ h2 {
     position: static;
     justify-content: center;
     align-items: center;
-    display: flex;
     white-space: normal;
+    display: grid;
+    grid-template-columns: repeat(3,20vw);
+    grid-auto-rows: minmax(10vw, auto);
 }
 
 .description{

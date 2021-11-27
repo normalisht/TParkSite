@@ -18,14 +18,9 @@ def index():
 
 @bp.route('/category/<category_id>', methods=['GET'])
 def test(category_id):
-    category = Category.query.filter_by(id=category_id).first()
     try:
-        a = engine.execute("SELECT service_id FROM service_category WHERE category_id = ?", category.id)
-        a = a.fetchall()
-        f = []
-        for row in a:
-            f.append(row[0])
-        service = Service.query.filter(Service.id.in_(f)).all()
+        category = Category.query.filter_by(id=category_id).first()
+        service = category.services.all()
 
         return render_template('category/category.html', category=category, category_id=category_id, services=service)
     except:
@@ -33,5 +28,6 @@ def test(category_id):
 
 
 @bp.route('/category/service/<service_id>?category_id=<category_id>', methods=['GET'])
-def service(service_id):
+def service(service_id, category_id):
     service = Service.query.filter_by(id=service_id).first()
+    return render_template('main/service.html', service=service)

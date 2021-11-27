@@ -12,7 +12,7 @@
         });
     </script>
     <link rel="stylesheet" href="{{ url_for('static', filename='category.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='slider_1.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='category_slider.css') }}">
     <div class="container">
         <div class="data">
             <table id="table" style="margin: 2px;" class="table">
@@ -27,16 +27,16 @@
                                     <div class="slider__wrapper">
                                         <div class="slider__items">
                                             <div class="slider__item">
-                                                <img src="{ url_for('static/images/staff/', filename='1.jpg') }">
+                                                <img src="{{ url_for('static',filename='/images/category/1.png' ) }}">
                                             </div>
                                             <div class="slider__item">
-                                                <img src="{ url_for('static/images/staff/', filename='1.jpg') }">
+                                                <img src="{{ url_for('static',filename='/images/category/1.png' ) }}">
                                             </div>
                                             <div class="slider__item">
-                                                <img src="{ url_for('static/images/staff/', filename='1.jpg') }">
+                                                <img src="{{ url_for('static',filename='/images/category/1.png' ) }}">
                                             </div>
                                             <div class="slider__item">
-                                                <img src="{ url_for('static/images/staff/', filename='1.jpg') }">
+                                                <img src="{{ url_for('static',filename='/images/category/1.png' ) }}">
                                             </div>
                                         </div>
                                     </div>
@@ -58,7 +58,8 @@
         </div>
     </div>
     <div class="buttons">
-        {% for service in services %}
+        {% for element in services %}
+            {% set service = element.service %}
             {% if service.status == true %}
                 <table id="button" style="margin-right: 3vw;" class="button">
                     <tr style="border: 2px solid black;">
@@ -73,7 +74,7 @@
                                         <br>Краткое описание: {{ service.short_description }}
                                     {% endif %}
                                     {% if service.next == true %}
-                                           <br> Ссылка на полное описание
+                                        <a href="{{ url_for('main.service', service_id = service.id, category_id = category.id)}}" >Ссылка на полное описание </a>
                                     {% endif %}
                                 </div>
                             </div>
