@@ -2,7 +2,6 @@
 
 
 {% block app_content %}
-    <script type="text/javascript" src="{{ url_for('static', filename='slider.js') }}"></script>
     <script>    /*Этот скрипт был написан только для теста развертки и работает не совсем правильно*/
     $(function () {
         $(".content").click(function () {
@@ -10,11 +9,10 @@
         });
     });
     </script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='O_nas.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='O_nas_slider.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='about/about.css') }}">
     <div class="container">
         <div class="data">
-        {{ O_nas }}
+        {{ about }}
         </div>
     </div>
     {% for employee in employees%}

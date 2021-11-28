@@ -1,4 +1,3 @@
-import employee as employee
 from flask import render_template, flash, redirect, url_for, request, jsonify, current_app
 from app.main import bp
 from app import db
@@ -39,10 +38,10 @@ def service():
     return render_template('main/service.html', service=service)
 
 
-@bp.route('/O_nas', methods=['GET'])
-def O_nas():
+@bp.route('/about', methods=['GET'])
+def about():
 
-    O_nas_text = Text.query.filter_by(title="O_nas").first().text
+    about_text = Text.query.filter_by(title="about").first().text
     employees = Employee.query.all()
 
-    return render_template('main/O_nas.html', O_nas_text=O_nas_text, employees=employees)
+    return render_template('main/about.html', about_text=about_text, employees=employees)
