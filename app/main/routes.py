@@ -16,9 +16,11 @@ def index():
     return render_template('main/main.html', main_text=main_text, events=events)
 
 
-@bp.route('/category?category_id=<category_id>', methods=['GET'])
-def test(category_id):
+@bp.route('/category', methods=['GET'])
+def test():
     try:
+        category_id = request.args.get('category_id')
+
         category = Category.query.filter_by(id=category_id).first()
         services = category.services.all()
 
@@ -28,7 +30,9 @@ def test(category_id):
         return render_template('errors/500.html')
 
 
-@bp.route('/category/service?service_id=<service_id>', methods=['GET'])
-def service(service_id):
+@bp.route('/category/service', methods=['GET'])
+def service():
+    service_id = request.args.get('service_id')
+
     service = Service.query.filter_by(id=service_id).first()
     return render_template('main/service.html', service=service)
