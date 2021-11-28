@@ -3,9 +3,7 @@
 :root {
     --primary-width:calc(100%/3);
     --primary-flex: 0 0 calc(100% / 3);
-
 }
-
 
 .block_slider {
     width: min(100vw, 1400px);
@@ -40,6 +38,8 @@
 .slider__shadow {
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, .5) 100%);
     position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
 }
