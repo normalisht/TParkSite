@@ -2,23 +2,17 @@
 
 
 {% block app_content %}
-    <script>    /*Этот скрипт был написан только для теста развертки и работает не совсем правильно*/
-    $(function () {
-        $(".content").click(function () {
-            $(".description").toggleClass('active')
-        });
-    });
-    </script>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='about/about.css') }}">
     <div class="container">
-        <div class="data">
+        <div class="">
         {{ about }}
         </div>
     </div>
+
     {% for employee in employees%}
     {{ employee.name }}
     {% endfor %}
 
-    </div>
 
 {% endblock %}
