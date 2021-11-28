@@ -72,9 +72,7 @@
                                     {% if service.short_description != None %}
                                         <br>Краткое описание: {{ service.short_description }}
                                     {% endif %}
-                                    {% if service.next == true %}
-                                        <a href="{{ url_for('main.service', service_id = service.id, category_id = category.id)}}" >Ссылка на полное описание </a>
-                                    {% endif %}
+                                    <a href="{{ url_for('main.service')}}?service_id={{ service.id }}" >Ссылка на полное описание </a>
                                 </div>
                             </div>
                         </td>

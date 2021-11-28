@@ -14,13 +14,14 @@
             });
         });
     </script>
+
+{% endblock %}
+
+{% block link %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='slider.css') }}">
 {% endblock %}
 
 {% block app_content %}
-
-    <link rel="stylesheet" href="{{ url_for('static', filename='slider.css') }}">
-
-
     <!--Слайдер-->
     <div class="block_slider">
         <div class="slider">
@@ -30,6 +31,10 @@
                         {% for i in range(3) %}
                             <div class="slider__item">
                                 <img class="slider__img" alt="" src="{{ url_for('static',filename='/images/staff/1.png' ) }}">
+
+
+
+                                <div class="slider__shadow">000</div>
 
                             </div>
                             <div class="slider__item">
