@@ -139,11 +139,8 @@
     display: flex;
     justify-content: center;
     padding-left: 0;
-    margin-right: 15%;
-    margin-left: 15%;
     list-style: none;
-    margin-top: 0;
-    margin-bottom: 0;
+    margin: 0 15%;
 }
 
 .slider__indicators li {
