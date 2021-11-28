@@ -2,6 +2,8 @@ from flask import render_template, flash, redirect, url_for, request, jsonify, c
 from app.main import bp
 from app import db
 from app.models import Text, Event, Category, ServiceCategory, Service, Employee
+from app.main.functions import get_categories
+
 from sqlalchemy import create_engine
 
 engine = create_engine("sqlite:///T_Park.db")
@@ -13,7 +15,8 @@ def index():
     main_text = Text.query.filter_by(title="main_text").first().text
     events = Event.query.all()
 
-    return render_template('main/main.html', main_text=main_text, events=events)
+    return render_template('main/main.html', main_text=main_text, events=events,
+                           categories=get_categories())
 
 
 @bp.route('/category', methods=['GET'])
@@ -25,7 +28,7 @@ def test():
         services = category.services.all()
 
         return render_template('main/category.html', category=category, category_id=category_id,
-                               services=services)
+                               services=services, categories=get_categories())
     except:
         return render_template('errors/500.html')
 
@@ -35,7 +38,8 @@ def service():
     service_id = request.args.get('service_id')
 
     service = Service.query.filter_by(id=service_id).first()
-    return render_template('main/service.html', service=service)
+
+    return render_template('main/service.html', service=service, categories=get_categories())
 
 
 @bp.route('/about', methods=['GET'])
@@ -44,3 +48,4 @@ def about():
     employees = Employee.query.all()
 
     return render_template('main/about.html', employees=employees)
+
