@@ -13,6 +13,7 @@
 * {
     appearance: none;
     -webkit-appearance: none;
+    transition: background-color .8s;
 }
 
 body {
@@ -148,7 +149,6 @@ img {
     width: 100vw;
     max-height: 30vh;
     margin-top: 20px;
-
 }
 
 .img_logo {
@@ -187,33 +187,6 @@ img {
     transform: translate(-50%, 20px);
     opacity: 0.7;
     transition: .3s;
-}
-
-
-.submenu {
-    position: absolute;
-    z-index: 4;
-    left: 50%;
-    top: 100%;
-    width: 150px;
-    padding: 15px 0 15px;
-    margin-top: 5px;
-    background: white;
-    border-radius: 5px;
-    box-shadow: 0 0 30px rgba(0, 0, 0, .2);
-    box-sizing: border-box;
-    visibility: hidden;
-    opacity: 0;
-    transform: translate(-50%, 20px);
-    transition: .3s;
-}
-
-.submenu div {
-    font-family: 'Libre Baskerville', serif;
-    font-size: 11px;
-    letter-spacing: 1px;
-    padding: 5px 10px;
-    transition: .3s linear;
 }
 
 .next_menu {

@@ -17,7 +17,7 @@
     document.head.append(link)
 
     function activate_modal_window() {
-        let time_animation_modal_window = 500
+        let time_animation_modal_window = 400
         document.documentElement.style
             .setProperty('--modal_window_time', `${time_animation_modal_window}ms`)
 
