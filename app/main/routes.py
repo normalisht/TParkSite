@@ -41,7 +41,6 @@ def service():
 @bp.route('/about', methods=['GET'])
 def about():
 
-    about_text = Text.query.filter_by(title="about").first().text
     employees = Employee.query.all()
 
-    return render_template('main/about.html', about_text=about_text, employees=employees)
+    return render_template('main/about.html', employees=employees)
