@@ -2,7 +2,6 @@
 
 
 {% block app_content %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.0/jquery.min.js"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='slider.js') }}"></script>
     <script>    /*Этот скрипт был написан только для теста развертки и работает не совсем правильно*/
         $(function() {
@@ -12,7 +11,7 @@
         });
     </script>
     <link rel="stylesheet" href="{{ url_for('static', filename='category.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='slider_1.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='category_slider.css') }}">
     <div class="container">
         <div class="data">
             <table id="table" style="margin: 2px;" class="table">
@@ -27,13 +26,16 @@
                                     <div class="slider__wrapper">
                                         <div class="slider__items">
                                             <div class="slider__item">
-                                                <img src="{ url_for('static/images/category/', filename='1.jpg') }">
+                                                <img src="{{ url_for('static',filename='/images/category/1.png' ) }}" alt="">
                                             </div>
                                             <div class="slider__item">
-                                                <img src="{ url_for('static/images/category/', filename='1.jpg') }">
+                                                <img src="{{ url_for('static',filename='/images/category/1.png' ) }}" alt="">
                                             </div>
                                             <div class="slider__item">
-                                                <img src="{ url_for('static/images/category/', filename='1.jpg') }">
+                                                <img src="{{ url_for('static',filename='/images/category/1.png' ) }}" alt="">
+                                            </div>
+                                            <div class="slider__item">
+                                                <img src="{{ url_for('static',filename='/images/category/1.png' ) }}" alt="">
                                             </div>
                                         </div>
                                     </div>
@@ -71,7 +73,7 @@
                                         <br>Краткое описание: {{ service.short_description }}
                                     {% endif %}
                                     {% if service.next == true %}
-                                           <br> Ссылка на полное описание
+                                        <a href="{{ url_for('main.service', service_id = service.id, category_id = category.id)}}" >Ссылка на полное описание </a>
                                     {% endif %}
                                 </div>
                             </div>
@@ -81,6 +83,5 @@
             {% endif %}
         {% endfor %}
     </div>
-
 
 {% endblock %}

@@ -26,28 +26,6 @@
         }
     </script>
 
-    <script>
-        /* Когда пользователь нажимает на кнопку, переключаться между скрытием и отображением раскрывающегося содержимого */
-        function myFunction() {
-            document.getElementById("myDropdown").classList.toggle("show");
-        }
-
-        // Закрытие раскрывающегося списка, при нажатии за его пределами
-        window.onclick = function(event) {
-            if (!event.target.matches('.dropbtn')) {
-
-                var dropdowns = document.getElementsByClassName("dropdown-content");
-                var i;
-                for (i = 0; i < dropdowns.length; i++) {
-                    var openDropdown = dropdowns[i];
-                    if (openDropdown.classList.contains('show')) {
-                        openDropdown.classList.remove('show');
-                    }
-                }
-            }
-        }
-    </script>
-
     {% if title %}
         <title>{{ title }}</title>
     {% else %}
@@ -92,17 +70,21 @@
         <div class="overlay"></div>
     </div>
     <!--конец модальных окон-->
-    <div class="dropdown">
-    <div id="services-button" class="button_main" data-modal-window-toggle="#services-modal-win">Услуги</div>
-        <div id="myDropdown" class="dropdown-content">
-            <a href="">Услуга 1</a>
-            <a href="">Услуга 2</a>
-            <a href="">Услуга 3</a>
-        </div>
-    </div>
-
-    <div class="button_main">О нас</div>
-    <div class="button_main" data-modal-window-toggle="#contacts-modal-win">Контакты</div>
+<nav>
+    <ul class="topmenu">
+        <li>
+        <div id="services-button" class="button_main" data-modal-window-toggle="#services-modal-win">Услуги</div>
+        <ul class="submenu">
+            <li><a href="">Услуга 1</a></li>
+            <li><a href="">Услуга 2</a></li>
+            <li><a href="">Услуга 3</a></li>
+            <li><a href="">Услуга 4</a></li>
+        </ul>
+        </li>
+        <li><div class="button_main">О нас</div></li>
+        <li><div class="button_main" data-modal-window-toggle="#contacts-modal-win">Контакты</div></li>
+    </ul>
+</nav>
 </div>
 
 
