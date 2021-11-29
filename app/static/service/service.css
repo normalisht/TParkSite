@@ -5,6 +5,14 @@
 
 }
 
+.block_info {
+    display:flex;
+    margin: 0 auto;
+    box-shadow: 2px 4px 16px #ccc;
+
+
+}
+
 .block_img {
     display:block;
 
