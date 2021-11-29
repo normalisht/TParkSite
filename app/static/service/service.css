@@ -1,34 +1,38 @@
 /*Стили для шаблона "конкретная услуга"(service.html)*/
 :root {
-    --background-color: #ffa200;
-    --primary-color: #0871D3FF;
+
 
 }
 
-.block_info {
+.block_service {
     display:flex;
     margin: 0 auto;
     box-shadow: 2px 4px 16px #ccc;
-
-
+    justify-content: space-around;
+    border-radius: 5px;
+    max-width:90vw;
+    min-height: 55vh;
+    background-color:var(--body-background-color);
+    z-index:2;
 }
 
 .block_img {
-    display:block;
-
-
+    display:flex;
+    min-height:10vh;
+    min-width:10vw;
 }
 
 .block_text {
-    display:block;
+    display:flex;
     max-width: 45vw;
+
 
 }
 
 .block_price {
-    display:block;
+    display:flex;
     float:right;
-
+    align-items: center;
 
 
 }
