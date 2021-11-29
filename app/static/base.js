@@ -11,6 +11,7 @@
 
     let detect = new MobileDetect(window.navigator.userAgent)
 
+
     let link = document.createElement('link')
     link.rel  = 'stylesheet';
     link.type = 'text/css';
@@ -23,7 +24,6 @@
     }
 
     document.head.append(link)
-
 })()
 
 
