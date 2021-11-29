@@ -1,0 +1,19 @@
+.block_info {
+    display:flex;
+    margin: 0 auto;
+    box-shadow: 2px 4px 16px #ccc;
+}
+
+.block_img_partners {
+    display:block;
+}
+
+.block_img_employees {
+    display:block;
+}
+
+.block_text {
+    display:block;
+    max-width: 45vw;
+}
+
