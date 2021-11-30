@@ -4,7 +4,7 @@
     --background-color: #c8eaff;/*547dd2;*/
     --primary-color: #6f90dc;
     --body-background-color: #4acfeb;
-    --primary-big-font: clamp(12px, 3vh, 20px);
+    --primary-big-font: clamp(14px, 1.5vw, 30px);
     --primary-font-family: Times New Roman, serif;
     --modal_window_time: none;
     --vw: none;
@@ -23,7 +23,7 @@ body {
 }
 
 img {
-    user-select: none; /* чтобы картини не выделялись при выделении текста */
+    user-select: none; /* чтобы картинки не выделялись при выделении текста */
 }
 
 .upper {
@@ -70,7 +70,6 @@ img {
 
     }
 
-
 }
 
 @media (max-width: 562px) {
@@ -81,7 +80,7 @@ img {
     }
 
     .block_info {
-        --primary-big-font: clamp(8px, 4vh, 14px);
+        float: right;
     }
 
     .block_numbers {
@@ -94,6 +93,7 @@ img {
         position: relative;
 
     }
+
 }
 
 .main_block {
