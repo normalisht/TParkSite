@@ -2,7 +2,7 @@ from flask import render_template, flash, redirect, url_for, request, jsonify, c
 from app.main import bp
 from app import db
 from app.main.functions import get_categories
-from app.models import Text, Event, Category, ServiceCategory, Service, Employee
+from app.models import Text, Event, Category, ServiceCategory, Service, Employee, Partner
 from sqlalchemy import create_engine
 
 engine = create_engine("sqlite:///T_Park.db")
@@ -45,5 +45,10 @@ def service():
 def about():
 
     employees = Employee.query.all()
+    about = Text.query.filter_by(title='about').first()
+    filosofi = Text.query.filter_by(title='filosofi').first()
+    partners = Partner.query.all()
 
-    return render_template('main/about.html', employees=employees)
+    return render_template('main/about.html', employees=employees,
+                           filosofi=filosofi, about=about, partners=partners,
+                           categories=get_categories())

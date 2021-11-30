@@ -55,17 +55,17 @@
          data-modal-window-toggle="#services-modal-win">
         Услуги
         <!--Модальные окно/выпадающее меню -->
-        <div id="services-modal-win" class="modal submenu">
-            <div class="modal-window">
-                {% for category in categories %}
-                    <div class="modal-item submenu-item">{{ category.name }}</div>
-                {% endfor %}
-                <close class="btn-close-modal-window">
-                    <img src="{{ url_for('static', filename='cross.png') }}" alt="X">
-                </close>
-            </div>
-            <div class="overlay"></div>
+    </div>
+    <div id="services-modal-win" class="modal submenu">
+        <div class="modal-window">
+            {% for category in categories %}
+                <div class="modal-item submenu-item">{{ category.name }}</div>
+            {% endfor %}
+            <close class="btn-close-modal-window">
+                <img src="{{ url_for('static', filename='cross.png') }}" alt="X">
+            </close>
         </div>
+        <div class="overlay"></div>
     </div>
     <div class="button_main">О нас</div>
     <div class="button_main" data-modal-window-toggle="#contacts-modal-win">

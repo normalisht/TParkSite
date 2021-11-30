@@ -19,12 +19,14 @@
     box-sizing: border-box;
     transform: translate(-100%);
 }
+/*
 
 .button_main:hover .submenu {
     visibility: visible;
     opacity: 1;
     transform: translate(0);
 }
+*/
 
 .submenu-item {
     letter-spacing: 1px;
