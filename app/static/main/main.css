@@ -1,7 +1,7 @@
 @charset "UTF-8";
 
 :root {
-    --background-color: #fff;/*547dd2;*/
+    --background-color: #c8eaff;/*547dd2;*/
     --primary-color: #6f90dc;
     --body-background-color: #4acfeb;
     --primary-big-font: clamp(12px, 3vh, 20px);
@@ -97,11 +97,11 @@ img {
 }
 
 .main_block {
-    background-color: #e1e1e1;
+    background-color: white;
     width: 100%;
     z-index: 1;
 }
-.lll {
+.block {
     display: flex;
 
 
@@ -111,8 +111,8 @@ img {
 
 .button_main {
     user-select: none;
-    background-color: var(--primary-color);
-    border-radius: 5px;
+    background-color: var(--background-color);
+    border-radius: 1px;
     width: 100px;
     height: 50px;
     position: relative;
@@ -120,8 +120,14 @@ img {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 0 6px ;
+
+    border-right: 1px solid;
+    border-left: 1px solid;
 }
+
+
+
+
 
 .block_logo {
     display: flex;

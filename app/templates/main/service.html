@@ -8,10 +8,10 @@
 
     <h2 style="text-align:center;">{{ service.name }}</h2>
 
-    {% set path = "static/images/service" + service.id|string + ".png" %}
+    {% set path = "images/service/" + service.id|string + ".png" %}
     <div class="block_service">
     <div class="">
-        <div class="block_img"><img src="{{ url_for("static", filename="path") }}" alt=""></div> <!--Фото услуги-->
+        <div class="block_img"><img src="{{ url_for("static", filename=path) }}" alt="" class="img_service"></div> <!--Фото услуги-->
         <div class="block_price">{{ service.price }}</div>
     </div>
     <div class="">
