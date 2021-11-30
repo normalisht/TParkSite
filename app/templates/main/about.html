@@ -1,12 +1,11 @@
 {% extends "main/base.html" %}
 
-
 {% block app_content %}
 
     <link rel="stylesheet" href="{{ url_for('static', filename='about/about.css') }}">
 
     <!--Философия-->
-    <div class="block_text">{{ filosofi.text }}</div>
+    <div class="block_filosofi">{{ filosofi.text }}</div>
 
     <!--Партнёры-->
     <div class="block_img_partners">    <!--Позиц-->
@@ -19,18 +18,16 @@
             </div>
         {% endfor %}
     </div>
-    <!--Фото сотрудника-->
 
     <!--Что есть-->
     <div class="block_text">{{ about.text }}</div>
 
-
     <!--Сотрудники-->
-    <div class="block_img_employees"> <!--Фото сотрудника-->
+    <div class="block_employees_block">
         {% for employee in employees %}
-            <div class="">
-                <div class=""><img src="{{ url_for('static', filename='') }}" alt=""></div>
-                <div class="">{{ employee.name }}</div>
+            <div class="block_employees">
+                <div class="block_img_employees"><img src="{{ url_for('static', filename='') }}" alt=""></div>
+                <div class="block_name_employees">{{ employee.name }}</div>
                 <div class="block_text_employees">{{ employee.position }}</div>
             </div>
         {% endfor %}
