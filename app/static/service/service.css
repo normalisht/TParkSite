@@ -7,12 +7,12 @@
 .block_service {
     display:flex;
     margin: 0 auto;
-    box-shadow: 2px 4px 16px #ccc;
+    /*box-shadow: 2px 4px 16px #ccc;*/
     justify-content: space-around;
     border-radius: 5px;
     max-width:90vw;
     min-height: 55vh;
-    background-color:var(--body-background-color);
+    /*background-color:var(--body-background-color);*/
     z-index:2;
 }
 
