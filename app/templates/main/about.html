@@ -5,21 +5,36 @@
 
     <link rel="stylesheet" href="{{ url_for('static', filename='about/about.css') }}">
 
-            <!--Философия-->
+    <!--Философия-->
+    <div class="block_text">{{ filosofi.text }}</div>
+
+    <!--Партнёры-->
+    <div class="block_img_partners">    <!--Позиц-->
+        {% for partner in partners %}
+            <div>
+                <a href="{{ partner.link }}">
+                    <img src="{{ url_for('static', filename='partners/' + partner.id|string + '.png') }}"
+                         alt="{{ partner.name }}">
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+    <!--Фото сотрудника-->
+
+    <!--Что есть-->
     <div class="block_text">{{ about.text }}</div>
 
-            <!--Партнёры-->
-    <div class="block_img_partners"><a href=""><img src="{{ url_for("", filename="") }}" alt=""></a></div> <!--Фото сотрудника-->
 
-            <!--Что есть-->
-    <div class="block_text">{{ about.text }}</div>
-
-            <!--Сотрудники-->
-    <div class="block_img_employees"><img src="{{ url_for("", filename="") }}" alt=""></div> <!--Фото сотрудника-->
-    {% for employee in employees%}
-    {{ employee.name }}
-    {% endfor %}
-    <div class="block_text_employees">{{ Employee.position }}</div>
+    <!--Сотрудники-->
+    <div class="block_img_employees"> <!--Фото сотрудника-->
+        {% for employee in employees %}
+            <div class="">
+                <div class=""><img src="{{ url_for('static', filename='') }}" alt=""></div>
+                <div class="">{{ employee.name }}</div>
+                <div class="block_text_employees">{{ employee.position }}</div>
+            </div>
+        {% endfor %}
+    </div>
 
 
 {% endblock %}

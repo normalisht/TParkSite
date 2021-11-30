@@ -79,7 +79,15 @@ class Event(db.Model):
         return False
 
 
+class Partner(db.Model):
+    id = db.Column(db.Integer, primary_key=True, index=True, unique=True)
+    name = db.Column(db.String(128))
+    link = db.Column(db.String(1024))  # ссылка на мероприятие(соц сеть или левый сайт)
+
+    def update_img(self, file):
+        pass
+
+
 @login.user_loader
 def load_user(id):
     return Admin.query.get(int(id))
-
