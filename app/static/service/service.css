@@ -31,16 +31,26 @@
 }
 
 .block_price {
-    display:flex;
+    display:block;
     float:right;
     align-items: center;
-
+    text-align:center;
 
 }
 
 
 .img_service {
     object-fit: cover;
+
+
+}
+
+
+.block_img_price {
+    display:grid;
+    grid-template-columns: 1fr;
+    max-width:45vw;
+
 
 
 }

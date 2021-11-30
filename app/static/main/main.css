@@ -104,12 +104,18 @@ img {
 .block {
     display: flex;
 
+}
+
+
+.block_buttons_grid {
+    display: grid;
 
 
 }
 
 
 .button_main {
+
     user-select: none;
     background-color: var(--background-color);
     border-radius: 1px;
@@ -121,11 +127,13 @@ img {
     justify-content: center;
     align-items: center;
 
-    border-right: 1px solid;
-    border-left: 1px solid;
 }
 
+.button_main:nth-child(2) {
+    border-right: 1px solid;
+    border-left: 1px solid;
 
+}
 
 
 
