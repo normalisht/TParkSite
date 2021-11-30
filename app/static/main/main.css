@@ -7,18 +7,25 @@
     --primary-font-family: Times New Roman, serif;
     --modal_window_time: none;
     --vw: none;
+}
 
+html {
+    box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+    box-sizing: inherit;
 }
 
 * {
     appearance: none;
     -webkit-appearance: none;
-    transition: background-color .8s;
 }
 
 body {
     margin: 0;
-    overflow-x: hidden;
 }
 
 img {
@@ -99,11 +106,9 @@ img {
 .block_buttons {
     display: flex;
     justify-content: space-between;
-    max-width: 50%;
-    margin: 0 auto;
-    margin-bottom: 2vh;
-    position: relative;
-    background-color: white;
+    margin: 0 auto 2vh;
+    top: 0;
+    z-index: 1;
 }
 
 .button_main {
@@ -112,7 +117,6 @@ img {
     border-radius: 5px;
     width: 100px;
     height: 50px;
-    position: relative;
     color: black;
     display: flex;
     justify-content: center;
