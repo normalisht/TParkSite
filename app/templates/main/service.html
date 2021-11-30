@@ -12,7 +12,7 @@
     <div class="block_info">
         <div class="block_img"><img src="{{ url_for("static", filename="path") }}" alt=""></div> <!--Фото услуги-->
         <div class="block_text">{{ service.description }}</div><!--Описание услуги-->
-        <div class="block_price">{{ service.price }}</div>
+        <div class="block_price">{{ service.prices[0] }}</div>
     </div>
 
 {% endblock %}
