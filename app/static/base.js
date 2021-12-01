@@ -60,7 +60,6 @@ function buttons_position() {
 
 
     if(document.documentElement.scrollTop <= el.offsetTop) {
-        console.log(123)
         el.style.height = '0'
         buttons.style.position = 'relative'
     }

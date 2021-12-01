@@ -4,7 +4,7 @@
     --background-color: #c8eaff; /*547dd2;*/
     --primary-color: #6f90dc;
     --body-background-color: #4acfeb;
-    --primary-big-font: clamp(14px, 1.5vw, 30px);
+    --primary-big-font: clamp(16px, 1.3vw, 25px);
     --primary-font-family: Times New Roman, serif;
     --modal_window_time: none;
     --vw: none;
@@ -36,14 +36,12 @@ img {
 .upper {
     width: 100%;
     max-width: 1920px;
-    height: 100px;
     background-color: var(--background-color);
     position: sticky;
     justify-content: space-between;
     vertical-align: middle;
     align-items: center;
     color: black;
-    margin-bottom: 20px;
     display: flex;
 }
 
@@ -62,45 +60,13 @@ img {
     font-size: 14px;
 }
 
-@media (min-width: 562px) {
-    /*Desktop*/
-    .img_logo {
-        max-width: 200px;
-        max-height: 100px;
-        margin-left: 5vw;
-    }
-
-    .block_buttons {
-        display: flex;
-        position: relative;
-
-
-    }
-
-}
-
-@media (max-width: 562px) {
-    /*Phone*/
-    .img_logo {
-        max-width: 150px;
-        max-height: 100px;
-    }
-
-    .block_info {
-        float: right;
-    }
-
-    .block_numbers {
-        --primary-big-font: clamp(8px, 4vh, 14px);
-    }
-
-    .block_buttons {
-        display: flex;
-        margin: 0 auto 2vh;
-        position: relative;
-
-    }
-
+.block_buttons {
+    display: flex;
+    margin: auto;
+    justify-content: center;
+    width: max-content;
+    position: relative;
+    z-index: 2;
 }
 
 .main_block {
@@ -121,12 +87,9 @@ img {
     display: grid;
 }
 
-
 .button_main {
     user-select: none;
-    background-color: var(--background-color);
-    border-radius: 1px;
-    width: 100px;
+    /*background-color: var(--background-color);*/
     height: 50px;
     color: black;
     display: flex;
@@ -142,16 +105,18 @@ img {
 
 
 .block_logo {
-    display: flex;
+    margin-left: 1vw;
+    margin-top: 1vh;
     justify-content: center;
-    max-width: 200px;
-    max-height: 150px;
+    display: flex;
+    justify-items: center;
+    flex-flow: column;
 }
 
 .block_info {
     display: flex;
     position: relative;
-    width: 40%;
+    margin-right: 1vw;
     justify-content: space-around;
     align-items: center;
     font-size: var(--primary-big-font);
@@ -160,11 +125,16 @@ img {
 
 .block_numbers {
     display: flex;
-    padding: 2vh;
-    flex-direction: column;
-    justify-content: center;
+    justify-content: space-between;
+    margin: auto;
+    padding-top: 3px;
+    padding-bottom: 3px;
     font-size: var(--primary-big-font);
     font-family: var(--primary-font-family);
+}
+
+.block_numbers > div:first-child {
+    margin-right: 5px;
 }
 
 .block_content {
@@ -239,5 +209,58 @@ img {
     display: none;
 }
 
+@media (min-width: 562px) {
+    /*Desktop*/
+    .img_logo {
+        max-width: 200px;
+        max-height: 100px;
+        object-fit: cover;
+        margin: auto;
+    }
+
+    .block_numbers {
+        margin-top: 0;
+        --primary-big-font: 1.1rem;
+    }
+
+    .block_buttons {
+        font-size: 1.2rem;
+    }
+
+    .button_main {
+        width: 100px;
+    }
+
+    .block_info {
+        width: 30%;
+    }
+
+}
+
+@media (max-width: 562px) {
+    /*Phone*/
+    .img_logo {
+        max-width: 150px;
+        max-height: 100px;
+        margin: auto;
+    }
+
+    .block_info {
+        text-align: center;
+    }
+
+
+    .block_numbers {
+        --primary-big-font: 1.2rem;
+    }
+
+    .block_buttons {
+        font-size: 1.5rem;
+    }
+
+    .button_main {
+        width: calc(100vw / 3);
+    }
+}
 
 

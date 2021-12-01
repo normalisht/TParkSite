@@ -27,81 +27,59 @@
 </head>
 
 <body id="body">
+
 <div class="upper">
     <div class="block_logo">
         <img id="logo" class="img_logo" src="{{ url_for('static', filename='logo.png') }}" alt="">
-    </div>
-    <div class="block">
-        <div id='navigation_buttons' class="block_buttons">
-            <div id="services-button" class="button_main"
-                 data-modal-window-toggle="#services-modal-win">
-                Услуги
-                <!--Модальные окно/выпадающее меню -->
-                <div id="services-modal-win" class="modal submenu">
-                    <div class="modal-window">
-                        {% for category in categories %}
-                            <div class="modal-item submenu-item">{{ category.name }}</div>
-                        {% endfor %}
-                        <close class="btn-close-modal-window">
-                            <img src="{{ url_for('static', filename='cross.png') }}" alt="X">
-                        </close>
-                    </div>
-                    <div class="overlay"></div>
-                </div>
-            </div>
-            <div class="button_main"><a href="about">О нас</a></div>
-            <div class="button_main" data-modal-window-toggle="#contacts-modal-win">
-                Контакты
-                <div id="contacts-modal-win" class="modal submenu">
-                    <div class="modal-window">
-                        {% for i in range(100) %}
-                            <div class="modal-item submenu-item">Категория услуг {{ i }}</div>
-                        {% endfor %}
-                        <button class="btn-close-modal-window" data-modal-window-toggle="#contacts-modal-win">X</button>
-                    </div>
-                    <div class="overlay"></div>
-                </div>
-                <!--конец модальных окон--></div>
+        <div class="block_numbers">
+            <div>+79999999999</div>
+            <div>+79999999999</div>
         </div>
     </div>
-    <div class="block">
-
-
-        <div class="block_info">
-            <div>Тренинг-Парк Дмитрия Сергеева</div>
-            <div class="block_numbers">
-                <div>+79999999999</div>
-                <div>+79999999999</div>
-            </div>
-
-            <div id='navigation_buttons' class="block_buttons">
-                <div id="services-button" class="button_main"
-                     data-modal-window-toggle="#services-modal-win">
-                    Услуги
-                    <!--Модальные окно/выпадающее меню -->
-                    <div id="services-modal-win" class="modal submenu">
-                        <div class="modal-window">
-                            {% for category in categories %}
-                                <div class="modal-item submenu-item">{{ category.name }}</div>
-                            {% endfor %}
-                            <close class="btn-close-modal-window">
-                                <img src="{{ url_for('static', filename='cross.png') }}" alt="X">
-                            </close>
-                        </div>
-                        <div class="overlay"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <div id="main_block" class="main_block">
-            {% block app_content %}{% endblock %}
-        </div>
-
-        <div id="footer" class="footer">© 2021</div>
+    <div class="block_info">
+        <div>Тренинг-Парк Дмитрия Сергеева</div>
     </div>
 </div>
+
+<div id='navigation_buttons' class="block_buttons">
+    <div id="services-button" class="button_main"
+         data-modal-window-toggle="#services-modal-win">
+        Услуги
+        <!--Модальные окно/выпадающее меню -->
+        <div id="services-modal-win" class="modal submenu">
+            <div class="modal-window">
+                {% for category in categories %}
+                    <div class="modal-item submenu-item">{{ category.name }}</div>
+                {% endfor %}
+                <close class="btn-close-modal-window">
+                    <img src="{{ url_for('static', filename='cross.png') }}" alt="X">
+                </close>
+            </div>
+            <div class="overlay"></div>
+        </div>
+    </div>
+    <div class="button_main">О нас</div>
+    <div class="button_main" data-modal-window-toggle="#contacts-modal-win">
+        Контакты
+        <div id="contacts-modal-win" class="modal submenu">
+            <div class="modal-window">
+                {% for i in range(100) %}
+                    <div class="modal-item submenu-item">Категория услуг {{ i }}</div>
+                {% endfor %}
+                <button class="btn-close-modal-window" data-modal-window-toggle="#contacts-modal-win">X</button>
+            </div>
+            <div class="overlay"></div>
+        </div>
+        <!--конец модальных окон-->
+    </div>
+</div>
+
+<div id="main_block" class="main_block">
+    {% block app_content %}{% endblock %}
+</div>
+
+<div id="footer" class="footer">© 2021</div>
+
 
 </body>
 </html>
