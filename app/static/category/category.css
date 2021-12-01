@@ -15,26 +15,26 @@
 }
 
 .text {
-    position: static;
+    display: flex;
 }
 
 .table {
     font-family: 'Roboto', sans-serif;
     font-size: 14px;
     border-collapse: collapse;
-    table-layout: auto;
     width: 80vw;
     word-break: break-all;
 }
 
 td {
-    position: static;
+    position: center;
     vertical-align: top;
     padding-right: 2vw;
 }
 
-h2 {
+h1 {
     text-align: center;
+    font-family: 'Roboto', sans-serif;
 }
 
 .button {
@@ -44,6 +44,9 @@ h2 {
     table-layout: fixed;
     position: relative;
     align-items: center;
+    box-shadow: 0 4px 16px #ccc; /*Не является конечным вариантом*/
+    background-color: cornflowerblue; /*Не является конечным вариантом*/
+    -webkit-transition: background-color,1s;
 }
 
 .buttons {
@@ -59,21 +62,33 @@ h2 {
 .description{
     max-height: 0;
     overflow: hidden;
-
     transition: max-height 2s cubic-bezier(0, 1, 0, 1);
 }
 
 .content{
+    min-height: 20px;
     max-height: 20vw;
-    max-width:  30vw
-
+    max-width:  20vw;
 }
 
 .description.active{
-    max-height: 90vw;
-    transition: max-height 2s ease-out;
+    max-height: 30vw;
+    transition: max-height 1.5s ease-out;
 }
 
-.content:hover {
+.button:hover {
     cursor: pointer;
+    -webkit-filter: grayscale(50%);
+    -webkit-transition: -webkit-filter,1s;
+}
+
+.content:after{
+    content:"";
+    position: absolute;
+    right: 10px;
+    top: 40%;
+    border-left: 5px solid transparent;
+    border-top: 5px solid #333;
+    border-right: 5px solid transparent;
+    z-index: 999;
 }
