@@ -64,8 +64,9 @@ img {
 }
 
 .block_buttons {
+    background: white;
     display: flex;
-    margin: auto;
+    margin: 0 auto;
     justify-content: center;
     width: max-content;
     position: relative;
@@ -212,4 +213,66 @@ img {
 }
 
 
+@keyframes circlePulse {
+    0% {
+        transform: scale(0.1);
+    }
+    80% {
+        opacity: .8;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0;
+    }
+}
 
+@keyframes rotate {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.preloader {
+    transition: all 900ms ease;
+}
+
+.loader-container {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10000;
+}
+
+.preloader-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #ffffff;
+    z-index: 9999;
+}
+
+.circle-pulse-multiple .loader {
+    width: 100px;
+    height: 100px;
+}
+
+.circle-pulse-multiple .loader > div {
+    position: absolute;
+    top: 0; left: 0;
+    width: min(10vw, 10vh);
+    height: min(10vw, 10vh);
+    border: 2px solid #8cc5f3;
+    border-radius: 50%;
+    animation: circlePulse 1s ease infinite;
+    transform: translate(-50%, -50%);
+}
+
+.circle-pulse-multiple .loader .circle-2 {
+    animation-delay: -.9s;
+}
+
+.circle-pulse-multiple .loader .circle-3 {
+    animation-delay: -.8s;
+}

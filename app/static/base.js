@@ -67,12 +67,14 @@ function buttons_position() {
     if(document.documentElement.scrollTop <= el.offsetTop) {
         el.style.height = '0'
         buttons.style.position = 'relative'
+        buttons.style.marginTop = '5px'
     }
 
     if (buttons.offsetTop < document.documentElement.scrollTop) {
         el.style.height =  window.getComputedStyle(buttons).height
         buttons.style.position = 'fixed'
         buttons.style.top = buttons.style.left = buttons.style.right = '0'
+        buttons.style.marginTop = '0'
     }
 }
 
@@ -83,16 +85,21 @@ function generate_mobile_upper() {
         navigation_buttons = document.getElementById('navigation_buttons'),
         upper = document.getElementById('upper')
 
-    block_info.style.flexDirection = 'column'
-    block_info.firstElementChild.style.flexDirection = 'column'
+    block_info.style.flexDirection =
+        block_info.firstElementChild.style.flexDirection = 'column'
     block_info.firstElementChild.style.alignItems = 'center'
     block_info.firstElementChild.lastElementChild.innerHTML =
         block_info.firstElementChild.lastElementChild.innerHTML.slice(0)
+
+    document.getElementById('logo').parentElement.style.width =
+        block_info.style.width = '50%'
 
     navigation_buttons.style.marginBottom = '20px'
     upper.after(navigation_buttons)
     upper.after(phone_numbers)
     upper.style.justifyContent = 'space-around'
+
+    phone_numbers.style.display = 'none'
 }
 
 

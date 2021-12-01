@@ -31,12 +31,18 @@
 }
 
 .block_buttons {
-    font-size: 1.2rem;
+    --font-size: 1.2rem;
+    font-size: var(--font-size);
 }
 
 .button_main {
     width: 100px;
     height: 30px;
+    transition: all 0.2s ease;
+}
+
+.button_main:hover {
+    font-size: calc(var(--font-size) * 1.075);
 }
 
 .block_info {

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html id="html" lang="ru">
 <head id="head">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
@@ -16,8 +16,13 @@
     <script type="text/javascript" src="{{ url_for('static', filename='modal_window.js') }}"></script>
     {% block scripts %}{% endblock %}
     <script>
-    </script>
+        window.addEventListener('load', function () {
+            let preloader = document.getElementById('preloader')
 
+            preloader.style.opacity = '0'
+
+        })
+    </script>
 
     {% if title %}
         <title>{{ title }}</title>
@@ -27,6 +32,7 @@
 </head>
 
 <body id="body">
+
 
 <div id="upper" class="upper">
     <div class="block_logo">
@@ -82,6 +88,17 @@
 </div>
 
 <div id="footer" class="footer">© 2021</div>
+
+<div id="preloader" class="preloader">
+    <div class="loader-container circle-pulse-multiple">
+        <div class="loader">
+            <div class="circle-1"></div>
+            <div class="circle-2"></div>
+            <div class="circle-3"></div>
+        </div>
+    </div>
+    <div class="preloader-overlay"></div>
+</div>
 
 
 </body>
