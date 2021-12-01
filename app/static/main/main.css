@@ -1,9 +1,10 @@
 @charset "UTF-8";
 
 :root {
-    --background-color: #ffa200;
-    --primary-color: #0871D3FF;
-    --primary-big-font: clamp(12px, 3vh, 20px);
+    --background-color: #c8eaff;/*547dd2;*/
+    --primary-color: #6f90dc;
+    --body-background-color: #4acfeb;
+    --primary-big-font: clamp(14px, 1.5vw, 30px);
     --primary-font-family: Times New Roman, serif;
     --modal_window_time: none;
     --vw: none;
@@ -29,13 +30,14 @@ body {
 }
 
 img {
-    user-select: none; /* чтобы картини не выделялись при выделении текста */
+    user-select: none; /* чтобы картинки не выделялись при выделении текста */
 }
 
 .upper {
     width: 100%;
+    max-width: 1920px;
     height: 100px;
-    background-color: #ffa200;
+    background-color: var(--background-color);
     position: sticky;
     justify-content: space-between;
     vertical-align: middle;
@@ -53,8 +55,8 @@ img {
     text-align: center;
     height: min(10vh, 60px);
     width: 100%;
-    --background-color: #1c1919;
-    background-color: var(--background-color);
+    background-color: #1c1919;
+    /*background-color: var(--background-color);*/
     margin-top: 10px;
     color: #a8a8a8;
     font-size: 14px;
@@ -69,9 +71,11 @@ img {
     }
 
     .block_buttons {
-        max-width: 50%;
-    }
+        display: flex;
+        position: relative;
 
+
+    }
 
 }
 
@@ -83,7 +87,7 @@ img {
     }
 
     .block_info {
-        --primary-big-font: clamp(8px, 4vh, 14px);
+        float: right;
     }
 
     .block_numbers {
@@ -91,10 +95,12 @@ img {
     }
 
     .block_buttons {
-        max-width: 90%;
-    !important;
+        display: flex;
+        margin: 0 auto 2vh;
+        position: relative;
 
     }
+
 }
 
 .main_block {
@@ -103,7 +109,7 @@ img {
     z-index: 1;
 }
 
-.block_buttons {
+.block {
     display: flex;
     justify-content: space-between;
     margin: 0 auto 2vh;
@@ -111,17 +117,34 @@ img {
     z-index: 1;
 }
 
+.block_buttons_grid {
+    display: grid;
+
+
+}
+
+
 .button_main {
+
     user-select: none;
-    background-color: var(--primary-color);
-    border-radius: 5px;
+    background-color: var(--background-color);
+    border-radius: 1px;
     width: 100px;
     height: 50px;
     color: black;
     display: flex;
     justify-content: center;
     align-items: center;
+
 }
+
+.button_main:nth-child(2) {
+    border-right: 1px solid;
+    border-left: 1px solid;
+
+}
+
+
 
 .block_logo {
     display: flex;

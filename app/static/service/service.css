@@ -1,26 +1,64 @@
 /*Стили для шаблона "конкретная услуга"(service.html)*/
 :root {
-    --background-color: #ffa200;
-    --primary-color: #0871D3FF;
-
-}
-
-.block_info {
-    display:flex;
-    margin: 0 auto;
-    box-shadow: 2px 4px 16px #ccc;
 
 
 }
+
+@media (min-width: 562px) {
+    /*Desktop*/
+
+    .block_service {
+        display:flex;
+        margin: 0 auto;
+        /*box-shadow: 2px 4px 16px #ccc;*/
+        justify-content: space-around;
+        border-radius: 5px;
+        max-width:90vw;
+        min-height: 55vh;
+        /*background-color:var(--body-background-color);*/
+        z-index:2;
+    }
+
+    .img_service {
+        object-fit: cover;
+        width: clamp(150px, 20vw, 800px);
+        height: clamp(100px, 20vh, 400px);
+        margin: 0 auto;
+    }
+
+
+}
+
+@media (max-width: 562px) {
+    /*Phone*/
+
+    .block_service {
+        display:flex;
+        margin: 0 auto;
+        /*box-shadow: 2px 4px 16px #ccc;*/
+        justify-content: space-around;
+        border-radius: 5px;
+        max-width: 99vw;
+        min-height: 55vh;
+        /*background-color:var(--body-background-color);*/
+        z-index:2;
+    }
+
+
+
+}
+
+
 
 .block_img {
-    display:block;
-
+    display:flex;
+    height:clamp(100px,30vh, 400px );
+    width:clamp(200px,30vw, 600px );
 
 }
 
 .block_text {
-    display:block;
+    display:flex;
     max-width: 45vw;
 
 }
@@ -28,7 +66,19 @@
 .block_price {
     display:block;
     float:right;
-
-
+    align-items: center;
+    text-align:center;
 
 }
+
+
+
+
+.block_img_price {
+    display:grid;
+    grid-template-columns: 1fr;
+    max-width:45vw;
+    grid-auto-rows: minmax(100px, 200px);
+}
+
+

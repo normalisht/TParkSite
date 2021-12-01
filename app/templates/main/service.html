@@ -6,13 +6,18 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='service/service.css') }}">
 
 
-    <h2 style="margin: 0 auto;">{{ service.name }}</h2>
+    <h2 style="text-align:center;">{{ service.name }}</h2>
 
-    {% set path = "static/images/service" + service.id|string + ".jpg" %}
-    <div class="block_info">
-        <div class="block_img"><img src="{{ url_for("static", filename="path") }}" alt=""></div> <!--Фото услуги-->
+
+    {% set path = "images/service/" + service.id|string + ".png" %}
+    <div class="block_service">
+    <div class="block_img_price">
+        <div class="block_img"><img src="{{ url_for("static", filename=path) }}" alt="" class="img_service"></div> <!--Фото услуги-->
+        <div class="block_price">{{ service.price[0] }}</div>
+    </div>
+    <div class="">
         <div class="block_text">{{ service.description }}</div><!--Описание услуги-->
-        <div class="block_price">{{ service.prices[0] }}</div>
+    </div>
     </div>
 
 {% endblock %}
