@@ -1,36 +1,41 @@
 {% extends "main/base.html" %}
 
-
 {% block app_content %}
 
     <link rel="stylesheet" href="{{ url_for('static', filename='about/about.css') }}">
 
+    <h2 class="title_about">О нас</h2>
+
     <!--Философия-->
-    <div class="block_text">{{ filosofi.text }}</div>
+    <div class="block_fil">{{ filosofi.text }}</div>
 
     <!--Партнёры-->
-    <div class="block_img_partners">    <!--Позиц-->
+    <h2 class="title_about">Партнёры</h2>
+    <div class="block_img_partners">
         {% for partner in partners %}
             <div>
                 <a href="{{ partner.link }}">
-                    <img src="{{ url_for('static', filename='partners/' + partner.id|string + '.png') }}"
+                    <img src="{{ url_for('static/', filename='partners/' + partner.id|string + '.png') }}"
                          alt="{{ partner.name }}">
                 </a>
             </div>
         {% endfor %}
     </div>
-    <!--Фото сотрудника-->
 
     <!--Что есть-->
-    <div class="block_text">{{ about.text }}</div>
-
+    <h2 class="title_about">Что есть</h2>
+    <div class="block_text_about">{{ about.text }}</div>
 
     <!--Сотрудники-->
-    <div class="block_img_employees"> <!--Фото сотрудника-->
+    <h2 class="title_about">Сотрудники</h2>
+    <div class="block_employees_block">
         {% for employee in employees %}
-            <div class="">
-                <div class=""><img src="{{ url_for('static', filename='') }}" alt=""></div>
-                <div class="">{{ employee.name }}</div>
+            <div class="block_employees">
+                <div class="block_img_employees">
+                    <img src="{{ url_for('static/', filename='employees/') }}"
+                         alt="">
+                </div>
+                <div class="block_name_employees">{{ amployee.name }}</div>
                 <div class="block_text_employees">{{ employee.position }}</div>
             </div>
         {% endfor %}
