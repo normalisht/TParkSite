@@ -63,6 +63,7 @@ img {
     font-size: 14px;
 }
 
+
 .block_buttons {
     background: white;
     display: flex;
@@ -212,6 +213,11 @@ img {
     display: none;
 }
 
+.about_a {
+    text-decoration: none;
+    color: black;
+
+}
 
 @keyframes circlePulse {
     0% {
@@ -246,7 +252,8 @@ img {
 
 .preloader-overlay {
     position: absolute;
-    top: 0; left: 0;
+    top: 0;
+    left: 0;
     width: 100vw;
     height: 100vh;
     background-color: #ffffff;
@@ -260,7 +267,8 @@ img {
 
 .circle-pulse-multiple .loader > div {
     position: absolute;
-    top: 0; left: 0;
+    top: 0;
+    left: 0;
     width: min(10vw, 10vh);
     height: min(10vw, 10vh);
     border: 2px solid #8cc5f3;
