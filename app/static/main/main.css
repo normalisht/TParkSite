@@ -133,9 +133,10 @@ a {
 
 .block_content {
     justify-content: center;
-    width: 100vw;
+    width: 90vw;
     max-height: 30vh;
     margin-top: 20px;
+    text-align: center;
 }
 
 .img_logo {
