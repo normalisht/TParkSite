@@ -12,3 +12,19 @@
     background-color: #6a7d9b;
 }
 /**/
+
+/*Desktop*/
+.img_logo {
+    max-width: 200px;
+    max-height: 100px;
+    margin-left: 5vw;
+}
+
+.block_buttons {
+    display: flex;
+    position: relative;
+
+
+}
+
+

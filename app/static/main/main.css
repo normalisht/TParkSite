@@ -55,48 +55,8 @@ img {
     font-size: 14px;
 }
 
-@media (min-width: 562px) {
-    /*Desktop*/
-    .img_logo {
-        max-width: 200px;
-        max-height: 100px;
-        margin-left: 5vw;
-    }
-
-    .block_buttons {
-        display: flex;
-        position: relative;
 
 
-    }
-
-
-
-}
-
-@media (max-width: 562px) {
-    /*Phone*/
-    .img_logo {
-        max-width: 150px;
-        max-height: 100px;
-    }
-
-    .block_info {
-        float: right;
-    }
-
-    .block_numbers {
-        --primary-big-font: clamp(8px, 4vh, 14px);
-    }
-
-    .block_buttons {
-        display: none;
-        margin: 0 auto 2vh;
-        position: relative;
-
-    }
-
-}
 
 a {
     text-decoration:none;
