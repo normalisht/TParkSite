@@ -1,19 +1,54 @@
-.block_info {
-    display:flex;
-    margin: 0 auto;
-    box-shadow: 2px 4px 16px #ccc;
+.title_about {
+    display: flex;
+    justify-content: center;
 }
 
+.block_fil {
+    justify-content: center;
+    width: 100vw;
+    max-height: 80vh;
+    margin-top: 20px;
+}
+
+.block_text_about {
+    justify-content: center;
+    width: 100vw;
+    max-height: 120vh;
+    margin-top: 20px;
+}
+
+
 .block_img_partners {
-    display:block;
+    width: 70%;
+    margin: 0px auto;
+    display: grid;
+    grid-gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+    list-style: none;
+    padding: 0;
+}
+
+.block_img_partners > * {
+    height: 15rem;
+}
+
+.block_employees_block {
+    width: 20%;
+    margin: 0px auto;
+}
+
+.block_employees {
+
 }
 
 .block_img_employees {
-    display:block;
+
 }
 
-.block_text {
-    display:block;
-    max-width: 45vw;
+.block_name_employees {
+
 }
 
+.block_text_employees {
+
+}
