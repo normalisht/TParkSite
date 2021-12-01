@@ -1,5 +1,5 @@
 
-idetected_phone()
+
 
 function detected_phone() {
     let detect = new MobileDetect(window.navigator.userAgent)
@@ -24,7 +24,7 @@ function detected_phone() {
 }
 
 
-
+detected_phone()
 
 document.addEventListener('DOMContentLoaded', set_vw)
 window.addEventListener('resize', set_vw)
