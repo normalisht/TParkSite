@@ -1,28 +1,29 @@
-let detect = new MobileDetect(window.navigator.userAgent)
-let link = document.createElement('link')
-link.rel = 'stylesheet';
-link.type = 'text/css';
-link.media = 'all';
 
-if (detect.mobile()) {
+idetected_phone()
 
-    if (detect.phone()) {
-        link.href = '/app/static/main/phone.css'
-        generate_mobile_upper()
-    } else if (detect.tablet()) {
+function detected_phone() {
+    let detect = new MobileDetect(window.navigator.userAgent)
+    let link = document.createElement('link')
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.media = 'all';
+
+    if (detect.mobile()) {
+
+        if (detect.phone()) {
+            link.href = '/app/static/main/phone.css'
+            generate_mobile_upper()
+        } else if (detect.tablet()) {
+            link.href = '/app/static/main/desktop.css'
+        }
+    } else {
         link.href = '/app/static/main/desktop.css'
     }
-} else {
-    link.href = '/app/static/main/desktop.css'
+
+    document.head.append(link)
 }
 
-document.head.append(link)
 
-
-function set_vw() {
-    let vw = document.documentElement.clientWidth / 100
-    document.documentElement.style.setProperty('--vw', `${vw}px`)
-}
 
 
 document.addEventListener('DOMContentLoaded', set_vw)
@@ -76,8 +77,6 @@ function buttons_position() {
         buttons.style.position = 'relative'
         buttons.style.marginTop = '5px'
     }
-}
-
 
     if (buttons.offsetTop < document.documentElement.scrollTop) {
         el.style.height =  window.getComputedStyle(buttons).height
@@ -85,7 +84,6 @@ function buttons_position() {
         buttons.style.top = buttons.style.left = buttons.style.right = '0'
         buttons.style.marginTop = '0'
     }
-
 }
 
 
@@ -111,7 +109,6 @@ function generate_mobile_upper() {
 
     phone_numbers.style.display = 'none'
 }
-
 
 
 
