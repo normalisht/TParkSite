@@ -13,9 +13,16 @@ engine = create_engine("sqlite:///T_Park.db")
 def index():
     main_text = Text.query.filter_by(title="main_text").first().text
     events = Event.query.all()
+    geolocation = Text.query.filter_by(title='geolocation').first()
+    address = Text.query.filter_by(title='address').first()
+    phone_numbers = Text.query.filter_by(title='phone_numbers').first()
+    vk = Text.query.filter_by(title='vk').first()
+    insta = Text.query.filter_by(title='insta').first()
 
     return render_template('main/main.html', main_text=main_text, events=events,
-                           categories=get_categories())
+                           categories=get_categories(), geolocation=geolocation,
+                           address=address, phone_numbers=phone_numbers,
+                           insta=insta, vk=vk)
 
 
 @bp.route('/category', methods=['GET'])
