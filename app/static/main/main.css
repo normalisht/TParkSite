@@ -1,7 +1,7 @@
 @charset "UTF-8";
 
 :root {
-    --background-color: #c8eaff;/*547dd2;*/
+    --background-color: #c8eaff; /*547dd2;*/
     --primary-color: #6f90dc;
     --body-background-color: #4acfeb;
     --primary-big-font: clamp(14px, 1.5vw, 30px);
@@ -103,11 +103,6 @@ img {
 
 }
 
-a {
-    text-decoration:none;
-    color: black;
-}
-
 .main_block {
     background-color: white;
     width: 100%;
@@ -124,13 +119,10 @@ a {
 
 .block_buttons_grid {
     display: grid;
-
-
 }
 
 
 .button_main {
-
     user-select: none;
     background-color: var(--background-color);
     border-radius: 1px;
@@ -146,9 +138,7 @@ a {
 .button_main:nth-child(2) {
     border-right: 1px solid;
     border-left: 1px solid;
-
 }
-
 
 
 .block_logo {
