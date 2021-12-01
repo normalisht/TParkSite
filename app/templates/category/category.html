@@ -13,12 +13,10 @@
     </script>
     <link rel="stylesheet" href="{{ url_for('static', filename='category.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='category_slider.css') }}">
+    <h1>{{ category.name }}</h1>
     <div class="container">
         <div class="data">
             <table id="table" style="margin: 2px;" class="table">
-                <tr>
-                    <td><h1>{{ category.name }}</h1></td>
-                </tr>
                 <tr>
                     <td>
                         <div class="block_slider">
@@ -48,10 +46,12 @@
                         </div>
                     </td>
                     <td>
-                        <h2>ОПИСАНИЕ</h2>
+                        <h1>ОПИСАНИЕ</h1>
+                        {% if category.description == true %}
                         <div class="text">
                         <span>{{ category.description }}</span>
                         </div>
+                        {% endif %}
                     </td>
                 </tr>
             </table>
@@ -63,12 +63,9 @@
             {% if service.status == true %}
                 <table id="button" style="margin-right: 3vw;" class="button">
                     <tr style="border: 2px solid black;">
-                        <td>{{ service.name }}</td>
-                    </tr>
-                    <tr style="border: 2px solid black;">
                         <td>
                             <div class="content">
-                                Цена: {{ service.price }}
+                                {{ service.name }} - Цена: {{ service.price }}
                                 <div class="description">
                                     {% if service.short_description != None %}
                                         <br>Краткое описание: {{ service.short_description }}
