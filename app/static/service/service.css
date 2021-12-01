@@ -1,55 +1,11 @@
 @charset "UTF-8";
 
 /*Стили для шаблона "конкретная услуга"(service.html)*/
+
 :root {
 
 
 }
-
-@media (min-width: 562px) {
-    /*Desktop*/
-
-    .block_service {
-        display:flex;
-        margin: 0 auto;
-        /*box-shadow: 2px 4px 16px #ccc;*/
-        justify-content: space-around;
-        border-radius: 5px;
-        max-width:90vw;
-        min-height: 55vh;
-        /*background-color:var(--body-background-color);*/
-        z-index:2;
-    }
-
-    .img_service {
-        object-fit: cover;
-        width: clamp(150px, 20vw, 800px);
-        height: clamp(100px, 20vh, 400px);
-        margin: 0 auto;
-    }
-
-
-}
-
-@media (max-width: 562px) {
-    /*Phone*/
-
-    .block_service {
-        display:flex;
-        margin: 0 auto;
-        /*box-shadow: 2px 4px 16px #ccc;*/
-        justify-content: space-around;
-        border-radius: 5px;
-        max-width: 99vw;
-        min-height: 55vh;
-        /*background-color:var(--body-background-color);*/
-        z-index:2;
-    }
-
-
-
-}
-
 
 
 .block_img {
@@ -66,15 +22,19 @@
 }
 
 .block_price {
-    display:block;
+    display:flex;
     float:right;
     align-items: center;
     text-align:center;
+    justify-content: center;
 
 }
 
+.price {
+    display:block;
 
 
+}
 
 .block_img_price {
     display:grid;

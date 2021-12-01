@@ -5,6 +5,7 @@ link.type = 'text/css';
 link.media = 'all';
 
 if (detect.mobile()) {
+
     if (detect.phone()) {
         link.href = '/app/static/main/phone.css'
         generate_mobile_upper()
@@ -16,6 +17,12 @@ if (detect.mobile()) {
 }
 
 document.head.append(link)
+
+
+function set_vw() {
+    let vw = document.documentElement.clientWidth / 100
+    document.documentElement.style.setProperty('--vw', `${vw}px`)
+}
 
 
 document.addEventListener('DOMContentLoaded', set_vw)
@@ -69,6 +76,8 @@ function buttons_position() {
         buttons.style.position = 'relative'
         buttons.style.marginTop = '5px'
     }
+}
+
 
     if (buttons.offsetTop < document.documentElement.scrollTop) {
         el.style.height =  window.getComputedStyle(buttons).height
@@ -76,6 +85,7 @@ function buttons_position() {
         buttons.style.top = buttons.style.left = buttons.style.right = '0'
         buttons.style.marginTop = '0'
     }
+
 }
 
 
@@ -101,6 +111,7 @@ function generate_mobile_upper() {
 
     phone_numbers.style.display = 'none'
 }
+
 
 
 
