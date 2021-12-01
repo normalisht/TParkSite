@@ -12,11 +12,29 @@
     <div class="block_service">
     <div class="block_img_price">
         <div class="block_img"><img src="{{ url_for("static", filename=path) }}" alt="" class="img_service"></div> <!--Фото услуги-->
-        <div class="block_price">{{ service.price }}</div>
+        <div class="block_price"><span class="price">{{ service.price }}</span></div>
     </div>
     <div class="">
         <div class="block_text">{{ service.description }}</div><!--Описание услуги-->
     </div>
     </div>
+
+
+
+    <script>
+        let detect = new MobileDetect(window.navigator.userAgent)
+        let link = document.createElement('link')
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.media = 'all';
+
+        if (detect.mobile()) {
+            link.href = '/app/static/service/service_mobile.css';
+        } else {
+            link.href = '/app/static/service/service_desktop.css'
+        }
+
+        document.head.append(link)
+    </script>
 
 {% endblock %}

@@ -70,6 +70,8 @@ img {
 
     }
 
+
+
 }
 
 @media (max-width: 562px) {
@@ -88,7 +90,7 @@ img {
     }
 
     .block_buttons {
-        display: flex;
+        display: none;
         margin: 0 auto 2vh;
         position: relative;
 
@@ -105,6 +107,7 @@ img {
     display: flex;
 
 }
+
 
 
 .block_buttons_grid {
