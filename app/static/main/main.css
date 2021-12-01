@@ -34,15 +34,18 @@ img {
 }
 
 .upper {
+    padding: 1vh;
     width: 100%;
-    max-width: 1920px;
-    background-color: var(--background-color);
+    max-width: 1400px;
+    margin: 0 auto;
+    /*background-color: var(--background-color);*/
     position: sticky;
     justify-content: space-between;
     vertical-align: middle;
     align-items: center;
     color: black;
     display: flex;
+    z-index: 1;
 }
 
 .footer {
@@ -66,13 +69,14 @@ img {
     justify-content: center;
     width: max-content;
     position: relative;
-    z-index: 2;
+    z-index: 5;
 }
 
 .main_block {
-    background-color: white;
+    background-color: rgba(169, 191, 239, 0.3);
     width: 100%;
     z-index: 1;
+
 }
 
 .block {
@@ -90,7 +94,7 @@ img {
 .button_main {
     user-select: none;
     /*background-color: var(--background-color);*/
-    height: 50px;
+    height: 2.5vh;
     color: black;
     display: flex;
     justify-content: center;
@@ -105,19 +109,19 @@ img {
 
 
 .block_logo {
-    margin-left: 1vw;
-    margin-top: 1vh;
     justify-content: center;
     display: flex;
     justify-items: center;
     flex-flow: column;
+    position: sticky;
 }
 
 .block_info {
     display: flex;
     position: relative;
     margin-right: 1vw;
-    justify-content: space-around;
+    flex-direction: column;
+    justify-content: space-evenly;
     align-items: center;
     font-size: var(--primary-big-font);
     font-family: var(--primary-font-family);
@@ -125,16 +129,14 @@ img {
 
 .block_numbers {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-evenly;
     margin: auto;
-    padding-top: 3px;
-    padding-bottom: 3px;
     font-size: var(--primary-big-font);
     font-family: var(--primary-font-family);
 }
 
 .block_numbers > div:first-child {
-    margin-right: 5px;
+    margin-right: 15px;
 }
 
 .block_content {
@@ -209,58 +211,5 @@ img {
     display: none;
 }
 
-@media (min-width: 562px) {
-    /*Desktop*/
-    .img_logo {
-        max-width: 200px;
-        max-height: 100px;
-        object-fit: cover;
-        margin: auto;
-    }
-
-    .block_numbers {
-        margin-top: 0;
-        --primary-big-font: 1.1rem;
-    }
-
-    .block_buttons {
-        font-size: 1.2rem;
-    }
-
-    .button_main {
-        width: 100px;
-    }
-
-    .block_info {
-        width: 30%;
-    }
-
-}
-
-@media (max-width: 562px) {
-    /*Phone*/
-    .img_logo {
-        max-width: 150px;
-        max-height: 100px;
-        margin: auto;
-    }
-
-    .block_info {
-        text-align: center;
-    }
-
-
-    .block_numbers {
-        --primary-big-font: 1.2rem;
-    }
-
-    .block_buttons {
-        font-size: 1.5rem;
-    }
-
-    .button_main {
-        width: calc(100vw / 3);
-    }
-}
 
 

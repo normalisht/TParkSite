@@ -12,3 +12,33 @@
     background-color: #6a7d9b;
 }
 /**/
+
+
+.block_logo {
+    margin-left: 1vw;
+}
+
+.img_logo {
+    max-width: 200px;
+    max-height: 100px;
+    object-fit: cover;
+    margin: auto;
+}
+
+.block_numbers {
+    margin-top: 0;
+    --primary-big-font: 1.1rem;
+}
+
+.block_buttons {
+    font-size: 1.2rem;
+}
+
+.button_main {
+    width: 100px;
+    height: 30px;
+}
+
+.block_info {
+    /*width: 30%;*/
+}
