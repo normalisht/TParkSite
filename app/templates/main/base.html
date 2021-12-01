@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="ru">
+
+<html id="html" lang="ru">
 <head id="head">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
@@ -16,8 +17,13 @@
     <script type="text/javascript" src="{{ url_for('static', filename='modal_window.js') }}"></script>
     {% block scripts %}{% endblock %}
     <script>
-    </script>
+        window.addEventListener('load', function () {
+            let preloader = document.getElementById('preloader')
 
+            preloader.style.opacity = '0'
+
+        })
+    </script>
 
     {% if title %}
         <title>{{ title }}</title>
@@ -28,7 +34,7 @@
 
 <body id="body">
 
-<div class="upper">
+<div id="upper" class="upper">
     <div class="block_logo">
         <img id="logo" class="img_logo" src="{{ url_for('static', filename='logo.png') }}" alt="">
 
@@ -65,14 +71,17 @@
             <!--конец модальных окон-->
         </div>
     </div>
-    <div class="block_info">
-        <div>Тренинг-Парк Дмитрия Сергеева</div>
-        <!--
-        <div class="block_numbers">
-            <div>+79999999999</div>
-            <div>+79999999999</div>
+
+    <div id="upper_block_info" class="block_info">
+        <div style="flex-direction: row; display: flex">
+            <div style="display: flex">Тренинг-Парк</div>
+            <div style="display: flex">&nbsp;Дмитрия Сергеева</div>
         </div>
-        -->
+        <div id="phone_numbers" class="block_numbers">
+            <div>+7(920)898-46-80</div>
+            <div>+7(920)898-46-80</div>
+        </div>
+
     </div>
 </div>
 
@@ -83,6 +92,17 @@
 
 <div id="footer" class="footer">© 2021</div>
 
+
+<div id="preloader" class="preloader">
+    <div class="loader-container circle-pulse-multiple">
+        <div class="loader">
+            <div class="circle-1"></div>
+            <div class="circle-2"></div>
+            <div class="circle-3"></div>
+        </div>
+    </div>
+    <div class="preloader-overlay"></div>
+</div>
 
 </body>
 </html>

@@ -5,12 +5,24 @@ link.type = 'text/css';
 link.media = 'all';
 
 if (detect.mobile()) {
-    link.href = '/app/static/main/phone.css'
+
+    if (detect.phone()) {
+        link.href = '/app/static/main/phone.css'
+        generate_mobile_upper()
+    } else if (detect.tablet()) {
+        link.href = '/app/static/main/desktop.css'
+    }
 } else {
     link.href = '/app/static/main/desktop.css'
 }
 
 document.head.append(link)
+
+
+function set_vw() {
+    let vw = document.documentElement.clientWidth / 100
+    document.documentElement.style.setProperty('--vw', `${vw}px`)
+}
 
 
 document.addEventListener('DOMContentLoaded', set_vw)
@@ -62,13 +74,42 @@ function buttons_position() {
     if(document.documentElement.scrollTop <= el.offsetTop) {
         el.style.height = '0'
         buttons.style.position = 'relative'
+        buttons.style.marginTop = '5px'
     }
+}
+
 
     if (buttons.offsetTop < document.documentElement.scrollTop) {
         el.style.height =  window.getComputedStyle(buttons).height
         buttons.style.position = 'fixed'
         buttons.style.top = buttons.style.left = buttons.style.right = '0'
+        buttons.style.marginTop = '0'
     }
+
+}
+
+
+function generate_mobile_upper() {
+    let phone_numbers = document.getElementById('phone_numbers'),
+        block_info = document.getElementById('upper_block_info'),
+        navigation_buttons = document.getElementById('navigation_buttons'),
+        upper = document.getElementById('upper')
+
+    block_info.style.flexDirection =
+        block_info.firstElementChild.style.flexDirection = 'column'
+    block_info.firstElementChild.style.alignItems = 'center'
+    block_info.firstElementChild.lastElementChild.innerHTML =
+        block_info.firstElementChild.lastElementChild.innerHTML.slice(0)
+
+    document.getElementById('logo').parentElement.style.width =
+        block_info.style.width = '50%'
+
+    navigation_buttons.style.marginBottom = '20px'
+    upper.after(navigation_buttons)
+    upper.after(phone_numbers)
+    upper.style.justifyContent = 'space-around'
+
+    phone_numbers.style.display = 'none'
 }
 
 

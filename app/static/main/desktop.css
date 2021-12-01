@@ -14,17 +14,40 @@
 /**/
 
 /*Desktop*/
+
+
+.block_logo {
+    margin-left: 1vw;
+}
+
 .img_logo {
     max-width: 200px;
     max-height: 100px;
-    margin-left: 5vw;
+    object-fit: cover;
+    margin: auto;
+}
+
+.block_numbers {
+    margin-top: 0;
+    --primary-big-font: 1.1rem;
 }
 
 .block_buttons {
-    display: flex;
-    position: relative;
-
-
+    --font-size: 1.2rem;
+    font-size: var(--font-size);
 }
 
+.button_main {
+    width: 100px;
+    height: 30px;
+    transition: all 0.2s ease;
+}
+
+.button_main:hover {
+    font-size: calc(var(--font-size) * 1.075);
+}
+
+.block_info {
+    /*width: 30%;*/
+}
 

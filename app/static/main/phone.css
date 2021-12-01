@@ -1,23 +1,28 @@
 
-
 /*Phone*/
 .img_logo {
     max-width: 150px;
     max-height: 100px;
-}
-
-.block_info {
-    float: right;
-    flex-direction: column;
+    margin: auto;
 }
 
 .block_numbers {
-    --primary-big-font: clamp(8px, 4vh, 14px);
+    --primary-big-font: 1.3rem;
+}
+
+.block_info {
+    text-align: center;
+    font-size: 1.25rem;
 }
 
 .block_buttons {
-    display: none;
-    margin: 0 auto 2vh;
-    position: relative;
-
+    font-size: 1.5rem;
+    margin: 5px auto 0;
 }
+
+.button_main {
+    padding: 4px;
+    width: calc(100vw / 3);
+    height: min-content;
+}
+

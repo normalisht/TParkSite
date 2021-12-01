@@ -1,25 +1,32 @@
 @charset "UTF-8";
 
 :root {
-    --background-color: #c8eaff;/*547dd2;*/
+    --background-color: #c8eaff; /*547dd2;*/
     --primary-color: #6f90dc;
     --body-background-color: #4acfeb;
-    --primary-big-font: clamp(14px, 1.5vw, 30px);
+    --primary-big-font: clamp(16px, 1.3vw, 25px);
     --primary-font-family: Times New Roman, serif;
     --modal_window_time: none;
     --vw: none;
+}
 
+html {
+    box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+    box-sizing: inherit;
 }
 
 * {
     appearance: none;
     -webkit-appearance: none;
-    transition: background-color .8s;
 }
 
 body {
     margin: 0;
-
 }
 
 img {
@@ -27,17 +34,18 @@ img {
 }
 
 .upper {
+    padding: 1vh;
     width: 100%;
-    max-width: 1920px;
-    height: 100px;
-    background-color: var(--background-color);
+    max-width: 1400px;
+    margin: 0 auto;
+    /*background-color: var(--background-color);*/
     position: sticky;
     justify-content: space-between;
     vertical-align: middle;
     align-items: center;
     color: black;
-    margin-bottom: 20px;
     display: flex;
+    z-index: 1;
 }
 
 .footer {
@@ -56,40 +64,44 @@ img {
 }
 
 
-
-
 a {
     text-decoration:none;
     color: black;
 }
 
+.block_buttons {
+    background: white;
+    display: flex;
+    margin: 0 auto;
+    justify-content: center;
+    width: max-content;
+    position: relative;
+    z-index: 5;
+}
+
 .main_block {
-    background-color: white;
+    background-color: rgba(169, 191, 239, 0.3);
     width: 100%;
     z-index: 1;
+
 }
+
 .block {
     display: flex;
-
+    justify-content: space-between;
+    margin: 0 auto 2vh;
+    top: 0;
+    z-index: 1;
 }
-
-
 
 .block_buttons_grid {
     display: grid;
-
-
 }
 
-
 .button_main {
-
     user-select: none;
-    background-color: var(--background-color);
-    border-radius: 1px;
-    width: 100px;
-    height: 50px;
-    position: relative;
+    /*background-color: var(--background-color);*/
+    height: 2.5vh;
     color: black;
     display: flex;
     justify-content: center;
@@ -100,23 +112,23 @@ a {
 .button_main:nth-child(2) {
     border-right: 1px solid;
     border-left: 1px solid;
-
 }
 
 
-
 .block_logo {
-    display: flex;
     justify-content: center;
-    max-width: 200px;
-    max-height: 150px;
+    display: flex;
+    justify-items: center;
+    flex-flow: column;
+    position: sticky;
 }
 
 .block_info {
     display: flex;
     position: relative;
-    width: 40%;
-    justify-content: space-around;
+    margin-right: 1vw;
+    flex-direction: column;
+    justify-content: space-evenly;
     align-items: center;
     font-size: var(--primary-big-font);
     font-family: var(--primary-font-family);
@@ -124,11 +136,14 @@ a {
 
 .block_numbers {
     display: flex;
-    padding: 2vh;
-    flex-direction: column;
-    justify-content: center;
+    justify-content: space-evenly;
+    margin: auto;
     font-size: var(--primary-big-font);
     font-family: var(--primary-font-family);
+}
+
+.block_numbers > div:first-child {
+    margin-right: 15px;
 }
 
 .block_content {
@@ -205,4 +220,66 @@ a {
 }
 
 
+@keyframes circlePulse {
+    0% {
+        transform: scale(0.1);
+    }
+    80% {
+        opacity: .8;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0;
+    }
+}
 
+@keyframes rotate {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.preloader {
+    transition: all 900ms ease;
+}
+
+.loader-container {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10000;
+}
+
+.preloader-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #ffffff;
+    z-index: 9999;
+}
+
+.circle-pulse-multiple .loader {
+    width: 100px;
+    height: 100px;
+}
+
+.circle-pulse-multiple .loader > div {
+    position: absolute;
+    top: 0; left: 0;
+    width: min(10vw, 10vh);
+    height: min(10vw, 10vh);
+    border: 2px solid #8cc5f3;
+    border-radius: 50%;
+    animation: circlePulse 1s ease infinite;
+    transform: translate(-50%, -50%);
+}
+
+.circle-pulse-multiple .loader .circle-2 {
+    animation-delay: -.9s;
+}
+
+.circle-pulse-multiple .loader .circle-3 {
+    animation-delay: -.8s;
+}
