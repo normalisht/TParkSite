@@ -20,7 +20,7 @@
 
 .block_img_partners {
     width: 70%;
-    margin: 0px auto;
+    margin: 0 auto;
     display: grid;
     grid-gap: 1rem;
     grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
@@ -34,7 +34,7 @@
 
 .block_employees_block {
     width: 20%;
-    margin: 0px auto;
+    margin: 0 auto;
 }
 
 .block_employees {

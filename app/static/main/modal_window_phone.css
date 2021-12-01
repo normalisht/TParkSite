@@ -27,6 +27,7 @@
     left: -1px;
     width: 102%;
     height: 102%;
+    z-index: -1;
     opacity: 0;
     background-color: #000;
     transition: var(--modal_window_time, 500ms) linear;
@@ -46,7 +47,6 @@
 }
 
 .modal-item {
-    max-width: 85%;
     letter-spacing: 1px;
     transition: .3s linear;
     text-decoration: none;
@@ -55,6 +55,19 @@
     border-bottom: 1px solid rgba(0, 0, 0, 0.35);
     font-size: 2rem;
     font-family: 'Kurale', serif;
+}
+
+.modal-item:nth-last-child(2) {
+    border-bottom: 0;
+}
+
+.modal-item:first-child {
+    max-width: 85%;
+    border-bottom: 0;
+}
+
+.modal-item:nth-child(2) {
+    border-top: 1px solid rgba(0, 0, 0, 0.35);
 }
 
 .show_modal_window .modal-window {
