@@ -32,8 +32,7 @@
         {% for employee in employees %}
             <div class="block_employees">
                 <div class="block_img_employees">
-                    <img src="{{ url_for('static/', filename='employees/') }}"
-                         alt="">
+                    <img src="{{ url_for('static/', filename='employees/') }}">
                 </div>
                 <div class="block_name_employees">{{ amployee.name }}</div>
                 <div class="block_text_employees">{{ employee.position }}</div>
