@@ -1,22 +1,26 @@
-let detect = new MobileDetect(window.navigator.userAgent)
-let link = document.createElement('link')
-link.rel = 'stylesheet';
-link.type = 'text/css';
-link.media = 'all';
+detected_phone()
 
-if (detect.mobile()) {
+function detected_phone() {
+    let detect = new MobileDetect(window.navigator.userAgent)
+    let link = document.createElement('link')
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.media = 'all';
 
-    if (detect.phone()) {
-        link.href = '/app/static/main/phone.css'
-        generate_mobile_upper()
-    } else if (detect.tablet()) {
+    if (detect.mobile()) {
+
+        if (detect.phone()) {
+            link.href = '/app/static/main/phone.css'
+            generate_mobile_upper()
+        } else if (detect.tablet()) {
+            link.href = '/app/static/main/desktop.css'
+        }
+    } else {
         link.href = '/app/static/main/desktop.css'
     }
-} else {
-    link.href = '/app/static/main/desktop.css'
-}
 
-document.head.append(link)
+    document.head.append(link)
+}
 
 document.addEventListener('DOMContentLoaded', set_vw)
 window.addEventListener('resize', set_vw)
