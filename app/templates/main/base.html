@@ -49,7 +49,11 @@
             <div id="services-modal-win" class="modal submenu">
                 <div class="modal-window">
                     {% for category in categories %}
-                        <div class="modal-item submenu-item">{{ category.name }}</div>
+                        <a href="{{ url_for('main.category') }}?category_id={{ category.id }}">
+                            <div class="modal-item submenu-item">
+                                {{ category.name }}
+                            </div>
+                        </a>
                     {% endfor %}
                     <close class="btn-close-modal-window">
                         <img src="{{ url_for('static', filename='cross.png') }}" alt="X">
