@@ -22,7 +22,6 @@
 .button_main:hover .submenu {
     visibility: visible;
     opacity: 1;
-
 }
 
 .submenu-item {
