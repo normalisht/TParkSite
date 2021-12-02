@@ -285,7 +285,12 @@ img {
 }
 
 .name {
-    display: grid;
-    grid-gap: 1rem;
-    grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.name > div {
+    flex: 0 1 calc(100% / 4 - 15px);
 }

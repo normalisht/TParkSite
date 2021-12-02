@@ -70,14 +70,14 @@ function buttons_position() {
     let el = buttons.nextElementSibling
 
 
-    if(document.documentElement.scrollTop <= el.offsetTop) {
+    if (document.documentElement.scrollTop <= el.offsetTop) {
         el.style.height = '0'
         buttons.style.position = 'relative'
         buttons.style.marginTop = '5px'
     }
 
     if (buttons.offsetTop < document.documentElement.scrollTop) {
-        el.style.height =  window.getComputedStyle(buttons).height
+        el.style.height = window.getComputedStyle(buttons).height
         buttons.style.position = 'fixed'
         buttons.style.top = buttons.style.left = buttons.style.right = '0'
         buttons.style.marginTop = '0'
@@ -127,8 +127,8 @@ function generate_desktop_upper() {
         block_info.firstElementChild.style.flexDirection = 'row'
     block_info.firstElementChild.style.alignItems = 'left'
 
-    block_info.firstElementChild.lastElementChild.innerHTML = ' ' +
-        block_info.firstElementChild.lastElementChild.innerHTML
+    // block_info.firstElementChild.lastElementChild.innerHTML = ' ' +
+    //     block_info.firstElementChild.lastElementChild.innerHTML
 
     upper.firstElementChild.after(navigation_buttons)
     block_info.style.width = 'max-content'
