@@ -1,3 +1,4 @@
+
 detected_phone()
 
 function detected_phone() {
@@ -21,6 +22,7 @@ function detected_phone() {
 
     document.head.append(link)
 }
+
 
 document.addEventListener('DOMContentLoaded', set_vw)
 window.addEventListener('resize', set_vw)
@@ -82,6 +84,7 @@ function buttons_position() {
         buttons.style.top = buttons.style.left = buttons.style.right = '0'
         buttons.style.marginTop = '0'
     }
+
 }
 
 function generate_upper(event) {
@@ -135,3 +138,4 @@ function generate_desktop_upper() {
     navigation_buttons.style.margin = 'auto'
     phone_numbers.style.display = 'flex'
 }
+
