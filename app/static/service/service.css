@@ -9,25 +9,26 @@
 
 
 .block_img {
-    display:flex;
+    display:block;
     height:clamp(100px,30vh, 400px );
     width:clamp(200px,30vw, 600px );
-
+    align-items: center;
+    margin: 0  auto 5vh;
 }
 
 .block_text {
-    display:flex;
-    max-width: 45vw;
-
+    display:block;
+    max-width: 90vw;
+    text-align: center;
 }
 
 .block_price {
     display:flex;
-    float:right;
     align-items: center;
     text-align:center;
     justify-content: center;
-
+    max-width: 90vw;
+    margin-bottom:3vh;
 }
 
 .price {
@@ -37,10 +38,11 @@
 }
 
 .block_img_price {
-    display:grid;
+    display:block;
+    /*display:grid;
     grid-template-columns: 1fr;
     max-width:45vw;
-    grid-auto-rows: minmax(100px, 200px);
+    grid-auto-rows: minmax(100px, 200px);*/
 }
 
 

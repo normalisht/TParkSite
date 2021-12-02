@@ -45,9 +45,7 @@ def service():
 
     service = Service.query.filter_by(id=service_id).first()
 
-    prices = Price.query.filter_by(id=service_id).all()
-
-    return render_template('main/service.html', service=service, categories=get_categories(), prices=prices)
+    return render_template('main/service.html', service=service, categories=get_categories())
 
 
 @bp.route('/about', methods=['GET'])
