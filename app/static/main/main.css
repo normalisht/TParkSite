@@ -77,7 +77,6 @@ img {
     background-color: rgba(169, 191, 239, 0.3);
     width: 100%;
     z-index: 1;
-
 }
 
 .block {
@@ -283,4 +282,10 @@ img {
 
 .circle-pulse-multiple .loader .circle-3 {
     animation-delay: -.8s;
+}
+
+.name {
+    display: grid;
+    grid-gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
 }

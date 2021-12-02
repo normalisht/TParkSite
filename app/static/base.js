@@ -34,7 +34,9 @@ window.addEventListener("orientationchange", top_footer)
 
 set_vw()
 
-
+window.addEventListener('resize', generate_upper)
+window.addEventListener("orientationchange", generate_upper)
+document.addEventListener("DOMContentLoaded", generate_upper)
 
 function set_vw() {
     let vw = document.documentElement.clientWidth / 100
@@ -82,6 +84,13 @@ function buttons_position() {
     }
 }
 
+function generate_upper(event) {
+    if (document.documentElement.clientWidth < 900)
+        generate_mobile_upper()
+    else
+        generate_desktop_upper()
+}
+
 
 function generate_mobile_upper() {
     let phone_numbers = document.getElementById('phone_numbers'),
@@ -89,8 +98,9 @@ function generate_mobile_upper() {
         navigation_buttons = document.getElementById('navigation_buttons'),
         upper = document.getElementById('upper')
 
-    block_info.style.flexDirection =
-        block_info.firstElementChild.style.flexDirection = 'column'
+    // block_info.style.flexDirection =
+    //     block_info.firstElementChild.style.flexDirection = 'column'
+
     block_info.firstElementChild.style.alignItems = 'center'
     block_info.firstElementChild.lastElementChild.innerHTML =
         block_info.firstElementChild.lastElementChild.innerHTML.slice(0)
@@ -106,6 +116,22 @@ function generate_mobile_upper() {
     phone_numbers.style.display = 'none'
 }
 
+function generate_desktop_upper() {
+    let phone_numbers = document.getElementById('phone_numbers'),
+        block_info = document.getElementById('upper_block_info'),
+        navigation_buttons = document.getElementById('navigation_buttons'),
+        upper = document.getElementById('upper')
 
+    block_info.append(phone_numbers)
+    phone_numbers.style.flexDirection =
+        block_info.firstElementChild.style.flexDirection = 'row'
+    block_info.firstElementChild.style.alignItems = 'left'
 
+    block_info.firstElementChild.lastElementChild.innerHTML = ' ' +
+        block_info.firstElementChild.lastElementChild.innerHTML
 
+    upper.firstElementChild.after(navigation_buttons)
+    block_info.style.width = 'max-content'
+    navigation_buttons.style.margin = 'auto'
+    phone_numbers.style.display = 'flex'
+}

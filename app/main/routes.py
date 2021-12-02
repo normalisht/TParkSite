@@ -15,7 +15,7 @@ def index():
     events = Event.query.all()
     geolocation = Text.query.filter_by(title='geolocation').first()
     address = Text.query.filter_by(title='address').first()
-    phone_numbers = Text.query.filter_by(title='phone_numbers').first()
+    phone_numbers = Text.query.filter_by(title='phone_numbers').first().text.split()
     vk = Text.query.filter_by(title='vk').first()
     insta = Text.query.filter_by(title='insta').first()
 

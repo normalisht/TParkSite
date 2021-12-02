@@ -78,7 +78,6 @@ function activate_modal_window() {
     window.addEventListener('orientationchange', modal_windows_position)
     document.addEventListener('DOMContentLoaded', modal_windows_position)
 
-
     document.addEventListener('DOMContentLoaded', function () {
 
         let modal_window_events = document.getElementById('navigation_buttons')

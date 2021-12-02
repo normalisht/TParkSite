@@ -4,19 +4,19 @@
 }
 
 .block_fil {
-    padding: 0px 10% 0px;
+    padding: 0 10% 0;
     justify-content: center;
     letter-spacing: 1px;
-    word-spacing: 0px;
+    word-spacing: 0;
     white-space: normal;
     line-height: normal;
 }
 
 .block_text_about {
-    padding: 0px 10% 0px;
+    padding: 0 10% 0;
     justify-content: center;
     letter-spacing: 1px;
-    word-spacing: 0px;
+    word-spacing: 0;
     white-space: normal;
     line-height: normal;
 }
