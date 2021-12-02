@@ -16,14 +16,14 @@
             <div class="block_img"><img src="{{ url_for("static", filename=path) }}" alt="" class="img_service"></div>
             <!--Фото услуги-->
         </div>
+        <div class="block_price">
             {% for price in service.prices %}
-            <div class="block_price">{{ price }}</div>
+                <div class="price">{{ price }}</div>
             {% endfor %}
-
+        </div>
         <div class="">
             <div class="block_text">{{ service.description }}</div><!--Описание услуги-->
         </div>
-
     </div>
 
 
