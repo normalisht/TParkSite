@@ -2,21 +2,22 @@
 
 
 .block_service {
-    display:flex;
+    display:grid;
     margin: 0 auto;
-    /*box-shadow: 2px 4px 16px #ccc;*/
-    justify-content: space-around;
+    grid-template-columns: 1fr;
+    align-items: center;
     border-radius: 5px;
-    max-width: 99vw;
+    max-width:90vw;
     min-height: 55vh;
     /*background-color:var(--body-background-color);*/
+    /*box-shadow: 2px 4px 16px #ccc;*/
     z-index:2;
 }
 
 .img_service {
     object-fit: cover;
-    width: clamp(100px, 30vw, 400px);
-    height: clamp(100px, 30vh, 200px);
+    width: 100%;
+    height: clamp(100px, 30vh, 400px);
     margin: 0 auto;
 }
 
