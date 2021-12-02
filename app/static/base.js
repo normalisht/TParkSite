@@ -98,8 +98,8 @@ function generate_mobile_upper() {
         navigation_buttons = document.getElementById('navigation_buttons'),
         upper = document.getElementById('upper')
 
-    // block_info.style.flexDirection =
-    //     block_info.firstElementChild.style.flexDirection = 'column'
+    block_info.style.flexDirection =
+        block_info.firstElementChild.style.flexDirection = 'column'
 
     block_info.firstElementChild.style.alignItems = 'center'
     block_info.firstElementChild.lastElementChild.innerHTML =
@@ -127,8 +127,8 @@ function generate_desktop_upper() {
         block_info.firstElementChild.style.flexDirection = 'row'
     block_info.firstElementChild.style.alignItems = 'left'
 
-    // block_info.firstElementChild.lastElementChild.innerHTML = ' ' +
-    //     block_info.firstElementChild.lastElementChild.innerHTML
+    block_info.firstElementChild.lastElementChild.innerHTML = ' ' +
+        block_info.firstElementChild.lastElementChild.innerHTML
 
     upper.firstElementChild.after(navigation_buttons)
     block_info.style.width = 'max-content'

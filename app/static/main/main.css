@@ -127,6 +127,10 @@ img {
     font-family: var(--primary-font-family);
 }
 
+.block_info > div {
+    display: flex;
+}
+
 .block_numbers {
     display: flex;
     justify-content: space-evenly;
@@ -282,15 +286,4 @@ img {
 
 .circle-pulse-multiple .loader .circle-3 {
     animation-delay: -.8s;
-}
-
-.name {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    width: 100%;
-}
-
-.name > div {
-    flex: 0 1 calc(100% / 4 - 15px);
 }
