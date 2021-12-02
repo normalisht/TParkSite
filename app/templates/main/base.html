@@ -27,11 +27,11 @@
 
         })
 
-{#        window.addEventListener('unload', function () {
-            let preloader = document.getElementById('preloader')
-            preloader.style.display = 'block'
-            preloader.style.opacity = '1'
-        })#}
+        {#        window.addEventListener('unload', function () {
+                    let preloader = document.getElementById('preloader')
+                    preloader.style.display = 'block'
+                    preloader.style.opacity = '1'
+                })#}
     </script>
 
     {% if title %}
@@ -58,11 +58,11 @@
                 <div id="services-modal-win" class="modal submenu">
                     <div class="modal-window">
                         {% for category in categories %}
-                            <a href="{{ url_for('main.category') }}?category_id={{ category.id }}">
-                                <div class="modal-item submenu-item">
+                            <div class="modal-item submenu-item">
+                                <a href="{{ url_for('main.category') }}?category_id={{ category.id }}">
                                     {{ category.name }}
-                                </div>
-                            </a>
+                                </a>
+                            </div>
                         {% endfor %}
                         <close class="btn-close-modal-window">
                             <img src="{{ url_for('static', filename='cross.png') }}" alt="X">
