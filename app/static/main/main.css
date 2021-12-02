@@ -1,7 +1,7 @@
 @charset "UTF-8";
 
 :root {
-    --background-color: #c8eaff; /*547dd2;*/
+    --background-color: rgba(169, 191, 239, 0.15); /*547dd2;*/
     --primary-color: #6f90dc;
     --body-background-color: #4acfeb;
     --primary-big-font: clamp(16px, 1.3vw, 25px);
@@ -27,10 +27,16 @@ html {
 
 body {
     margin: 0;
+    background-color: var(--background-color);
 }
 
 img {
     user-select: none; /* чтобы картинки не выделялись при выделении текста */
+}
+
+.upper_container {
+    width: 100%;
+    background-color: white;
 }
 
 .upper {
@@ -46,6 +52,7 @@ img {
     color: black;
     display: flex;
     z-index: 1;
+    background-color: white;
 }
 
 .footer {
@@ -74,7 +81,7 @@ img {
 }
 
 .main_block {
-    background-color: rgba(169, 191, 239, 0.3);
+    margin-top: 0;
     width: 100%;
     z-index: 1;
 }
