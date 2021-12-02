@@ -4,17 +4,21 @@
 }
 
 .block_fil {
+    padding: 0 10% 0;
     justify-content: center;
-    width: 100vw;
-    max-height: 80vh;
-    margin-top: 20px;
+    letter-spacing: 1px;
+    word-spacing: 0;
+    white-space: normal;
+    line-height: normal;
 }
 
 .block_text_about {
+    padding: 0 10% 0;
     justify-content: center;
-    width: 100vw;
-    max-height: 120vh;
-    margin-top: 20px;
+    letter-spacing: 1px;
+    word-spacing: 0;
+    white-space: normal;
+    line-height: normal;
 }
 
 

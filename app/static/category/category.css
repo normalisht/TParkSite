@@ -46,7 +46,7 @@ h1 {
     align-items: center;
     box-shadow: 0 4px 16px #ccc; /*Не является конечным вариантом*/
     background-color: cornflowerblue; /*Не является конечным вариантом*/
-    -webkit-transition: background-color,1s;
+    -webkit-transition: background-color, 1s;
 }
 
 .buttons {
@@ -55,23 +55,23 @@ h1 {
     align-items: center;
     white-space: normal;
     display: grid;
-    grid-template-columns: repeat(3,20vw);
+    grid-template-columns: repeat(3, 20vw);
     grid-auto-rows: minmax(10vw, auto);
 }
 
-.description{
+.description {
     max-height: 0;
     overflow: hidden;
     transition: max-height 2s cubic-bezier(0, 1, 0, 1);
 }
 
-.content{
+.content {
     min-height: 20px;
     max-height: 20vw;
-    max-width:  20vw;
+    max-width: 20vw;
 }
 
-.description.active{
+.active {
     max-height: 30vw;
     transition: max-height 1.5s ease-out;
 }
@@ -79,11 +79,11 @@ h1 {
 .button:hover {
     cursor: pointer;
     -webkit-filter: grayscale(50%);
-    -webkit-transition: -webkit-filter,1s;
+    -webkit-transition: -webkit-filter, 1s;
 }
 
-.content:after{
-    content:"";
+.content:after {
+    content: "";
     position: absolute;
     right: 10px;
     top: 40%;

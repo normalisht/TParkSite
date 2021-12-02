@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html id="html" lang="ru">
 <head id="head">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -8,6 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='main/main.css') }}">
     <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename="favicon.ico") }}"/>
     <link rel="stylesheet" href="{{ url_for('static', filename='slider.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='contacts/contacts.css') }}">
     {% block link %}{% endblock %}
 
     <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -21,6 +21,7 @@
             let preloader = document.getElementById('preloader')
 
             preloader.style.opacity = '0'
+            preloader.style.display = 'none'
 
         })
     </script>
@@ -36,8 +37,9 @@
 
 <div id="upper" class="upper">
     <div class="block_logo">
-        <img id="logo" class="img_logo" src="{{ url_for('static', filename='logo.png') }}" alt="">
-
+        <a href="{{ url_for('main.index') }}">
+            <img id="logo" class="img_logo" src="{{ url_for('static', filename='logo.png') }}" alt="">
+        </a>
     </div>
     <div id='navigation_buttons' class="block_buttons">
         <div id="services-button" class="button_main"
@@ -56,14 +58,39 @@
                 <div class="overlay"></div>
             </div>
         </div>
-        <div class="button_main">О нас</div>
+        <div class="button_main"><a href="{{ url_for('main.about') }}" class="about_a">О нас</a></div>
         <div class="button_main" data-modal-window-toggle="#contacts-modal-win">
             Контакты
             <div id="contacts-modal-win" class="modal submenu">
                 <div class="modal-window">
-                    {% for i in range(100) %}
-                        <div class="modal-item submenu-item">Категория услуг {{ i }}</div>
+                    <div class="modal-item submenu-item">
+                        <div class="geolocation">
+                            <a href="{{ geolocation }}" target="_blank">Наше местоположение
+                                <svg width="24  " height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M 12 1 a 9.002 9.002 0 0 0 -6.366 15.362 c 1.63 1.63 5.466 3.988 5.693 6.465 c 0.034 0.37 0.303 0.673 0.673 0.673 c 0.37 0 0.64 -0.303 0.673 -0.673 c 0.227 -2.477 4.06 -4.831 5.689 -6.46 A 9.002 9.002 0 0 0 12 1 Z m 0 12.079 a 3.079 3.079 0 1 1 0 -6.158 a 3.079 3.079 0 0 1 0 6.158 Z"
+                                          fill="red"></path>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="modal-item submenu-item">
+                        <div style="max-width: 350px;">Адрес: {{ address }}</div>
+                    </div>
+                    {% for number in phone_numbers %}
+                        <div class="modal-item submenu-item">
+                            <a style='text-decoration: none' href="https://wa.me/7{{ number }}">+7{{ number }}</a>
+                        </div>
                     {% endfor %}
+                    <div class="modal-item submenu-item">
+                        <div class="social">
+                            Ссылки на социальные сети
+                            <ul class="social-icons">
+                                <li><a class="vk" href="{{ vk }}" target="_blank"><i class="fa fa-vk"></i></a></li>
+                                <li><a class="insta" href="{{ insta }}" target="_blank"><i class="fa fa-instagram"></i></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                     <button class="btn-close-modal-window" data-modal-window-toggle="#contacts-modal-win">X</button>
                 </div>
                 <div class="overlay"></div>
@@ -73,9 +100,8 @@
     </div>
 
     <div id="upper_block_info" class="block_info">
-        <div style="flex-direction: row; display: flex">
-            <div style="display: flex">Тренинг-Парк</div>
-            <div style="display: flex">&nbsp;Дмитрия Сергеева</div>
+        <div class='name'>
+            <div>Тренинг-</div><div>Парк</div><div>Дмитрия </div><div>Сергеева</div>
         </div>
         <div id="phone_numbers" class="block_numbers">
             <div>+7(920)898-46-80</div>
@@ -85,14 +111,11 @@
     </div>
 </div>
 
-
 <div id="main_block" class="main_block">
     {% block app_content %}{% endblock %}
 </div>
 
 <div id="footer" class="footer">© 2021</div>
-
-
 <div id="preloader" class="preloader">
     <div class="loader-container circle-pulse-multiple">
         <div class="loader">

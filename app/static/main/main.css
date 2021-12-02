@@ -63,12 +63,6 @@ img {
     font-size: 14px;
 }
 
-
-a {
-    text-decoration:none;
-    color: black;
-}
-
 .block_buttons {
     background: white;
     display: flex;
@@ -83,7 +77,6 @@ a {
     background-color: rgba(169, 191, 239, 0.3);
     width: 100%;
     z-index: 1;
-    height:90vh;/*Костыль, надо подумать как задать высоту без возможных наплывов*/
 }
 
 .block {
@@ -219,6 +212,11 @@ a {
     display: none;
 }
 
+.about_a {
+    text-decoration: none;
+    color: black;
+
+}
 
 @keyframes circlePulse {
     0% {
@@ -253,7 +251,8 @@ a {
 
 .preloader-overlay {
     position: absolute;
-    top: 0; left: 0;
+    top: 0;
+    left: 0;
     width: 100vw;
     height: 100vh;
     background-color: #ffffff;
@@ -267,7 +266,8 @@ a {
 
 .circle-pulse-multiple .loader > div {
     position: absolute;
-    top: 0; left: 0;
+    top: 0;
+    left: 0;
     width: min(10vw, 10vh);
     height: min(10vw, 10vh);
     border: 2px solid #8cc5f3;
@@ -282,4 +282,15 @@ a {
 
 .circle-pulse-multiple .loader .circle-3 {
     animation-delay: -.8s;
+}
+
+.name {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.name > div {
+    flex: 0 1 calc(100% / 4 - 15px);
 }

@@ -56,7 +56,7 @@ class Employee(db.Model):
 
 class Text(db.Model):
     id = db.Column(db.Integer, primary_key=True, index=True, unique=True)
-    title = db.Column(db.String(64), unique=True)  # название текста
+    title = db.Column(db.String(64))  # название текста
     text = db.Column(db.Text)  # содержание
 
     def __repr__(self):

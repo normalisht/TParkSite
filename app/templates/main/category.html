@@ -3,13 +3,7 @@
 
 {% block app_content %}
     <script type="text/javascript" src="{{ url_for('static', filename='slider.js') }}"></script>
-    <script>    /*Этот скрипт был написан только для теста развертки и работает не совсем правильно*/
-        $(function() {
-            $(".content").click(function() {
-                $(".description").toggleClass('active')
-            });
-        });
-    </script>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='category/category.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='category_slider.css') }}">
     <h1>{{ category.name }}</h1>
@@ -24,32 +18,38 @@
                                     <div class="slider__wrapper">
                                         <div class="slider__items">
                                             <div class="slider__item">
-                                                <img src="{{ url_for('static',filename='/images/category/1.png' ) }}" alt="">
+                                                <img src="{{ url_for('static',filename='/images/category/1.png' ) }}"
+                                                     alt="">
                                             </div>
                                             <div class="slider__item">
-                                                <img src="{{ url_for('static',filename='/images/category/1.png' ) }}" alt="">
+                                                <img src="{{ url_for('static',filename='/images/category/1.png' ) }}"
+                                                     alt="">
                                             </div>
                                             <div class="slider__item">
-                                                <img src="{{ url_for('static',filename='/images/category/1.png' ) }}" alt="">
+                                                <img src="{{ url_for('static',filename='/images/category/1.png' ) }}"
+                                                     alt="">
                                             </div>
                                             <div class="slider__item">
-                                                <img src="{{ url_for('static',filename='/images/category/1.png' ) }}" alt="">
+                                                <img src="{{ url_for('static',filename='/images/category/1.png' ) }}"
+                                                     alt="">
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <a class="slider__control slider__control_prev" href="#" role="button" data-slide="prev"></a>
-                                <a class="slider__control slider__control_next" href="#" role="button" data-slide="next"></a>
+                                <a class="slider__control slider__control_prev" href="#" role="button"
+                                   data-slide="prev"></a>
+                                <a class="slider__control slider__control_next" href="#" role="button"
+                                   data-slide="next"></a>
                             </div>
                         </div>
                     </td>
                     <td>
                         <h1>ОПИСАНИЕ</h1>
                         {% if category.description == true %}
-                        <div class="text">
-                            <span>{{ category.description }}</span>
-                        </div>
+                            <div class="text">
+                                <span>{{ category.description }}</span>
+                            </div>
                         {% endif %}
                     </td>
                 </tr>
@@ -60,7 +60,7 @@
         {% for element in services %}
             {% set service = element.service %}
             {% if service.status == true %}
-                <table id="button" style="margin-right: 3vw;" class="button">
+                <table id="{{ service.id }}"  style="margin-right: 3vw;" class="button">
                     <tr style="border: 2px solid black;">
                         <td>
                             <div class="content">
@@ -69,7 +69,8 @@
                                     {% if service.short_description != None %}
                                         <br>Краткое описание: {{ service.short_description }}
                                     {% endif %}
-                                    <a href="{{ url_for('main.service')}}?service_id={{ service.id }}" >Ссылка на полное описание </a>
+                                    <a href="{{ url_for('main.service') }}?service_id={{ service.id }}">Ссылка на полное
+                                        описание </a>
                                 </div>
                             </div>
                         </td>
@@ -78,5 +79,17 @@
             {% endif %}
         {% endfor %}
     </div>
+
+    <div id="123">123</div>
+
+    <script>
+        let services = document.querySelectorAll('.button')
+
+        for(let service of services) {
+            service.addEventListener('click', function() {
+                service.querySelector('.description').classList.toggle('active')
+            })
+        }
+    </script>
 
 {% endblock %}
