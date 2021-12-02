@@ -26,7 +26,7 @@ def index():
 
 
 @bp.route('/category', methods=['GET'])
-def test():
+def category():
     try:
         category_id = request.args.get('category_id')
 

@@ -76,6 +76,7 @@ function buttons_position() {
         el.style.height = '0'
         buttons.style.position = 'relative'
         buttons.style.marginTop = '5px'
+        buttons.style.paddingBottom = '12px'
     }
 
     if (buttons.offsetTop < document.documentElement.scrollTop) {
@@ -83,6 +84,7 @@ function buttons_position() {
         buttons.style.position = 'fixed'
         buttons.style.top = buttons.style.left = buttons.style.right = '0'
         buttons.style.marginTop = '0'
+        buttons.style.paddingBottom = '0'
     }
 
 }
@@ -101,8 +103,8 @@ function generate_mobile_upper() {
         navigation_buttons = document.getElementById('navigation_buttons'),
         upper = document.getElementById('upper')
 
-    // block_info.style.flexDirection =
-    //     block_info.firstElementChild.style.flexDirection = 'column'
+    block_info.style.flexDirection =
+        block_info.firstElementChild.style.flexDirection = 'column'
 
     block_info.firstElementChild.style.alignItems = 'center'
     block_info.firstElementChild.lastElementChild.innerHTML =
@@ -111,7 +113,7 @@ function generate_mobile_upper() {
     document.getElementById('logo').parentElement.style.width =
         block_info.style.width = '50%'
 
-    navigation_buttons.style.marginBottom = '20px'
+    navigation_buttons.style.paddingBottom = '12px'
     upper.after(navigation_buttons)
     upper.after(phone_numbers)
     upper.style.justifyContent = 'space-around'
@@ -130,8 +132,8 @@ function generate_desktop_upper() {
         block_info.firstElementChild.style.flexDirection = 'row'
     block_info.firstElementChild.style.alignItems = 'left'
 
-    // block_info.firstElementChild.lastElementChild.innerHTML = ' ' +
-    //     block_info.firstElementChild.lastElementChild.innerHTML
+    block_info.firstElementChild.lastElementChild.innerHTML = ' ' +
+        block_info.firstElementChild.lastElementChild.innerHTML
 
     upper.firstElementChild.after(navigation_buttons)
     block_info.style.width = 'max-content'

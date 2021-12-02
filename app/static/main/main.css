@@ -1,7 +1,7 @@
 @charset "UTF-8";
 
 :root {
-    --background-color: rgb(196, 219, 255); /*547dd2;*/
+    --background-color: rgba(169, 191, 239, 0.15); /*547dd2;*/
     --primary-color: #ffa200; /*fff600*/
     --body-background-color: #4acfeb;
     --primary-big-font: clamp(16px, 1.3vw, 25px);
@@ -32,6 +32,11 @@ body {
 
 img {
     user-select: none; /* чтобы картинки не выделялись при выделении текста */
+}
+
+.upper_container {
+    width: 100%;
+    background-color: white;
 }
 
 .upper {
@@ -82,6 +87,7 @@ img {
 }
 
 .main_block {
+    margin-top: 0;
     width: 100%;
     z-index: 1;
 }
@@ -145,6 +151,10 @@ img {
     align-items: center;
     font-size: var(--primary-big-font);
     font-family: var(--primary-font-family);
+}
+
+.block_info > div {
+    display: flex;
 }
 
 .block_numbers {
@@ -304,13 +314,8 @@ img {
     animation-delay: -.8s;
 }
 
-.name {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
+.modal-window > a {
+    text-decoration: none;
+    color: black;
     width: 100%;
-}
-
-.name > div {
-    flex: 0 1 calc(100% / 4 - 15px);
 }

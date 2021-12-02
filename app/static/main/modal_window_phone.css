@@ -86,3 +86,12 @@
     width: 25px;
     height: 25px;
 }
+
+.contacts .modal-item {
+    font-size: 1.7rem;
+}
+
+.social-icons {
+    margin-top: 5px;
+    justify-content: space-evenly;
+}

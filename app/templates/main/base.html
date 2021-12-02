@@ -14,16 +14,24 @@
     <script defer src="https://ajax.googleapis.com/ajax/libs/hammerjs/2.0.8/hammer.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mobile-detect/1.4.4/mobile-detect.min.js"></script>
     <script defer src="{{ url_for('static', filename='base.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='modal_window.js') }}"></script>
+    <script defer type="text/javascript" src="{{ url_for('static', filename='modal_window.js') }}"></script>
     {% block scripts %}{% endblock %}
     <script>
         window.addEventListener('load', function () {
             let preloader = document.getElementById('preloader')
 
             preloader.style.opacity = '0'
-            preloader.style.display = 'none'
+            setTimeout(() => {
+                preloader.style.display = 'none'
+            }, 900)
 
         })
+
+{#        window.addEventListener('unload', function () {
+            let preloader = document.getElementById('preloader')
+            preloader.style.display = 'block'
+            preloader.style.opacity = '1'
+        })#}
     </script>
 
     {% if title %}
@@ -35,7 +43,7 @@
 
 <body id="body">
 
-<div class="upper_white">
+<div class="upper_container">
     <div id="upper" class="upper">
         <div class="block_logo">
             <a href="{{ url_for('main.index') }}">
@@ -50,7 +58,11 @@
                 <div id="services-modal-win" class="modal submenu">
                     <div class="modal-window">
                         {% for category in categories %}
-                            <div class="modal-item submenu-item">{{ category.name }}</div>
+                            <a href="{{ url_for('main.category') }}?category_id={{ category.id }}">
+                                <div class="modal-item submenu-item">
+                                    {{ category.name }}
+                                </div>
+                            </a>
                         {% endfor %}
                         <close class="btn-close-modal-window">
                             <img src="{{ url_for('static', filename='cross.png') }}" alt="X">
@@ -59,14 +71,14 @@
                     <div class="overlay"></div>
                 </div>
             </div>
-            <div class="button_main_about"><a href="{{ url_for('main.about') }}" class="about_a">О нас</a></div>
+            <div class="button_main"><a href="{{ url_for('main.about') }}" class="about_a">О нас</a></div>
             <div class="button_main" data-modal-window-toggle="#contacts-modal-win">
                 Контакты
-                <div id="contacts-modal-win" class="modal submenu">
+                <div id="contacts-modal-win" class="modal submenu contacts">
                     <div class="modal-window">
                         <div class="modal-item submenu-item">
                             <div class="geolocation">
-                                <a href="{{ geolocation }}" target="_blank">Наше местоположение
+                                <a href="{{ geolocation }}" target="_blank">Мы на карте
                                     <svg width="24  " height="24" viewBox="0 0 24 24"
                                          xmlns="http://www.w3.org/2000/svg">
                                         <path d="M 12 1 a 9.002 9.002 0 0 0 -6.366 15.362 c 1.63 1.63 5.466 3.988 5.693 6.465 c 0.034 0.37 0.303 0.673 0.673 0.673 c 0.37 0 0.64 -0.303 0.673 -0.673 c 0.227 -2.477 4.06 -4.831 5.689 -6.46 A 9.002 9.002 0 0 0 12 1 Z m 0 12.079 a 3.079 3.079 0 1 1 0 -6.158 a 3.079 3.079 0 0 1 0 6.158 Z"
@@ -76,7 +88,7 @@
                             </div>
                         </div>
                         <div class="modal-item submenu-item">
-                            <div style="max-width: 350px;">Адрес: {{ address }}</div>
+                            <div class="address">Адрес: {{ address }}</div>
                         </div>
                         {% for number in phone_numbers %}
                             <div class="modal-item submenu-item">
@@ -85,7 +97,7 @@
                         {% endfor %}
                         <div class="modal-item submenu-item">
                             <div class="social">
-                                Ссылки на социальные сети
+                                Социальные сети
                                 <ul class="social-icons">
                                     <li><a class="vk" href="{{ vk }}" target="_blank"><i class="fa fa-vk"></i></a></li>
                                     <li><a class="insta" href="{{ insta }}" target="_blank"><i
@@ -104,10 +116,8 @@
 
         <div id="upper_block_info" class="block_info">
             <div class='name'>
-                <div>Тренинг-</div>
-                <div>Парк</div>
-                <div>Дмитрия</div>
-                <div>Сергеева</div>
+                <div>Тренинг-Парк</div>
+                <div>&nbsp;Дмитрия Сергеева</div>
             </div>
             <div id="phone_numbers" class="block_numbers">
                 <div>+7(920)898-46-80</div>
