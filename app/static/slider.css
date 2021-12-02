@@ -1,8 +1,8 @@
 @charset "UTF-8";
 
 :root {
-    --primary-width:calc(100%/3);
-    --primary-flex: 0 0 calc(100% / 3);
+    --primary-width:calc(100%/2);
+    --primary-flex: 0 0 calc(100% / 2);
 }
 
 .block_slider {
@@ -31,7 +31,7 @@
 .slider__img {
     overflow: hidden;
     object-fit: cover;
-    height: clamp(200px, 33vh, 500px);
+    height: clamp(200px, 45vh, 800px);
     width: 100%;
 }
 

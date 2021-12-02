@@ -45,6 +45,19 @@
     font-size: calc(var(--font-size) * 1.075);
 }
 
+.button_main_about {
+    width: 100px;
+    height: 30px;
+    transition: all 0.2s ease;
+}
+
+.button_main_about:hover {
+    font-size: calc(var(--font-size) * 1.175);
+    background-color: var(--primary-color);
+    border-color:var(--primary-color);
+}
+
+
 .block_info {
     /*width: 30%;*/
 }

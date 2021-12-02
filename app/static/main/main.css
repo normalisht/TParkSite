@@ -2,7 +2,7 @@
 
 :root {
     --background-color: rgba(169, 191, 239, 0.15); /*547dd2;*/
-    --primary-color: #6f90dc;
+    --primary-color: #ffa200; /*fff600*/
     --body-background-color: #4acfeb;
     --primary-big-font: clamp(16px, 1.3vw, 25px);
     --primary-font-family: Times New Roman, serif;
@@ -70,6 +70,12 @@ img {
     font-size: 14px;
 }
 
+.upper_white {
+    background-color:white;
+    width: 100%;
+    z-index: 1;
+}
+
 .block_buttons {
     background: white;
     display: flex;
@@ -109,10 +115,23 @@ img {
 
 }
 
-.button_main:nth-child(2) {
+.button_main_about {
+    user-select: none;
+    /*background-color: var(--background-color);*/
+    height: 2.5vh;
+    color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.button_main_about:nth-child(2) {
     border-right: 1px solid;
     border-left: 1px solid;
 }
+
+
 
 
 .block_logo {
