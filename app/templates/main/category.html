@@ -61,13 +61,19 @@
             {% if service.status == true %}
                 <div id="{{ service.id }}" class="button">
                     <div class="content">
-                        {{ service.name }} - Цена: {{ service.price }}
-                        <div class="description">
-                            {% if service.short_description != None %}
-                                <br>{{ service.short_description }}
-                            {% endif %}
-                            <br><a href="{{ url_for('main.service') }}?service_id={{ service.id }}">Ссылка на полное описание </a>
+                        <div style="display: flex; justify-content: space-between; margin-right: 8px">
+                            <div>{{ service.name }}</div>
+                            <div>{{ service.prices[0] }}</div>
                         </div>
+                        {% if service.short_description %}
+                            <div class="description">
+                                {% if service.short_description != None %}
+                                    <br>{{ service.short_description }}
+                                {% endif %}
+                                <br><a href="{{ url_for('main.service') }}?service_id={{ service.id }}">Ссылка на полное
+                                описание </a>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             {% endif %}
@@ -78,8 +84,8 @@
     <script>
         let services = document.querySelectorAll('.button')
 
-        for(let service of services) {
-            service.addEventListener('click', function() {
+        for (let service of services) {
+            service.addEventListener('click', function () {
                 service.querySelector('.description').classList.toggle('active')
             })
         }

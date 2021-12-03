@@ -1,8 +1,8 @@
 @charset "UTF-8";
 
 :root {
-    --primary-width:calc(100%/2);
-    --primary-flex: 0 0 calc(100% / 2);
+    --primary-width: calc(100% / 1);
+    --primary-flex: 0 0 calc(100% / 1);
 }
 
 .block_slider {

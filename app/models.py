@@ -29,7 +29,7 @@ class Price(db.Model):
         if self.time:
             return self.price + ' руб/' + self.time
         else:
-            return self.price
+            return self.price + ' руб'
 
 
 class Category(db.Model):

@@ -41,7 +41,7 @@ h1 {
     max-height: 0;
     overflow: hidden;
     transition: max-height 2s cubic-bezier(0, 1, 0, 1);
-    left: 1vw;
+    left: 2%;
     position: relative;
 }
 
