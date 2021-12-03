@@ -9,70 +9,63 @@
     <h1>{{ category.name }}</h1>
     <div class="container">
         <div class="data">
-            <table id="table" style="margin: 2px;" class="table">
-                <tr>
-                    <td>
-                        <div class="block_slider">
-                            <div class="slider">
-                                <div class="slider__container">
-                                    <div class="slider__wrapper">
-                                        <div class="slider__items">
-                                            <div class="slider__item">
-                                                <img src="{{ url_for('static',filename='/images/category/1.png' ) }}"
+            <div class="block_slider">
+                <div class="slider">
+                    <div class="slider__container">
+                        <div class="slider__wrapper">
+                            <div class="slider__items">
+                                <div class="slider__item">
+                                    <img src="{{ url_for('static',filename='/images/category/1.png' ) }}"
                                                      alt="">
-                                            </div>
-                                            <div class="slider__item">
-                                                <img src="{{ url_for('static',filename='/images/category/1.png' ) }}"
-                                                     alt="">
-                                            </div>
-                                            <div class="slider__item">
-                                                <img src="{{ url_for('static',filename='/images/category/1.png' ) }}"
-                                                     alt="">
-                                            </div>
-                                            <div class="slider__item">
-                                                <img src="{{ url_for('static',filename='/images/category/1.png' ) }}"
-                                                     alt="">
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
-
-                                <a class="slider__control slider__control_prev" href="#" role="button"
-                                   data-slide="prev"></a>
-                                <a class="slider__control slider__control_next" href="#" role="button"
-                                   data-slide="next"></a>
+                                <div class="slider__item">
+                                    <img src="{{ url_for('static',filename='/images/category/1.png' ) }}"
+                                                     alt="">
+                                </div>
+                                <div class="slider__item">
+                                    <img src="{{ url_for('static',filename='/images/category/1.png' ) }}"
+                                                     alt="">
+                                </div>
+                                <div class="slider__item">
+                                    <img src="{{ url_for('static',filename='/images/category/1.png' ) }}"
+                                                     alt="">
+                                </div>
                             </div>
-                        </div>
-                    </td>
-                    <td>
-                        <h1>ОПИСАНИЕ</h1>
-                        {% if category.description == true %}
-                            <div class="text">
-                                <span>{{ category.description }}</span>
-                            </div>
-                        {% endif %}
-                    </td>
-                </tr>
-            </table>
-        </div>
-    </div>
-    <div class="buttons">
-        {% for element in services %}
-            {% set service = element.service %}
-            {% if service.status == true %}
-                <button id="{{ service.id }}", class="button">
-                    <div class="content">
-                        {{ service.name }} - Цена: {{ service.price }}
-                        <div class="description">
-                            {% if service.short_description != None %}
-                                <br>{{ service.short_description }}
-                            {% endif %}
-                            <br><a href="{{ url_for('main.service') }}?service_id={{ service.id }}">Ссылка на полное описание </a>
                         </div>
                     </div>
-                </button>
-            {% endif %}
-        {% endfor %}
+                    <a class="slider__control slider__control_prev" href="#" role="button"
+                       data-slide="prev"></a>
+                    <a class="slider__control slider__control_next" href="#" role="button"
+                       data-slide="next"></a>
+                </div>
+            </div>
+        </div>
+        <div class="category_description">
+            <h1>ОПИСАНИЕ</h1>
+            <div class="text">
+                {{ category.description if category.description }}
+            </div>
+        </div>
+        <div class="buttons">
+            {% for element in services %}
+                {% set service = element.service %}
+                {% if service.status == true %}
+                    <button id="{{ service.id }}", class="button">
+                        <div class="content">
+                            {% for price in service.prices %}
+                                {{ service.name }} - {{ price }}<br>
+                            {% endfor %}
+                            <div class="description">
+                                {% if service.short_description != None %}
+                                    <br>{{ service.short_description }}
+                                {% endif %}
+                                <br><a href="{{ url_for('main.service') }}?service_id={{ service.id }}">Ссылка на полное описание </a>
+                            </div>
+                        </div>
+                    </button>
+                {% endif %}
+            {% endfor %}
+        </div>
     </div>
 
 

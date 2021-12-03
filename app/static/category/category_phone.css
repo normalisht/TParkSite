@@ -1,12 +1,18 @@
+.container {
+    grid-column-gap: clamp(3vw, 20px, 50px);
+    align-items: start;
+    grid-row-gap: clamp(3vw, 20px, 50px);
+}
+
 .buttons {
-    max-height: 100vh;
-    position: static;
+    position: relative;
     justify-content: center;
-    align-items: center;
+    align-items: start;
     white-space: normal;
     display: grid;
-    grid-row-gap: clamp(20px, 3vw, 10vw);
-    grid-column-gap: clamp(80px, 1vw, 15vw);
+    grid-row-gap: clamp(3vw, 20px, 50px);
+    grid-column-gap: clamp(3vw, 10px, 30px);
+    grid-column: 1/3;
 }
 
 .content {
@@ -51,24 +57,10 @@
     padding: 10px;
 }
 
-.table {
-    font-family: 'Roboto', sans-serif;
-    font-size: 14px;
-    border-collapse: collapse;
-    min-width: clamp(160px, 30vw, 80vw) ;
-    word-break: break-all;
-}
-
-td {
-    position: center;
-    vertical-align: top;
-    padding-right: 2vw;
-}
-
 @media (max-width:500px)
 {
     .buttons{
-        grid-template-columns: repeat(2, 100px);
+        grid-template-columns: repeat(1, 100px);
     }
     h1{
         font-size: 18px;
@@ -77,6 +69,15 @@ td {
         font-size: 12px;
         border-radius: 30px;
     }
+    .block_slider {
+        width: min(50vw, 600px);
+        margin: 0 auto;
+        display: block;
+    }
+    .slider__container {
+        overflow: hidden;
+        height: min(30vw, 500px);
+    }
 }
 
 @media (min-width: 500px)
@@ -84,12 +85,13 @@ td {
     .buttons{
         grid-template-columns: repeat(3, 150px);
     }
-}
-
-@media (max-width: 380px)
-{
-    .buttons{
-        grid-template-columns: repeat(2, 80px);
-        max-width: 80vw;
+    .block_slider {
+        width: min(30vw, 600px);
+        margin: 0 auto;
+        display: block;
+    }
+    .slider__container {
+        overflow: hidden;
+        height: min(20vw, 500px);
     }
 }
