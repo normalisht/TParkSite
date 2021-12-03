@@ -171,9 +171,10 @@ img {
 
 .block_content {
     justify-content: center;
-    width: 90vw;
+    max-width: 90vw;
+    width: max-content;
     max-height: 30vh;
-    margin-top: 20px;
+    margin: 20px auto;
     text-align: center;
 }
 
