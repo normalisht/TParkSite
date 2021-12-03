@@ -48,7 +48,7 @@ h1 {
 
 .active {
     max-height: 100vh;
-    transition: max-height 1.5s ease-out;
+    transition: max-height 1.5s ease;
 }
 
 .content:after {
@@ -61,7 +61,6 @@ h1 {
     border-right: 5px solid transparent;
     z-index: 999;
 }
-
 
 
 .button:hover, .button:focus {
