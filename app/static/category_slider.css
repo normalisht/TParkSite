@@ -1,7 +1,18 @@
 @charset "UTF-8";
 
+.block_slider {
+    width: min(30vw, 600px);
+    margin: 0 auto;
+    display: block;
+}
+
 .slider {
     position: relative;
+}
+
+.slider__container {
+    overflow: hidden;
+    height: min(20vw, 500px);
 }
 
 .slider__wrapper {
@@ -20,7 +31,7 @@
 @media (max-width: 768px) {
     .slider__item {
         flex: 0 0 100%;
-        max-width: 100%;
+        max-width: 1%;
         display: flex;
         justify-content: center;
         align-items: center;

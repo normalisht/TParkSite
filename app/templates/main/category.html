@@ -9,42 +9,50 @@
     <h1>{{ category.name }}</h1>
     <div class="container">
         <div class="data">
-            <div class="block_slider">
-                <div class="slider">
-                    <div class="slider__container">
-                        <div class="slider__wrapper">
-                            <div class="slider__items">
-                                <div class="slider__item">
-                                    <img src="{{ url_for('static',filename='/images/category/1.png' ) }}"
+            <table id="table" style="margin: 2px;" class="table">
+                <tr>
+                    <td>
+                        <div class="block_slider">
+                            <div class="slider">
+                                <div class="slider__container">
+                                    <div class="slider__wrapper">
+                                        <div class="slider__items">
+                                            <div class="slider__item">
+                                                <img src="{{ url_for('static',filename='/images/category/1.png' ) }}"
                                                      alt="">
-                                </div>
-                                <div class="slider__item">
-                                    <img src="{{ url_for('static',filename='/images/category/1.png' ) }}"
+                                            </div>
+                                            <div class="slider__item">
+                                                <img src="{{ url_for('static',filename='/images/category/1.png' ) }}"
                                                      alt="">
-                                </div>
-                                <div class="slider__item">
-                                    <img src="{{ url_for('static',filename='/images/category/1.png' ) }}"
+                                            </div>
+                                            <div class="slider__item">
+                                                <img src="{{ url_for('static',filename='/images/category/1.png' ) }}"
                                                      alt="">
-                                </div>
-                                <div class="slider__item">
-                                    <img src="{{ url_for('static',filename='/images/category/1.png' ) }}"
+                                            </div>
+                                            <div class="slider__item">
+                                                <img src="{{ url_for('static',filename='/images/category/1.png' ) }}"
                                                      alt="">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
+                                <a class="slider__control slider__control_prev" href="#" role="button"
+                                   data-slide="prev"></a>
+                                <a class="slider__control slider__control_next" href="#" role="button"
+                                   data-slide="next"></a>
                             </div>
                         </div>
-                    </div>
-                    <a class="slider__control slider__control_prev" href="#" role="button"
-                       data-slide="prev"></a>
-                    <a class="slider__control slider__control_next" href="#" role="button"
-                       data-slide="next"></a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="category_description">
-        <h1>ОПИСАНИЕ</h1>
-        <div class="text">
-            {{ category.description if category.description }}
+                    </td>
+                    <td>
+                        <h1>ОПИСАНИЕ</h1>
+                        {% if category.description == true %}
+                            <div class="text">
+                                <span>{{ category.description }}</span>
+                            </div>
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
         </div>
     </div>
     <div class="buttons">
@@ -74,6 +82,7 @@
             {% endif %}
         {% endfor %}
     </div>
+
 
     <script>
         let services = document.querySelectorAll('.button')
