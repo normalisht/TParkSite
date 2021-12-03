@@ -1,0 +1,62 @@
+.buttons {
+    position: static;
+    justify-content: center;
+    align-items: center;
+    white-space: normal;
+    display: grid;
+    grid-template-columns: repeat(3, 18vw);
+    grid-row-gap: 3vw;
+    grid-column-gap: 1vw;
+}
+
+.content {
+    min-width: 10vw;
+    text-align: center;
+}
+
+
+.content:after {
+    content: "";
+    position: absolute;
+    right: 10px;
+    top: 40%;
+    border-left: 5px solid transparent;
+    border-top: 5px solid #333;
+    border-right: 5px solid transparent;
+    z-index: 999;
+}
+
+.button {
+    min-width: 10vw;
+    max-width: 20vw;
+    min-height: 2vh;
+    max-height: 100vh;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #313133;
+    background: #4FD1C5;
+    background: linear-gradient(90deg, rgba(129,230,217,1) 0%, rgba(79,209,197,1) 100%);
+    border: none;
+    border-radius: 100px;
+    box-shadow: 12px 12px 24px rgba(79,209,197,.64);
+    transition: all 0.3s ease-in-out 0s;
+    cursor: pointer;
+    outline: none;
+    position: relative;
+    padding: 10px;
+}
+
+.table {
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    border-collapse: collapse;
+    width: 80vw;
+    word-break: break-all;
+}
+
+td {
+    position: center;
+    vertical-align: top;
+    padding-right: 2vw;
+}
