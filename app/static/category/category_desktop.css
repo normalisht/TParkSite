@@ -59,3 +59,7 @@ td {
     vertical-align: top;
     padding-right: 2vw;
 }
+
+.description {
+    text-align: left;
+}

@@ -1,12 +1,9 @@
 .buttons {
-    max-height: 100vh;
-    position: static;
     justify-content: center;
     align-items: center;
     white-space: normal;
     display: grid;
-    grid-row-gap: clamp(20px, 3vw, 10vw);
-    grid-column-gap: clamp(80px, 1vw, 15vw);
+    background-color: white;
 }
 
 .content {
@@ -32,30 +29,32 @@
 }
 
 .button {
-    min-width: clamp(160px, 10vw, 20vw);
-    max-width: clamp(250px, 20vw, 30vw);
-    min-height: 2vh;
+    margin: 0 auto;
+    width: calc(100 * var(--vw));
     font-family: 'Roboto', sans-serif;
-    font-size: 14px;
+    font-size: 18px;
     font-weight: 700;
     color: #313133;
-    background: #4FD1C5;
-    background: linear-gradient(90deg, rgba(129,230,217,1) 0%, rgba(79,209,197,1) 100%);
-    border: none;
-    border-radius: 100px;
-    box-shadow: 12px 12px 24px rgba(79,209,197,.64);
+    background: #ffffff;
+    border-bottom:  1px solid rgba(0, 0, 0, 0.35);
+    /*box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.2);*/
     transition: all 0.3s ease-in-out 0s;
     cursor: pointer;
     outline: none;
-    position: relative;
     padding: 10px;
+}
+
+.description {
+    text-align: left;
+    margin-left: 0;
+    padding-left: 0;
 }
 
 .table {
     font-family: 'Roboto', sans-serif;
     font-size: 14px;
     border-collapse: collapse;
-    min-width: clamp(160px, 30vw, 80vw) ;
+    min-width: clamp(160px, 30vw, 80vw);
     word-break: break-all;
 }
 
@@ -63,33 +62,4 @@ td {
     position: center;
     vertical-align: top;
     padding-right: 2vw;
-}
-
-@media (max-width:500px)
-{
-    .buttons{
-        grid-template-columns: repeat(2, 100px);
-    }
-    h1{
-        font-size: 18px;
-    }
-    .button{
-        font-size: 12px;
-        border-radius: 30px;
-    }
-}
-
-@media (min-width: 500px)
-{
-    .buttons{
-        grid-template-columns: repeat(3, 150px);
-    }
-}
-
-@media (max-width: 380px)
-{
-    .buttons{
-        grid-template-columns: repeat(2, 80px);
-        max-width: 80vw;
-    }
 }
