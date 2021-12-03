@@ -17,9 +17,9 @@
 }
 
 .block_text {
-    display:block;
-    max-width: 90vw;
+    max-width: 600px;
     text-align: center;
+    margin: 10px  auto;
 }
 
 .block_price{
