@@ -30,7 +30,7 @@
 
 @media (max-width: 768px) {
     .slider__item {
-        flex: 0 0 30%;
+        flex: 0 0 100%;
         max-width: 1%;
         display: flex;
         justify-content: center;
