@@ -15,7 +15,7 @@
         {% for partner in partners %}
         <a href="#">
             <div class="block_img_partners">
-                <img src="{{ url_for('static/', filename='partner/' + partner.id|string + '.png') }}"
+                <img src="{{ url_for('static', filename='/images/partner/' + partner.id|string + '.png') }}"
                      width="244px" height="240px">
             </div>
         </a>
@@ -31,7 +31,7 @@
     <div class="block_employees_block">
         {% for employee in employees %}
         <figure class="block_employees">
-            <img src="{{ url_for('static/', filename='employee/' + employee.id|string + '.png') }}"
+            <img src="{{ url_for('static', filename='/images/employee/' + employee.id|string + '.png') }}"
                  width="244px" height="240px">
             <figcaption>
                 <div class="name_employees">{{ employee.name }}</div>
