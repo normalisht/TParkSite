@@ -70,7 +70,11 @@
                                 {% if service.short_description != None %}
                                     <br>{{ service.short_description }}
                                 {% endif %}
-                                <br><a href="{{ url_for('main.service') }}?service_id={{ service.id }}">Подробнее</a>
+                                <br>
+                                <a style="color: black;"
+                                   href="{{ url_for('main.service') }}?service_id={{ service.id }}">
+                                    Подробнее
+                                </a>
                             </div>
                         {% endif %}
                     </div>

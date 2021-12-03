@@ -74,3 +74,8 @@ button:hover::before, button:focus::before {
 button:hover::after, button:focus::after {
     display: none;
 }
+
+.description {
+    text-decoration: none;
+    color: black;
+}

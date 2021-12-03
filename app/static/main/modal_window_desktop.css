@@ -52,6 +52,15 @@
     background: rgba(0, 0, 0, 0.15);
 }
 
+.media:hover {
+    background-color: white; !important;
+}
+
+.social-icons {
+    margin-top: 5px;
+    justify-content: space-evenly;
+}
+
 .contacts .submenu-item:last-child:hover {
     background-color: white;
 }

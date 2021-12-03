@@ -12,6 +12,7 @@
 
 html {
     box-sizing: border-box;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 *,
@@ -84,7 +85,6 @@ img {
     width: max-content;
     position: relative;
     z-index: 5;
-
 }
 
 .main_block {
@@ -159,9 +159,8 @@ img {
 
 .block_content {
     justify-content: center;
-    max-width: 90vw;
-    width: max-content;
-    max-height: 30vh;
+    max-width: 70%;
+    overflow: hidden;
     margin: 20px auto;
     text-align: center;
 }
