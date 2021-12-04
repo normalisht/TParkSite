@@ -1,6 +1,26 @@
-.title_about {
-    display: flex;
-    justify-content: center;
+/**/
+@media (max-width: 768px){
+    .block_employees_block {
+        margin: 0 auto;
+        justify-content: center;
+        display: grid;
+        grid-gap: 1rem;
+        grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+        list-style: none;
+        padding: 0;
+    }
+    .block_img_block {
+        margin: 0 auto;
+        justify-content: center;
+        display: grid;
+        grid-gap: 1rem;
+        grid-template-columns: repeat(auto-fill, minmax(15.4rem, 1fr));
+        list-style: none;
+        padding: 0;
+    }
+    .block_employees_block > * {
+        height: 18rem;
+    }
 }
 
 .block_fil {
@@ -14,6 +34,149 @@
     text-align: left;
 }
 
+/*
+Эксперимент.
+Дима, если говно, отключи. Как по мне , цвета можно подобрать намного лучше, да и вообще как то многовато втулил.
+Но, я ,вроде, проверил , всё более менее правильно работает.
+*/
+@media (min-width: 768px){
+    .post-wrap {
+        margin: 0 auto;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .post-item {
+        padding: 10px;
+    }
+    .post-item-wrap {
+        background: white;
+        position: relative;
+    }
+    .post-item-wrap:after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        background: #71d6ec;
+        transform: rotate(1deg);
+        transform-origin: left bottom;
+        transition: .3s ease-in-out;
+    }
+    .post-item-wrap:hover:after {
+        top: 5px;
+        left: 5px;
+        transform: rotate(2deg);
+    }
+    .post-link {
+        text-decoration: none;
+        display: block;
+        padding: 20px;
+    }
+    .post-title {
+        color: #33261D;
+        margin-bottom: 15px;
+        transition: .3s ease-in-out;
+    }
+    .post-item-wrap:hover .post-title {
+        color: #C9F2C7;
+    }
+}
+/*откл*/
+/*конец эксперимента */
+
+
+/*.block_img_partners {*/
+/*    justify-content: center;*/
+/*    width: 70%;*/
+/*    margin: 0 auto;*/
+/*    display: flex;*/
+/*}*/
+
+/*Партнёры*/
+.block_img_block {
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+    display: grid;
+    grid-gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(15.4rem, 1fr));
+    list-style: none;
+    padding: 0;
+}
+
+.block_img_block > * {
+    height: 16rem;
+}
+
+.block_img_partners {
+    width: 246px;
+    height: 240px;
+    margin-left: auto;
+    margin-right: auto;
+}
+/*конец партнёров*/
+
+/*сотрудники*/
+.block_employees_block {
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+    display: grid;
+    grid-gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+    list-style: none;
+    padding: 0;
+}
+
+.block_employees_block > * {
+    height: 27rem;
+}
+
+.block_employees {
+    width: 244px;
+    height: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    background: white;
+    -webkit-box-shadow: 3px 3px 3px #9ecad4;
+    -moz-box-shadow: 3px 3px 3px #9ecad4;
+    box-shadow: 3px 3px 3px #9ecad4;
+}
+
+.block_employees figcaption {
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+}
+
+.name_employees {
+    text-align: center;
+}
+
+.position_employees {
+    text-align: center;
+}
+
+.title_about {
+    display: flex;
+    justify-content: center;
+}
+
+.block_fil {
+    padding: 0 10% 0;
+    justify-content: center;
+    letter-spacing: 1px;
+    word-spacing: 0;
+    white-space: normal;
+    line-height: normal;
+    margin: 0 auto;
+    text-align: center;
+}
+
 .block_text_about {
     padding: 0 10% 0;
     justify-content: center;
@@ -21,41 +184,4 @@
     word-spacing: 0;
     white-space: normal;
     line-height: normal;
-}
-
-
-.block_img_partners {
-    justify-content: center;
-    width: 70%;
-    margin: 0 auto;
-    display: flex;
-    grid-gap: 1rem;
-    grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
-    list-style: none;
-    padding: 0;
-}
-
-.block_img_partners > * {
-    height: 15rem;
-}
-
-.block_employees_block {
-    width: 20%;
-    margin: 0 auto;
-}
-
-.block_employees {
-
-}
-
-.block_img_employees {
-
-}
-
-.block_name_employees {
-
-}
-
-.block_text_employees {
-
 }
