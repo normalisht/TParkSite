@@ -40,7 +40,7 @@ h1 {
 .description {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 2s cubic-bezier(0, 1, 0, 1);
+    transition: max-height 1.5s ease;
     left: 2%;
     position: relative;
 }

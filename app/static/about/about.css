@@ -49,7 +49,7 @@
     .post-item {
         padding: 10px;
     }
-    .post-item-wrap {
+    /*.post-item-wrap {
         background: white;
         position: relative;
     }
@@ -70,7 +70,7 @@
         top: 5px;
         left: 5px;
         transform: rotate(2deg);
-    }
+    }*/
     .post-link {
         text-decoration: none;
         display: block;
@@ -89,12 +89,12 @@
 /*конец эксперимента */
 
 
-/*.block_img_partners {*/
-/*    justify-content: center;*/
-/*    width: 70%;*/
-/*    margin: 0 auto;*/
-/*    display: flex;*/
-/*}*/
+.block_img_partners {
+    justify-content: center;
+    width: 70%;
+    margin: 0 auto;
+    display: flex;
+}
 
 /*Партнёры*/
 .block_img_block {

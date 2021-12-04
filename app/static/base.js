@@ -91,7 +91,6 @@ function buttons_position() {
         buttons.style.top = buttons.style.left = buttons.style.right = '0'
         buttons.style.marginTop = '0'
         buttons.style.paddingBottom = '0'
-
     }
 
 }
