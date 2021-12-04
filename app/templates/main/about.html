@@ -15,8 +15,9 @@
         {% for partner in partners %}
             <div>
                 <a href="{{ partner.link }}">
-                    <img src="{{ url_for('static/', filename='partners/' + partner.id|string + '.png') }}"
+                    <img style="width: 200px; height:200px; object-fit: cover" src="{{ url_for('static', filename='images/partners/' + partner.id|string + '.png') }}"
                          alt="{{ partner.name }}">
+
                 </a>
             </div>
         {% endfor %}

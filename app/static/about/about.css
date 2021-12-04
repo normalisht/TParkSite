@@ -11,7 +11,7 @@
     white-space: normal;
     line-height: normal;
     margin: 0 auto;
-    text-align: center;
+    text-align: left;
 }
 
 .block_text_about {
@@ -25,9 +25,10 @@
 
 
 .block_img_partners {
+    justify-content: center;
     width: 70%;
     margin: 0 auto;
-    display: grid;
+    display: flex;
     grid-gap: 1rem;
     grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
     list-style: none;
