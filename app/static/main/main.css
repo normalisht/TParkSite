@@ -5,7 +5,7 @@
     --primary-color: #ffa200; /*fff600*/
     --body-background-color: #4acfeb;
     --primary-big-font: clamp(16px, 1.3vw, 25px);
-    --primary-font-family: Times New Roman, serif;
+    --primary-font-family: Arial,  sans-serif;
     --modal_window_time: none;
     --vw: none;
 }
@@ -23,6 +23,7 @@ html {
 * {
     appearance: none;
     -webkit-appearance: none;
+    font-family: Arial, sans-serif;
 }
 
 body {
@@ -116,7 +117,7 @@ img {
 
 }
 
-.about:nth-child(2) {
+.button_main_middle:nth-child(2) {
     border-right: 1px solid;
     border-left: 1px solid;
 }

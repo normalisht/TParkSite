@@ -9,11 +9,11 @@
 
 
 .block_img {
-    display:block;
+    display:flex;
     height:clamp(100px,30vh, 400px );
     width:clamp(200px,30vw, 600px );
     align-items: center;
-    margin: 0  auto 5vh;
+    margin: 0  auto 10px;
 }
 
 .block_text {
@@ -31,8 +31,7 @@
     min-width: 100px;
     width: max-content;
     margin: 0 auto;
-    border-radius: 5px;
-    box-shadow: 2px 4px 8px #ccc;
+    border-radius: 2px;
     font-size: 1.2rem;
     padding: 4px;
 }
