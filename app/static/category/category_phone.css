@@ -1,0 +1,95 @@
+.buttons {
+    max-height: 100vh;
+    position: static;
+    justify-content: center;
+    align-items: center;
+    white-space: normal;
+    display: grid;
+    grid-row-gap: clamp(20px, 3vw, 10vw);
+    grid-column-gap: clamp(80px, 1vw, 15vw);
+}
+
+.content {
+    min-width: clamp(150px, 10vw, 20vw);
+    max-height: 100vh;
+    text-align: center;
+}
+
+.active {
+    max-height: 100vh;
+    transition: max-height 1.5s ease-out;
+}
+
+.content:after {
+    content: "";
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    border-left: 10px solid transparent;
+    border-top: 10px solid #333;
+    border-right: 10px solid transparent;
+    z-index: 999;
+}
+
+.button {
+    min-width: clamp(160px, 10vw, 20vw);
+    max-width: clamp(250px, 20vw, 30vw);
+    min-height: 2vh;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #313133;
+    background: #4FD1C5;
+    background: linear-gradient(90deg, rgba(129,230,217,1) 0%, rgba(79,209,197,1) 100%);
+    border: none;
+    border-radius: 100px;
+    box-shadow: 12px 12px 24px rgba(79,209,197,.64);
+    transition: all 0.3s ease-in-out 0s;
+    cursor: pointer;
+    outline: none;
+    position: relative;
+    padding: 10px;
+}
+
+.table {
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    border-collapse: collapse;
+    min-width: clamp(160px, 30vw, 80vw) ;
+    word-break: break-all;
+}
+
+td {
+    position: center;
+    vertical-align: top;
+    padding-right: 2vw;
+}
+
+@media (max-width:500px)
+{
+    .buttons{
+        grid-template-columns: repeat(2, 100px);
+    }
+    h1{
+        font-size: 18px;
+    }
+    .button{
+        font-size: 12px;
+        border-radius: 30px;
+    }
+}
+
+@media (min-width: 500px)
+{
+    .buttons{
+        grid-template-columns: repeat(3, 150px);
+    }
+}
+
+@media (max-width: 380px)
+{
+    .buttons{
+        grid-template-columns: repeat(2, 80px);
+        max-width: 80vw;
+    }
+}

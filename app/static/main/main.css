@@ -84,6 +84,7 @@ img {
     width: max-content;
     position: relative;
     z-index: 5;
+
 }
 
 .main_block {
@@ -115,23 +116,10 @@ img {
 
 }
 
-.button_main_about {
-    user-select: none;
-    /*background-color: var(--background-color);*/
-    height: 2.5vh;
-    color: black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-}
-
-.button_main_about:nth-child(2) {
+.about:nth-child(2) {
     border-right: 1px solid;
     border-left: 1px solid;
 }
-
-
 
 
 .block_logo {

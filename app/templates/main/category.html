@@ -36,7 +36,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <a class="slider__control slider__control_prev" href="#" role="button"
                                    data-slide="prev"></a>
                                 <a class="slider__control slider__control_next" href="#" role="button"
@@ -60,35 +59,53 @@
         {% for element in services %}
             {% set service = element.service %}
             {% if service.status == true %}
-                <table id="{{ service.id }}"  style="margin-right: 3vw;" class="button">
-                    <tr style="border: 2px solid black;">
-                        <td>
-                            <div class="content">
-                                {{ service.name }} - Цена: {{ service.price }}
-                                <div class="description">
-                                    {% if service.short_description != None %}
-                                        <br>Краткое описание: {{ service.short_description }}
-                                    {% endif %}
-                                    <a href="{{ url_for('main.service') }}?service_id={{ service.id }}">Ссылка на полное
-                                        описание </a>
-                                </div>
+                <div id="{{ service.id }}" class="button">
+                    <div class="content">
+                        <div style="display: flex; justify-content: space-between; margin-right: 8px">
+                            <div>{{ service.name }}</div>
+                            <div>{{ service.prices[0] }}</div>
+                        </div>
+                        {% if service.short_description %}
+                            <div class="description">
+                                {% if service.short_description != None %}
+                                    <br>{{ service.short_description }}
+                                {% endif %}
+                                <br><a href="{{ url_for('main.service') }}?service_id={{ service.id }}">Ссылка на полное
+                                описание </a>
                             </div>
-                        </td>
-                    </tr>
-                </table>
+                        {% endif %}
+                    </div>
+                </div>
             {% endif %}
         {% endfor %}
     </div>
 
-    <div id="123">123</div>
 
     <script>
         let services = document.querySelectorAll('.button')
 
-        for(let service of services) {
-            service.addEventListener('click', function() {
+        for (let service of services) {
+            service.addEventListener('click', function () {
                 service.querySelector('.description').classList.toggle('active')
             })
+        }
+
+        style_css()
+
+        function style_css() {
+            let detect = new MobileDetect(window.navigator.userAgent)
+            let link = document.createElement('link')
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.media = 'all';
+
+            if (detect.mobile()) {
+                link.href = '/app/static/category/category_phone.css';
+            } else {
+                link.href = '/app/static/category/category_desktop.css'
+            }
+
+            document.head.append(link)
         }
     </script>
 

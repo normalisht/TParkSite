@@ -1,0 +1,61 @@
+.buttons {
+    justify-content: center;
+    align-items: center;
+    white-space: normal;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(100px, 400px));
+    grid-row-gap: 3vw;
+    grid-column-gap: 1vw;
+}
+
+.content {
+    min-width: 10vw;
+    text-align: center;
+}
+
+
+.content:after {
+    content: "";
+    position: absolute;
+    right: 10px;
+    top: 40%;
+    border-left: 5px solid transparent;
+    border-top: 5px solid #333;
+    border-right: 5px solid transparent;
+    z-index: 999;
+}
+
+.button {
+    min-width: 10vw;
+    max-width: 700px;
+    min-height: 2vh;
+    max-height: 100vh;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #313133;
+    background: #ffffff;
+    background: linear-gradient(90deg, rgb(255, 255, 255) 0%, rgb(231, 231, 231) 100%);
+    border: none;
+    border-radius: 5px;
+    box-shadow: 6px 6px 8px rgba(0, 0, 0, 0.20);
+    transition: all 0.3s ease-in-out 0s;
+    cursor: pointer;
+    outline: none;
+    position: relative;
+    padding: 10px;
+}
+
+.table {
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    border-collapse: collapse;
+    width: 80vw;
+    word-break: break-all;
+}
+
+td {
+    position: center;
+    vertical-align: top;
+    padding-right: 2vw;
+}

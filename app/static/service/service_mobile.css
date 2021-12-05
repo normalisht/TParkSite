@@ -1,5 +1,6 @@
 /*Phone*/
 
+
 .block_service {
     display:grid;
     margin: 0 auto;
@@ -14,8 +15,10 @@
 }
 
 .img_service {
+    position: absolute;
     object-fit: cover;
-    width: 100%;
+    width: 100vw;
+    left: 0;
     height: clamp(100px, 40vh, 400px);
     margin: 0 auto;
 }
