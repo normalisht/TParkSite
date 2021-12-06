@@ -44,7 +44,7 @@
 }
 
 
-.button_main:hover {
+.button_main_hover {
     font-size: calc(var(--font-size) * 1.125);
     background-color: var(--primary-color);
 }

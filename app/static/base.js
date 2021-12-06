@@ -90,9 +90,9 @@ function buttons_position() {
         el.style.height = '0'
         buttons.style.position = 'relative'
         buttons.style.margin = 'auto'
-        //
-        let detect = new MobileDetect(window.navigator.userAgent)
-        if (detect.mobile()) {
+
+        console.log(generate_upper.type, generate_upper.type == 'mobile')
+        if (generate_upper.type == 'mobile') {
             buttons.style.paddingBottom = '12px'
             buttons.style.marginTop = '5px'
         }
@@ -108,11 +108,15 @@ function buttons_position() {
 
 }
 
+generate_upper.type = null
 function generate_upper(event) {
-    if (document.documentElement.clientWidth < 900)
+    if (document.documentElement.clientWidth < 900) {
         generate_mobile_upper()
-    else
+        generate_upper.type = 'mobile'
+    } else {
         generate_desktop_upper()
+        generate_upper.type = 'desktop'
+    }
 }
 
 
@@ -140,6 +144,7 @@ function generate_mobile_upper() {
     upper.style.justifyContent = 'space-around'
 
     phone_numbers.style.display = 'none'
+
 }
 
 function generate_desktop_upper() {
@@ -148,7 +153,9 @@ function generate_desktop_upper() {
         navigation_buttons = document.getElementById('navigation_buttons'),
         upper = document.getElementById('upper')
 
+    phone_numbers.style.display = 'flex'
     block_info.append(phone_numbers)
+
     phone_numbers.style.flexDirection =
         block_info.firstElementChild.style.flexDirection = 'row'
     block_info.firstElementChild.style.alignItems = 'left'
@@ -158,10 +165,11 @@ function generate_desktop_upper() {
 
     navigation_buttons.style.paddingBottom = '0'
 
-    navigation_buttons.nextElementSibling.remove()
+    // navigation_buttons.nextElementSibling.remove()
     upper.firstElementChild.after(navigation_buttons)
     block_info.style.width = 'max-content'
     navigation_buttons.style.margin = 'auto'
-    phone_numbers.style.display = 'flex'
+
+
 }
 
