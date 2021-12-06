@@ -30,6 +30,7 @@ html {
 body {
     margin: 0;
     background-color: var(--background-color);
+    min-height: 100vh;
 }
 
 img {
