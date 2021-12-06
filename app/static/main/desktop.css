@@ -33,9 +33,6 @@
 .block_buttons {
     --font-size: 1.2rem;
     font-size: var(--font-size);
-    border: 1px solid white;
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
 }
 
 .button_main {
@@ -44,19 +41,13 @@
     transition: background-color .4s ease,
     border-color 0.4s ease,
     font-size 0.2s ease;
-    padding: 2px;
 }
+
 
 .button_main:hover {
     font-size: calc(var(--font-size) * 1.125);
     background-color: var(--primary-color);
-    transform: scale(1.05); /*Обсудить целесообразность, нужно чтобы перекрыть бордеры средней кнопки*/
 }
-
-.button_main_middle:hover {
-    border-color:var(--primary-color);
-}
-
 
 .block_info {
     /*width: 30%;*/

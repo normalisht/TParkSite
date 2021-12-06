@@ -11,7 +11,7 @@
     {% block link %}{% endblock %}
 
     <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script defer src="https://ajax.googleapis.com/ajax/libs/hammerjs/2.0.8/hammer.min.js"></script>
+    <script defer src="{{ url_for('static', filename='plugins/hammer.min.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mobile-detect/1.4.4/mobile-detect.min.js"></script>
     <script defer src="{{ url_for('static', filename='base.js') }}"></script>
     <script defer type="text/javascript" src="{{ url_for('static', filename='modal_window.js') }}"></script>
@@ -51,9 +51,11 @@
             </a>
         </div>
         <div id='navigation_buttons' class="block_buttons">
-            <div id="services-button" class="button_main"
+            <div class="button_main"
                  data-modal-window-toggle="#services-modal-win">
-                Услуги
+                <div id="services-button">
+                    Услуги
+                </div>
                 <!--Модальные окно/выпадающее меню -->
                 <div id="services-modal-win" class="modal submenu">
                     <div class="modal-window">
@@ -71,9 +73,15 @@
                     <div class="overlay"></div>
                 </div>
             </div>
-            <div class="button_main button_main_middle"><a href="{{ url_for('main.about') }}" class="about_a">О нас</a></div>
+            <div id="about-us-button" class="button_main button_main_middle">
+                <a href="{{ url_for('main.about') }}" class="about_a">
+                    О нас
+                </a>
+            </div>
             <div class="button_main" data-modal-window-toggle="#contacts-modal-win">
-                Контакты
+                <div id="contact-button">
+                    Контакты
+                </div>
                 <div id="contacts-modal-win" class="modal submenu contacts">
                     <div class="modal-window">
                         <div class="modal-item submenu-item">

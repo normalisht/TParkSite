@@ -1,26 +1,39 @@
 
 detected_phone()
 
-function detected_phone() {
-    let detect = new MobileDetect(window.navigator.userAgent)
+function add_css_file(path) {
     let link = document.createElement('link')
     link.rel = 'stylesheet';
     link.type = 'text/css';
     link.media = 'all';
+    link.href = path
+    document.head.append(link)
+}
+
+function add_js_file(path) {
+    let script = document.createElement('script')
+    script.type = 'text/javascript'
+    script.defer = true
+    script.src = path
+    document.head.append(script)
+}
+
+function detected_phone() {
+    let detect = new MobileDetect(window.navigator.userAgent)
+
 
     if (detect.mobile()) {
 
         if (detect.phone()) {
-            link.href = '/app/static/main/phone.css'
+            add_css_file('/app/static/main/phone.css')
             generate_mobile_upper()
         } else if (detect.tablet()) {
-            link.href = '/app/static/main/desktop.css'
+            add_css_file('/app/static/main/desktop.css')
         }
     } else {
-        link.href = '/app/static/main/desktop.css'
+        add_css_file('/app/static/main/desktop.css')
+        add_js_file('/app/static/base_desktop.js')
     }
-
-    document.head.append(link)
 }
 
 
