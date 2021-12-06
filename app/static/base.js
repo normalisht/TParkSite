@@ -1,58 +1,19 @@
-
-detected_phone()
-
-function add_css_file(path) {
-    let link = document.createElement('link')
-    link.rel = 'stylesheet';
-    link.type = 'text/css';
-    link.media = 'all';
-    link.href = path
-    document.head.append(link)
-}
-
-function add_js_file(path) {
-    let script = document.createElement('script')
-    script.type = 'text/javascript'
-    script.defer = true
-    script.src = path
-    document.head.append(script)
-}
-
-function detected_phone() {
-    let detect = new MobileDetect(window.navigator.userAgent)
-
-
-    if (detect.mobile()) {
-
-        if (detect.phone()) {
-            add_css_file('/app/static/main/phone.css')
-            generate_mobile_upper()
-        } else if (detect.tablet()) {
-            add_css_file('/app/static/main/desktop.css')
-        }
-    } else {
-        add_css_file('/app/static/main/desktop.css')
-        add_js_file('/app/static/base_desktop.js')
-    }
-}
-
-
 document.addEventListener('DOMContentLoaded', set_vw)
 window.addEventListener('resize', set_vw)
 window.addEventListener('orientationchange', set_vw)
 
-
-/*document.addEventListener("DOMContentLoaded", top_footer)
+document.addEventListener("DOMContentLoaded", top_footer)
 window.addEventListener('resize', top_footer)
 window.addEventListener("orientationchange", top_footer)
-window.addEventListener("change", top_footer)*/
-
-
-set_vw()
+window.addEventListener("change", top_footer)
 
 window.addEventListener('resize', generate_upper)
 window.addEventListener("orientationchange", generate_upper)
 document.addEventListener("DOMContentLoaded", generate_upper)
+
+set_vw()
+detected_phone()
+
 
 function set_vw() {
     let vw = document.documentElement.clientWidth / 100
@@ -66,11 +27,11 @@ function top_footer() {
     let footer_height = footer.outerHeight(),
         footer_top = footer.css('margin-top').slice(0, 2)
 
-    footer.css('display', 'none')
+/*    footer.css('display', 'none')
     let height = document.documentElement.scrollHeight < document.documentElement.clientHeight ?
         document.documentElement.clientHeight : document.documentElement.scrollHeight
     footer.css('top', height - footer_height - footer_top + 'px')
-    footer.css('display', 'block')
+    footer.css('display', 'block')*/
 }
 
 
@@ -169,3 +130,37 @@ function generate_desktop_upper() {
     navigation_buttons.style.margin = 'auto'
 }
 
+function add_css_file(path) {
+    let link = document.createElement('link')
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.media = 'all';
+    link.href = path
+    document.head.append(link)
+}
+
+function add_js_file(path) {
+    let script = document.createElement('script')
+    script.type = 'text/javascript'
+    script.defer = true
+    script.src = path
+    document.head.append(script)
+}
+
+function detected_phone() {
+    let detect = new MobileDetect(window.navigator.userAgent)
+
+
+    if (detect.mobile()) {
+
+        if (detect.phone()) {
+            add_css_file('/app/static/main/phone.css')
+            generate_mobile_upper()
+        } else if (detect.tablet()) {
+            add_css_file('/app/static/main/desktop.css')
+        }
+    } else {
+        add_css_file('/app/static/main/desktop.css')
+        add_js_file('/app/static/base_desktop.js')
+    }
+}
