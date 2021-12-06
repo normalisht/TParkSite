@@ -14,63 +14,59 @@
                     <div class="slider__container">
                         <div class="slider__wrapper">
                             <div class="slider__items">
+                                {% for i in range(3) %}
                                 <div class="slider__item">
-                                    <img src="{{ url_for('static',filename='/images/category/1.png' ) }}"
-                                                     alt="">
+                                    <img class="slider__img" alt="" src="{{ url_for('static',filename='/images/staff/1.png' ) }}">
                                 </div>
                                 <div class="slider__item">
-                                    <img src="{{ url_for('static',filename='/images/category/1.png' ) }}"
-                                                     alt="">
+                                    <img class="slider__img" alt="" src="{{ url_for('static',filename='/images/staff/2.png' ) }}">
                                 </div>
-                                <div class="slider__item">
-                                    <img src="{{ url_for('static',filename='/images/category/1.png' ) }}"
-                                                     alt="">
-                                </div>
-                                <div class="slider__item">
-                                    <img src="{{ url_for('static',filename='/images/category/1.png' ) }}"
-                                                     alt="">
-                                </div>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
-                    <a class="slider__control slider__control_prev" href="#" role="button"
-                       data-slide="prev"></a>
-                    <a class="slider__control slider__control_next" href="#" role="button"
-                       data-slide="next"></a>
+                    <a class="slider__control slider__control_prev" href="#" role="button" data-slide="prev"></a>
+                    <a class="slider__control slider__control_next" href="#" role="button" data-slide="next"></a>
                 </div>
             </div>
         </div>
         <div class="category_description">
-            <h1>ОПИСАНИЕ</h1>
             <div class="text">
                 {{ category.description if category.description }}
             </div>
         </div>
         <div class="buttons">
             {% for element in services %}
-                {% set service = element.service %}
-                {% if service.status == true %}
-                    <button id="{{ service.id }}", class="button">
-                        <div class="content">
-                            {% for price in service.prices %}
-                                {{ service.name }} - {{ price }}<br>
-                            {% endfor %}
-                            <div class="description">
-                                {% if service.short_description != None %}
-                                    <br>{{ service.short_description }}
-                                {% endif %}
-                                <br><a href="{{ url_for('main.service') }}?service_id={{ service.id }}">Ссылка на полное описание </a>
-                            </div>
-                        </div>
-                    </button>
-                {% endif %}
+            {% set service = element.service %}
+            {% if service.status == true %}
+            <div id="{{ service.id }}" class="button_3">
+                <div class="content">
+                    <div style="display: flex; justify-content: space-between; margin-right: 8px">
+                        <div>{{ service.name }}</div>
+                        <div>{{ service.prices[0] }}</div>
+                    </div>
+                    {% if service.short_description %}
+                    <div class="description">
+                        {% if service.short_description != None %}
+                        <br>{{ service.short_description }}
+                        {% endif %}
+                        <br>
+                        <a style="color: black;"
+                           href="{{ url_for('main.service') }}?service_id={{ service.id }}">
+                            Подробнее
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
             {% endfor %}
         </div>
-    </div>
 
 
-    <script>
-        let services = document.querySelectorAll('.button')
+
+        <script>
+        let services = document.querySelectorAll('.button_3')
 
         for(let service of services) {
             service.addEventListener('click', function() {

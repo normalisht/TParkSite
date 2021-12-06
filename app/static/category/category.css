@@ -1,46 +1,46 @@
 @charset "UTF-8";
 
+
 .container {
     position: relative;
     justify-content: center;
     display: grid;
-    grid-template-columns: 50vw 50vw;
+    grid-template-columns: 100vw;
     overflow: hidden;
+    grid-row-gap: 2vw;
 }
 
 .data {
     position: relative;
     display: flex;
-    justify-content: right;
-    font-family: 'Roboto', sans-serif;
-    font-size: 14px;
+    justify-content: center;
+    align-items: center;
 }
 
 .text {
     display: flex;
     position: relative;
+    justify-content: center;
+    font-size: 16px;
+    font-family: Arial;
 }
-
 
 h1 {
     text-align: center;
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Arial';
 }
 
 .description {
     max-height: 0;
-    overflow: auto;
-    transition: max-height 2s cubic-bezier(0, 1, 0, 1);
-    right: 5px;
+    overflow: hidden;
+    transition: max-height 1.5s ease;
+    left: 2%;
     position: relative;
-    border-radius: 38px;
 }
 
-
 .active {
-    max-height: 30vh;
-    transition: max-height 1.5s ease-out;
-    border-radius: 38px;
+    max-height: 100vh;
+    transition: max-height 1.5s ease;
 }
 
 .content:after {
@@ -51,33 +51,33 @@ h1 {
     border-left: 5px solid transparent;
     border-top: 5px solid #333;
     border-right: 5px solid transparent;
-    z-index: 4;
-}
-
-.button:hover, .button:focus {
-    color: #313133;
-    transform: translateY(-6px);
-}
-
-button:hover::before, button:focus::before {
-    opacity: 1;
+    z-index: 999;
 }
 
 
-button:hover::after, button:focus::after {
-    display: none;
+.button_1:before {
+    border-left-width: 2px;
+    border-top-width: 2px;
+    left: -5px;
+    top: -5px;
 }
 
-.category_description{
-    position: relative;
-    display: grid;
-    justify-content: center;
-    align-items: center;
-    font-family: 'Roboto', sans-serif;
-    font-size: 14px;
-    grid-template-rows: auto;
+.button_1:after {
+    border-bottom-width: 2px;
+    border-right-width: 2px;
+    bottom: -5px;
+    right: -5px;
+}
+.button_1:hover:before,
+.button_1:hover:after
+{
+    height:100%;
+    width:100%;
 }
 
-.footer{
-    position: relative;
+
+
+.description {
+    text-decoration: none;
+    color: black;
 }
