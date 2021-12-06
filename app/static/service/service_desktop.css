@@ -15,7 +15,7 @@
 
 .img_service {
     object-fit: cover;
-    width: clamp(150px, 30vw, 800px);
-    height: clamp(100px, 30vh, 400px);
+    width: clamp(150px, 35vw, 800px);
+    height: clamp(100px, 35vh, 400px);
     margin: 0 auto;
 }
