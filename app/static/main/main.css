@@ -42,7 +42,7 @@ img {
 }
 
 .upper {
-    padding: 1vh;
+    padding-top: 5px;
     width: 100%;
     max-width: 1400px;
     margin: 0 auto;
