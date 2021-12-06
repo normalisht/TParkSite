@@ -42,10 +42,10 @@ window.addEventListener('resize', set_vw)
 window.addEventListener('orientationchange', set_vw)
 
 
-document.addEventListener("DOMContentLoaded", top_footer)
+/*document.addEventListener("DOMContentLoaded", top_footer)
 window.addEventListener('resize', top_footer)
 window.addEventListener("orientationchange", top_footer)
-window.addEventListener("change", top_footer)
+window.addEventListener("change", top_footer)*/
 
 
 set_vw()
@@ -87,24 +87,26 @@ function buttons_position() {
     let el = buttons.nextElementSibling
 
     if (document.documentElement.scrollTop <= el.offsetTop) {
-        el.style.height = '0'
         buttons.style.position = 'relative'
         buttons.style.margin = 'auto'
 
         if (generate_upper.type == 'mobile') {
             buttons.style.paddingBottom = '12px'
             buttons.style.marginTop = '5px'
+            el.style.height = '0'
         }
     }
 
     if (buttons.offsetTop < document.documentElement.scrollTop) {
-        el.style.height = window.getComputedStyle(buttons).height
+
+        if (generate_upper.type == 'mobile') {
+            el.style.height = window.getComputedStyle(buttons).height
+        }
         buttons.style.position = 'fixed'
         buttons.style.top = buttons.style.left = buttons.style.right = '0'
         buttons.style.marginTop = '0'
         buttons.style.paddingBottom = '0'
     }
-
 }
 
 generate_upper.type = null
@@ -137,13 +139,11 @@ function generate_mobile_upper() {
 
     navigation_buttons.style.paddingBottom = '12px'
 
-    upper.after(document.createElement('div'))
     upper.after(navigation_buttons)
     upper.after(phone_numbers)
     upper.style.justifyContent = 'space-around'
 
     phone_numbers.style.display = 'none'
-
 }
 
 function generate_desktop_upper() {
@@ -164,11 +164,8 @@ function generate_desktop_upper() {
 
     navigation_buttons.style.paddingBottom = '0'
 
-    // navigation_buttons.nextElementSibling.remove()
     upper.firstElementChild.after(navigation_buttons)
     block_info.style.width = 'max-content'
     navigation_buttons.style.margin = 'auto'
-
-
 }
 
