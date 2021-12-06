@@ -91,7 +91,6 @@ function buttons_position() {
         buttons.style.position = 'relative'
         buttons.style.margin = 'auto'
 
-        console.log(generate_upper.type, generate_upper.type == 'mobile')
         if (generate_upper.type == 'mobile') {
             buttons.style.paddingBottom = '12px'
             buttons.style.marginTop = '5px'
