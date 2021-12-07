@@ -41,7 +41,7 @@
             {% for element in services %}
                 {% set service = element.service %}
                 {% if service.status == true %}
-                    <div id="{{ service.id }}" class="button_4">
+                    <div id="{{ service.id }}" class="button_1">
                         <div class="content">
                             <div style="display: flex; justify-content: space-between; margin-right: 8px">
                                 <div>{{ service.name }}</div>
@@ -55,7 +55,7 @@
                                     <br>
                                     <a style="color: black;"
                                        href="{{ url_for('main.service') }}?service_id={{ service.id }}">
-                                        <span>Подробнее</span>
+                                        Подробнее
                                     </a>
                                 </div>
                             {% endif %}
@@ -66,11 +66,13 @@
         </div>
 
         <script>
-            let services = document.querySelectorAll('.button_4')
+            let services = document.querySelectorAll('.button_1')
 
             for (let service of services) {
                 service.addEventListener('click', function () {
-                    service.querySelector('.description').classList.toggle('active')
+                    let description = service.querySelector('.description')
+
+                    description.classList.toggle('active')
                 })
             }
 

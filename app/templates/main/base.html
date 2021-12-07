@@ -43,6 +43,17 @@
 
 <body id="body">
 
+<div id="preloader" class="preloader">
+    <div class="loader-container circle-pulse-multiple">
+        <div class="loader">
+            <div class="circle-1"></div>
+            <div class="circle-2"></div>
+            <div class="circle-3"></div>
+        </div>
+    </div>
+    <div class="preloader-overlay"></div>
+</div>
+
 <div class="upper_container">
     <div id="upper" class="upper">
         <div class="block_logo">
@@ -114,8 +125,9 @@
                                 </ul>
                             </div>
                         </div>
-                        <button class="btn-close-modal-window" data-modal-window-toggle="#contacts-modal-win">X</button>
-                    </div>
+                        <close class="btn-close-modal-window">
+                            <img src="{{ url_for('static', filename='cross.png') }}" alt="X">
+                        </close>                    </div>
                     <div class="overlay"></div>
                 </div>
                 <!--конец модальных окон-->
@@ -131,7 +143,6 @@
                 <div>+7(920)898-46-80</div>
                 <div>+7(920)898-46-80</div>
             </div>
-
         </div>
     </div>
 </div>
@@ -141,16 +152,6 @@
 </div>
 
 <div id="footer" class="footer">© 2021</div>
-<div id="preloader" class="preloader">
-    <div class="loader-container circle-pulse-multiple">
-        <div class="loader">
-            <div class="circle-1"></div>
-            <div class="circle-2"></div>
-            <div class="circle-3"></div>
-        </div>
-    </div>
-    <div class="preloader-overlay"></div>
-</div>
 
 </body>
 </html>
