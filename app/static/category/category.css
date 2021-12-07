@@ -75,9 +75,13 @@ h1 {
     width:100%;
 }
 
-
-
 .description {
     text-decoration: none;
     color: black;
+}
+
+.more {
+    display: flex;
+    justify-content: right;
+    margin-right: 1vw;
 }
