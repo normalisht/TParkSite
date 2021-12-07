@@ -7,7 +7,7 @@
     display: grid;
     grid-template-columns: 100vw;
     overflow: hidden;
-    grid-row-gap: 2vw;
+    grid-row-gap: 10px;
     font-family: Arial, serif;
 }
 
@@ -39,7 +39,7 @@ h1 {
 
 .active {
     max-height: 100vh;
-    transition: max-height 1.5s ease;
+    transition: max-height 1s ease-in;
 }
 
 .content:after {
@@ -77,4 +77,5 @@ h1 {
 .description {
     text-decoration: none;
     color: black;
+    cursor: default;
 }
