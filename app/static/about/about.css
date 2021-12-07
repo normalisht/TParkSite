@@ -40,7 +40,7 @@
 Эксперимент.
 Дима, если говно, отключи. Как по мне , цвета можно подобрать намного лучше, да и вообще как то многовато втулил.
 Но, я ,вроде, проверил , всё более менее правильно работает.
-*/
+*//*
 @media (min-width: 768px) {
     .post-wrap {
         margin: 0 auto;
@@ -53,7 +53,7 @@
         padding: 10px;
     }
 
-    /*.post-item-wrap {
+    .post-item-wrap {
         background: white;
         position: relative;
     }
@@ -74,7 +74,7 @@
         top: 5px;
         left: 5px;
         transform: rotate(2deg);
-    }*/
+    }
     .post-link {
         text-decoration: none;
         display: block;
@@ -91,7 +91,7 @@
         color: #C9F2C7;
     }
 }
-
+*/
 /*откл*/
 /*конец эксперимента */
 
