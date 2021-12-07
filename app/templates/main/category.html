@@ -9,83 +9,64 @@
     <h1>{{ category.name }}</h1>
     <div class="container">
         <div class="data">
-            <table id="table" style="margin: 2px;" class="table">
-                <tr>
-                    <td>
-                        <div class="block_slider">
-                            <div class="slider">
-                                <div class="slider__container">
-                                    <div class="slider__wrapper">
-                                        <div class="slider__items">
-                                            <div class="slider__item">
-                                                <img src="{{ url_for('static',filename='/images/category/1.png' ) }}"
-                                                     alt="">
-                                            </div>
-                                            <div class="slider__item">
-                                                <img src="{{ url_for('static',filename='/images/category/1.png' ) }}"
-                                                     alt="">
-                                            </div>
-                                            <div class="slider__item">
-                                                <img src="{{ url_for('static',filename='/images/category/1.png' ) }}"
-                                                     alt="">
-                                            </div>
-                                            <div class="slider__item">
-                                                <img src="{{ url_for('static',filename='/images/category/1.png' ) }}"
-                                                     alt="">
-                                            </div>
-                                        </div>
-                                    </div>
+            <div class="block_slider">
+                <div class="slider">
+                    <div class="slider__container">
+                        <div class="slider__wrapper">
+                            <div class="slider__items">
+                                {% for i in range(3) %}
+                                <div class="slider__item">
+                                    <img class="slider__img" alt="" src="{{ url_for('static',filename='/images/staff/1.png' ) }}">
                                 </div>
-                                <a class="slider__control slider__control_prev" href="#" role="button"
-                                   data-slide="prev"></a>
-                                <a class="slider__control slider__control_next" href="#" role="button"
-                                   data-slide="next"></a>
+                                <div class="slider__item">
+                                    <img class="slider__img" alt="" src="{{ url_for('static',filename='/images/staff/2.png' ) }}">
+                                </div>
+                                {% endfor %}
                             </div>
                         </div>
-                    </td>
-                    <td>
-                        <h1>ОПИСАНИЕ</h1>
-                        {% if category.description == true %}
-                            <div class="text">
-                                <span>{{ category.description }}</span>
-                            </div>
-                        {% endif %}
-                    </td>
-                </tr>
-            </table>
+                    </div>
+                    <a class="slider__control slider__control_prev" href="#" role="button" data-slide="prev"></a>
+                    <a class="slider__control slider__control_next" href="#" role="button" data-slide="next"></a>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="buttons">
-        {% for element in services %}
+        <div class="category_description">
+            <div class="text">
+                {{ category.description if category.description }}
+            </div>
+        </div>
+        <div class="buttons">
+            {% for element in services %}
             {% set service = element.service %}
             {% if service.status == true %}
-                <div id="{{ service.id }}" class="button">
-                    <div class="content">
-                        <div style="display: flex; justify-content: space-between; margin-right: 8px">
-                            <div>{{ service.name }}</div>
-                            <div>{{ service.prices[0] }}</div>
-                        </div>
-                        {% if service.short_description %}
-                            <div class="description">
-                                {% if service.short_description != None %}
-                                    <br>{{ service.short_description }}
-                                {% endif %}
-                                <br>
-                                <a style="color: black;"
-                                   href="{{ url_for('main.service') }}?service_id={{ service.id }}">
-                                    Подробнее
-                                </a>
-                            </div>
-                        {% endif %}
+            <div id="{{ service.id }}" class="button_3">
+                <div class="content">
+                    <div style="display: flex; justify-content: space-between; margin-right: 8px">
+                        <div>{{ service.name }}</div>
+                        <div>{{ service.prices[0] }}</div>
                     </div>
+                    {% if service.short_description %}
+                    <div class="description">
+                        {% if service.short_description != None %}
+                        <br>{{ service.short_description }}
+                        {% endif %}
+                        <br>
+                        <a style="color: black;"
+                           href="{{ url_for('main.service') }}?service_id={{ service.id }}">
+                            Подробнее
+                        </a>
+                    </div>
+                    {% endif %}
                 </div>
+            </div>
             {% endif %}
-        {% endfor %}
-    </div>
+            {% endfor %}
+        </div>
 
 
-    <script>
-        let services = document.querySelectorAll('.button')
+
+        <script>
+        let services = document.querySelectorAll('.button_3')
 
         for (let service of services) {
             service.addEventListener('click', function () {
