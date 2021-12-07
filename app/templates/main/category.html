@@ -64,38 +64,36 @@
                 {% endif %}
             {% endfor %}
         </div>
+    </div>
 
-        <script>
-            let services = document.querySelectorAll('.button_1')
+    <script>
+        let services = document.querySelectorAll('.button_1')
 
-            for (let service of services) {
-                service.addEventListener('click', function () {
-                    let description = service.querySelector('.description')
+        for (let service of services) {
+            service.addEventListener('click', function () {
+                let description = service.querySelector('.description')
 
-                    description.classList.toggle('active')
-                })
+                description.classList.toggle('active')
+            })
+        }
+
+        style_css()
+
+        function style_css() {
+            let detect = new MobileDetect(window.navigator.userAgent)
+            let link = document.createElement('link')
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.media = 'all';
+
+            if (detect.mobile()) {
+                link.href = '/app/static/category/category_phone.css';
+            } else {
+                link.href = '/app/static/category/category_desktop.css'
             }
 
-            style_css()
-
-            function style_css() {
-                let detect = new MobileDetect(window.navigator.userAgent)
-                let link = document.createElement('link')
-                link.rel = 'stylesheet';
-                link.type = 'text/css';
-                link.media = 'all';
-
-                if (detect.mobile()) {
-                    link.href = '/app/static/category/category_phone.css';
-                } else {
-                    link.href = '/app/static/category/category_desktop.css'
-                }
-
-                document.head.append(link)
-            }
-        </script>
-
-
-
+            document.head.append(link)
+        }
+    </script>
 
 {% endblock %}

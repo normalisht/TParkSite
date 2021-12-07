@@ -11,14 +11,33 @@ window.addEventListener('resize', generate_upper)
 window.addEventListener("orientationchange", generate_upper)
 document.addEventListener("DOMContentLoaded", generate_upper)
 
+setInterval(top_footer, 1)
+
 set_vw()
 detected_phone()
+
+document.addEventListener('scroll', buttons_position)
+
+let buttons = document.getElementById('navigation_buttons')
+let el = document.createElement('div')
+el.setAttribute('id', 'for_nav_btns')
+el.style.height = '0'
+
+buttons.after(el)
 
 
 function set_vw() {
     let vw = document.documentElement.clientWidth / 100
     document.documentElement.style.setProperty('--vw', `${vw}px`)
 }
+
+let footer_2 = document.getElementById('footer').cloneNode(true)
+document.getElementById('footer').after(footer_2)
+footer_2.setAttribute('id', 'footer-2')
+footer_2.style.display = 'block'
+footer_2.style.visibility = 'hidden'
+footer_2.style.zIndex = '-1000'
+footer_2.style.position = 'absolute'
 
 function top_footer() {
     let footer = $('#footer')
@@ -27,48 +46,72 @@ function top_footer() {
     let footer_height = footer.outerHeight(),
         footer_top = footer.css('margin-top').slice(0, 2)
 
-
-
-/*    footer.css('display', 'none')
-    let height = document.documentElement.scrollHeight < document.documentElement.clientHeight ?
-        document.documentElement.clientHeight : document.documentElement.scrollHeight
-    footer.css('top', height - footer_height - footer_top + 'px')
-    footer.css('display', 'block')*/
+    if (document.documentElement.clientHeight > footer.offset().top + footer_height + footer_top) {
+        footer_2.style.top = document.documentElement.clientHeight - footer_height - footer_top + 'px'
+        footer_2.style.visibility = 'visible'
+        footer_2.style.zIndex = '1'
+        footer.css({'visibility': 'hidden',
+            'z-index': '-1000'})
+    } else {
+        footer.css({'visibility': 'visible',
+            'z-index': '1'})
+        footer_2.style.visibility = 'hidden'
+        footer_2.style.zIndex = '-1000'
+    }
 }
 
 
-document.addEventListener('scroll', buttons_position)
-
-let buttons = document.getElementById('navigation_buttons')
-let el = document.createElement('div')
-el.style.height = '0'
-
-buttons.after(el)
-
 function buttons_position() {
     let buttons = document.getElementById('navigation_buttons')
-    let el = buttons.nextElementSibling
+    let el = document.getElementById('for_nav_btns')
+    let bottom_coord = buttons.offsetTop + buttons.offsetHeight
+    let margin = 0, padding = 0
 
-    if (document.documentElement.scrollTop <= el.offsetTop) {
+    if (document.documentElement.scrollTop <= el.offsetTop - 12) {
         buttons.style.position = 'relative'
         buttons.style.margin = 'auto'
 
         if (generate_upper.type == 'mobile') {
-            buttons.style.paddingBottom = '12px'
-            buttons.style.marginTop = '5px'
+
+            //
+            // if (buttons.offsetTop - document.documentElement.scrollTop > 0)
+            //     margin = Math.min(buttons.offsetTop - document.documentElement.scrollTop, 5)
+            // else margin = 5
+            //
+            // console.log(margin)
+
+            // buttons.style.marginTop = margin + 'px'
+
+            // if (12 - document.documentElement.scrollTop + bottom_coord > 0)
+            //     padding = Math.min(12 - document.documentElement.scrollTop + bottom_coord, 12)
+            // else padding = 12
+            //
+            // console.log(padding)
+
+            buttons.style.paddingBottom = 12 + 'px'
+            // buttons.style.marginTop = '5px'
             el.style.height = '0'
+            el.style.paddingBottom = '0'
         }
     }
 
-    if (buttons.offsetTop < document.documentElement.scrollTop) {
+    if (buttons.offsetTop - 12 < document.documentElement.scrollTop) {
 
         if (generate_upper.type == 'mobile') {
             el.style.height = window.getComputedStyle(buttons).height
         }
         buttons.style.position = 'fixed'
         buttons.style.top = buttons.style.left = buttons.style.right = '0'
-        buttons.style.marginTop = '0'
-        buttons.style.paddingBottom = '0'
+
+        // buttons.style.marginTop = '0px'
+
+        if (12 - document.documentElement.scrollTop + bottom_coord > 0)
+            padding = Math.min(12 - document.documentElement.scrollTop + bottom_coord, 12)
+        else padding = 0
+
+        console.log(padding)
+
+        buttons.style.paddingBottom = padding + 'px'
     }
 }
 
@@ -88,7 +131,12 @@ function generate_mobile_upper() {
     let phone_numbers = document.getElementById('phone_numbers'),
         block_info = document.getElementById('upper_block_info'),
         navigation_buttons = document.getElementById('navigation_buttons'),
-        upper = document.getElementById('upper')
+        upper = document.getElementById('upper'),
+        logo = document.getElementById('block_logo')
+
+    logo.style.width = '50%'
+    block_info.style.width = '50%'
+    navigation_buttons.style.width = '100%'
 
     block_info.style.flexDirection =
         block_info.firstElementChild.style.flexDirection = 'column'
@@ -97,11 +145,17 @@ function generate_mobile_upper() {
     block_info.firstElementChild.lastElementChild.innerHTML =
         block_info.firstElementChild.lastElementChild.innerHTML.slice(0)
 
-    document.getElementById('logo').parentElement.style.width =
-        block_info.style.width = '50%'
 
     navigation_buttons.style.paddingBottom = '12px'
 
+    let el
+    if (!document.getElementById('for_nav_btns')) {
+        el = document.createElement('div')
+        el.setAttribute('id', 'for_nav_btns')
+    }
+
+    upper.after(document.getElementById('for_nav_btns') ?
+        document.getElementById('for_nav_btns') : el)
     upper.after(navigation_buttons)
     upper.after(phone_numbers)
     upper.style.justifyContent = 'space-around'
@@ -113,7 +167,10 @@ function generate_desktop_upper() {
     let phone_numbers = document.getElementById('phone_numbers'),
         block_info = document.getElementById('upper_block_info'),
         navigation_buttons = document.getElementById('navigation_buttons'),
-        upper = document.getElementById('upper')
+        upper = document.getElementById('upper'),
+        logo = document.getElementById('block_logo')
+
+
 
     phone_numbers.style.display = 'flex'
     block_info.append(phone_numbers)
@@ -127,9 +184,10 @@ function generate_desktop_upper() {
 
     navigation_buttons.style.paddingBottom = '0'
 
+    upper.firstElementChild.after(document.getElementById('for_nav_btns'))
     upper.firstElementChild.after(navigation_buttons)
-    block_info.style.width = 'max-content'
     navigation_buttons.style.margin = 'auto'
+    block_info.style.width = logo.style.width = 100 / 3 + '%'
 }
 
 function add_css_file(path) {

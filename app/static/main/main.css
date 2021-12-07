@@ -147,6 +147,7 @@ img {
     flex-direction: column;
     justify-content: space-evenly;
     align-items: center;
+    width: calc(100% / 3); !important;
     font-size: var(--primary-big-font);
     font-family: var(--primary-font-family);
 }
