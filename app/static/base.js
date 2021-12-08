@@ -27,6 +27,8 @@ function top_footer() {
     let footer_height = footer.outerHeight(),
         footer_top = footer.css('margin-top').slice(0, 2)
 
+
+
 /*    footer.css('display', 'none')
     let height = document.documentElement.scrollHeight < document.documentElement.clientHeight ?
         document.documentElement.clientHeight : document.documentElement.scrollHeight

@@ -15,12 +15,14 @@
                         <div class="slider__wrapper">
                             <div class="slider__items">
                                 {% for i in range(3) %}
-                                <div class="slider__item">
-                                    <img class="slider__img" alt="" src="{{ url_for('static',filename='/images/staff/1.png' ) }}">
-                                </div>
-                                <div class="slider__item">
-                                    <img class="slider__img" alt="" src="{{ url_for('static',filename='/images/staff/2.png' ) }}">
-                                </div>
+                                    <div class="slider__item">
+                                        <img class="slider__img" alt=""
+                                             src="{{ url_for('static',filename='/images/staff/1.png' ) }}">
+                                    </div>
+                                    <div class="slider__item">
+                                        <img class="slider__img" alt=""
+                                             src="{{ url_for('static',filename='/images/staff/2.png' ) }}">
+                                    </div>
                                 {% endfor %}
                             </div>
                         </div>
@@ -37,60 +39,63 @@
         </div>
         <div class="buttons">
             {% for element in services %}
-            {% set service = element.service %}
-            {% if service.status == true %}
-            <div id="{{ service.id }}" class="button_3">
-                <div class="content">
-                    <div style="display: flex; justify-content: space-between; margin-right: 8px">
-                        <div>{{ service.name }}</div>
-                        <div>{{ service.prices[0] }}</div>
+                {% set service = element.service %}
+                {% if service.status == true %}
+                    <div id="{{ service.id }}" class="button_1">
+                        <div class="content">
+                            <div style="display: flex; justify-content: space-between; margin-right: 8px">
+                                <div>{{ service.name }}</div>
+                                <div>{{ service.prices[0] }}</div>
+                            </div>
+                            {% if service.short_description %}
+                                <div class="description">
+                                    {% if service.short_description != None %}
+                                        <br>{{ service.short_description }}
+                                    {% endif %}
+                                    <br>
+                                    <a style="color: black;"
+                                       href="{{ url_for('main.service') }}?service_id={{ service.id }}">
+                                        Подробнее
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
-                    {% if service.short_description %}
-                    <div class="description">
-                        {% if service.short_description != None %}
-                        <br>{{ service.short_description }}
-                        {% endif %}
-                        <br>
-                        <a style="color: black;"
-                           href="{{ url_for('main.service') }}?service_id={{ service.id }}">
-                            Подробнее
-                        </a>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-            {% endif %}
+                {% endif %}
             {% endfor %}
         </div>
 
-
-
         <script>
-        let services = document.querySelectorAll('.button_3')
+            let services = document.querySelectorAll('.button_1')
 
-        for (let service of services) {
-            service.addEventListener('click', function () {
-                service.querySelector('.description').classList.toggle('active')
-            })
-        }
+            for (let service of services) {
+                service.addEventListener('click', function () {
+                    let description = service.querySelector('.description')
 
-        style_css()
-
-        function style_css() {
-            let detect = new MobileDetect(window.navigator.userAgent)
-            let link = document.createElement('link')
-            link.rel = 'stylesheet';
-            link.type = 'text/css';
-            link.media = 'all';
-
-            if (detect.mobile()) {
-                link.href = '/app/static/category/category_phone.css';
-            } else {
-                link.href = '/app/static/category/category_desktop.css'
+                    description.classList.toggle('active')
+                })
             }
 
-            document.head.append(link)
-        }
-    </script>
+            style_css()
+
+            function style_css() {
+                let detect = new MobileDetect(window.navigator.userAgent)
+                let link = document.createElement('link')
+                link.rel = 'stylesheet';
+                link.type = 'text/css';
+                link.media = 'all';
+
+                if (detect.mobile()) {
+                    link.href = '/app/static/category/category_phone.css';
+                } else {
+                    link.href = '/app/static/category/category_desktop.css'
+                }
+
+                document.head.append(link)
+            }
+        </script>
+
+
+
 
 {% endblock %}
