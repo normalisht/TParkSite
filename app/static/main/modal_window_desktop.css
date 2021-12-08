@@ -11,7 +11,6 @@
     top: 100%;
     width: var(--block-width);
     background: #fafafa;
-    z-index: 5;
     visibility: hidden;
     opacity: 0;
     transition: 0.25s ease-out;
@@ -36,7 +35,7 @@
     padding: 8px 10px 2px 12px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.2);
     font-size: 1.3rem;
-    font-family: 'Kurale', serif;
+    font-family: 'Arial', serif;
 }
 
 .submenu-item > a {
