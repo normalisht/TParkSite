@@ -25,19 +25,20 @@ el.style.height = '0'
 
 buttons.after(el)
 
-
+let footer_2
 function set_vw() {
     let vw = document.documentElement.clientWidth / 100
     document.documentElement.style.setProperty('--vw', `${vw}px`)
 }
-
-let footer_2 = document.getElementById('footer').cloneNode(true)
-document.getElementById('footer').after(footer_2)
-footer_2.setAttribute('id', 'footer-2')
-footer_2.style.display = 'block'
-footer_2.style.visibility = 'hidden'
-footer_2.style.zIndex = '-1000'
-footer_2.style.position = 'absolute'
+document.addEventListener('DOMContentLoaded', function () {
+    footer_2 = document.getElementById('footer').cloneNode(true)
+    document.getElementById('footer').after(footer_2)
+    footer_2.setAttribute('id', 'footer-2')
+    footer_2.style.display = 'block'
+    footer_2.style.visibility = 'hidden'
+    footer_2.style.zIndex = '-1000'
+    footer_2.style.position = 'absolute'
+})
 
 function top_footer() {
     let footer = $('#footer')
@@ -221,3 +222,12 @@ function detected_phone() {
         add_js_file('/app/static/base_desktop.js')
     }
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    let categories = $('#services-modal-win').find('.submenu-item')
+    categories.each(function () {
+        $(this).click(function () {
+            window.location = $(this).find('a').attr('href')
+        })
+    })
+})
