@@ -30,10 +30,11 @@ h1 {
 }
 
 .description {
-    max-height: 0;
+    /*max-height: 0;*/
+    height: 0;
     overflow: hidden;
-    transition: max-height 1.5s ease;
-    left: 2%;
+    /*transition: max-height 1.5s ease;*/
+    margin-left: 3px;
     position: relative;
 }
 
