@@ -12,30 +12,32 @@
     text-align: center;
 }
 
-.active {
-    max-height: 100vh;
-    transition: max-height 1.5s ease-out;
+
+.price_switch {
+    top: 8px;
+    right: -1px;
+    width: 20px;
+    height: min-content;
+    object-fit: cover;
+    transition: all 0.5s;
+    z-index: 3;
 }
 
-.content:after {
-    content: "";
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    border-left: 10px solid transparent;
-    border-top: 10px solid #333;
-    border-right: 10px solid transparent;
-    z-index: 999;
+.price_switch_active {
+    transform: rotate(-180deg);
 }
 
-.button {
+
+
+
+.button_1 {
     margin: 0 auto;
     width: calc(100 * var(--vw));
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Arial', sans-serif;
     font-size: 18px;
     font-weight: 700;
     color: #313133;
-    background: #4acfeb;
+    /*background: #4acfeb;*/
     border-bottom:  1px solid rgba(0, 0, 0, 0.35);
     /*box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.2);*/
     transition: all 0.3s ease-in-out 0s;

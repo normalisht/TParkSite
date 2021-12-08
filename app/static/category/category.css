@@ -30,10 +30,11 @@ h1 {
 }
 
 .description {
-    max-height: 0;
+    /*max-height: 0;*/
+    height: 0;
     overflow: hidden;
-    transition: max-height 1.5s ease;
-    left: 2%;
+    /*transition: max-height 1.5s ease;*/
+    margin-left: 3px;
     position: relative;
 }
 
@@ -42,40 +43,14 @@ h1 {
     transition: max-height 1s ease-in;
 }
 
-.content:after {
-    content: "";
-    position: absolute;
-    right: 5px;
-    top: 1vw;
-    border-left: 5px solid transparent;
-    border-top: 5px solid #333;
-    border-right: 5px solid transparent;
-    z-index: 999;
-}
-
-
-.button_1:before {
-    border-left-width: 2px;
-    border-top-width: 2px;
-    left: -5px;
-    top: -5px;
-}
-
-.button_1:after {
-    border-bottom-width: 2px;
-    border-right-width: 2px;
-    bottom: -5px;
-    right: -5px;
-}
-.button_1:hover:before,
-.button_1:hover:after
-{
-    height:100%;
-    width:100%;
-}
-
 .description {
     text-decoration: none;
     color: black;
     cursor: default;
+}
+
+.more {
+    display: flex;
+    justify-content: right;
+    margin-right: 1vw;
 }

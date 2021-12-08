@@ -1,7 +1,7 @@
 from flask import render_template, flash, redirect, url_for, request, jsonify, current_app
 from app.main import bp
 from app import db
-from app.main.functions import get_categories
+from app.main.functions import get_categories, get_contacts_data
 from app.models import Text, Event, Category, ServiceCategory, Service, Employee, Partner, Price
 from sqlalchemy import create_engine
 
@@ -13,16 +13,9 @@ engine = create_engine("sqlite:///T_Park.db")
 def index():
     main_text = Text.query.filter_by(title="main_text").first().text
     events = Event.query.all()
-    geolocation = Text.query.filter_by(title='geolocation').first()
-    address = Text.query.filter_by(title='address').first()
-    phone_numbers = Text.query.filter_by(title='phone_numbers').first().text.split()
-    vk = Text.query.filter_by(title='vk').first()
-    insta = Text.query.filter_by(title='insta').first()
 
     return render_template('main/main.html', main_text=main_text, events=events,
-                           categories=get_categories(), geolocation=geolocation,
-                           address=address, phone_numbers=phone_numbers,
-                           insta=insta, vk=vk)
+                           categories=get_categories(), contacts_data=get_contacts_data())
 
 
 @bp.route('/category', methods=['GET'])
@@ -34,7 +27,8 @@ def category():
         services = category.services.all()
 
         return render_template('main/category.html', category=category, category_id=category_id,
-                               services=services, categories=get_categories())
+                               services=services, categories=get_categories(),
+                               contacts_data=get_contacts_data())
     except:
         return render_template('errors/500.html')
 
@@ -45,7 +39,8 @@ def service():
 
     service = Service.query.filter_by(id=service_id).first()
 
-    return render_template('main/service.html', service=service, categories=get_categories())
+    return render_template('main/service.html', service=service, categories=get_categories(),
+                           contacts_data=get_contacts_data())
 
 
 @bp.route('/about', methods=['GET'])
@@ -58,4 +53,4 @@ def about():
 
     return render_template('main/about.html', employees=employees,
                            filosofi=filosofi, about=about, partners=partners,
-                           categories=get_categories())
+                           categories=get_categories(), contacts_data=get_contacts_data())

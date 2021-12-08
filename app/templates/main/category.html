@@ -1,11 +1,14 @@
 {% extends "main/base.html" %}
 
+{% block scripts %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='category/category.css') }}">
+
+    <script type="text/javascript" src="{{ url_for('static', filename='slider.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='category/category.js') }}"></script>
+{% endblock %}
 
 {% block app_content %}
-    <script type="text/javascript" src="{{ url_for('static', filename='slider.js') }}"></script>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='category/category.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='category_slider.css') }}">
     <h1>{{ category.name }}</h1>
     <div class="container">
         <div class="data">
@@ -37,15 +40,21 @@
                 {{ category.description if category.description }}
             </div>
         </div>
-        <div class="buttons">
+        <div id="buttons" class="buttons">
             {% for element in services %}
                 {% set service = element.service %}
                 {% if service.status == true %}
-                    <div id="{{ service.id }}" class="button_1">
+                    <div id="{{ service.id }}" class="button_5" status="0">
                         <div class="content">
-                            <div style="display: flex; justify-content: space-between; margin-right: 8px">
+                            <div class="price" style="display: flex; justify-content: space-between; margin-right: 8px">
                                 <div>{{ service.name }}</div>
-                                <div>{{ service.prices[0] }}</div>
+                                <div style="display: flex;">
+                                    <div style="margin-right: 5px;">{{ service.prices[0] }}</div>
+                                    {% if service.short_description %}
+                                        <img class="price_switch" src="{{ url_for('static', filename='down.svg') }}"
+                                             alt="">
+                                    {% endif %}
+                                </div>
                             </div>
                             {% if service.short_description %}
                                 <div class="description">
@@ -53,7 +62,7 @@
                                         <br>{{ service.short_description }}
                                     {% endif %}
                                     <br>
-                                    <a style="color: black;"
+                                    <a style="color: black;" class="more"
                                        href="{{ url_for('main.service') }}?service_id={{ service.id }}">
                                         Подробнее
                                     </a>
@@ -64,38 +73,6 @@
                 {% endif %}
             {% endfor %}
         </div>
-
-        <script>
-            let services = document.querySelectorAll('.button_1')
-
-            for (let service of services) {
-                service.addEventListener('click', function () {
-                    let description = service.querySelector('.description')
-
-                    description.classList.toggle('active')
-                })
-            }
-
-            style_css()
-
-            function style_css() {
-                let detect = new MobileDetect(window.navigator.userAgent)
-                let link = document.createElement('link')
-                link.rel = 'stylesheet';
-                link.type = 'text/css';
-                link.media = 'all';
-
-                if (detect.mobile()) {
-                    link.href = '/app/static/category/category_phone.css';
-                } else {
-                    link.href = '/app/static/category/category_desktop.css'
-                }
-
-                document.head.append(link)
-            }
-        </script>
-
-
-
+    </div>
 
 {% endblock %}
