@@ -12,10 +12,6 @@
     text-align: center;
 }
 
-.active {
-    max-height: 100vh;
-    transition: max-height 1.5s ease-out;
-}
 
 .content:after {
     content: "";
@@ -28,14 +24,14 @@
     z-index: 999;
 }
 
-.button {
+.button_1 {
     margin: 0 auto;
     width: calc(100 * var(--vw));
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Arial', sans-serif;
     font-size: 18px;
     font-weight: 700;
     color: #313133;
-    background: #4acfeb;
+    /*background: #4acfeb;*/
     border-bottom:  1px solid rgba(0, 0, 0, 0.35);
     /*box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.2);*/
     transition: all 0.3s ease-in-out 0s;

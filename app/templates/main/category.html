@@ -2,9 +2,9 @@
 
 {% block scripts %}
     <link rel="stylesheet" href="{{ url_for('static', filename='category/category.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='category_slider.css') }}">
 
     <script type="text/javascript" src="{{ url_for('static', filename='slider.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='category/category.js') }}"></script>
 {% endblock %}
 
 {% block app_content %}
@@ -68,20 +68,5 @@
             {% endfor %}
         </div>
     </div>
-
-    <script>
-        {#let services = document.querySelectorAll('.button_1')#}
-
-        {#for (let service of services) {#}
-        {#    service.addEventListener('click', function () {#}
-        {#        let description = service.querySelector('.description')#}
-        {##}
-        {#        description.classList.toggle('active')#}
-        {#    })#}
-
-
-
-
-    </script>
 
 {% endblock %}

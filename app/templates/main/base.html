@@ -41,6 +41,12 @@
     {% endif %}
 </head>
 
+{% set geolocation = contacts_data.geolocation %}
+{% set address = contacts_data.address %}
+{% set phone_numbers = contacts_data.phone_numbers %}
+{% set vk = contacts_data.media[0] %}
+{% set geolocation = contacts_data.media[1] %}
+
 <body id="body">
 
 <div id="preloader" class="preloader">

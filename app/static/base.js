@@ -60,58 +60,58 @@ function top_footer() {
     }
 }
 
+let butt = document.getElementById('navigation_buttons')
+butt.style.boxSizing = 'border-box'
+let bottom_coord =  butt.offsetTop + butt.offsetHeight
 
 function buttons_position() {
     let buttons = document.getElementById('navigation_buttons')
-    let el = document.getElementById('for_nav_btns')
-    let bottom_coord = buttons.offsetTop + buttons.offsetHeight
-    let margin = 0, padding = 0
 
-    if (document.documentElement.scrollTop <= el.offsetTop - 12) {
+    buttons.style.boxSizing = 'border-box'
+
+    let el = document.getElementById('for_nav_btns')
+    // let bottom_coord = buttons.offsetTop + buttons.offsetHeight
+    let  padding_top = 0, padding_bottom = 0
+
+    if (document.documentElement.scrollTop <= el.offsetTop) {
         buttons.style.position = 'relative'
         buttons.style.margin = 'auto'
 
         if (generate_upper.type == 'mobile') {
 
-            //
-            // if (buttons.offsetTop - document.documentElement.scrollTop > 0)
-            //     margin = Math.min(buttons.offsetTop - document.documentElement.scrollTop, 5)
-            // else margin = 5
-            //
-            // console.log(margin)
+            if (12 - document.documentElement.scrollTop + bottom_coord > 0)
+                padding_bottom = Math.min(12 - document.documentElement.scrollTop + bottom_coord, 12)
+            else padding_bottom = 0
 
-            // buttons.style.marginTop = margin + 'px'
+            if (document.documentElement.scrollTop + 5 - buttons.offsetTop > 0)
+                padding_top = Math.min(document.documentElement.scrollTop + 5 - buttons.offsetTop, 5)
+            else padding_top = 5
 
-            // if (12 - document.documentElement.scrollTop + bottom_coord > 0)
-            //     padding = Math.min(12 - document.documentElement.scrollTop + bottom_coord, 12)
-            // else padding = 12
-            //
-            // console.log(padding)
-
-            buttons.style.paddingBottom = 12 + 'px'
-            // buttons.style.marginTop = '5px'
+            buttons.style.paddingBottom = '12px'
+            buttons.style.paddingTop = 0 + 'px'
             el.style.height = '0'
             el.style.paddingBottom = '0'
         }
     }
 
-    if (buttons.offsetTop - 12 < document.documentElement.scrollTop) {
+    if (buttons.offsetTop < document.documentElement.scrollTop) {
 
         if (generate_upper.type == 'mobile') {
-            el.style.height = window.getComputedStyle(buttons).height
+            el.style.height = buttons.offsetHeight + 'px'
         }
         buttons.style.position = 'fixed'
         buttons.style.top = buttons.style.left = buttons.style.right = '0'
 
-        // buttons.style.marginTop = '0px'
-
         if (12 - document.documentElement.scrollTop + bottom_coord > 0)
-            padding = Math.min(12 - document.documentElement.scrollTop + bottom_coord, 12)
-        else padding = 0
+            padding_bottom = Math.min(12 - document.documentElement.scrollTop + bottom_coord, 12)
+        else padding_bottom = 0
 
-        console.log(padding)
+        if (document.documentElement.scrollTop + 5 - buttons.scrollTop > 0)
+            padding_top = Math.min(document.documentElement.scrollTop + 5 - buttons.offsetTop, 5)
+        else padding_top = 0
 
-        buttons.style.paddingBottom = padding + 'px'
+        buttons.style.paddingBottom = padding_bottom + 'px'
+        buttons.style.paddingTop = '0px'
     }
 }
 
@@ -134,8 +134,7 @@ function generate_mobile_upper() {
         upper = document.getElementById('upper'),
         logo = document.getElementById('block_logo')
 
-    logo.style.width = '50%'
-    block_info.style.width = '50%'
+    logo.style.width = block_info.style.width = '50%'
     navigation_buttons.style.width = '100%'
 
     block_info.style.flexDirection =
@@ -169,8 +168,6 @@ function generate_desktop_upper() {
         navigation_buttons = document.getElementById('navigation_buttons'),
         upper = document.getElementById('upper'),
         logo = document.getElementById('block_logo')
-
-
 
     phone_numbers.style.display = 'flex'
     block_info.append(phone_numbers)

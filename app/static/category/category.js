@@ -12,7 +12,6 @@ function style_css() {
     } else {
         link.href = '/app/static/category/category_desktop.css'
     }
-
     document.head.append(link)
 }
 
@@ -20,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let services = $('.button_1'),
         time_animation = 1000
 
-    services.each(function(index, value) {
+    services.each(function() {
         $(this).click(function () {
             let description = $(this).find('.description').stop()
 
