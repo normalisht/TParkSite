@@ -44,7 +44,8 @@
             {% for element in services %}
                 {% set service = element.service %}
                 {% if service.status == true %}
-                    <div id="{{ service.id }}" class="button_5" status="0">
+                    <div id="{{ service.id }}" class="button_5" status="0"
+                         style="cursor: {% if service.short_description != None %}pointer{% else %}default{% endif %}">
                         <div class="content">
                             <div class="price" style="display: flex; justify-content: space-between; margin-right: 8px">
                                 <div>{{ service.name }}</div>
@@ -59,13 +60,17 @@
                             {% if service.short_description %}
                                 <div class="description">
                                     {% if service.short_description != None %}
-                                        <br>{{ service.short_description }}
+                                        {{ service.short_description }}
                                     {% endif %}
                                     <br>
-                                    <a style="color: black;" class="more"
-                                       href="{{ url_for('main.service') }}?service_id={{ service.id }}">
-                                        Подробнее
-                                    </a>
+                                    <div class="more">
+                                        <div>
+                                            <a style="color: black;"
+                                               href="{{ url_for('main.service') }}?service_id={{ service.id }}">
+                                                Подробнее...
+                                            </a>
+                                        </div>
+                                    </div>
                                 </div>
                             {% endif %}
                         </div>
