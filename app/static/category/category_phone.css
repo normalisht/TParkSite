@@ -32,6 +32,7 @@
     width: calc(100 * var(--vw));
     font-family: 'Arial', sans-serif;
     font-size: 20px;
+    font-weight: 500;
     color: #000000;
     /*background: #4acfeb;*/
     border-bottom:  1px solid rgba(0, 0, 0, 0.35);
