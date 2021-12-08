@@ -47,23 +47,19 @@
 }
 
 .block_fil {
-    padding: 0 10% 0;
     justify-content: center;
-    letter-spacing: 1px;
-    word-spacing: 0;
-    white-space: normal;
-    line-height: normal;
-    margin: 0 auto;
+    max-width: 70%;
+    overflow: hidden;
+    margin: 20px auto;
     text-align: center;
 }
 
 .block_text_about {
-    padding: 0 10% 0;
     justify-content: center;
-    letter-spacing: 1px;
-    word-spacing: 0;
-    white-space: normal;
-    line-height: normal;
+    max-width: 70%;
+    overflow: hidden;
+    margin: 20px auto;
+    text-align: center;
 }
 
 /*сотрудники*/
