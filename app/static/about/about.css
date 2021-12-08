@@ -3,7 +3,6 @@
     height: 240px;
 }
 
-
 .block_img_partners {
     justify-content: center;
     width: 60%;
@@ -15,10 +14,10 @@
 .block_img_block {
     margin-left: auto;
     margin-right: auto;
-    width: 70%;
+    width: 60%;
     display: grid;
     grid-gap: 1rem;
-    grid-template-columns: repeat(auto-fill, minmax(15.4rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
     list-style: none;
     padding: 0;
 }
@@ -48,30 +47,26 @@
 }
 
 .block_fil {
-    padding: 0 10% 0;
     justify-content: center;
-    letter-spacing: 1px;
-    word-spacing: 0;
-    white-space: normal;
-    line-height: normal;
-    margin: 0 auto;
+    max-width: 70%;
+    overflow: hidden;
+    margin: 20px auto;
     text-align: center;
 }
 
 .block_text_about {
-    padding: 0 10% 0;
     justify-content: center;
-    letter-spacing: 1px;
-    word-spacing: 0;
-    white-space: normal;
-    line-height: normal;
+    max-width: 70%;
+    overflow: hidden;
+    margin: 20px auto;
+    text-align: center;
 }
 
 /*сотрудники*/
 .block_employees_block {
     margin-left: auto;
     margin-right: auto;
-    width: 70%;
+    width: 80%;
     display: grid;
     grid-gap: 1rem;
     grid-template-columns: repeat(auto-fill, minmax(15.4rem, 1fr));
@@ -88,28 +83,23 @@
     height: 300px;
     margin-left: auto;
     margin-right: auto;
-    background: white;
+    background: #f2f5fc;
 }
 
 .block_employees figcaption {
     margin-left: auto;
     margin-right: auto;
     width: 100%;
-    background: white;
+    background: #f2f5fc;
 }
 
 .name_employees {
-    text-align: center;
+    text-align: left;
 }
 
 .position_employees {
-    text-align: center;
+    text-align: left;
 }
-
-
-
-
-
 
 @media (max-width: 768px){
     .block_employees_block {
@@ -155,7 +145,7 @@
     }
     .block_employees {
         margin-left: 0;
-        width: 400px;
+        width: 375px;
         height: 300px;
     }
     .block_employees figcaption {
@@ -175,11 +165,11 @@
         height: 15rem;
     }
     .name_employees {
-        text-align: left;
+        text-align: center;
     }
 
     .position_employees {
-        text-align: left;
+        text-align: center;
     }
 }
 
@@ -191,10 +181,10 @@
         grid-gap: 1rem;
         grid-template-columns: repeat(auto-fill, minmax(15.4rem, 1fr));
         list-style: none;
-        padding: 40px 90px 40px 90px;
-        background: #faf8f8;
+        padding: 40px 100px 40px 100px;
+        background: #e1e9fc;
         border-radius: 2px;
-        box-shadow: 0 0 2px 0 #cbcbcb;
+        box-shadow: 0 0 2px 0 #dadbdf;
     }
 }
 @media (max-width: 991px) and (min-width: 376px) {
@@ -206,9 +196,9 @@
         grid-template-columns: repeat(auto-fill, minmax(14.8rem, 1fr));
         list-style: none;
         padding: 40px 50px 40px 50px;
-        background: #faf8f8;
+        background: #e1e9fc;
         border-radius: 2px;
-        box-shadow: 0 0 2px 0 #cbcbcb;
+        box-shadow: 0 0 2px 0 #cad1e1;
     }
 }
 @media (max-width: 750px) and (min-width: 376px) {
@@ -220,8 +210,9 @@
         grid-template-columns: repeat(auto-fill, minmax(14.8rem, 1fr));
         list-style: none;
         padding: 40px 45px 40px 45px;
-        background: #faf8f8;
+        background: #e1e9fc;
         border-radius: 2px;
-        box-shadow: 0 0 2px 0 #cbcbcb;
+        box-shadow: 0 0 2px 0 #cad1e1;
     }
 }
+
