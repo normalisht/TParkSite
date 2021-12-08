@@ -1,99 +1,7 @@
-/**/
-@media (max-width: 768px) {
-    .block_employees_block {
-        margin: 0 auto;
-        justify-content: center;
-        display: grid;
-        grid-gap: 1rem;
-        grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
-        list-style: none;
-        padding: 0;
-    }
-
-    .block_img_block {
-        margin: 0 auto;
-        justify-content: center;
-        display: grid;
-        grid-gap: 1rem;
-        grid-template-columns: repeat(auto-fill, minmax(15.4rem, 1fr));
-        list-style: none;
-        padding: 0;
-    }
-
-    .block_employees_block > * {
-        height: 18rem;
-    }
+.img_img {
+    width: 244px;
+    height: 240px;
 }
-
-.block_fil {
-    padding: 0 10% 0;
-    justify-content: center;
-    letter-spacing: 1px;
-    word-spacing: 0;
-    white-space: normal;
-    line-height: normal;
-    margin: 0 auto;
-    text-align: left;
-}
-
-/*
-Эксперимент.
-Дима, если говно, отключи. Как по мне , цвета можно подобрать намного лучше, да и вообще как то многовато втулил.
-Но, я ,вроде, проверил , всё более менее правильно работает.
-*//*
-@media (min-width: 768px) {
-    .post-wrap {
-        margin: 0 auto;
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-
-    .post-item {
-        padding: 10px;
-    }
-
-    .post-item-wrap {
-        background: white;
-        position: relative;
-    }
-    .post-item-wrap:after {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-        background: #71d6ec;
-        transform: rotate(1deg);
-        transform-origin: left bottom;
-        transition: .3s ease-in-out;
-    }
-    .post-item-wrap:hover:after {
-        top: 5px;
-        left: 5px;
-        transform: rotate(2deg);
-    }
-    .post-link {
-        text-decoration: none;
-        display: block;
-        padding: 20px;
-    }
-
-    .post-title {
-        color: #33261D;
-        margin-bottom: 15px;
-        transition: .3s ease-in-out;
-    }
-
-    .post-item-wrap:hover .post-title {
-        color: #C9F2C7;
-    }
-}
-*/
-/*откл*/
-/*конец эксперимента */
 
 
 .block_img_partners {
@@ -125,42 +33,7 @@
     margin-left: auto;
     margin-right: auto;
 }
-
-/*конец партнёров*/
-
-/*сотрудники*/
-.block_employees_block {
-    margin-left: auto;
-    margin-right: auto;
-    width: 50%;
-    display: grid;
-    grid-gap: 1rem;
-    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
-    list-style: none;
-    padding: 0;
-}
-
-.block_employees_block > * {
-    height: 27rem;
-}
-
-.block_employees {
-    width: 244px;
-    height: 300px;
-    margin-left: auto;
-    margin-right: auto;
-    background: white;
-    -webkit-box-shadow: 3px 3px 3px #9ecad4;
-    -moz-box-shadow: 3px 3px 3px #9ecad4;
-    box-shadow: 3px 3px 3px #9ecad4;
-}
-
-.block_employees figcaption {
-    margin-left: auto;
-    margin-right: auto;
-    width: 100%;
-}
-
+/*КПартнёры*/
 .name_employees {
     text-align: center;
 }
@@ -192,4 +65,155 @@
     word-spacing: 0;
     white-space: normal;
     line-height: normal;
+}
+
+/*сотрудники*/
+.block_employees_block {
+    margin-left: auto;
+    margin-right: auto;
+    width: 70%;
+    display: grid;
+    grid-gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(15.4rem, 1fr));
+    list-style: none;
+    padding: 0;
+}
+
+.block_employees_block > * {
+    height: 15rem;
+}
+
+.block_employees {
+    width: 246px;
+    height: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    background: #f0f0f0;
+    -webkit-box-shadow: 3px 3px 3px #cfd8da;
+    -moz-box-shadow: 3px 3px 3px #cfd8da;
+    box-shadow: 3px 3px 3px #cfd8da;
+}
+
+.block_employees figcaption {
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+}
+
+.name_employees {
+    text-align: center;
+}
+
+.position_employees {
+    text-align: center;
+}
+
+
+
+
+
+
+@media (max-width: 768px){
+    .block_employees_block {
+        margin: 0 auto;
+        justify-content: center;
+        display: grid;
+        grid-gap: 1rem;
+        grid-template-columns: repeat(auto-fill, minmax(15.4rem, 1fr));
+        list-style: none;
+        padding: 0;
+    }
+    .block_img_block {
+        margin: 0 auto;
+        justify-content: center;
+        display: grid;
+        grid-gap: 1rem;
+        grid-template-columns: repeat(auto-fill, minmax(15.4rem, 1fr));
+        list-style: none;
+        padding: 0;
+    }
+    .block_employees_block > * {
+        height: 17rem;
+    }
+}
+
+@media (min-width: 376px){
+    .block_employees {
+        width: 244px;
+        height: 300px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .block_employees_block > * {
+        height: 17rem;
+    }
+}
+
+@media (max-width: 375px){
+    .img_img{
+        width: 100%;
+        padding: 0;
+    }
+    .block_employees {
+        margin-left: 0;
+        width: 400px;
+        height: 300px;
+    }
+    .block_employees figcaption {
+        margin-left: auto;
+        margin-right: auto;
+        width: 100%;
+    }
+    .block_employees_block {
+        margin-left: 0;
+        display: grid;
+        grid-gap: 1rem;
+        grid-template-columns: repeat(auto-fill, minmax(15.4rem, 1fr));
+        list-style: none;
+        padding: 0;
+    }
+    .block_employees_block > * {
+        height: 15rem;
+    }
+}
+
+@media (min-width: 992px) {
+    .block_employees_block {
+        margin: 0 auto;
+        justify-content: center;
+        display: grid;
+        grid-gap: 1rem;
+        grid-template-columns: repeat(auto-fill, minmax(15.4rem, 1fr));
+        list-style: none;
+        padding: 40px 90px 40px 90px;
+        background: wheat;
+        border-radius: 2px;
+    }
+}
+@media (max-width: 991px) and (min-width: 376px) {
+    .block_employees_block {
+        margin: 0 auto;
+        justify-content: center;
+        display: grid;
+        grid-gap: 1rem;
+        grid-template-columns: repeat(auto-fill, minmax(14.8rem, 1fr));
+        list-style: none;
+        padding: 40px 50px 40px 50px;
+        background: wheat;
+        border-radius: 2px;
+        box-shadow: 0 0 4px 0 gray;
+    }
+}
+@media (max-width: 750px) and (min-width: 376px) {
+    .block_employees_block {
+        margin: 0 auto;
+        justify-content: center;
+        display: grid;
+        grid-gap: 1rem;
+        grid-template-columns: repeat(auto-fill, minmax(14.8rem, 1fr));
+        list-style: none;
+        padding: 40px 45px 40px 45px;
+        background: wheat;
+        border-radius: 2px;
+    }
 }

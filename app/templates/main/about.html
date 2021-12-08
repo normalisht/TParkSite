@@ -31,26 +31,17 @@
     <h2 class="title_about">Сотрудники</h2>
     <div class="block_employees_block">
         {% for employee in employees %}
-            <div class="post-wrap">
-                <div class="post-item">
-                    <div class="post-item-wrap">
-                        <div class="post-link">
-                            <figure class="block_employees">
-                                <img src="{{ url_for('static', filename='/images/employee/' + employee.id|string + '.png') }}"
-                                     width="244px" height="240px">
-                                <figcaption>
-                                    <div class="name_employees">{{ employee.name }}</div>
-                                </figcaption>
-                                <figcaption>
-                                    <div class="position_employees">{{ employee.position }}</div>
-                                </figcaption>
-                            </figure>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <figure class="block_employees">
+                <img src="{{ url_for('static', filename='/images/employee/' + employee.id|string + '.png') }}"
+                     class="img_img">
+                <figcaption>
+                    <div class="name_employees">{{ employee.name }}</div>
+                </figcaption>
+                <figcaption>
+                    <div class="position_employees">{{ employee.position }}</div>
+                </figcaption>
+            </figure>
         {% endfor %}
     </div>
 
 {% endblock %}
-
