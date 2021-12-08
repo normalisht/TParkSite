@@ -6,7 +6,7 @@
 
 .block_img_partners {
     justify-content: center;
-    width: 70%;
+    width: 60%;
     margin: 0 auto;
     display: flex;
 }
@@ -15,7 +15,7 @@
 .block_img_block {
     margin-left: auto;
     margin-right: auto;
-    width: 50%;
+    width: 70%;
     display: grid;
     grid-gap: 1rem;
     grid-template-columns: repeat(auto-fill, minmax(15.4rem, 1fr));
@@ -88,16 +88,14 @@
     height: 300px;
     margin-left: auto;
     margin-right: auto;
-    background: #f0f0f0;
-    -webkit-box-shadow: 3px 3px 3px #cfd8da;
-    -moz-box-shadow: 3px 3px 3px #cfd8da;
-    box-shadow: 3px 3px 3px #cfd8da;
+    background: white;
 }
 
 .block_employees figcaption {
     margin-left: auto;
     margin-right: auto;
     width: 100%;
+    background: white;
 }
 
 .name_employees {
@@ -137,13 +135,14 @@
     }
 }
 
-@media (min-width: 376px){
+@media (min-width: 376px) {
     .block_employees {
         width: 244px;
         height: 300px;
         margin-left: auto;
         margin-right: auto;
     }
+
     .block_employees_block > * {
         height: 17rem;
     }
@@ -175,6 +174,13 @@
     .block_employees_block > * {
         height: 15rem;
     }
+    .name_employees {
+        text-align: left;
+    }
+
+    .position_employees {
+        text-align: left;
+    }
 }
 
 @media (min-width: 992px) {
@@ -186,8 +192,9 @@
         grid-template-columns: repeat(auto-fill, minmax(15.4rem, 1fr));
         list-style: none;
         padding: 40px 90px 40px 90px;
-        background: wheat;
+        background: #faf8f8;
         border-radius: 2px;
+        box-shadow: 0 0 2px 0 #cbcbcb;
     }
 }
 @media (max-width: 991px) and (min-width: 376px) {
@@ -199,9 +206,9 @@
         grid-template-columns: repeat(auto-fill, minmax(14.8rem, 1fr));
         list-style: none;
         padding: 40px 50px 40px 50px;
-        background: wheat;
+        background: #faf8f8;
         border-radius: 2px;
-        box-shadow: 0 0 4px 0 gray;
+        box-shadow: 0 0 2px 0 #cbcbcb;
     }
 }
 @media (max-width: 750px) and (min-width: 376px) {
@@ -213,7 +220,8 @@
         grid-template-columns: repeat(auto-fill, minmax(14.8rem, 1fr));
         list-style: none;
         padding: 40px 45px 40px 45px;
-        background: wheat;
+        background: #faf8f8;
         border-radius: 2px;
+        box-shadow: 0 0 2px 0 #cbcbcb;
     }
 }
