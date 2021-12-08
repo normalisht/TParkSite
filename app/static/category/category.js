@@ -17,7 +17,7 @@ function style_css() {
 
 
 function close_all() {
-    let services = $('.button_1')
+    let services = $('.button_5')
 
     services.each(function () {
         let description = $(this).find('.description').stop()
@@ -32,14 +32,14 @@ function close_all() {
 }
 
 document.addEventListener('click', function (event) {
-    if(event.target.closest('.button_1')) return
+    if(event.target.closest('.button_5')) return
 
     close_all()
 })
 
 
 document.addEventListener('DOMContentLoaded', function () {
-    let services = $('.button_1'),
+    let services = $('.button_5'),
         time_animation = 1000
 
     services.each(function () {
