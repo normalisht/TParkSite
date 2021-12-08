@@ -13,16 +13,22 @@
 }
 
 
-.content:after {
-    content: "";
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    border-left: 10px solid transparent;
-    border-top: 10px solid #333;
-    border-right: 10px solid transparent;
-    z-index: 999;
+.price_switch {
+    top: 8px;
+    right: -1px;
+    width: 20px;
+    height: min-content;
+    object-fit: cover;
+    transition: all 0.5s;
+    z-index: 3;
 }
+
+.price_switch_active {
+    transform: rotate(-180deg);
+}
+
+
+
 
 .button_1 {
     margin: 0 auto;

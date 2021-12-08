@@ -40,15 +40,21 @@
                 {{ category.description if category.description }}
             </div>
         </div>
-        <div class="buttons">
+        <div id="buttons" class="buttons">
             {% for element in services %}
                 {% set service = element.service %}
                 {% if service.status == true %}
                     <div id="{{ service.id }}" class="button_1" status="0">
                         <div class="content">
-                            <div style="display: flex; justify-content: space-between; margin-right: 8px">
+                            <div class="price" style="display: flex; justify-content: space-between; margin-right: 8px">
                                 <div>{{ service.name }}</div>
-                                <div>{{ service.prices[0] }}</div>
+                                <div style="display: flex;">
+                                    <div style="margin-right: 3px;">{{ service.prices[0] }}</div>
+                                    {% if service.short_description %}
+                                        <img class="price_switch" src="{{ url_for('static', filename='down.svg') }}"
+                                             alt="">
+                                    {% endif %}
+                                </div>
                             </div>
                             {% if service.short_description %}
                                 <div class="description">
@@ -56,7 +62,7 @@
                                         <br>{{ service.short_description }}
                                     {% endif %}
                                     <br>
-                                    <a style="color: black;"
+                                    <a style="color: black;" class="more"
                                        href="{{ url_for('main.service') }}?service_id={{ service.id }}">
                                         Подробнее
                                     </a>

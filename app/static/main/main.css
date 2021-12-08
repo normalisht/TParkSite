@@ -2,7 +2,7 @@
 
 :root {
     --background-color: rgba(169, 191, 239, 0.15); /*547dd2;*/
-    --primary-color: #ffa200; /*fff600*/
+    --primary-color: #ffa300; /*fff600*/
     --body-background-color: #4acfeb;
     --primary-big-font: clamp(16px, 1.3vw, 25px);
     --primary-font-family: Arial,  sans-serif;
