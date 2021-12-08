@@ -10,13 +10,26 @@ from flask_login import UserMixin
 class Service(db.Model):
     id = db.Column(db.Integer, primary_key=True, index=True, unique=True)
     name = db.Column(db.String(128))
-    price = db.Column(db.Integer)
     short_description = db.Column(db.String(512))  # краткое описание
     description = db.Column(db.Text)  # полное описание
     number = db.Column(db.Integer, index=True)  # порядковый номер
     status = db.Column(db.BOOLEAN())  # отображение клиентам
     next = db.Column(db.BOOLEAN())   # есть ли переход на дальнейшую страницу
     categories = db.relationship('ServiceCategory', backref='service', lazy='dynamic')
+    prices = db.relationship('Price', backref='service', lazy='dynamic')
+
+
+class Price(db.Model):
+    id = db.Column(db.Integer, primary_key=True, index=True, unique=True)
+    service_id = db.Column(db.ForeignKey('service.id'))
+    price = db.Column(db.String(8))
+    time = db.Column(db.String(128))
+
+    def __repr__(self):
+        if self.time:
+            return self.price + ' руб/' + self.time
+        else:
+            return self.price + ' руб'
 
 
 class Category(db.Model):
@@ -43,14 +56,20 @@ class Employee(db.Model):
 
 class Text(db.Model):
     id = db.Column(db.Integer, primary_key=True, index=True, unique=True)
-    title = db.Column(db.String(64), unique=True)  # название текста
+    title = db.Column(db.String(64))  # название текста
     text = db.Column(db.Text)  # содержание
+
+    def __repr__(self):
+        return self.text
 
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True, index=True, unique=True)
     name = db.Column(db.String(128))  # имя комментатора
     text = db.Column(db.Text)  # содержание
+
+    def __repr__(self):
+        return self.text
 
 
 class Admin(UserMixin, db.Model):
@@ -75,9 +94,19 @@ class Event(db.Model):
         if self.date < datetime.now():
             db.session.delete(self)
             db.session.commit()
+            return True
+        return False
+
+
+class Partner(db.Model):
+    id = db.Column(db.Integer, primary_key=True, index=True, unique=True)
+    name = db.Column(db.String(128))
+    link = db.Column(db.String(1024))  # ссылка на мероприятие(соц сеть или левый сайт)
+
+    def update_img(self, file):
+        pass
 
 
 @login.user_loader
 def load_user(id):
     return Admin.query.get(int(id))
-

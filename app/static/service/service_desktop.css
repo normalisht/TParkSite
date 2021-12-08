@@ -1,0 +1,21 @@
+/*Desktop*/
+
+.block_service {
+    display:grid;
+    margin: 0 auto;
+    grid-template-columns: 1fr;
+    align-items: center;
+    border-radius: 5px;
+    max-width:90vw;
+    min-height: 55vh;
+    /*background-color:var(--body-background-color);*/
+    /*box-shadow: 2px 4px 16px #ccc;*/
+    z-index:2;
+}
+
+.img_service {
+    object-fit: cover;
+    width: clamp(150px, 35vw, 800px);
+    height: clamp(100px, 35vh, 400px);
+    margin: 0 auto;
+}

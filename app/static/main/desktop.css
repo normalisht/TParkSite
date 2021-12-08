@@ -1,0 +1,58 @@
+/* scrollbar */
+*::-webkit-scrollbar-track {
+    border-radius: 6px;
+}
+
+*::-webkit-scrollbar {
+    width: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    background-color: #6a7d9b;
+}
+/**/
+
+/*Desktop*/
+.block_logo {
+    margin-left: 1vw;
+}
+
+.img_logo {
+    max-width: 200px;
+    max-height: 100px;
+    object-fit: cover;
+    margin: auto;
+}
+
+.block_numbers {
+    margin-top: 0;
+    --primary-big-font: 1.1rem;
+}
+
+.block_buttons {
+    --font-size: 1.2rem;
+    font-size: var(--font-size);
+}
+
+.button_main {
+    width: 120px;
+    height: 40px;
+    transition: background-color 0.6s ease,
+    border-color 0.6s ease,
+    font-size 0.3s ease;
+}
+
+
+.button_main_hover {
+    font-size: calc(var(--font-size) * 1.125);
+    background-color: var(--primary-color);
+}
+
+.block_info {
+    /*width: 30%;*/
+}
+
+.address {
+    max-width: 350px;
+}

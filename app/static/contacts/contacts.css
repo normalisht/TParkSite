@@ -1,0 +1,102 @@
+@import url(https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css);
+
+.social-icons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    list-style: none;
+    padding-inline-start: 0;
+    margin-block-start: 0;
+    margin-block-end: 0;
+}
+
+.social-icons a {
+    display: inline-block;
+    width: 60px;
+    height: 60px;
+    border-radius: 40%;
+    background: #efefef;
+    position: relative;
+    margin: 5px;
+    text-align: center;
+    box-shadow: 0 2px 6px #c1c1c1;
+    font-size: 32px;
+    transition: 0.5s;
+}
+
+.social-icons .vk {
+    color: #337AB7;
+}
+
+.social-icons .insta {
+    color: #ff1f7cb0;
+}
+
+.social-icons a img {
+    width: 32px;
+    height: 32px;
+    margin-top: 14px;
+}
+
+.social-icons a i,
+.social-icons a img {
+    z-index:2;
+    position: relative;
+    line-height: 60px;
+}
+
+.social-icons a:hover {
+    color: #fff;
+}
+
+.social-icons a:after {
+    content: '';
+    display: block;
+    position: absolute;
+    border-radius: 40%;
+    width: 0;
+    height: 0;
+    transition: 0.3s;
+    top: 0;
+    left: 50%;
+}
+
+.social-icons .vk:after{
+    background: #BFE2FF;
+}
+
+.social-icons .insta:after{
+    background: radial-gradient(circle farthest-corner at 35% 90%, #fec564, transparent 50%),
+    radial-gradient(circle farthest-corner at 0 140%, #fec564, transparent 50%),
+    radial-gradient(ellipse farthest-corner at 0 -25%, #5258cf, transparent 50%),
+    radial-gradient(ellipse farthest-corner at 20% -50%, #5258cf, transparent 50%),
+    radial-gradient(ellipse farthest-corner at 100% 0, #893dc2, transparent 50%),
+    radial-gradient(ellipse farthest-corner at 60% -20%, #893dc2, transparent 50%),
+    radial-gradient(ellipse farthest-corner at 100% 100%, #d9317a, transparent),
+    linear-gradient(#6559ca, #bc318f 30%, #e33f5f 50%, #f77638 70%, #fec66d 100%);
+}
+
+.social-icons a:hover:after {
+    width: 60px;
+    height: 60px;
+    margin-left: -30px;
+}
+
+.social-icons .vk:hover:after{
+    background: #337AB7;
+}
+
+.social-icons .insta:hover:after {
+    background: radial-gradient(circle farthest-corner at 35% 90%, #fec564, transparent 50%),
+    radial-gradient(circle farthest-corner at 0 140%, #fec564, transparent 50%),
+    radial-gradient(ellipse farthest-corner at 0 -25%, #5258cf, transparent 50%),
+    radial-gradient(ellipse farthest-corner at 20% -50%, #5258cf, transparent 50%),
+    radial-gradient(ellipse farthest-corner at 100% 0, #893dc2, transparent 50%),
+    radial-gradient(ellipse farthest-corner at 60% -20%, #893dc2, transparent 50%),
+    radial-gradient(ellipse farthest-corner at 100% 100%, #d9317a, transparent),
+    linear-gradient(#6559ca, #bc318f 30%, #e33f5f 50%, #f77638 70%, #fec66d 100%);
+}
+
+.geolocation a{
+    text-decoration: none;
+}

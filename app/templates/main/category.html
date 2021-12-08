@@ -1,0 +1,78 @@
+{% extends "main/base.html" %}
+
+{% block scripts %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='category/category.css') }}">
+
+    <script type="text/javascript" src="{{ url_for('static', filename='slider.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='category/category.js') }}"></script>
+{% endblock %}
+
+{% block app_content %}
+
+    <h1>{{ category.name }}</h1>
+    <div class="container">
+        <div class="data">
+            <div class="block_slider">
+                <div class="slider">
+                    <div class="slider__container">
+                        <div class="slider__wrapper">
+                            <div class="slider__items">
+                                {% for i in range(3) %}
+                                    <div class="slider__item">
+                                        <img class="slider__img" alt=""
+                                             src="{{ url_for('static',filename='/images/staff/1.png' ) }}">
+                                    </div>
+                                    <div class="slider__item">
+                                        <img class="slider__img" alt=""
+                                             src="{{ url_for('static',filename='/images/staff/2.png' ) }}">
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <a class="slider__control slider__control_prev" href="#" role="button" data-slide="prev"></a>
+                    <a class="slider__control slider__control_next" href="#" role="button" data-slide="next"></a>
+                </div>
+            </div>
+        </div>
+        <div class="category_description">
+            <div class="text">
+                {{ category.description if category.description }}
+            </div>
+        </div>
+        <div id="buttons" class="buttons">
+            {% for element in services %}
+                {% set service = element.service %}
+                {% if service.status == true %}
+                    <div id="{{ service.id }}" class="button_5" status="0">
+                        <div class="content">
+                            <div class="price" style="display: flex; justify-content: space-between; margin-right: 8px">
+                                <div>{{ service.name }}</div>
+                                <div style="display: flex;">
+                                    <div style="margin-right: 5px;">{{ service.prices[0] }}</div>
+                                    {% if service.short_description %}
+                                        <img class="price_switch" src="{{ url_for('static', filename='down.svg') }}"
+                                             alt="">
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% if service.short_description %}
+                                <div class="description">
+                                    {% if service.short_description != None %}
+                                        <br>{{ service.short_description }}
+                                    {% endif %}
+                                    <br>
+                                    <a style="color: black;" class="more"
+                                       href="{{ url_for('main.service') }}?service_id={{ service.id }}">
+                                        Подробнее
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+{% endblock %}

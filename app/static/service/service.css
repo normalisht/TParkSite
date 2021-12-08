@@ -1,0 +1,58 @@
+@charset "UTF-8";
+
+/*Стили для шаблона "конкретная услуга"(service.html)*/
+
+:root {
+
+
+}
+
+
+.block_img {
+    display:flex;
+    height:clamp(100px,30vh, 400px );
+    width:clamp(200px,30vw, 600px );
+    align-items: center;
+    margin: 0  auto 10px;
+}
+
+.block_text {
+    max-width: 600px;
+    text-align: center;
+    margin: 10px  auto;
+}
+
+.block_price{
+    display:block;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    max-width: 50vw;
+    min-width: 100px;
+    width: max-content;
+    margin: 10px auto;
+    border-radius: 2px;
+    font-size: 1.2rem;
+    padding: 4px;
+}
+
+.price {
+    margin-top: 5px;
+}
+
+
+.price:first-child {
+   margin-top: 0;
+
+}
+
+.block_img_price {
+
+    display:block;
+    /*display:grid;
+    grid-template-columns: 1fr;
+    max-width:45vw;
+    grid-auto-rows: minmax(100px, 200px);*/
+}
+
+

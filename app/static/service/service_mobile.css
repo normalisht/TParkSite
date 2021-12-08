@@ -1,0 +1,26 @@
+/*Phone*/
+
+
+.block_service {
+    display:grid;
+    margin: 0 auto;
+    grid-template-columns: 1fr;
+    align-items: center;
+    border-radius: 5px;
+    max-width:90vw;
+    /*background-color:var(--body-background-color);*/
+    /*box-shadow: 2px 4px 16px #ccc;*/
+    z-index:2;
+}
+
+.img_service {
+    position: absolute;
+    object-fit: cover;
+    width: 100vw;
+    left: 0;
+    height: clamp(100px, 40vh, 400px);
+    margin: 0 auto;
+}
+
+
+
