@@ -49,12 +49,12 @@
     font-family: 'Roboto', sans-serif;
     font-size: 16px;
     font-weight: 700;
+    cursor: pointer;
     outline: none;
     position: relative;
     padding: 8px;
     border: 0;
     margin: 5px;
-    cursor: pointer;
     z-index: 1;
 }
 
@@ -205,6 +205,7 @@
     bottom: 0;
 }
 
+
 .button_4 {
     cursor: pointer;
     --main-color: #808080;
@@ -283,7 +284,6 @@
     cursor: pointer;
     border-bottom: 1px solid rgba(0, 0, 0, 0.35);
 }
-
 
 .table {
     font-family: 'Roboto', sans-serif;
