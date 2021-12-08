@@ -90,15 +90,13 @@ img {
 
 .main_block {
     margin-top: 0;
-    width: 90%;
+    /*width: 90%;*/
     z-index: 2;
 }
 
 .main_block_sides {
     width: 100%;
     z-index: 1;
-
-
 }
 
 .block {
