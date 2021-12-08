@@ -1,6 +1,6 @@
 .buttons {
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     white-space: normal;
     display: grid;
     grid-template-columns: repeat(2, minmax(100px, 400px));
@@ -160,9 +160,11 @@
     bottom: 0;
 }
 
-.button_3:hover:before, .button_3:hover:after {
-    width: 100%;
-    transition: 800ms ease all;
+.button_3:after {
+    right: inherit;
+    top: inherit;
+    left: 0;
+    bottom: 0;
 }
 
 .button_4 {
@@ -183,6 +185,7 @@
     vertical-align: middle;
     transition: all 1s, color 0.5s;
 }
+
 
 .button_4::before,
 .button_4::after {

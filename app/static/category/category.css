@@ -80,3 +80,9 @@ h1 {
     color: black;
     cursor: default;
 }
+
+.more {
+    display: flex;
+    justify-content: right;
+    margin-right: 1vw;
+}
