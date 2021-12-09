@@ -6,7 +6,8 @@
 }
 
 .block_slider {
-    width: min(100vw, 1400px);
+    width: 100%;
+    /*width: min(100vw, 1400px);*/
     margin: 0 auto;
     display: block;
 }
