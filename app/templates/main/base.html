@@ -105,11 +105,7 @@
                         <div class="modal-item submenu-item">
                             <div class="geolocation">
                                 <a href="{{ geolocation }}" target="_blank">Мы на карте
-                                    <svg width="24  " height="24" viewBox="0 0 24 24"
-                                         xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M 12 1 a 9.002 9.002 0 0 0 -6.366 15.362 c 1.63 1.63 5.466 3.988 5.693 6.465 c 0.034 0.37 0.303 0.673 0.673 0.673 c 0.37 0 0.64 -0.303 0.673 -0.673 c 0.227 -2.477 4.06 -4.831 5.689 -6.46 A 9.002 9.002 0 0 0 12 1 Z m 0 12.079 a 3.079 3.079 0 1 1 0 -6.158 a 3.079 3.079 0 0 1 0 6.158 Z"
-                                              fill="red"></path>
-                                    </svg>
+                                    <img id="geo" class="geo" src="{{ url_for('static', filename='geo.png') }}" alt="">
                                 </a>
                             </div>
                         </div>
@@ -123,9 +119,10 @@
                         {% endfor %}
                         <div class="modal-item submenu-item media">
                             <div class="social">
-                                Социальные сети
                                 <ul class="social-icons">
                                     <li><a class="vk" href="{{ vk }}" target="_blank"><i class="fa fa-vk"></i></a></li>
+                                    <li><a class="whatsapp" href="https://wa.me/7{{ number }}" target="_blank">
+                                        <i class="fa fa-whatsapp"></i></a></li>
                                     <li><a class="insta" href="{{ insta }}" target="_blank"><i
                                             class="fa fa-instagram"></i></a>
                                     </li>
