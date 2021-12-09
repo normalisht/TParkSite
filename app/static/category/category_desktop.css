@@ -4,8 +4,6 @@
     white-space: normal;
     display: grid;
     grid-template-columns: repeat(1, minmax(100px, 700px));
-    grid-row-gap: 1vw;
-    grid-column-gap: 6vw;
 }
 
 .content {
@@ -277,30 +275,16 @@
 }
 
 .button_5 {
-    width: 700px;
-    font-size: 1.8rem;
-    padding: 3px;
-    margin: 5px;
+    font-size: 1.7rem;
+    padding: 24px 3px 4px;
     cursor: pointer;
     border-bottom: 1px solid rgba(0, 0, 0, 0.35);
-}
-
-.table {
-    font-family: 'Roboto', sans-serif;
-    font-size: 14px;
-    border-collapse: collapse;
-    width: 80vw;
-    word-break: break-all;
-}
-
-td {
-    position: center;
-    vertical-align: top;
-    padding-right: 2vw;
 }
 
 .description {
     text-align: left;
     cursor: default;
-    z-index: 1;
+    font-size: 1.3rem;
+    z-index: 0;
+    color: #000000;
 }

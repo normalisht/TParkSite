@@ -3,7 +3,7 @@
     align-items: center;
     white-space: normal;
     display: grid;
-    background-color: white;
+    /*background-color: white;*/
 }
 
 .content {
@@ -27,16 +27,13 @@
     transform: rotate(-180deg);
 }
 
-
-
-
-.button_1 {
+.button_5 {
     margin: 0 auto;
     width: calc(100 * var(--vw));
     font-family: 'Arial', sans-serif;
-    font-size: 18px;
-    font-weight: 700;
-    color: #313133;
+    font-size: 20px;
+    font-weight: 500;
+    color: #000000;
     /*background: #4acfeb;*/
     border-bottom:  1px solid rgba(0, 0, 0, 0.35);
     /*box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.2);*/
@@ -44,7 +41,6 @@
     cursor: pointer;
     outline: none;
     padding: 10px;
-
 }
 
 .description {

@@ -5,8 +5,7 @@
     position: relative;
     justify-content: center;
     display: grid;
-    grid-template-columns: 100vw;
-    overflow: hidden;
+    grid-template-columns: calc(var(--vw) * 100);
     grid-row-gap: 10px;
     font-family: Arial, serif;
 }
@@ -51,6 +50,16 @@ h1 {
 
 .more {
     display: flex;
-    justify-content: right;
-    margin-right: 1vw;
+    justify-content: flex-end;
+    text-decoration: none;
+    width: 100%;
+}
+
+.more > div > a {
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.more > div > a:hover {
+    opacity: 0.85;
 }
