@@ -7,6 +7,11 @@ window.addEventListener('resize', top_footer)
 window.addEventListener("orientationchange", top_footer)
 window.addEventListener("change", top_footer)
 
+document.addEventListener("DOMContentLoaded", main_block_height)
+window.addEventListener('resize', main_block_height)
+window.addEventListener("orientationchange", main_block_height)
+window.addEventListener("change", main_block_height)
+
 window.addEventListener('resize', generate_upper)
 window.addEventListener("orientationchange", generate_upper)
 document.addEventListener("DOMContentLoaded", generate_upper)
@@ -15,6 +20,7 @@ setInterval(top_footer, 1)
 
 set_vw()
 detected_phone()
+main_block_height()
 
 document.addEventListener('scroll', buttons_position)
 
@@ -54,10 +60,16 @@ function top_footer() {
         footer.css({'visibility': 'hidden',
             'z-index': '-1000'})
     } else {
-        footer.css({'visibility': 'visible',
-            'z-index': '1'})
-        footer_2.style.visibility = 'hidden'
-        footer_2.style.zIndex = '-1000'
+        footer.css({
+            'visibility': 'visible',
+            'z-index': '1'
+        })
+        try {
+            footer_2.style.visibility = 'hidden'
+            footer_2.style.zIndex = '-1000'
+        } catch (e) {
+
+        }
     }
 }
 
@@ -121,9 +133,11 @@ function generate_upper(event) {
     if (document.documentElement.clientWidth < 900) {
         generate_mobile_upper()
         generate_upper.type = 'mobile'
+        console.log('mobile')
     } else {
         generate_desktop_upper()
         generate_upper.type = 'desktop'
+        console.log('desk')
     }
 }
 
@@ -232,18 +246,20 @@ document.addEventListener('DOMContentLoaded', function () {
     })
 })
 
-main_block_height()
-
 function main_block_height() {
+    // если main блок по высоте не достаёт до футера,
+    // то он увеличивается
     let main_block = $('#main_block'),
         footer = $('#footer'),
-        upper = $('#upper')
+        upper = $('#upper_container')
 
-    if (upper.outerHeight() + main_block.outerHeight() < $(window).height()) {
+    if (upper.outerHeight(true) + main_block.outerHeight(true) < $(window).height()) {
         let height
 
-        height = 2
+        height = $(window).height() - footer.outerHeight() - upper.outerHeight(true)
 
-        main_block.css({'min-height': height})
+        main_block.css({'min-height': height + 'px'})
+    } else {
+        main_block.css({'min-height': '0'})
     }
 }
