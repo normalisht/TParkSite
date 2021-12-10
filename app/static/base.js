@@ -231,3 +231,19 @@ document.addEventListener('DOMContentLoaded', function () {
         })
     })
 })
+
+main_block_height()
+
+function main_block_height() {
+    let main_block = $('#main_block'),
+        footer = $('#footer'),
+        upper = $('#upper')
+
+    if (upper.outerHeight() + main_block.outerHeight() < $(window).height()) {
+        let height
+
+        height = 2
+
+        main_block.css({'min-height': height})
+    }
+}
