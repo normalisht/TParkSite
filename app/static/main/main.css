@@ -8,6 +8,7 @@
     --primary-font-family: Arial, sans-serif;
     --modal_window_time: none;
     --vw: none;
+    --vh: none;
 }
 
 html {
@@ -24,7 +25,7 @@ html {
 * {
     appearance: none;
     -webkit-appearance: none;
-    font-family: Arial, sans-serif;
+    font-family: var(--primary-font-family);
 }
 
 body {

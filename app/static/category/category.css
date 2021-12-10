@@ -35,17 +35,14 @@ h1 {
     /*transition: max-height 1.5s ease;*/
     margin-left: 3px;
     position: relative;
+    text-decoration: none;
+    color: black;
+    cursor: default;
 }
 
 .active {
     max-height: 100vh;
     transition: max-height 1s ease-in;
-}
-
-.description {
-    text-decoration: none;
-    color: black;
-    cursor: default;
 }
 
 .more {
