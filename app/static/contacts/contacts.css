@@ -12,8 +12,8 @@
 
 .social-icons a {
     display: inline-block;
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     border-radius: 40%;
     background: #efefef;
     position: relative;
@@ -26,6 +26,10 @@
 
 .social-icons .vk {
     color: #337AB7;
+}
+
+.social-icons .whatsapp {
+    color:#25d366;
 }
 
 .social-icons .insta {
@@ -42,7 +46,7 @@
 .social-icons a img {
     z-index:2;
     position: relative;
-    line-height: 60px;
+    line-height: 50px;
 }
 
 .social-icons a:hover {
@@ -76,10 +80,15 @@
     linear-gradient(#6559ca, #bc318f 30%, #e33f5f 50%, #f77638 70%, #fec66d 100%);
 }
 
+.social-icons .whatsapp:after{
+    background: linear-gradient(#25d366,#25d366) 14% 84%/16% 16% no-repeat,
+    radial-gradient(#25d366 100%,transparent 0);
+}
+
 .social-icons a:hover:after {
-    width: 60px;
-    height: 60px;
-    margin-left: -30px;
+    width: 50px;
+    height: 50px;
+    margin-left: -25px;
 }
 
 .social-icons .vk:hover:after{
@@ -99,4 +108,9 @@
 
 .geolocation a{
     text-decoration: none;
+}
+
+.geo {
+    max-width: 50px;
+    max-height: 30px;
 }
