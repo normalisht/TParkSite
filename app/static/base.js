@@ -7,6 +7,11 @@ window.addEventListener('resize', top_footer)
 window.addEventListener("orientationchange", top_footer)
 window.addEventListener("change", top_footer)
 
+document.addEventListener("DOMContentLoaded", main_block_height)
+window.addEventListener('resize', main_block_height)
+window.addEventListener("orientationchange", main_block_height)
+window.addEventListener("change", main_block_height)
+
 window.addEventListener('resize', generate_upper)
 window.addEventListener("orientationchange", generate_upper)
 document.addEventListener("DOMContentLoaded", generate_upper)
@@ -15,6 +20,7 @@ setInterval(top_footer, 1)
 
 set_vw()
 detected_phone()
+main_block_height()
 
 document.addEventListener('scroll', buttons_position)
 
@@ -27,8 +33,10 @@ buttons.after(el)
 
 let footer_2
 function set_vw() {
-    let vw = document.documentElement.clientWidth / 100
+    let vw = document.documentElement.clientWidth / 100,
+        vh = document.documentElement.clientHeight / 100
     document.documentElement.style.setProperty('--vw', `${vw}px`)
+    document.documentElement.style.setProperty('--vh', `${vh}px`)
 }
 document.addEventListener('DOMContentLoaded', function () {
     footer_2 = document.getElementById('footer').cloneNode(true)
@@ -41,6 +49,7 @@ document.addEventListener('DOMContentLoaded', function () {
 })
 
 function top_footer() {
+    // делает пожвал плавающим(я думаю, что это какой-то костыли)
     let footer = $('#footer')
     if (!footer) return
 
@@ -54,10 +63,16 @@ function top_footer() {
         footer.css({'visibility': 'hidden',
             'z-index': '-1000'})
     } else {
-        footer.css({'visibility': 'visible',
-            'z-index': '1'})
-        footer_2.style.visibility = 'hidden'
-        footer_2.style.zIndex = '-1000'
+        footer.css({
+            'visibility': 'visible',
+            'z-index': '1'
+        })
+        try {
+            footer_2.style.visibility = 'hidden'
+            footer_2.style.zIndex = '-1000'
+        } catch (e) {
+
+        }
     }
 }
 
@@ -66,6 +81,7 @@ butt.style.boxSizing = 'border-box'
 let bottom_coord =  butt.offsetTop + butt.offsetHeight
 
 function buttons_position() {
+    // оставляет навигационные кнопки на верху экарана
     let buttons = document.getElementById('navigation_buttons')
 
     buttons.style.boxSizing = 'border-box'
@@ -91,44 +107,51 @@ function buttons_position() {
             buttons.style.paddingBottom = '12px'
             buttons.style.paddingTop = 0 + 'px'
             el.style.height = '0'
+            el.style.width = '0'
             el.style.paddingBottom = '0'
         }
     }
 
     if (buttons.offsetTop < document.documentElement.scrollTop) {
 
-        if (generate_upper.type == 'mobile') {
-            el.style.height = buttons.offsetHeight + 'px'
-        }
         buttons.style.position = 'fixed'
         buttons.style.top = buttons.style.left = buttons.style.right = '0'
 
-        if (12 - document.documentElement.scrollTop + bottom_coord > 0)
-            padding_bottom = Math.min(12 - document.documentElement.scrollTop + bottom_coord, 12)
-        else padding_bottom = 0
+        if (generate_upper.type == 'mobile') {
+            el.style.height = buttons.offsetHeight + 'px'
+            el.style.width = buttons.offsetWidth + 'px'
 
-        if (document.documentElement.scrollTop + 5 - buttons.scrollTop > 0)
-            padding_top = Math.min(document.documentElement.scrollTop + 5 - buttons.offsetTop, 5)
-        else padding_top = 0
+            if (12 - document.documentElement.scrollTop + bottom_coord > 0)
+                padding_bottom = Math.min(12 - document.documentElement.scrollTop + bottom_coord, 12)
+            else padding_bottom = 0
 
-        buttons.style.paddingBottom = padding_bottom + 'px'
-        buttons.style.paddingTop = '0px'
+            if (document.documentElement.scrollTop + 5 - buttons.scrollTop > 0)
+                padding_top = Math.min(document.documentElement.scrollTop + 5 - buttons.offsetTop, 5)
+            else padding_top = 0
+
+            buttons.style.paddingBottom = padding_bottom + 'px'
+            buttons.style.paddingTop = '0px'
+        }
     }
 }
 
 generate_upper.type = null
 function generate_upper(event) {
+    // функция для генерации нужной шапки в зависимости от разрешения экрана
     if (document.documentElement.clientWidth < 900) {
         generate_mobile_upper()
         generate_upper.type = 'mobile'
+        console.log('mobile')
     } else {
         generate_desktop_upper()
         generate_upper.type = 'desktop'
+        console.log('desk')
     }
 }
 
 
 function generate_mobile_upper() {
+    // шапка переделвывается в мобильную версию
     let phone_numbers = document.getElementById('phone_numbers'),
         block_info = document.getElementById('upper_block_info'),
         navigation_buttons = document.getElementById('navigation_buttons'),
@@ -136,7 +159,7 @@ function generate_mobile_upper() {
         logo = document.getElementById('block_logo')
 
     logo.style.width = block_info.style.width = '50%'
-    navigation_buttons.style.width = '100%'
+    // navigation_buttons.style.width = '100%'
 
     block_info.style.flexDirection =
         block_info.firstElementChild.style.flexDirection = 'column'
@@ -164,6 +187,7 @@ function generate_mobile_upper() {
 }
 
 function generate_desktop_upper() {
+    // шапка переделывается в десктопную версию
     let phone_numbers = document.getElementById('phone_numbers'),
         block_info = document.getElementById('upper_block_info'),
         navigation_buttons = document.getElementById('navigation_buttons'),
@@ -208,9 +232,7 @@ function add_js_file(path) {
 function detected_phone() {
     let detect = new MobileDetect(window.navigator.userAgent)
 
-
     if (detect.mobile()) {
-
         if (detect.phone()) {
             add_css_file('/app/static/main/phone.css')
             generate_mobile_upper()
@@ -224,6 +246,7 @@ function detected_phone() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+    // делает всю область кнопки в выпадающем меню кликабельной
     let categories = $('#services-modal-win').find('.submenu-item')
     categories.each(function () {
         $(this).click(function () {
@@ -231,3 +254,21 @@ document.addEventListener('DOMContentLoaded', function () {
         })
     })
 })
+
+function main_block_height() {
+    // если main блок по высоте не достаёт до подвала,
+    // то он увеличивается
+    let main_block = $('#main_block'),
+        footer = $('#footer'),
+        upper = $('#upper_container')
+
+    if (upper.outerHeight(true) + main_block.outerHeight(true) < $(window).height()) {
+        let height
+
+        height = $(window).height() - footer.outerHeight() - upper.outerHeight(true)
+
+        main_block.css({'min-height': height + 'px'})
+    } else {
+        main_block.css({'min-height': '0'})
+    }
+}

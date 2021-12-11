@@ -279,6 +279,7 @@
     padding: 24px 3px 4px;
     cursor: pointer;
     border-bottom: 1px solid rgba(0, 0, 0, 0.35);
+    transition: all 0.25s;
 }
 
 .description {
