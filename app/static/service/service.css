@@ -13,7 +13,7 @@
     height:clamp(100px,40vh, 400px );
     width:clamp(200px,40vw, 600px );
     align-items: center;
-    margin: 0  auto 10px;
+    margin: 0  auto;
 }
 
 .block_price{
