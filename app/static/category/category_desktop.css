@@ -3,7 +3,9 @@
     align-items: flex-start;
     white-space: normal;
     display: grid;
-    grid-template-columns: repeat(1, minmax(100px, 700px));
+    grid-template-columns: repeat(2, minmax(100px, 500px));
+    grid-row-gap: 30px;
+    grid-column-gap: 50px;
 }
 
 .content {
@@ -90,20 +92,21 @@
 }
 
 .button_2 {
+    background-color: rgba(227, 225, 218, 0.5);
     min-width: 10vw;
     max-width: 700px;
     min-height: 2vh;
     max-height: 100vh;
     font-family: 'Arial', sans-serif;
     font-size: 16px;
+    font-color: black;
     font-weight: 700;
     padding: 10px;
-    border-radius: 5px;
     cursor: pointer;
     outline: none;
     position: relative;
     border: 0;
-    transition: all 500ms cubic-bezier(0.77, 0, 0.175, 1);
+    transition: all 0.5s;
     user-select: none;
 }
 
@@ -115,8 +118,9 @@
 }
 
 .button_2:hover {
-    color: black;
-    transition-delay: .5s;
+    transition-delay: 0s;
+    opacity: 1;
+    background-color: #e39204;
 }
 
 .button_2:hover:before {
@@ -124,9 +128,7 @@
 }
 
 .button_2:hover:after {
-    background: #ffffff;
-    background: linear-gradient(90deg, rgb(255, 255, 255) 0%, rgb(231, 231, 231) 100%);
-    transition-delay: .35s;
+    background-color: #e3e1da;
 }
 
 .button_2:before,
@@ -136,12 +138,6 @@
     width: 100%;
 }
 
-.button_2:before {
-    bottom: 0;
-    border: 1px solid black;
-    border-top: 0;
-    border-bottom: 0;
-}
 
 .button_2:after {
     top: 0;
@@ -285,7 +281,6 @@
 .description {
     text-align: left;
     cursor: default;
-    font-size: 1.3rem;
     z-index: 0;
     color: #000000;
 }
