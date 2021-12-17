@@ -1,6 +1,7 @@
 .img_img {
     width: 244px;
     height: 240px;
+    box-shadow: 0 0 4px 0 #b8cef3;
 }
 
 .block_img_partners {
@@ -99,18 +100,19 @@
         margin-left: auto;
         margin-right: auto;
         background: #f2f5fc;
-        box-shadow: 0 0 4px 0 #b8cef3;
     }
 
     .block_employees_block > * {
         height: 18rem;
     }
+
 }
 
 @media (max-width: 500px){
     .img_img{
         width: 100%;
         padding: 0;
+        box-shadow: none;
     }
     .block_employees {
         margin-left: 0;
@@ -148,7 +150,6 @@
     .block_img_block {
         margin: 0 auto;
         justify-content: center;
-
     }
 
 }
