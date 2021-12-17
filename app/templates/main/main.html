@@ -62,6 +62,7 @@
                                 {% set path = "images/events/" + event.id + ".png" %}
                                 <div class="slider__item">
                                     <!-- Контент 1 слайда -->
+                                    <span>{{ event.description }}</span>
                                     <img class="slider__img" alt="" src="{{ url_for('static',filename='path') }}">
                                 </div>
                             {% endfor %}
