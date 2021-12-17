@@ -127,6 +127,15 @@
     color: white;
 }
 
+.button_2:hover .price_switch {
+    filter: invert(1);
+}
+
+.button_2:hover .detailed{
+    color: white;
+    border-bottom: 1px solid white;
+}
+
 .button_2:hover > div > div:last-child {
     color: white;
 }
@@ -136,6 +145,7 @@
 
 .button_2:hover:after {
     background-color: #e3e1da;
+    filter: grayscale(1);
 }
 
 .button_2:before,
@@ -291,4 +301,9 @@
     z-index: 0;
     color: black;
     transition: all 0.25s;
+}
+
+.detailed {
+    color: black;
+    border-bottom: 1px solid black;
 }
