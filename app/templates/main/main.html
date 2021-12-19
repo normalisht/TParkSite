@@ -29,13 +29,16 @@
                     <div class="slider__items">
                         {% for i in range(3) %}
                             <div class="slider__item">
-                                <img class="slider__img" alt="" src="{{ url_for('static',filename='/images/staff/1.png' ) }}">
+                                <img class="slider__img" alt=""
+                                     src="{{ url_for('static',filename='/images/staff/1.png' ) }}">
                             </div>
                             <div class="slider__item">
-                                <img class="slider__img" alt="" src="{{ url_for('static',filename='/images/staff/2.png' ) }}">
+                                <img class="slider__img" alt=""
+                                     src="{{ url_for('static',filename='/images/staff/2.png' ) }}">
                             </div>
                             <div class="slider__item">
-                                <img class="slider__img" alt="" src="{{ url_for('static',filename='/images/staff/3.png' ) }}">
+                                <img class="slider__img" alt=""
+                                     src="{{ url_for('static',filename='/images/staff/3.png' ) }}">
                             </div>
                         {% endfor %}
                     </div>
@@ -58,22 +61,21 @@
                 <div class="slider__container">
                     <div class="slider__wrapper">
                         <div class="slider__items">
-                            {% for event in events %}
-                                {% set path = "static/images/events/" + "event.id" + ".png" %}
+                            {% for i in range(2) %}
                                 <div class="slider__item">
                                     <!-- Контент 1 слайда -->
-                                    <span>{{ event.description }}</span>
-                                    <img class="slider__img" alt="" src="{{ url_for('static',filename='/images/events/1.png') }}">
+                                    <span>{{ events[0].description }}</span>
+                                    <img class="slider__img" alt=""
+                                         src="{{ url_for('static',filename='/images/events/1.png') }}">
                                 </div>
                             {% endfor %}
                         </div>
                     </div>
                 </div>
 
-                <!-- Стрелки для перехода к предыдущему и следующему слайду
                 <a class="slider__control slider__control_prev" href="#" role="button" data-slide="prev"></a>
                 <a class="slider__control slider__control_next" href="#" role="button" data-slide="next"></a>
-        -->    </div>
+            </div>
         </div>
     </div>
 
