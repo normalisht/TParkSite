@@ -112,6 +112,15 @@ img {
 
 }
 
+.block_text_event {
+    position: absolute;
+    margin: 0 auto;
+    left: 0;
+    bottom: 0;
+    color: white;
+    z-index:3;
+}
+
 .block {
     display: flex;
     justify-content: space-between;
