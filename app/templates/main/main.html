@@ -59,7 +59,7 @@
                     <div class="slider__wrapper">
                         <div class="slider__items">
                             {% for event in events %}
-                                {% set path = "static/images/events/" + "event.id" + ".png" %}
+                                {% set path = "static/images/events/" + event.id|string + ".png" %}
                                 <div class="slider__item">
                                     <!-- Контент 1 слайда -->
                                     <span>{{ event.description }}</span>
