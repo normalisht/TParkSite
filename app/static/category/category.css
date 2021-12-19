@@ -6,7 +6,6 @@
     justify-content: center;
     display: grid;
     grid-template-columns: calc(var(--vw) * 100);
-    grid-row-gap: 10px;
     font-family: Arial, serif;
 }
 
