@@ -55,28 +55,29 @@
         {{ main_text }}
     </div>
 
-    <div class="events">
-        <div class="block_slider">
-            <div class="slider">
-                <div class="slider__container">
-                    <div class="slider__wrapper">
-                        <div class="slider__items">
-                            {% for i in range(3) %}
-                                <div class="slider__item">
-                                    <!-- Контент 1 слайда -->
-                                    <span>{{ events[0].description }}</span>
-                                    <img class="slider__img" alt=""
-                                         src="{{ url_for('static',filename='/images/events/1.png') }}">
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-
-                <a class="slider__control slider__control_prev" href="#" role="button" data-slide="prev"></a>
-                <a class="slider__control slider__control_next" href="#" role="button" data-slide="next"></a>
-            </div>
-        </div>
-    </div>
+{#    <div class="events">#}
+{#        <div class="block_slider">#}
+{#            <div class="slider">#}
+{#                <div class="slider__container">#}
+{#                    <div class="slider__wrapper">#}
+{#                        <div class="slider__items">#}
+{#                            {% for event in events %}#}
+{#                                {% set path = "static/images/events/" + event.id|string + ".png" %}#}
+{#                                <div class="slider__item">#}
+{#                                    <!-- Контент 1 слайда -->#}
+{#                                    <span>{{ events[0].description }}</span>#}
+{#                                    <img class="slider__img" alt=""#}
+{#                                         src="{{ url_for('static',filename='/images/events/1.png') }}">#}
+{#                                </div>#}
+{#                            {% endfor %}#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{##}
+{#                <a class="slider__control slider__control_prev" href="#" role="button" data-slide="prev"></a>#}
+{#                <a class="slider__control slider__control_next" href="#" role="button" data-slide="next"></a>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
 
 {% endblock %}

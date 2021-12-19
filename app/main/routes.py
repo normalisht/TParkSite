@@ -18,8 +18,6 @@ def index():
         pass
     elif len(events) < 3:
         events = events * 3
-    print(events)
-
     return render_template('main/main.html', main_text=main_text, events=events,
                            categories=get_categories(), contacts_data=get_contacts_data())
 
