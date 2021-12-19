@@ -24,15 +24,17 @@
     </div>
 
     <!--Что есть-->
-    <h2 class="title_about">Что есть</h2>
+    <h2 class="title_about">У нас есть(уточнить название категории)</h2>
     <div class="block_fil">{{ about.text }}</div>
 
     <!--Сотрудники-->
     <h2 class="title_about">Сотрудники</h2>
     <div class="block_employees_block">
         {% for employee in employees %}
-            <figure class="block_employees">
-                <img src="{{ url_for('static', filename='/images/employee/' + employee.id|string + '.png') }}"
+            <div class="block_employees">
+{#                <img src="{{ url_for('static', filename='/images/employee/' + employee.id|string + '.png') }}"#}
+{#                     class="img_img">                #}
+                <img src="{{ url_for('static', filename='/images/employee/123' + '.png') }}"
                      class="img_img">
                 <figcaption>
                     <div class="name_employees">{{ employee.name }}</div>
@@ -40,7 +42,7 @@
                 <figcaption>
                     <div class="position_employees">{{ employee.position }}</div>
                 </figcaption>
-            </figure>
+            </div>
         {% endfor %}
     </div>
 

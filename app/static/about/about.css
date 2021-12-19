@@ -51,7 +51,7 @@
     justify-content: center;
     max-width: 70%;
     overflow: hidden;
-    margin: 20px auto;
+    margin: 0px auto 5px;
     text-align: center;
 }
 
@@ -184,7 +184,7 @@
         grid-gap: 1rem;
         grid-template-columns: repeat(auto-fill, minmax(14.8rem, 1fr));
         list-style: none;
-        padding: 40px 45px 40px 45px;
+        padding: 40px 10px 40px 10px;
     }
 }
 
@@ -193,9 +193,23 @@
         margin: 0 auto;
         justify-content: center;
         display: grid;
-        grid-gap: 1rem;
+        grid-gap: 4.5rem;
         grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
         list-style: none;
-        padding: 40px 45px 40px 45px;
     }
+}
+
+.block_employees_block {
+    padding-top: 0;
+    width: 1250px;
+}
+
+.block_employees figcaption {
+    padding-top: 5px;
+}
+
+.block_employees img {
+    --x: 75px;
+    width: calc(3 * var(--x));
+    height: calc(4 * var(--x));
 }

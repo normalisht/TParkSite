@@ -111,6 +111,7 @@
 }
 
 .geo {
-    max-width: 50px;
+    max-width: 27px;
     max-height: 30px;
+    object-fit: cover;
 }
