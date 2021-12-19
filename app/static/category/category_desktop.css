@@ -102,7 +102,7 @@
     font-family: 'Arial', sans-serif;
     font-size: 18px;
     font-weight: 400;
-    color: rgba(0, 0, 0, 0.95);
+    /*color: rgba(0, 0, 0, 0.95);*/
     padding: 10px;
     cursor: pointer;
     outline: none;
@@ -112,6 +112,8 @@
     user-select: none;
     box-shadow: 2px 4px 6px rgba(204, 204, 204, 0.82);
     border-radius: 2px;
+    background-color: #e39204;
+    color: #eeeeee;
     /*box-shadow: inset 0 0 20px rgba(255, 255, 255, .5), 0 0 20px rgba(255, 255, 255, .2);*/
 }
 
@@ -125,12 +127,18 @@
 .button_2:hover {
     transition-delay: 0s;
     opacity: 1;
-    background-color: #e39204;
-    color: white;
+    /*background-color: #e39204;*/
+    /*color: #eeeeee;*/
+    background: #eeeeee;
+    color: rgba(0, 0, 0, 0.95);
+}
+
+.button_2 .price_switch {
+    filter: invert(1);
 }
 
 .button_2:hover .price_switch {
-    filter: invert(1);
+    filter: invert(0);
 }
 
 .button_2:hover .detailed{
@@ -139,7 +147,7 @@
 }
 
 .button_2:hover > div > div:last-child {
-    color: white;
+    color: black;
 }
 .button_2:hover:before {
     transition-delay: 0s;
@@ -302,9 +310,8 @@
     text-align: left;
     cursor: default;
     z-index: 0;
-    color: black;
-    font-size: 1.3rem;
-    /*transition: all 0.25s;*/
+    color: #eeeeee;
+    transition: color 0.25s;
 }
 
 .button_5:first-child {
@@ -312,6 +319,9 @@
 }
 
 .detailed {
+    color: white;
+}
+
+.button_2:hover .detailed {
     color: black;
-    border-bottom: 1px solid black;
 }
