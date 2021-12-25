@@ -24,7 +24,7 @@ def login():
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('main.index')
         return redirect(next_page)
-    return render_template('admin_panel/login.html', title='Авторизация')
+    return render_template('аdmin_panel/login.html', title='Авторизация')
 
 
 # выход
@@ -39,7 +39,7 @@ def logout():
 def menu():
     categories = Category.query.all()
 
-    return render_template('admin_panel/menu.html', title='Меню', categories=categories)
+    return render_template('аdmin_panel/menu.html', title='Меню', categories=categories)
 
 
 @bp.route('/texts', methods=['GET'])
@@ -47,7 +47,7 @@ def menu():
 def texts():
     texts = Text.query.all()
 
-    return render_template('admin_panel/texts.html', title='Описания/Тексты',
+    return render_template('аdmin_panel/texts.html', title='Описания/Тексты',
                            texts=texts)
 
 
@@ -56,7 +56,7 @@ def texts():
 def events():
     events = Event.query.all()
 
-    return render_template('admin_panel/events.html', title='Мероприятия',
+    return render_template('аdmin_panel/events.html', title='Мероприятия',
                            events=events)
 
 
@@ -65,7 +65,7 @@ def events():
 def employees():
     employees = Employee.query.all()
 
-    return render_template('admin_panel/employees.html', title='Содрудники',
+    return render_template('аdmin_panel/employees.html', title='Содрудники',
                            employees=employees)
 
 
@@ -77,7 +77,7 @@ def category():
     category = Category.query.filter_by(id=id).first()
     services = category.services.all()
 
-    return render_template('admin_panel/category.html', title='{}'.format(category.name),
+    return render_template('аdmin_panel/category.html', title='{}'.format(category.name),
                            category=category, services=services)
 
 
@@ -88,7 +88,7 @@ def service():
 
     service = Service.query.filter_by(id=id).first()
 
-    return render_template('admin_panel/service.html', title='{}'.format(category.name),
+    return render_template('аdmin_panel/service.html', title='{}'.format(category.name),
                            category=category, service=service)
 
 
@@ -97,7 +97,7 @@ def service():
 def comments():
     comments = Comment.query.all()
 
-    return render_template('admin_panel/comments.html', title='Отзывы', comments=comments)
+    return render_template('аdmin_panel/comments.html', title='Отзывы', comments=comments)
 
 
 '''json запросы'''
