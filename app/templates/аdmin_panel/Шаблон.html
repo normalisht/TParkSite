@@ -1,7 +1,7 @@
 {% extends "main/base.html" %}
 
 {% block scripts %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='category/шаблон.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='шаблон.css') }}">
 {% endblock %}
 
 {% block app_content %}
@@ -9,14 +9,35 @@
     <div class="title">Шаблон-пример для админ панели</div>
 
     <div class="grid_panel">
-        <div>
-            <div class="title">Текст</div>
-            <div>{{ text }}</div>
+    <div>
+        <div class="title">Текст</div>
+        <div>{{ title }}</div>
 
+    </div>
+
+    <div>
+    <div class="title">Фото</div>
+    {% for photo in photos %}
+    <div class="grid_block">
+        <div>{{ photo.title }}</div>
+
+        <div class="input__wrapper">
+            <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
+            <label for="block_photo" class="button">
+                <span class="input__file_button">Изменить</span>
+            </label>
+        </div>
+        <div class="button_delete" id="delete_photo">
+            <label for="block_photo" class="button">
+                <span class="input__file_button">Удалить</span>
+            </label>
         </div>
 
-        <div><div>Фото</div></div>
-
+        <div class="checkbox"></div>
+    </div>
+    {% endfor %}
+    </div>
+    </div>
 
 
 {% endblock %}
