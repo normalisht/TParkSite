@@ -16,7 +16,9 @@
                 <div class="grid_block">
                     <div>{{ texts.title }}</div>
                     <div>
-                    {{ text(class="comment") }}
+                        <form>
+                            <input type="text" id="input" name="input" value=texts.description>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -24,9 +26,10 @@
 
         <div>
             <div class="title">Фото</div>
-            {% for photo in photos %}
+            {% for event in events %}
                 <div class="grid_block">
-                    <div>{{ photo.title }}</div>
+                    {% set path = "images/events/" + events.id|string + ".png" %}
+                    <div><img src="{{ url_for("static", filename=path) }}" alt="" class=""></div>
 
                     <div class="input__wrapper">
                         <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
@@ -45,6 +48,7 @@
             {% endfor %}
         </div>
     </div>
+
 
 
 

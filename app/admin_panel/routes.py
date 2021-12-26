@@ -37,6 +37,14 @@ def logout():
     return redirect(url_for('main.index'))
 
 
+@bp.route('/admin_panel/main', methods=['GET'])
+@login_required
+def main():
+    main_text = Text.query.filter_by(title="main_text").first().text
+    events = Event.query.all()
+
+    return render_template('аdmin_panel/main.html', title='Главная страница', main_text=main_text, events=events)
+
 @bp.route('/menu', methods=['GET'])
 @login_required
 def menu():
