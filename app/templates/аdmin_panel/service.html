@@ -12,22 +12,21 @@
         <div>
             <div class="title">Текст</div>
             <div class="grid_block">
-                <div>{{ main_text.title }}</div>
+                <div>{{ service.title }}</div>
 
-                    <div>
-                        <form>
-                            <input type="text" id="input" name="input" value=main_text.text>
-                        </form>
-                    </div>
+                <div>
+                    <form>
+                        <input type="text" id="input" name="input" value=service.description>
+                    </form>
+                </div>
 
             </div>
         </div>
 
         <div>
             <div class="title">Фото</div>
-            {% for event in events %}
                 <div class="grid_block">
-                    {% set path = "images/events/" + events.id|string + ".png" %}
+                    {% set path = "images/sevice/" + service.id|string + ".png" %}
                     <div><img src="{{ url_for("static", filename=path) }}" alt="" class=""></div>
 
                     <div class="input__wrapper">
