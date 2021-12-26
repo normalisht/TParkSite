@@ -49,11 +49,9 @@ def menu():
 @login_required
 def texts():
     texts = Text.query.all()
-    # id = Text.query.filter_by("id").first().text Необходимо вытаскивать конкретный текст в тектовое поле,
-    # с возможностью его редактирования
-    # text = TextAreaField(texts.id, validators=[Length(max=200)])
+
     return render_template('аdmin_panel/texts.html', title='Описания/Тексты',
-                           texts=texts, id=id, text=text)
+                           texts=texts)
 
 
 @bp.route('/events', methods=['GET'])
