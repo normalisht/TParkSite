@@ -1,4 +1,7 @@
 from flask import render_template, flash, redirect, url_for, request, jsonify, current_app
+from wtforms import TextAreaField
+from wtforms.validators import Length
+
 from app.admin_panel import bp
 from app import db
 from flask_login import login_user, logout_user, current_user, login_required
@@ -46,9 +49,11 @@ def menu():
 @login_required
 def texts():
     texts = Text.query.all()
-
+    # id = Text.query.filter_by("id").first().text Необходимо вытаскивать конкретный текст в тектовое поле,
+    # с возможностью его редактирования
+    # text = TextAreaField(texts.id, validators=[Length(max=200)])
     return render_template('аdmin_panel/texts.html', title='Описания/Тексты',
-                           texts=texts)
+                           texts=texts, id=id, text=text)
 
 
 @bp.route('/events', methods=['GET'])
@@ -86,10 +91,12 @@ def category():
 def service():
     id = request.args.get('id')
 
+
     service = Service.query.filter_by(id=id).first()
 
     return render_template('аdmin_panel/service.html', title='{}'.format(category.name),
-                           category=category, service=service)
+                           category=category, service=service
+                           , id=text_id, text=text)
 
 
 @bp.route('/service', methods=['GET'])

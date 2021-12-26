@@ -9,35 +9,46 @@
     <div class="title">Шаблон-пример для админ панели</div>
 
     <div class="grid_panel">
-    <div>
-        <div class="title">Текст</div>
-        <div>{{ title }}</div>
-
-    </div>
-
-    <div>
-    <div class="title">Фото</div>
-    {% for photo in photos %}
-    <div class="grid_block">
-        <div>{{ photo.title }}</div>
-
-        <div class="input__wrapper">
-            <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
-            <label for="block_photo" class="button">
-                <span class="input__file_button">Изменить</span>
-            </label>
-        </div>
-        <div class="button_delete" id="delete_photo">
-            <label for="block_photo" class="button">
-                <span class="input__file_button">Удалить</span>
-            </label>
+        <div>
+            <div class="title">Текст</div>
+            <div class="grid_block">
+                <div>{{ title }}</div>
+                <div class="grid_block">
+                    <div>{{ texts.title }}</div>
+                    <div>
+                    {{ text(class="comment") }}
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="checkbox"></div>
-    </div>
-    {% endfor %}
-    </div>
+        <div>
+            <div class="title">Фото</div>
+            {% for photo in photos %}
+                <div class="grid_block">
+                    <div>{{ photo.title }}</div>
+
+                    <div class="input__wrapper">
+                        <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
+                        <label for="block_photo" class="button">
+                            <span class="input__file_button">Изменить</span>
+                        </label>
+                    </div>
+                    <div class="button_delete" id="delete_photo">
+                        <label for="block_photo" class="button">
+                            <span class="input__file_button">Удалить</span>
+                        </label>
+                    </div>
+
+                    <div class="checkbox"></div>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 
+
+    <!--Блоки текстов нужно прописывать как отдельную функцию
+    text = TextAreaField('text.id', validators=[Length(max=200)])
+    -->
 
 {% endblock %}
