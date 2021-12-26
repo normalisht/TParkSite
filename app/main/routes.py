@@ -13,7 +13,10 @@ engine = create_engine("sqlite:///T_Park.db")
 def index():
     main_text = Text.query.filter_by(title="main_text").first().text
     events = Event.query.all()
-
+    if len(events) == 0:
+        events = 0
+    if len(events) < 3:
+        events = events * 3
     return render_template('main/main.html', main_text=main_text, events=events,
                            categories=get_categories(), contacts_data=get_contacts_data())
 

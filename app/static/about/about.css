@@ -3,6 +3,11 @@
     height: 240px;
     box-shadow: 0 0 4px 0 #b8cef3;
 }
+.img_img_img {
+    width: 244px;
+    height: 240px;
+    box-shadow: 0 0 4px 0 #b8cef3;
+}
 
 .block_img_partners {
     justify-content: center;
@@ -33,6 +38,8 @@
     margin-left: auto;
     margin-right: auto;
 }
+
+
 /*КПартнёры*/
 .name_employees {
     text-align: center;
@@ -109,7 +116,7 @@
 }
 
 @media (max-width: 500px){
-    .img_img{
+    .img_img_img{
         width: 100%;
         padding: 0;
         box-shadow: none;
@@ -160,7 +167,7 @@
         justify-content: center;
         display: grid;
         grid-gap: 1rem;
-        grid-template-columns: repeat(auto-fill, minmax(15.4rem, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
         list-style: none;
         padding: 40px 100px 40px 100px;
     }
@@ -171,7 +178,7 @@
         justify-content: center;
         display: grid;
         grid-gap: 1rem;
-        grid-template-columns: repeat(auto-fill, minmax(14.8rem, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
         list-style: none;
         padding: 40px 50px 40px 50px;
     }

@@ -59,10 +59,11 @@
                     <div class="slider__wrapper">
                         <div class="slider__items">
                             {% for event in events %}
-                                {% set path = "static/images/events/" + event.id + ".jpg" %}
+                                {% set path = "static/images/events/" + event.id|string + ".png" %}
                                 <div class="slider__item">
                                     <!-- Контент 1 слайда -->
-                                    <img class="slider__img" alt="" src="{{ url_for('static',filename='path') }}">
+                                    <span class = "block_text_event">{{ event.description }}</span>
+                                    <img class="slider__img" alt="" src="{{ url_for('static',filename='/images/events/1.png') }}">
                                 </div>
                             {% endfor %}
                         </div>
