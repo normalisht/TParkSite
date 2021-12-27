@@ -45,6 +45,7 @@ def main():
 
     return render_template('аdmin_panel/main.html', title='Главная страница', main_text=main_text, events=events)
 
+
 @bp.route('/menu', methods=['GET'])
 @login_required
 def menu():

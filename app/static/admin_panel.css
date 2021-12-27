@@ -1,0 +1,48 @@
+
+
+
+.title {
+    text-align: center;
+    padding: 0.5em;
+}
+
+.div_grid_panel {
+    display: flex;
+    justify-content: space-around;
+
+}
+
+
+.grid_panel {
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 45vw 45vw;
+
+}
+
+.grid_block {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    min-height:100px;
+}
+
+.grid_block_photo {
+    display: grid;
+    grid-template-columns: 50% 25% 25%;
+    min-height:100px;
+}
+
+.input__wrapper {
+
+}
+
+.input__file_button {
+    width: 200px;
+    margin: 0 auto;
+}
+
+.input__file {
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+}
