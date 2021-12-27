@@ -3,7 +3,7 @@
 
 .title {
     text-align: center;
-
+    padding: 0.5em;
 }
 
 .div_grid_panel {
@@ -16,14 +16,20 @@
 .grid_panel {
     margin: 0 auto;
     display: grid;
-    grid-template-columns: 30vw 30vw;
+    grid-template-columns: 45vw 45vw;
 
 }
 
 .grid_block {
     display: grid;
-    grid-template-columns: 40% 40%;
+    grid-template-columns: 50% 50%;
+    min-height:100px;
+}
 
+.grid_block_photo {
+    display: grid;
+    grid-template-columns: 50% 25% 25%;
+    min-height:100px;
 }
 
 .input__wrapper {

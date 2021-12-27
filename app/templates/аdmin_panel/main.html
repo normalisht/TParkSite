@@ -26,7 +26,7 @@
             <div>
                 <div class="title">Фото</div>
                 {% for event in events %}
-                    <div class="grid_block">
+                    <div class="grid_block_photo">
                         {% set path = "images/events/" + events.id|string + ".png" %}
                         <div><img src="{{ url_for("static", filename=path) }}" alt="" class=""></div>
 
