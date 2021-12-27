@@ -6,8 +6,15 @@
 
 }
 
-.grid_panel {
+.div_grid_panel {
+    display: flex;
+    justify-content: space-around;
 
+}
+
+
+.grid_panel {
+    margin: 0 auto;
     display: grid;
     grid-template-columns: 30vw 30vw;
 
@@ -20,7 +27,7 @@
 }
 
 .input__wrapper {
-    display:none;
+
 }
 
 .input__file_button {
