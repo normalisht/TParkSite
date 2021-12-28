@@ -40,10 +40,13 @@ def logout():
 @bp.route('/admin_panel/about', methods=['GET'])
 @login_required
 def main():
-    main_text = Text.query.filter_by(title="main_text").first().text
-    events = Event.query.all()
+    employees = Employee.query.all()
+    about = Text.query.filter_by(title='about').first()
+    filosofi = Text.query.filter_by(title='filosofi').first()
+    partners = Partner.query.all()
 
-    return render_template('аdmin_panel/about.html', title='Главная страница', main_text=main_text, events=events)
+    return render_template('аdmin_panel/about.html', title='О НАС', employees=employees,
+                           filosofi=filosofi, about=about, partners=partners)
 
 @bp.route('/menu', methods=['GET'])
 @login_required
