@@ -57,3 +57,13 @@ def about():
     return render_template('main/about.html', employees=employees,
                            filosofi=filosofi, about=about, partners=partners,
                            categories=get_categories(), contacts_data=get_contacts_data())
+
+@bp.route('/admin_panel/about', methods=['GET'])
+def main():
+    employees = Employee.query.all()
+    about = Text.query.filter_by(title='about').first()
+    filosofi = Text.query.filter_by(title='filosofi').first()
+    partners = Partner.query.all()
+
+    return render_template('аdmin_panel/about.html', title='О НАС', employees=employees,
+                           filosofi=filosofi, about=about, partners=partners, contacts_data=get_contacts_data())
