@@ -16,7 +16,11 @@
 
                 <div>
                     <form>
-                        <input type="text" id="input" name="input" value=service.description>
+                        <label for="input_desc">Описание</label>
+                        <input type="text" id="input_desc" name="input_desc" value=service.description>
+{#                       Хз как, но нужно в значения импута засунуть из бд данные. JS без сомнения, займись этим#}
+                        <label for="input_price">Цена</label>
+                        <input type="text" id="input_price" name="input_price" value=service.price>
                     </form>
                 </div>
 

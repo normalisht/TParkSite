@@ -5,7 +5,7 @@ from wtforms.validators import Length
 from app.admin_panel import bp
 from app import db
 from flask_login import login_user, logout_user, current_user, login_required
-from app.models import Admin, Category, Service, Employee, Text, Comment, ServiceCategory, Event
+from app.models import Admin, Category, Service, Employee, Text, Comment, ServiceCategory, Event, Partner
 from werkzeug.urls import url_parse
 import json
 
@@ -48,7 +48,7 @@ def main():
 
 @bp.route('/admin_panel/about', methods=['GET'])
 @login_required
-def main():
+def about():#Косяк поправил(было мейн)
     employees = Employee.query.all()
     about = Text.query.filter_by(title='about').first()
     filosofi = Text.query.filter_by(title='filosofi').first()
@@ -109,7 +109,6 @@ def category():
 @login_required
 def service():
     id = request.args.get('id')
-
 
     service = Service.query.filter_by(id=id).first()
 
