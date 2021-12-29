@@ -67,13 +67,12 @@ def about():
                            filosofi=filosofi, about=about, partners=partners,
                            categories=get_categories(), contacts_data=get_contacts_data())
 
+@bp.route('/admin_panel/about', methods=['GET'])
+def main():
+    employees = Employee.query.all()
+    about = Text.query.filter_by(title='about').first()
+    filosofi = Text.query.filter_by(title='filosofi').first()
+    partners = Partner.query.all()
 
-@bp.route('/category_test', methods=['GET'])
-def category_test():
-    category_id = request.args.get('category_id')
-
-    category = Category.query.filter_by(id=category_id).first()
-    services = category.services.all()
-
-    return render_template('аdmin_panel/category.html', title='{}'.format(category.name),
-                           category=category, services=services, contacts_data=get_contacts_data())
+    return render_template('аdmin_panel/about.html', title='О НАС', employees=employees,
+                           filosofi=filosofi, about=about, partners=partners, contacts_data=get_contacts_data())
