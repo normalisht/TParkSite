@@ -1,6 +1,7 @@
+{% extends "main/base.html" %}
 
 {% block scripts %}
-<link rel="stylesheet" href="{{ url_for('static', filename='шаблон.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='admin_panel.css') }}">
 {% endblock %}
 
 {% block app_content %}
@@ -9,13 +10,20 @@
 
 <div class="grid_panel">
     <div>
-        <div class="title">Текст</div>
         <div class="grid_block">
             <div>{{ category.title }}</div>
-
             <div>
-                <form>
-                        <input type="text" id="input" name="input" value=category.description>
+                {% for msg in get_flashed_messages() %}
+                <div class="flash">{{msg}}</div>
+                {% endfor %}
+                <form method="POST">
+                    <label for="input_desc">Описание</label>
+                    <input type="text" id="input_desc" name="input_desc" value="{{category.description if category.description}}">
+                    <label for="checkbox_1">Отображать</label>
+                    <input type="checkbox" id="checkbox_1" class="checkbox"  name="mycheckbox" value="1" {{"checked" if category.status else ""}}/><br>
+                    <label for="checkbox_2">Скрыть</label>
+                    <input type="checkbox" id="checkbox_2" class="checkbox"  name="mycheckbox" value="0" {{"checked" if category.status == 0 else ""}}/><br>
+                    <input type="submit" value="Подтвердить">
                 </form>
             </div>
 
@@ -23,10 +31,9 @@
     </div>
 
     <div>
-        <div class="title">Фото</div>
         <div class="grid_block">
             {% set path = "images/category/" + category.id|string + ".png" %}
-            <div><img src="{{ url_for("static", filename=path) }}" alt="" class=""></div>
+            <div class="images"><img src="{{ url_for("static", filename=path) }}" alt="" class="images"></div>
 
             <div class="input__wrapper">
                 <input type="file" name="block_photo" id="photo" class="input input__file" multiple>

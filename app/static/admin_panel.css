@@ -24,6 +24,7 @@
     display: grid;
     grid-template-columns: 50% 50%;
     min-height:100px;
+    justify-items: center;
 }
 
 .grid_block_photo {
@@ -41,6 +42,21 @@
     visibility: hidden;
     position: absolute;
 }
+
+
+.images {
+    width: 30vw;
+    height: 30vw;
+    grid-column-start: 1;
+    grid-column-end: 3;
+}
+
+.checkbox {
+    position: absolute;
+    appearance: auto;
+    -webkit-appearance: checkbox;
+}
+
 
 /*"типа  кнопка 1"
 .input__file_button {

@@ -37,10 +37,12 @@ def category():
 
         category = Category.query.filter_by(id=category_id).first()
         services = category.services.all()
-
-        return render_template('main/category.html', category=category, category_id=category_id,
+        if category.status == 1:
+            return render_template('main/category.html', category=category, category_id=category_id,
                                services=services, categories=get_categories(),
                                contacts_data=get_contacts_data())
+        else:
+            return redirect(url_for('main.index'))
     except:
         return render_template('errors/500.html')
 
@@ -68,7 +70,7 @@ def about():
                            categories=get_categories(), contacts_data=get_contacts_data())
 
 @bp.route('/admin_panel/about', methods=['GET'])
-def main():
+def admin_about():
     employees = Employee.query.all()
     about = Text.query.filter_by(title='about').first()
     filosofi = Text.query.filter_by(title='filosofi').first()
@@ -76,3 +78,19 @@ def main():
 
     return render_template('аdmin_panel/about.html', title='О НАС', employees=employees,
                            filosofi=filosofi, about=about, partners=partners, contacts_data=get_contacts_data())
+
+@bp.route('/category_test', methods=['GET', 'POST'])
+def category_test():
+    category_id = request.args.get('category_id')
+    category = Category.query.filter_by(id=category_id).first()
+    services = category.services.all()
+    if request.method == 'POST':
+        if request.form.get('mycheckbox') == '1':
+            category.status = 1
+        else:
+            category.status = 0
+            print(category.status)
+        category.description = request.form.get('input_desc')
+        db.session.commit()
+    return render_template('аdmin_panel/category.html', title='{}'.format(category.name),
+                           category=category, services=services, contacts_data=get_contacts_data())
