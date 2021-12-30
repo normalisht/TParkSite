@@ -18,11 +18,11 @@
                 {% endfor %}
                 <form method="POST">
                     <label for="input_desc">Описание</label>
-                    <input type="text" id="input_desc" name="input_desc" value="{{category.description if category.description}}">
+                    <input type="text" id="input_desc" name="input_desc" value="{{category.description if category.description}}"><br>
                     <label for="checkbox_1">Отображать</label>
-                    <input type="checkbox" id="checkbox_1" class="checkbox"  name="mycheckbox" value="1" {{"checked" if category.status else ""}}/><br>
+                    <input type="radio" id="checkbox_1" class="checkbox"  name="mycheckbox" value="1" {{"checked" if category.status else ""}}/><br>
                     <label for="checkbox_2">Скрыть</label>
-                    <input type="checkbox" id="checkbox_2" class="checkbox"  name="mycheckbox" value="0" {{"checked" if category.status == 0 else ""}}/><br>
+                    <input type="radio" id="checkbox_2" class="checkbox"  name="mycheckbox" value="0" {{"checked" if category.status == 0 else ""}}/><br>
                     <input type="submit" value="Подтвердить">
                 </form>
             </div>
