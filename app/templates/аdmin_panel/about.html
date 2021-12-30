@@ -12,40 +12,30 @@
             <div>
                 <div class="title">О нас</div>
                 <div class="grid_block">
-                    <div>{{ filosofi.text }}</div>
-{#                    Дохрена правок, В первую очередь, копипастить надо умеючи, просто скопировав мой код
-                        (который является СПЕЦИАЛИЗИРОВАННЫМ под конкретно страницу мейна) Ну вот скажи,
-                        зачем тебе в цикле брать ивенты? У тебя они есть на странице? Еще раз посмоотри мой
-                        Ты явно не понял что мы хотим сделать. Я запишу ГС с пояснениями#}
-
                     <div>
                         <form>
                             <label for="input">{{ filosofi.text }}</label>
                             <input type="text" id="input" name="input">
                         </form>
                     </div>
-
                 </div>
 
                 <div class="title">Что есть</div>
                 <div class="grid_block">
-                    <div>{{ about.text }}</div>
                     <div>
                         <form>
-                            <label for="input">{{ filosofi.text }}</label>
+                            <label for="input">{{ about.text }}</label>
                             <input type="text" id="input" name="input">
                         </form>
                     </div>
-
                 </div>
-
             </div>
 
             <div>
                 <div class="title">Партнёры</div>
-                {% for event in events %}
+                {% for partner in partners %}
                     <div class="grid_block_photo">
-                        {% set path = "images/partners/" + partners.id|string + ".png" %}
+                        {% set path = "/images/partner/" + partners.id|string + ".png" %}
                         <div><img src="{{ url_for("static", filename=path) }}" alt="" class=""></div>
 
                         <div class="input__wrapper">
@@ -63,14 +53,21 @@
                         <div class="checkbox"></div>
                     </div>
                 {% endfor %}
-            </div>
 
-            <div>
                 <div class="title">Сотрудники</div>
-                {% for event in events %}
+                {% for employee in employees %}
                     <div class="grid_block_photo">
                         {% set path = "images/employee/" + employee.id|string + ".png" %}
-                        <div><img src="{{ url_for("static", filename=path) }}" alt="" class=""></div>
+                        <figure class="img__employ">
+                            <img src="{{ url_for("static", filename=path) }}" alt="" class="">
+
+                        <figcaption>
+                            <div class="name_employees">{{ employee.name }}<input type="text" id="input" name="input"></div>
+                        </figcaption>
+                        <figcaption>
+                            <div class="position_employees">{{ employee.position }}<input type="text" id="input" name="input"></div>
+                        </figcaption>
+                        </figure>
 
                         <div class="input__wrapper">
                             <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
@@ -87,6 +84,7 @@
                         <div class="checkbox"></div>
                     </div>
                 {% endfor %}
+
             </div>
 
         </div>

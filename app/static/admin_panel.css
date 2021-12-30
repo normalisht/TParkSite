@@ -109,3 +109,18 @@
     text-shadow: 0 0 1px  #e3af28;
 }
 /*типа кнопка 2*/
+
+
+.img__employ figcaption {
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+}
+
+.name_employees {
+    text-align: left;
+}
+
+.position_employees {
+    text-align: left;
+}
