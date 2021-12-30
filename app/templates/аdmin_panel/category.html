@@ -6,32 +6,33 @@
 
 {% block app_content %}
 
-<div class="title">Шаблон-пример для админ панели</div>
+<form method="POST">
+    <input type="text" name="title" class="category_name"
+           value="{{category.name if category.name}}">
 
-<div class="grid_panel">
-    <div>
-        <div>{{ category.title }}</div>
+    <div class="grid_panel">
         <div>
-            {% for msg in get_flashed_messages() %}
-            <div class="flash">{{msg}}</div>
-            {% endfor %}
-            <form method="POST">
-                <label for="input_desc">Описание</label>
-                <input type="text" id="input_desc" name="input_desc" class="description"
-                       value="{{category.description if category.description}}"><br>
-                <label for="checkbox_1">Отображать</label>
-                <input type="radio" id="checkbox_1" class="checkbox" name="mycheckbox" value="1" {{"checked" if
-                category.status else ""}}/><br>
-                <label for="checkbox_2">Скрыть</label>
-                <input type="radio" id="checkbox_2" class="checkbox" name="mycheckbox" value="0" {{"checked" if
-                category.status == 0 else ""}}/><br>
+            <div>{{ category.title }}</div>
+            <div>
+                {% for msg in get_flashed_messages() %}
+                <div class="flash">{{msg}}</div>
+                {% endfor %}
                 <div class="grid_service">
+                    <label for="input_desc">Описание</label>
+                    <input type="text" id="input_desc" name="input_desc" class="description"
+                           value="{{category.description if category.description}}">
+                    <label for="checkbox_1">Отображать</label>
+                    <input type="radio" id="checkbox_1" class="checkbox" name="mycheckbox" value="1" {{"checked" if
+                    category.status else ""}}/>
+                    <label for="checkbox_2">Скрыть</label>
+                    <input type="radio" id="checkbox_2" class="checkbox" name="mycheckbox" value="0" {{"checked" if
+                    category.status == 0 else ""}}/>
                     {% for element in services %}
                     {% set service = element.service %}
                     Название услуги
                     <input type="text" name="service_name" value="{{service.name if service.name}}">
                     Краткое описание
-                    <input type="text" name="service"
+                    <input type="text" name="service_description_{{service.id}}"
                            value="{{service.short_description if service.short_description}}">
                     Цена
                     <input type="text" name="price" value="{{service.prices[0] if service.prices[0]}}">
@@ -44,31 +45,31 @@
                     {% endfor %}
                 </div>
                 <input type="submit" value="Подтвердить">
-            </form>
+</form>
 
+</div>
+</div>
+
+<div>
+    <div class="grid_block">
+        {% set path = "images/category/" + category.id|string + ".png" %}
+        <div class="images"><img src="{{ url_for('static', filename=path) }}" alt="" class="images"></div>
+
+        <div class="input__wrapper">
+            <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
+            <label for="block_photo" class="button">
+                <span class="input__file_button">Изменить</span>
+            </label>
         </div>
-    </div>
-
-    <div>
-        <div class="grid_block">
-            {% set path = "images/category/" + category.id|string + ".png" %}
-            <div class="images"><img src="{{ url_for('static', filename=path) }}" alt="" class="images"></div>
-
-            <div class="input__wrapper">
-                <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
-                <label for="block_photo" class="button">
-                    <span class="input__file_button">Изменить</span>
-                </label>
-            </div>
-            <div class="button_delete" id="delete_photo">
-                <label for="block_photo" class="button">
-                    <span class="input__file_button">Удалить</span>
-                </label>
-            </div>
-
-            <div class="checkbox"></div>
+        <div class="button_delete" id="delete_photo">
+            <label for="block_photo" class="button">
+                <span class="input__file_button">Удалить</span>
+            </label>
         </div>
+
+        <div class="checkbox"></div>
     </div>
+</div>
 </div>
 
 
