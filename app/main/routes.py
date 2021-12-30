@@ -89,7 +89,13 @@ def category_test():
             category.status = 1
         else:
             category.status = 0
-            print(category.status)
+        for element in services:
+            if request.form.get('service_checkbox_' + str(element.service.id)) == '1':
+                element.service.status = 1
+            elif request.form.get('service_checkbox_'+ str(element.service.id)) == '0':
+                element.service.status = 0
+            else:
+                pass
         category.description = request.form.get('input_desc')
         db.session.commit()
     return render_template('аdmin_panel/category.html', title='{}'.format(category.name),

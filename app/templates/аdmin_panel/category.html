@@ -18,11 +18,22 @@
                 {% endfor %}
                 <form method="POST">
                     <label for="input_desc">Описание</label>
-                    <input type="text" id="input_desc" name="input_desc" value="{{category.description if category.description}}"><br>
+                    <input type="text" id="input_desc" name="input_desc" class="description" value="{{category.description if category.description}}"><br>
                     <label for="checkbox_1">Отображать</label>
                     <input type="radio" id="checkbox_1" class="checkbox"  name="mycheckbox" value="1" {{"checked" if category.status else ""}}/><br>
                     <label for="checkbox_2">Скрыть</label>
                     <input type="radio" id="checkbox_2" class="checkbox"  name="mycheckbox" value="0" {{"checked" if category.status == 0 else ""}}/><br>
+                    {% for element in services %}
+                        {% set service = element.service %}
+                        Краткое описание
+                        <input type="text"  name="service" value="{{service.short_description if service.short_description}}"><br>
+                        Цена
+                        <input type="text"  name="price" value="{{service.prices[0] if service.prices[0]}}"><br>
+                        Отображать
+                        <input type="radio" class="checkbox"  name="service_checkbox_{{service.id}}" value="1" {{"checked" if service.status else ""}}/><br>
+                        Скрыть
+                        <input type="radio"  class="checkbox"  name="service_checkbox_{{service.id}}" value="0" {{"checked" if service.status == 0 else ""}}/><br>
+                    {% endfor %}
                     <input type="submit" value="Подтвердить">
                 </form>
             </div>
