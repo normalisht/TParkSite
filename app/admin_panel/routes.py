@@ -48,7 +48,7 @@ def main():
 
 @bp.route('/admin_panel/about', methods=['GET'])
 @login_required
-def about():#Косяк поправил(было мейн)
+def about():  # Косяк поправил(было мейн)
     employees = Employee.query.all()
     about = Text.query.filter_by(title='about').first()
     filosofi = Text.query.filter_by(title='filosofi').first()

@@ -6,7 +6,8 @@
 
 {% block app_content %}
 
-<div class="title">Шаблон-пример для админ панели</div>
+<div class="title">Категории услуг</div>
+{#    НА будущее, мы делаем сразу готовый продукт, если у тебя в оглавлении написано Шаблон, то это не готовый продукт#}
 
 <div class="grid_panel">
     <div>
@@ -19,6 +20,9 @@
                 <form method="POST">
                     <label for="input_desc">Описание</label>
                     <input type="text" id="input_desc" name="input_desc" value="{{category.description if category.description}}">
+
+{#                    Отображать и скрыть можно выполнить всего одним чекбоксом, дима его к js подвяжет, при ON удет выводится отображается и наоборот#}
+
                     <label for="checkbox_1">Отображать</label>
                     <input type="checkbox" id="checkbox_1" class="checkbox"  name="mycheckbox" value="1" {{"checked" if category.status else ""}}/><br>
                     <label for="checkbox_2">Скрыть</label>
@@ -29,7 +33,7 @@
 
         </div>
     </div>
-
+{#Нет оглавления того что сдесь выводятся фотографии, Возьми в моем коде.#}
     <div>
         <div class="grid_block">
             {% set path = "images/category/" + category.id|string + ".png" %}
