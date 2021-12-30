@@ -10,33 +10,41 @@
 
 <div class="grid_panel">
     <div>
-        <div class="grid_block">
-            <div>{{ category.title }}</div>
-            <div>
-                {% for msg in get_flashed_messages() %}
-                <div class="flash">{{msg}}</div>
-                {% endfor %}
-                <form method="POST">
-                    <label for="input_desc">Описание</label>
-                    <input type="text" id="input_desc" name="input_desc" class="description" value="{{category.description if category.description}}"><br>
-                    <label for="checkbox_1">Отображать</label>
-                    <input type="radio" id="checkbox_1" class="checkbox"  name="mycheckbox" value="1" {{"checked" if category.status else ""}}/><br>
-                    <label for="checkbox_2">Скрыть</label>
-                    <input type="radio" id="checkbox_2" class="checkbox"  name="mycheckbox" value="0" {{"checked" if category.status == 0 else ""}}/><br>
+        <div>{{ category.title }}</div>
+        <div>
+            {% for msg in get_flashed_messages() %}
+            <div class="flash">{{msg}}</div>
+            {% endfor %}
+            <form method="POST">
+                <label for="input_desc">Описание</label>
+                <input type="text" id="input_desc" name="input_desc" class="description"
+                       value="{{category.description if category.description}}"><br>
+                <label for="checkbox_1">Отображать</label>
+                <input type="radio" id="checkbox_1" class="checkbox" name="mycheckbox" value="1" {{"checked" if
+                category.status else ""}}/><br>
+                <label for="checkbox_2">Скрыть</label>
+                <input type="radio" id="checkbox_2" class="checkbox" name="mycheckbox" value="0" {{"checked" if
+                category.status == 0 else ""}}/><br>
+                <div class="grid_service">
                     {% for element in services %}
-                        {% set service = element.service %}
-                        Краткое описание
-                        <input type="text"  name="service" value="{{service.short_description if service.short_description}}"><br>
-                        Цена
-                        <input type="text"  name="price" value="{{service.prices[0] if service.prices[0]}}"><br>
-                        Отображать
-                        <input type="radio" class="checkbox"  name="service_checkbox_{{service.id}}" value="1" {{"checked" if service.status else ""}}/><br>
-                        Скрыть
-                        <input type="radio"  class="checkbox"  name="service_checkbox_{{service.id}}" value="0" {{"checked" if service.status == 0 else ""}}/><br>
+                    {% set service = element.service %}
+                    Название услуги
+                    <input type="text" name="service_name" value="{{service.name if service.name}}">
+                    Краткое описание
+                    <input type="text" name="service"
+                           value="{{service.short_description if service.short_description}}">
+                    Цена
+                    <input type="text" name="price" value="{{service.prices[0] if service.prices[0]}}">
+                    Отображать
+                    <input type="radio" class="checkbox" name="service_checkbox_{{service.id}}" value="1" {{"checked" if
+                    service.status else ""}}/>
+                    Скрыть
+                    <input type="radio" class="checkbox" name="service_checkbox_{{service.id}}" value="0" {{"checked" if
+                    service.status == 0 else ""}}/>
                     {% endfor %}
-                    <input type="submit" value="Подтвердить">
-                </form>
-            </div>
+                </div>
+                <input type="submit" value="Подтвердить">
+            </form>
 
         </div>
     </div>
@@ -44,7 +52,7 @@
     <div>
         <div class="grid_block">
             {% set path = "images/category/" + category.id|string + ".png" %}
-            <div class="images"><img src="{{ url_for("static", filename=path) }}" alt="" class="images"></div>
+            <div class="images"><img src="{{ url_for('static', filename=path) }}" alt="" class="images"></div>
 
             <div class="input__wrapper">
                 <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
@@ -62,8 +70,6 @@
         </div>
     </div>
 </div>
-
-
 
 
 {% endblock %}

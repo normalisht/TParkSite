@@ -92,7 +92,7 @@ def category_test():
         for element in services:
             if request.form.get('service_checkbox_' + str(element.service.id)) == '1':
                 element.service.status = 1
-            elif request.form.get('service_checkbox_'+ str(element.service.id)) == '0':
+            elif request.form.get('service_checkbox_' + str(element.service.id)) == '0':
                 element.service.status = 0
             else:
                 pass
