@@ -165,6 +165,7 @@
         padding: 40px 100px 40px 100px;
     }
 }
+
 @media (max-width: 991px) and (min-width: 501px) {
     .block_employees_block {
         margin: 0 auto;
@@ -176,6 +177,7 @@
         padding: 40px 50px 40px 50px;
     }
 }
+
 @media (max-width: 750px) and (min-width: 501px) {
     .block_employees_block {
         margin: 0 auto;
