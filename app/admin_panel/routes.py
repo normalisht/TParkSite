@@ -12,6 +12,7 @@ import json
 
 # авторизация админа
 @bp.route('/', methods=['GET', 'POST'])
+@bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
@@ -27,7 +28,7 @@ def login():
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('main.index')
         return redirect(next_page)
-    return render_template('аdmin_panel/login.html', title='Авторизация')
+    return render_template('admin_panel/../templates/аdmin_panel/login.html', title='Авторизация')
 
 
 # выход
@@ -37,41 +38,42 @@ def logout():
     return redirect(url_for('main.index'))
 
 
-@bp.route('/admin_panel/main', methods=['GET'])
-@login_required
+@bp.route('/main', methods=['GET'])
+# @login_required
 def main():
     main_text = Text.query.filter_by(title="main_text").first().text
     events = Event.query.all()
 
-    return render_template('аdmin_panel/main.html', title='Главная страница', main_text=main_text, events=events)
+    return render_template('admin_panel/main.html', title='Главная страница', main_text=main_text, events=events)
 
 
-@bp.route('/admin_panel/about', methods=['GET'])
-@login_required
+@bp.route('/about', methods=['GET'])
+# @login_required
 def about():  # Косяк поправил(было мейн)
+
     employees = Employee.query.all()
     about = Text.query.filter_by(title='about').first()
     filosofi = Text.query.filter_by(title='filosofi').first()
     partners = Partner.query.all()
 
-    return render_template('аdmin_panel/about.html', title='О НАС', employees=employees,
+    return render_template('admin_panel/about.html', title='О НАС', employees=employees,
                            filosofi=filosofi, about=about, partners=partners)
 
 
 @bp.route('/menu', methods=['GET'])
-@login_required
+# @login_required
 def menu():
     categories = Category.query.all()
 
-    return render_template('аdmin_panel/menu.html', title='Меню', categories=categories)
+    return render_template('admin_panel/menu.html', title='Меню', categories=categories)
 
 
 @bp.route('/texts', methods=['GET'])
-@login_required
+# @login_required
 def texts():
     texts = Text.query.all()
 
-    return render_template('аdmin_panel/texts.html', title='Описания/Тексты',
+    return render_template('admin_panel/texts.html', title='Описания/Тексты',
                            texts=texts)
 
 
@@ -80,7 +82,7 @@ def texts():
 def events():
     events = Event.query.all()
 
-    return render_template('аdmin_panel/events.html', title='Мероприятия',
+    return render_template('admin_panel/events.html', title='Мероприятия',
                            events=events)
 
 
@@ -89,7 +91,7 @@ def events():
 def employees():
     employees = Employee.query.all()
 
-    return render_template('аdmin_panel/employees.html', title='Содрудники',
+    return render_template('admin_panel/employees.html', title='Содрудники',
                            employees=employees)
 
 
@@ -101,7 +103,7 @@ def category():
     category = Category.query.filter_by(id=id).first()
     services = category.services.all()
 
-    return render_template('аdmin_panel/category.html', title='{}'.format(category.name),
+    return render_template('admin_panel/category.html', title='{}'.format(category.name),
                            category=category, services=services)
 
 
@@ -112,7 +114,7 @@ def service():
 
     service = Service.query.filter_by(id=id).first()
 
-    return render_template('аdmin_panel/service.html', title='{}'.format(category.name),
+    return render_template('admin_panel/service.html', title='{}'.format(category.name),
                            category=category, service=service)
 
 
@@ -121,7 +123,7 @@ def service():
 def comments():
     comments = Comment.query.all()
 
-    return render_template('аdmin_panel/comments.html', title='Отзывы', comments=comments)
+    return render_template('admin_panel/comments.html', title='Отзывы', comments=comments)
 
 
 '''json запросы'''

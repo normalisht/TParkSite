@@ -7,14 +7,14 @@ from sqlalchemy import create_engine
 
 engine = create_engine("sqlite:///T_Park.db")
 
+
 @bp.route('/admin_panel/main', methods=['GET'])
 def main():
     main_text = Text.query.filter_by(title="main_text").first()
     events = Event.query.all()
 
-    return render_template('аdmin_panel/main.html', title='Главная страница', main_text=main_text, events=events, contacts_data=get_contacts_data())
-
-
+    return render_template('admin_panel/main.html', title='Главная страница', main_text=main_text, events=events,
+                           contacts_data=get_contacts_data())
 
 
 @bp.route('/', methods=['GET'])
@@ -40,8 +40,8 @@ def category():
         services = category.services.all()
         if category.status == 1:
             return render_template('main/category.html', category=category, category_id=category_id,
-                               services=services, categories=get_categories(),
-                               contacts_data=get_contacts_data())
+                                   services=services, categories=get_categories(),
+                                   contacts_data=get_contacts_data())
         else:
             return redirect(url_for('main.index'))
     except:
@@ -58,9 +58,8 @@ def service():
                            contacts_data=get_contacts_data())
 
 
-@bp.route('/about', methods=['GET'])
+@bp.route('/about_2', methods=['GET'])
 def about():
-
     employees = Employee.query.all()
     about = Text.query.filter_by(title='about').first()
     filosofi = Text.query.filter_by(title='filosofi').first()
@@ -70,15 +69,6 @@ def about():
                            filosofi=filosofi, about=about, partners=partners,
                            categories=get_categories(), contacts_data=get_contacts_data())
 
-@bp.route('/admin_panel/about', methods=['GET'])
-def admin_about():
-    employees = Employee.query.all()
-    about = Text.query.filter_by(title='about').first()
-    filosofi = Text.query.filter_by(title='filosofi').first()
-    partners = Partner.query.all()
-
-    return render_template('аdmin_panel/about.html', title='О НАС', employees=employees,
-                           filosofi=filosofi, about=about, partners=partners, contacts_data=get_contacts_data())
 
 @bp.route('/category_test', methods=['GET', 'POST'])
 def category_test():
@@ -93,5 +83,5 @@ def category_test():
             print(category.status)
         category.description = request.form.get('input_desc')
         db.session.commit()
-    return render_template('аdmin_panel/category.html', title='{}'.format(category.name),
+    return render_template('admin_panel/category.html', title='{}'.format(category.name),
                            category=category, services=services, contacts_data=get_contacts_data())

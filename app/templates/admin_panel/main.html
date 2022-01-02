@@ -1,4 +1,4 @@
-{% extends "main/base.html" %}
+{% extends "admin_panel/base.html" %}
 
 {% block scripts %}
     <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel.css') }}">
@@ -15,8 +15,8 @@
                     <div>{{ main_text.title }}</div>
                     <div>
                         <form>
-                            <label for="input">{{ main_text.text }}</label>
-                            <input type="text" id="input" name="input">
+                            <label for="input"></label>
+                            <textarea id="input" name="input">{{ main_text.text }}</textarea>
                         </form>
                     </div>
 
