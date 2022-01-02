@@ -1,0 +1,62 @@
+{% extends "main/base.html" %}
+
+{% block scripts %}
+<link rel="stylesheet" href="{{ url_for('static', filename='admin_panel.css') }}">
+{% endblock %}
+
+{% block app_content %}
+
+<div class="title">Категории услуг</div>
+{#    НА будущее, мы делаем сразу готовый продукт, если у тебя в оглавлении написано Шаблон, то это не готовый продукт#}
+
+<div class="grid_panel">
+    <div>
+        <div class="grid_block">
+            <div>{{ category.title }}</div>
+            <div>
+                {% for msg in get_flashed_messages() %}
+                <div class="flash">{{msg}}</div>
+                {% endfor %}
+                <form method="POST">
+                    <label for="input_desc">Описание</label>
+                    <input type="text" id="input_desc" name="input_desc" value="{{category.description if category.description}}">
+
+{#                    Отображать и скрыть можно выполнить всего одним чекбоксом, дима его к js подвяжет, при ON удет выводится отображается и наоборот#}
+
+                    <label for="checkbox_1">Отображать</label>
+                    <input type="checkbox" id="checkbox_1" class="checkbox"  name="mycheckbox" value="1" {{"checked" if category.status else ""}}/><br>
+                    <label for="checkbox_2">Скрыть</label>
+                    <input type="checkbox" id="checkbox_2" class="checkbox"  name="mycheckbox" value="0" {{"checked" if category.status == 0 else ""}}/><br>
+                    <input type="submit" value="Подтвердить">
+                </form>
+            </div>
+
+        </div>
+    </div>
+{#Нет оглавления того что сдесь выводятся фотографии, Возьми в моем коде.#}
+    <div>
+        <div class="grid_block">
+            {% set path = "images/category/" + category.id|string + ".png" %}
+            <div class="images"><img src="{{ url_for("static", filename=path) }}" alt="" class="images"></div>
+
+            <div class="input__wrapper">
+                <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
+                <label for="block_photo" class="button">
+                    <span class="input__file_button">Изменить</span>
+                </label>
+            </div>
+            <div class="button_delete" id="delete_photo">
+                <label for="block_photo" class="button">
+                    <span class="input__file_button">Удалить</span>
+                </label>
+            </div>
+
+            <div class="checkbox"></div>
+        </div>
+    </div>
+</div>
+
+
+
+
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "main/base.html" %}
+
+{% block scripts %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel.css') }}">
+{% endblock %}
+
+{% block app_content %}
+
+    <div class="title">Шаблон-пример для админ панели</div>
+    <div class="div_grid_panel">
+        <div class="grid_panel">
+            <div>
+                <div class="title">Текст</div>
+                <div class="grid_block">
+                    <div>{{ main_text.title }}</div>
+                    <div>
+                        <form>
+                            <label for="input">{{ main_text.text }}</label>
+                            <input type="text" id="input" name="input">
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+
+            <div>
+                <div class="title">Фото</div>
+                {% for event in events %}
+                    <div class="grid_block_photo">
+                        {% set path = "images/events/" + events.id|string + ".png" %}
+                        <div><img src="{{ url_for("static", filename=path) }}" alt="" class=""></div>
+
+                        <div class="input__wrapper">
+                            <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
+                            <label for="block_photo" class="button">
+                                <span class="input__file_button">Изменить</span>
+                            </label>
+                        </div>
+                        <div class="button_delete" id="delete_photo">
+                            <label for="block_photo" class="button">
+                                <span class="input__file_button">Удалить</span>
+                            </label>
+                        </div>
+
+                        <div class="checkbox"></div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+
+
+
+{% endblock %}

@@ -13,36 +13,36 @@
     <h2 class="title_about">Партнёры</h2>
     <div class="block_img_block">
         {% for partner in partners %}
-            <a href="{{ partner.link }}">
-                <div class="block_img_partners">
+
+            <div class="block_img_partners">
+                <a href="{{ partner.link }}">
                     <img src="{{ url_for('static', filename='/images/partner/' + partner.id|string + '.png') }}"
-                          alt="{{ partner.name }}" class="img_img">
-                </div>
-                <!-- style="width: 200px; height:200px; object-fit: cover" -->
-            </a>
+                         alt="{{ partner.name }}" class="img_img">
+                </a>
+            </div>
+
+            <!-- style="width: 200px; height:200px; object-fit: cover" -->
         {% endfor %}
     </div>
 
     <!--Что есть-->
-    <h2 class="title_about">У нас есть(уточнить название категории)</h2>
+    <h2 class="title_about">Что есть</h2>
     <div class="block_fil">{{ about.text }}</div>
 
     <!--Сотрудники-->
     <h2 class="title_about">Сотрудники</h2>
     <div class="block_employees_block">
         {% for employee in employees %}
-            <div class="block_employees">
-{#                <img src="{{ url_for('static', filename='/images/employee/' + employee.id|string + '.png') }}"#}
-{#                     class="img_img">                #}
+            <figure class="block_employees">
                 <img src="{{ url_for('static', filename='/images/employee/123' + '.png') }}"
-                     class="img_img">
+                     alt="" class="img_img_img">
                 <figcaption>
                     <div class="name_employees">{{ employee.name }}</div>
                 </figcaption>
                 <figcaption>
                     <div class="position_employees">{{ employee.position }}</div>
                 </figcaption>
-            </div>
+            </figure>
         {% endfor %}
     </div>
 
