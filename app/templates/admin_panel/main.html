@@ -15,8 +15,9 @@
                     <div>{{ main_text.title }}</div>
                     <div>
                         <form>
-                            <label for="input"></label>
-                            <textarea id="input" name="input">{{ main_text.text }}</textarea>
+                            <label for="title">Описание</label>
+                            <input type="text" name="title" id="title" class="category_name"
+                                   value="{{main_text.text if main_text.text}}">
                         </form>
                     </div>
 

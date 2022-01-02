@@ -57,6 +57,22 @@ def service():
     return render_template('main/service.html', service=service, categories=get_categories(),
                            contacts_data=get_contacts_data())
 
+@bp.route('/service_test', methods=['GET','POST'])
+# @login_required
+def service_test():
+    service_id = request.args.get('service_id')
+
+    service = Service.query.filter_by(id=service_id).first()
+    if request.method == 'POST':
+        if request.form.get('mycheckbox') == '1':
+            service.status = 1
+        else:
+            service.status = 0
+    service.description = request.form.get('input_desc')
+    service.name = request.form.get('title')
+    db.session.commit()
+    return render_template('admin_panel/service.html', title='{}'.format(service.name),
+                           category=category, service=service, contacts_data=get_contacts_data())
 
 @bp.route('/about_2', methods=['GET'])
 def about():

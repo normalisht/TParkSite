@@ -6,21 +6,23 @@
 
 {% block app_content %}
 
-    <div class="title">Шаблон-пример для админ панели</div>
+    <div class="title">{{ service.title }}</div>
 
     <div class="grid_panel">
         <div>
             <div class="title">Текст</div>
             <div class="grid_block">
-                <div>{{ service.title }}</div>
 
                 <div>
                     <form>
-                        <label for="input_desc">Описание</label>
-                        <input type="text" id="input_desc" name="input_desc" value=service.description>
-{#                       Хз как, но нужно в значения импута засунуть из бд данные. JS без сомнения, займись этим#}
-                        <label for="input_price">Цена</label>
-                        <input type="text" id="input_price" name="input_price" value=service.price>
+                        <label for="title">Описание</label>
+                        <input type="text" name="title" id="title" class="category_name"
+                               value="{{ service.description }}">
+
+                        <label for="title">Цена</label>
+                        <input type="text" name="title" id="title" class="category_name"
+                               value="{{ service.price }}">
+
                     </form>
                 </div>
 
@@ -29,7 +31,8 @@
 
         <div>
             <div class="title">Фото</div>
-                <div class="grid_block">
+
+                <div class="grid_block_photo">
                     {% set path = "images/sevice/" + service.id|string + ".png" %}
                     <div><img src="{{ url_for("static", filename=path) }}" alt="" class=""></div>
 
@@ -47,7 +50,7 @@
 
                     <div class="checkbox"></div>
                 </div>
-            {% endfor %}
+
         </div>
     </div>
 

@@ -107,14 +107,21 @@ def category():
                            category=category, services=services)
 
 
-@bp.route('/service', methods=['GET'])
-@login_required
-def service():
-    id = request.args.get('id')
+@bp.route('/service_test', methods=['GET','POST'])
+# @login_required
+def service_test():
+    service_id = request.args.get('service_id')
 
     service = Service.query.filter_by(id=id).first()
-
-    return render_template('admin_panel/service.html', title='{}'.format(category.name),
+    if request.method == 'POST':
+        if request.form.get('mycheckbox') == '1':
+            service.status = 1
+        else:
+            service.status = 0
+    service.description = request.form.get('input_desc')
+    service.name = request.form.get('title')
+    db.session.commit()
+    return render_template('admin_panel/service.html', title='{}'.format(service.name),
                            category=category, service=service)
 
 
