@@ -52,11 +52,23 @@
 }
 
 .checkbox {
-    position: absolute;
+    position: relative;
     appearance: auto;
     -webkit-appearance: checkbox;
 }
 
+.description {
+}
+
+.grid_service {
+    display: grid;
+    grid-row-gap: 10px;
+}
+
+.category_name {
+    display: flex;
+    align-content: center;
+}
 
 /*"типа  кнопка 1"
 .input__file_button {
