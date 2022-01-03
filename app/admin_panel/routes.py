@@ -333,18 +333,18 @@ def update_employee():
 
 # обновляет данные тексте
 @bp.route('/update_text', methods=['POST'])
-@login_required
+# @login_required
 def update_text():
     text = Text.query.filter_by(id=request.form['id']).first()
 
-    if getattr(text, 'title') != request.form['title']:
-        setattr(text, 'title', request.form['title'])
+    # if getattr(text, 'title') != request.form['title']:
+    #     setattr(text, 'title', request.form['title'])
 
     if getattr(text, 'text') != request.form['text']:
         setattr(text, 'text', request.form['text'])
 
-    if getattr(text, 'photo') != request.form['photo']:
-        setattr(text, 'photo', request.form['photo'])
+    # if getattr(text, 'photo') != request.form['photo']:
+    #     setattr(text, 'photo', request.form['photo'])
 
     return jsonify({'result': 'success'})
 
