@@ -6,7 +6,6 @@
 
 {% block app_content %}
 
-    <div class="title">{{ service.title }}</div>
 
     <div class="grid_panel">
         <div>
@@ -14,15 +13,21 @@
             <div class="grid_block">
 
                 <div>
-                    <form>
-                        <label for="title">Описание</label>
+                    <form method="POST">
+
+                        <label for="title">Название услуги</label>
                         <input type="text" name="title" id="title" class="category_name"
-                               value="{{ service.description }}">
+                               value="{{ service.title if service.title }}">
+
+                        <label for="title">Описание</label>
+                        <input type="text" name="input_desc" id="input_desc" class="category_name"
+                               value="{{ service.description if service.description }}">
 
                         <label for="title">Цена</label>
-                        <input type="text" name="title" id="title" class="category_name"
-                               value="{{ service.price }}">
+                        <input type="text" name="input_price" id="input_price" class="category_name"
+                               value="{{ service.price if service.price }}">
 
+                        <input type="submit" value="Подтвердить">
                     </form>
                 </div>
 
@@ -32,24 +37,24 @@
         <div>
             <div class="title">Фото</div>
 
-                <div class="grid_block_photo">
-                    {% set path = "images/sevice/" + service.id|string + ".png" %}
-                    <div><img src="{{ url_for("static", filename=path) }}" alt="" class=""></div>
+            <div class="grid_block_photo">
+                {% set path = "images/sevice/" + service.id|string + ".png" %}
+                <div><img src="{{ url_for("static", filename=path) }}" alt="" class=""></div>
 
-                    <div class="input__wrapper">
-                        <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
-                        <label for="block_photo" class="button">
-                            <span class="input__file_button">Изменить</span>
-                        </label>
-                    </div>
-                    <div class="button_delete" id="delete_photo">
-                        <label for="block_photo" class="button">
-                            <span class="input__file_button">Удалить</span>
-                        </label>
-                    </div>
-
-                    <div class="checkbox"></div>
+                <div class="input__wrapper">
+                    <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
+                    <label for="block_photo" class="button">
+                        <span class="input__file_button">Изменить</span>
+                    </label>
                 </div>
+                <div class="button_delete" id="delete_photo">
+                    <label for="block_photo" class="button">
+                        <span class="input__file_button">Удалить</span>
+                    </label>
+                </div>
+
+                <div class="checkbox"></div>
+            </div>
 
         </div>
     </div>

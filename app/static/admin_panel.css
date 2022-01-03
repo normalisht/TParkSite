@@ -63,6 +63,7 @@
 .grid_service {
     display: grid;
     grid-row-gap: 10px;
+    margin-bottom:10px;
 }
 
 .category_name {
