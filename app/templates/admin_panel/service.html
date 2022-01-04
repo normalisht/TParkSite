@@ -17,15 +17,15 @@
 
                         <label for="title">Название услуги</label>
                         <input type="text" name="title" id="title" class="category_name"
-                               value="{{ service.title if service.title }}">
+                               value="{{ service.name}}">
 
-                        <label for="title">Описание</label>
+                        <label for="input_desc">Описание</label>
                         <input type="text" name="input_desc" id="input_desc" class="category_name"
-                               value="{{ service.description if service.description }}">
+                               value="{{ service.description }}">
 
-                        <label for="title">Цена</label>
+                        <label for="input_price">Цена</label>
                         <input type="text" name="input_price" id="input_price" class="category_name"
-                               value="{{ service.price if service.price }}">
+                               value="{{ service.price }}">
 
                         <input type="submit" value="Подтвердить">
                     </form>
