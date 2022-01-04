@@ -8,15 +8,6 @@ from sqlalchemy import create_engine
 engine = create_engine("sqlite:///T_Park.db")
 
 
-@bp.route('/admin_panel/main', methods=['GET'])
-def main():
-    main_text = Text.query.filter_by(title="main_text").first()
-    events = Event.query.all()
-
-    return render_template('admin_panel/main.html', title='Главная страница', main_text=main_text, events=events,
-                           contacts_data=get_contacts_data())
-
-
 @bp.route('/', methods=['GET'])
 @bp.route('/TPark', methods=['GET'])
 def index():
@@ -29,6 +20,15 @@ def index():
         events = events * 3
     return render_template('main/main.html', main_text=main_text, events=events,
                            categories=get_categories(), contacts_data=get_contacts_data())
+
+
+@bp.route('/admin_panel/main', methods=['GET'])
+def main():
+    main_text = Text.query.filter_by(title="main_text").first()
+    events = Event.query.all()
+
+    return render_template('admin_panel/main.html', title='Главная страница', main_text=main_text, events=events,
+                           contacts_data=get_contacts_data())
 
 
 @bp.route('/category', methods=['GET'])

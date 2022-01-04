@@ -71,6 +71,18 @@
     align-content: center;
 }
 
+.block_image {
+    max-width:20vw;
+    max-height: 20vh;
+}
+
+.image {
+    width: 100%;
+    height: 100%;
+
+
+}
+
 /*"типа  кнопка 1"
 .input__file_button {
     text-decoration: none;
