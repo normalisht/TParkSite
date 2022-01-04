@@ -8,15 +8,6 @@ from sqlalchemy import create_engine
 engine = create_engine("sqlite:///T_Park.db")
 
 
-@bp.route('/admin_panel/main', methods=['GET'])
-def main():
-    main_text = Text.query.filter_by(title="main_text").first()
-    events = Event.query.all()
-
-    return render_template('admin_panel/main.html', title='Главная страница', main_text=main_text, events=events,
-                           contacts_data=get_contacts_data())
-
-
 @bp.route('/', methods=['GET'])
 @bp.route('/TPark', methods=['GET'])
 def index():
@@ -29,6 +20,15 @@ def index():
         events = events * 3
     return render_template('main/main.html', main_text=main_text, events=events,
                            categories=get_categories(), contacts_data=get_contacts_data())
+
+
+@bp.route('/admin_panel/main', methods=['GET'])
+def main():
+    main_text = Text.query.filter_by(title="main_text").first()
+    events = Event.query.all()
+
+    return render_template('admin_panel/main.html', title='Главная страница', main_text=main_text, events=events,
+                           contacts_data=get_contacts_data())
 
 
 @bp.route('/category', methods=['GET'])
@@ -56,6 +56,21 @@ def service():
 
     return render_template('main/service.html', service=service, categories=get_categories(),
                            contacts_data=get_contacts_data())
+
+
+@bp.route('/service_test', methods=['GET', 'POST'])
+# @login_required
+def service_test():
+    service_id = request.args.get('service_id')
+
+    service = Service.query.filter_by(id=service_id).first()
+    if request.method == 'POST':
+        service.description = request.form.get('input_desc')
+        service.price = request.form.get('input_price')
+        service.name = request.form.get('title')
+        db.session.commit()
+    return render_template('admin_panel/service.html', title='{}'.format(service.name),
+                           category=category, service=service, contacts_data=get_contacts_data())
 
 
 @bp.route('/about_2', methods=['GET'])

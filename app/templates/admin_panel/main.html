@@ -15,8 +15,9 @@
                     <div>{{ main_text.title }}</div>
                     <div>
                         <form>
-                            <label for="input"></label>
-                            <textarea id="input" name="input">{{ main_text.text }}</textarea>
+                            <label for="title">Описание</label>
+                            <input type="text" name="title" id="title" class="category_name"
+                                   value="{{ main_text.text if main_text.text }}">
                         </form>
                     </div>
 
@@ -45,6 +46,28 @@
                         <div class="checkbox"></div>
                     </div>
                 {% endfor %}
+            {% set i = 0 %}
+                {% for i in range(2) %}
+                    <div class="grid_block_photo">
+                        {% set path = "images/staff/" + i|string + ".png" %}
+                        <div class="block_image"><img src="{{ url_for("static", filename=path) }}" alt="" class="image" ></div>
+
+                        <div class="input__wrapper">
+                            <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
+                            <label for="block_photo" class="button">
+                                <span class="input__file_button">Изменить</span>
+                            </label>
+                        </div>
+                        <div class="button_delete" id="delete_photo">
+                            <label for="block_photo" class="button">
+                                <span class="input__file_button">Удалить</span>
+                            </label>
+                        </div>
+
+                        <div class="checkbox"></div>
+                    </div>
+                {% endfor %}
+
             </div>
         </div>
     </div>
