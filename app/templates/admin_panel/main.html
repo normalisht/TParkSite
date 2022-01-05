@@ -15,9 +15,10 @@
                     <div>{{ main_text.title }}</div>
                     <div>
                         <form>
-                            <label for="title">Описание</label>
+                            <label for="title">Текст главной страницы</label>
                             <input type="text" name="title" id="title" class="category_name"
                                    value="{{ main_text.text if main_text.text }}">
+                            <input type="submit" value="Подтвердить">
                         </form>
                     </div>
 
@@ -26,10 +27,12 @@
 
             <div>
                 <div class="title">Фото</div>
-                {% for event in events %}
+                {% set i = 0 %}
+                {% for i in range(3) %}
                     <div class="grid_block_photo">
-                        {% set path = "images/events/" + events.id|string + ".png" %}
-                        <div><img src="{{ url_for("static", filename=path) }}" alt="" class=""></div>
+                        {% set path = "images/staff/" + i|string + "0.png" %}
+                        <div class="block_image"><img src="{{ url_for("static", filename=path) }}" alt="" class="image">
+                        </div>
 
                         <div class="input__wrapper">
                             <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
@@ -46,27 +49,11 @@
                         <div class="checkbox"></div>
                     </div>
                 {% endfor %}
-            {% set i = 0 %}
-                {% for i in range(2) %}
-                    <div class="grid_block_photo">
-                        {% set path = "images/staff/" + i|string + ".png" %}
-                        <div class="block_image"><img src="{{ url_for("static", filename=path) }}" alt="" class="image" ></div>
-
-                        <div class="input__wrapper">
-                            <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
-                            <label for="block_photo" class="button">
-                                <span class="input__file_button">Изменить</span>
-                            </label>
-                        </div>
-                        <div class="button_delete" id="delete_photo">
-                            <label for="block_photo" class="button">
-                                <span class="input__file_button">Удалить</span>
-                            </label>
-                        </div>
-
-                        <div class="checkbox"></div>
-                    </div>
-                {% endfor %}
+                <div class="input__file_button" id="out">
+                    <label for="out" class="button_events">
+                        <span>Events</span>
+                    </label>
+                </div>
 
             </div>
         </div>

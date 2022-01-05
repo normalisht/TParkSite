@@ -38,7 +38,7 @@
                             </div>
                             <div class="slider__item">
                                 <img class="slider__img" alt=""
-                                     src="{{ url_for('static',filename='/images/staff/.png' ) }}">
+                                     src="{{ url_for('static',filename='/images/staff/0.png' ) }}">
                             </div>
                         {% endfor %}
                     </div>
@@ -62,7 +62,7 @@
                     <div class="slider__wrapper">
                         <div class="slider__items">
                             {% for event in events %}
-                                {% set path = "static/images/events/" + event.id|string + ".png" %}
+                                {% set path = "static/images/events/" + event.id|string + "0.png" %}
                                 <div class="slider__item">
                                     <!-- Контент 1 слайда -->
                                     <span style="font-size: 60px; position: absolute; right: 20px; top: 15px;

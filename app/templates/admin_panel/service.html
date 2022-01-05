@@ -42,7 +42,7 @@
             <div class="title">Фото</div>
 
             <div class="grid_block_photo">
-                {% set path = "images/sevice/" + service.id|string + ".png" %}
+                {% set path = "images/sevice/" + service.id|string + "0.png" %}
                 <div><img src="{{ url_for("static", filename=path) }}" alt="" class=""></div>
 
                 <div class="input__wrapper">
