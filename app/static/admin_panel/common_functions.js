@@ -7,13 +7,6 @@ function launch(options) {
         })
     })
 
-    // активирует кнопки изменения услуги
-    $('[type=service]').each(function(index, element) {
-        element.click(function () {
-            change_service(element.attr('filed'))
-        })
-    })
-
     // активирует кнопки изменения фото
 }
 
@@ -26,38 +19,6 @@ function create_input(id, type, value) {
 
     return element
 }
-
-
-function change_service(id) {
-    let service_element = $(`#${id}`),
-        price = change_service.price,
-        name = change_service.name,
-        description = change_service.description,
-        short_description = change_service.short_description,
-        status = change_service.status,
-        // categories = change_service.categories,
-        number = change_service.number
-
-    if (service_element.attr('status') === 'static') {
-
-        service_element.after(create_input(`${id}_price`, 'price', price))
-
-
-
-    } else {
-
-
-
-    }
-}
-change_service.name = null
-change_service.price = null
-change_service.short_description = null
-change_service.description = null
-change_service.status = null
-change_service.categories = null
-change_service.number = null
-
 
 function change_text(id) {
 
