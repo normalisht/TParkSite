@@ -16,7 +16,7 @@
                 <input type="text" name="title" id="title" class="category_name"
                        value="{{category.name if category.name}}">
                 {% for msg in get_flashed_messages() %}
-                <div class="flash">{{msg}}</div>
+                    <div class="flash">{{msg}}</div>
                 {% endfor %}
                 <label for="input_desc">Описание</label>
                 <input type="text" id="input_desc" name="input_desc" class="description"
@@ -28,20 +28,14 @@
                 <input type="radio" id="checkbox_2" class="checkbox" name="mycheckbox" value="0" {{"checked" if
                 category.status == 0 else ""}}/>
                 {% for element in services %}
-                {% set service = element.service %}
-                Название услуги
-                <input type="text" name="service_name" value="{{service.name if service.name}}">
-                Краткое описание
-                <input type="text" name="service_description_{{service.id}}"
-                       value="{{service.short_description if service.short_description}}">
-                Цена
-                <input type="text" name="price" value="{{service.prices[0] if service.prices[0]}}">
-                Отображать
-                <input type="radio" class="checkbox" name="service_checkbox_{{service.id}}" value="1" {{"checked" if
-                service.status else ""}}/>
-                Скрыть
-                <input type="radio" class="checkbox" name="service_checkbox_{{service.id}}" value="0" {{"checked" if
-                service.status == 0 else ""}}/>
+                    {% set service = element.service %}
+                    <a href="{{ url_for('main.service_test') }}?service_id={{ service.id }}">{{ service.name if service.name }}</a>
+                    Отображать
+                    <input type="radio" class="checkbox" name="service_checkbox_{{service.id}}" value="1" {{"checked" if
+                    service.status else ""}}/>
+                    Скрыть
+                    <input type="radio" class="checkbox" name="service_checkbox_{{service.id}}" value="0" {{"checked" if
+                    service.status == 0 else ""}}/>
                 {% endfor %}
             </div>
             <input type="submit" value="Подтвердить">
