@@ -10,12 +10,13 @@
     <div class="div_grid_panel">
         <div class="grid_panel">
             <div>
-                <div class="title">О нас</div>
                 <div class="grid_block">
                     <div>
                         <form>
-                            <label for="input">{{ filosofi.text }}</label>
-                            <input type="text" id="input" name="input">
+                            <label for="title">О нас</label>
+                            <input type="text" name="title" id="title" class=""
+                                   value="{{ filosofi.text if filosofi.text }}">
+                            <input type="submit" value="Подтвердить">
                         </form>
                     </div>
                 </div>
