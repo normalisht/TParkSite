@@ -42,7 +42,7 @@
             <div class="title">Фото</div>
 
             <div class="grid_block_photo">
-                {% set path = "images/sevice/" + service.id|string + "0.png" %}
+                {% set path = "images/sevice/" + service.id|string + ".png" %}
                 <div><img src="{{ url_for("static", filename=path) }}" alt="" class=""></div>
 
                 <div class="input__wrapper">
@@ -51,7 +51,7 @@
                         <span class="input__file_button">Изменить</span>
                     </label>
                 </div>
-                <div class="button_delete" id="delete_photo">
+                <div class="input__wrapper" id="delete_photo">
                     <label for="block_photo" class="button">
                         <span class="input__file_button">Удалить</span>
                     </label>

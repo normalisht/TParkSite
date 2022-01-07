@@ -31,12 +31,20 @@
     display: grid;
     grid-template-columns: 50% 25% 25%;
     min-height:100px;
+    align-self: center;
 }
 
 .input__wrapper {
-
+    display: flex;
+    align-items: center;
 }
 
+.input__wrapper_2 {
+    display: flex;
+    align-items: center;
+
+
+}
 .input__file {
     opacity: 0;
     visibility: hidden;
