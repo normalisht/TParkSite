@@ -100,6 +100,8 @@ def category_test():
                 element.service.status = 1
             else:
                 element.service.status = 0
+        category.description = request.form.get('input_desc')
+        category.name = request.form.get('title')
         db.session.commit()
     return render_template('admin_panel/category.html', title='{}'.format(category.name),
                            category=category, services=services, contacts_data=get_contacts_data())
