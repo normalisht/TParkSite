@@ -61,16 +61,25 @@
                 <div class="slider__container">
                     <div class="slider__wrapper">
                         <div class="slider__items">
+                            {% set i = namespace(a=0) %}
                             {% for event in events %}
-                                {% set path = "static/images/events/" + event.id|string + "0.png" %}
+                                {% set path = "static/images/events/" + event.id|string + ".png" %}
                                 <div class="slider__item">
-                                    <!-- Контент 1 слайда -->
-                                    <span style="font-size: 60px; position: absolute; right: 20px; top: 15px;
-                                    color: white; z-index: 10">20 ноября
-                                    <div style="position: absolute; z-index: 8; top: 0; width: 100%; height: 100%; background-color: black; opacity: 0.1"></div></span>
-                                    <img class="slider__img" alt=""
-                                         src="{{ url_for('static',filename='/images/events/1.png') }}">
+                                    <div style="width: 100%;">
+                                        <!-- Контент 1 слайда -->
+                                        <span id="event{{ i.a }}" data-date-month="{{ event.date.strftime('%m') }}"
+                                              class="event_info event_date">{{ event.date.strftime('%d') }}
+                                        <div></div></span>
+                                        <span class="event_info event_name">{{ event.name }}
+                                        <div></div></span>
+                                        <img class="slider__img" alt=""
+                                             src="{{ url_for('static',filename='/images/events/1.png') }}">
+                                        <div class="event_text">
+                                            {{ event.description }}
+                                        </div>
+                                    </div>
                                 </div>
+                                {% set i.a = i.a + 1 %}
                             {% endfor %}
                         </div>
                     </div>
@@ -81,5 +90,4 @@
             </div>
         </div>
     </div>
-
 {% endblock %}

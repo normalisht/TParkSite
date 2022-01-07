@@ -50,11 +50,16 @@
                             <div class="price" style="display: flex; justify-content: space-between; margin-right: 8px">
                                 <div>{{ service.name }}</div>
                                 <div style="display: flex;">
-                                    <div style="margin-right: 5px;">{{ service.prices[0] }}</div>
+                                    <div id="prices{{ service.name }}" style="margin-right: 5px;"></div>
                                     {% if service.short_description %}
                                         <img class="price_switch" src="{{ url_for('static', filename='down.svg') }}"
                                              alt="">
                                     {% endif %}
+                                    <script>
+                                        x = document.getElementById('prices{{ service.name }}')
+                                        x.innerHTML = `{{ service.prices[0] }}`
+                                        x.innerHTML = x.textContent
+                                    </script>
                                 </div>
                             </div>
                             {% if service.short_description %}

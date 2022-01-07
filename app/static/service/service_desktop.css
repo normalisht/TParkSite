@@ -1,5 +1,22 @@
 /*Desktop*/
 
+
+
+
+.block_price{
+    display:block;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    max-width: 50vw;
+    min-width: 100px;
+    width: max-content;
+    margin: 10px auto;
+    border-radius: 2px;
+    font-size: 1.6rem;
+    padding: 4px;
+}
+
 .block_service {
     display:grid;
     margin: 0 auto;
@@ -15,8 +32,8 @@
 
 .img_service {
     object-fit: cover;
-    width: clamp(150px, 40vw, 800px);
-    height: clamp(100px, 40vh, 400px);
+    width: 100%;
+    height: 100%;
     margin: 0 auto;
 }
 

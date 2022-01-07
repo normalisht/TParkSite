@@ -1,6 +1,95 @@
 <!DOCTYPE html>
 <html id="html" lang="ru">
 <head id="head">
+    <style>
+        /* scrollbar */
+        *::-webkit-scrollbar-track {
+            border-radius: 6px;
+        }
+
+        *::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            border-radius: 8px;
+            background-color: #6a7d9b;
+        }
+
+
+        .loader_container {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            z-index: 100000;
+        }
+
+
+        .loader,
+        .loader:before,
+        .loader:after {
+            background: #02b002;
+            -webkit-animation: load1 1s infinite ease-in-out;
+            animation: load1 1s infinite ease-in-out;
+            width: 1em;
+            height: 4em;
+        }
+        .loader {
+            display: flex;
+            position: relative;
+            color: #02b002;
+            text-indent: -9999em;
+            top: 50%;
+            transform: translate(0, -50%);
+            margin: 0 auto;
+            font-size: 11px;
+            -webkit-animation-delay: -0.16s;
+            animation-delay: -0.16s;
+        }
+        .loader:before,
+        .loader:after {
+            position: absolute;
+            top: 0;
+            content: '';
+        }
+        .loader:before {
+            left: -1.5em;
+            -webkit-animation-delay: -0.32s;
+            animation-delay: -0.32s;
+        }
+        .loader:after {
+            left: 1.5em;
+        }
+        @-webkit-keyframes load1 {
+            0%,
+            80%,
+            100% {
+                box-shadow: 0 0;
+                height: 4em;
+            }
+            40% {
+                box-shadow: 0 -2em;
+                height: 5em;
+            }
+        }
+        @keyframes load1 {
+            0%,
+            80%,
+            100% {
+                box-shadow: 0 0;
+                height: 4em;
+            }
+            40% {
+                box-shadow: 0 -2em;
+                height: 5em;
+            }
+        }
+
+    </style>
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -16,23 +105,6 @@
     <script defer src="{{ url_for('static', filename='base.js') }}"></script>
     <script defer type="text/javascript" src="{{ url_for('static', filename='modal_window.js') }}"></script>
     {% block scripts %}{% endblock %}
-    <script>
-        window.addEventListener('load', function () {
-            let preloader = document.getElementById('preloader')
-
-            preloader.style.opacity = '0'
-            setTimeout(() => {
-                preloader.style.display = 'none'
-            }, 900)
-
-        })
-
-        {#        window.addEventListener('unload', function () {
-                    let preloader = document.getElementById('preloader')
-                    preloader.style.display = 'block'
-                    preloader.style.opacity = '1'
-                })#}
-    </script>
 
     {% if title %}
         <title>{{ title }}</title>
@@ -43,23 +115,32 @@
 
 <body id="body">
 
+<div id="loader" class="loader_container">
+    <div class="loader">loading</div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        setTimeout(function () {
+            let loader = $('#loader')
+            loader.animate({'opacity': '0'}, 500)
+            setTimeout(function () {
+                loader.css('display', 'none')
+            }, 500)
+            console.log(loader)
+        }, 300)
+    })
+
+    let loader = document.getElementById('loader')
+    loader.offsetTop = 0
+
+</script>
+
 {% set geolocation = contacts_data.geolocation %}
 {% set address = contacts_data.address %}
 {% set phone_numbers = contacts_data.phone_numbers %}
 {% set vk = contacts_data.media[0] %}
 {% set geolocation = contacts_data.media[1] %}
-
-
-<div id="preloader" class="preloader">
-    <div class="loader-container circle-pulse-multiple">
-        <div class="loader">
-            <div class="circle-1"></div>
-            <div class="circle-2"></div>
-            <div class="circle-3"></div>
-        </div>
-    </div>
-    <div class="preloader-overlay"></div>
-</div>
 
 <div id="upper_container" class="upper_container">
     <div id="upper" class="upper">

@@ -1,16 +1,30 @@
 /*Phone*/
 
+.block_price {
+    margin: 0 auto;
+}
 
 .block_service {
-    display:grid;
-    margin: 0 auto;
-    grid-template-columns: 1fr;
-    align-items: center;
-    border-radius: 5px;
-    max-width:90vw;
     /*background-color:var(--body-background-color);*/
     /*box-shadow: 2px 4px 16px #ccc;*/
-    z-index:2;
+    z-index: 2;
+}
+
+.block_img {
+
+}
+
+.block_price {
+    display: block;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    width: 100%;
+    padding: 2px;
+    margin: 10px auto;
+    border-radius: 2px;
+    font-size: 1.5rem;
+    word-wrap: break-word;
 }
 
 .img_service {
@@ -26,7 +40,7 @@
 .block_text {
     max-width: 600px;
     text-align: center;
-    margin: 10px  auto;
+    margin: 10px auto;
     font-size: 1.2rem;
 }
 

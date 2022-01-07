@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', set_vw)
 window.addEventListener('resize', set_vw)
 window.addEventListener('orientationchange', set_vw)
 
+
 document.addEventListener("DOMContentLoaded", top_footer)
 window.addEventListener('resize', top_footer)
 window.addEventListener("orientationchange", top_footer)
@@ -15,6 +16,19 @@ window.addEventListener("change", main_block_height)
 window.addEventListener('resize', generate_upper)
 window.addEventListener("orientationchange", generate_upper)
 document.addEventListener("DOMContentLoaded", generate_upper)
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    $('.slider__control_prev').each(function (index, element) {
+        element.click()
+    })
+    setTimeout(function() {
+        $('.slider__control_next').each(function (index, element) {
+            element.click()
+        })
+    }, 300)
+})
+
 
 setInterval(top_footer, 1)
 
@@ -272,3 +286,19 @@ function main_block_height() {
         main_block.css({'min-height': '0'})
     }
 }
+
+
+
+let months = ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля',
+    'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря']
+
+document.addEventListener('DOMContentLoaded', function () {
+    $('.event_date').each(function (index, element) {
+        let content = element.innerHTML
+
+        content += ' ' + months[element.getAttribute(
+            'data-date-month') - 1]
+
+        element.innerHTML = content
+    })
+})
