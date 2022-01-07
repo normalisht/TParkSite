@@ -40,17 +40,19 @@
                     <div class="grid_block_photo">
                         {% set path = "/images/partner/" + partner.id|string + ".png" %}
                         <figure class="img__employ">
-                        <img src="{{ url_for("static", filename=path) }}" alt="{{ partner.name }}" class="partimg">
+                            <img src="{{ url_for("static", filename=path) }}" alt="{{ partner.name }}" class="partimg">
                             <figcaption>
-                                <div class="title">Ссылка  на партнера</div>
+                                <div class="title">Ссылка на партнера</div>
                             </figcaption>
-                            <figcaption>
-                                <input type="text" name="title" id="title" class=""
-                                    value="{{ partner.link if partner.link }}">
-                            </figcaption>
-                            <figcaption>
-                                <input type="submit" value="Подтвердить">
-                            </figcaption>
+                            <form>
+                                <figcaption>
+                                    <input type="text" name="title" id="title" class=""
+                                           value="{{ partner.link if partner.link }}">
+                                </figcaption>
+                                <figcaption>
+                                    <input type="submit" value="Подтвердить">
+                                </figcaption>
+                            </form>
                         </figure>
 
                         <div class="input__wrapper">
@@ -75,24 +77,26 @@
                         {% set path = "images/employee/" + employee.id|string + ".png" %}
                         <figure class="img__employ">
                             <img src="{{ url_for("static", filename=path) }}" alt="" class="emplimg">
-
-                        <figcaption>
-                            <div class="name_employees">
-                                ФИО
-                                <input type="text" name="title" id="title" class=""
-                                      value="{{ employee.name if employee.name }}">
-                            </div>
-                        </figcaption>
-                        <figcaption>
-                            <div class="position_employees">
-                                Должность
-                                <input type="text" name="title" id="title" class=""
-                                      value="{{ employee.position if employee.position }}">
-                            </div>
-                        </figcaption>
-                        <figcaption>
-                                <input type="submit" value="Подтвердить">
-                        </figcaption>
+                            <form>
+                                <figcaption>ФИО</figcaption>
+                                <figcaption>
+                                    <input type="text" name="title" id="title" class=""
+                                           value="{{ employee.name if employee.name }}">
+                                </figcaption>
+                                <figcaption>
+                                    <input type="submit" value="Подтвердить">
+                                </figcaption>
+                            </form>
+                            <form>
+                                <figcaption>
+                                    <figcaption>Должность</figcaption>
+                                    <input type="text" name="title" id="title" class=""
+                                           value="{{ employee.position if employee.position }}">
+                                </figcaption>
+                                <figcaption>
+                                    <input type="submit" value="Подтвердить">
+                                </figcaption>
+                            </form>
                         </figure>
 
                         <div class="input__wrapper">
