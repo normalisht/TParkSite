@@ -12,6 +12,7 @@
             <div>
                 <div class="grid_block">
                     <div>
+                        <div class="title">Текст</div>
                         <form>
                             <label for="title">О нас</label>
                             <input type="text" name="title" id="title" class=""
@@ -21,12 +22,13 @@
                     </div>
                 </div>
 
-                <div class="title">Что есть</div>
                 <div class="grid_block">
                     <div>
                         <form>
-                            <label for="input">{{ about.text }}</label>
-                            <input type="text" id="input" name="input">
+                            <label for="title">Что есть</label>
+                            <input type="text" name="title" id="title" class=""
+                                   value="{{ about.text if about.text }}">
+                            <input type="submit" value="Подтвердить">
                         </form>
                     </div>
                 </div>
@@ -37,7 +39,19 @@
                 {% for partner in partners %}
                     <div class="grid_block_photo">
                         {% set path = "/images/partner/" + partners.id|string + ".png" %}
-                        <div><img src="{{ url_for("static", filename=path) }}" alt="" class=""></div>
+                        <figure class="img__employ">
+                        <img src="{{ url_for("static", filename=path) }}" alt="" class="">
+                            <figcaption>
+                                <div class="title">Ссылка  на партнера</div>
+                            </figcaption>
+                            <figcaption>
+                                <input type="text" name="title" id="title" class=""
+                                    value="{{ partner.link if partner.link }}">
+                            </figcaption>
+                            <figcaption>
+                                <input type="submit" value="Подтвердить">
+                            </figcaption>
+                        </figure>
 
                         <div class="input__wrapper">
                             <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
@@ -63,10 +77,21 @@
                             <img src="{{ url_for("static", filename=path) }}" alt="" class="">
 
                         <figcaption>
-                            <div class="name_employees">{{ employee.name }}<input type="text" id="input" name="input"></div>
+                            <div class="name_employees">
+                                ФИО
+                                <input type="text" name="title" id="title" class=""
+                                      value="{{ employee.name if employee.name }}">
+                            </div>
                         </figcaption>
                         <figcaption>
-                            <div class="position_employees">{{ employee.position }}<input type="text" id="input" name="input"></div>
+                            <div class="position_employees">
+                                Должность
+                                <input type="text" name="title" id="title" class=""
+                                      value="{{ employee.position if employee.position }}">
+                            </div>
+                        </figcaption>
+                        <figcaption>
+                                <input type="submit" value="Подтвердить">
                         </figcaption>
                         </figure>
 

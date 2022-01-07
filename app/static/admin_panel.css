@@ -22,7 +22,7 @@
 
 .grid_block {
     display: grid;
-    grid-template-columns: 50% 50%;
+    grid-template-columns: 100%;
     min-height:100px;
     justify-items: center;
 }
@@ -31,12 +31,20 @@
     display: grid;
     grid-template-columns: 50% 25% 25%;
     min-height:100px;
+    align-self: center;
 }
 
 .input__wrapper {
-
+    display: flex;
+    align-items: center;
 }
 
+.input__wrapper_2 {
+    display: flex;
+    align-items: center;
+
+
+}
 .input__file {
     opacity: 0;
     visibility: hidden;
@@ -52,11 +60,44 @@
 }
 
 .checkbox {
-    position: absolute;
+    position: relative;
     appearance: auto;
     -webkit-appearance: checkbox;
 }
 
+.description {
+}
+
+.grid_service {
+    display: grid;
+    grid-row-gap: 10px;
+    margin-bottom:10px;
+}
+
+.category_name {
+    display: flex;
+    align-content: center;
+    margin-bottom: 10px;
+}
+
+.block_image {
+    max-width:20vw;
+    max-height: 20vh;
+}
+
+.image {
+    width: 100%;
+    height: 100%;
+
+
+}
+
+
+.button_events {
+    margin: 0 auto;
+
+
+}
 
 /*"типа  кнопка 1"
 .input__file_button {
