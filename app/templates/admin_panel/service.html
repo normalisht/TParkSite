@@ -19,6 +19,10 @@
                         <input type="text" name="title" id="title" class="category_name"
                                value="{{ service.name}}">
 
+                        <label for="input_desc">Краткое описание</label>
+                        <input type="text" name="input_short_desc" id="input_short_desc" class="category_name"
+                               value="{{ service.short_description }}">
+
                         <label for="input_desc">Описание</label>
                         <input type="text" name="input_desc" id="input_desc" class="category_name"
                                value="{{ service.description }}">
@@ -38,7 +42,7 @@
             <div class="title">Фото</div>
 
             <div class="grid_block_photo">
-                {% set path = "images/sevice/" + service.id|string + ".png" %}
+                {% set path = "images/sevice/" + service.id|string + "0.png" %}
                 <div><img src="{{ url_for("static", filename=path) }}" alt="" class=""></div>
 
                 <div class="input__wrapper">

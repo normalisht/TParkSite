@@ -35,7 +35,7 @@
                 <div class="title">Партнёры</div>
                 {% for partner in partners %}
                     <div class="grid_block_photo">
-                        {% set path = "/images/partner/" + partners.id|string + ".png" %}
+                        {% set path = "/images/partner/" + partners.id|string + "0.png" %}
                         <div><img src="{{ url_for("static", filename=path) }}" alt="" class=""></div>
 
                         <div class="input__wrapper">
@@ -57,7 +57,7 @@
                 <div class="title">Сотрудники</div>
                 {% for employee in employees %}
                     <div class="grid_block_photo">
-                        {% set path = "images/employee/" + employee.id|string + ".png" %}
+                        {% set path = "images/employee/" + employee.id|string + "0.png" %}
                         <figure class="img__employ">
                             <img src="{{ url_for("static", filename=path) }}" alt="" class="">
 

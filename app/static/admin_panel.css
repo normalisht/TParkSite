@@ -69,6 +69,7 @@
 .category_name {
     display: flex;
     align-content: center;
+    padding-bottom: 10px;
 }
 
 .block_image {
@@ -79,6 +80,13 @@
 .image {
     width: 100%;
     height: 100%;
+
+
+}
+
+
+.button_events {
+    margin: 0 auto;
 
 
 }
