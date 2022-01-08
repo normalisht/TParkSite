@@ -135,6 +135,7 @@
 /* Типа Кнопка 2*/
 
 .input__file_button {
+
     text-decoration: none;
     color: black;
     padding: 6px;
@@ -165,3 +166,14 @@
 .position_employees {
     text-align: left;
 }
+
+.emplimg {
+    width: 70%;
+    height: 70%;
+}
+
+.partimg {
+    width: 150px;
+    height: 150px;
+}
+
