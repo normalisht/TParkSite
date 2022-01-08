@@ -27,7 +27,7 @@
     transform: rotate(-180deg);
 }
 
-.button_2_1 {
+.button_5 {
     margin: 0 auto;
     width: calc(100 * var(--vw));
     font-family: 'Arial', sans-serif;
@@ -45,6 +45,7 @@
 
 .description {
     text-align: left;
+    font-size: 18px;
     margin-left: 0;
     padding-left: 0;
     color: black;

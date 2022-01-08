@@ -4,10 +4,10 @@
     align-items: flex-start;
     white-space: normal;
     display: grid;
-    /*grid-template-columns: repeat(1, minmax(100px, 700px));*/
-    grid-template-columns: repeat(2, minmax(100px, 500px));
-    grid-row-gap: 30px;
-    grid-column-gap: 50px;
+    grid-template-columns: repeat(1, minmax(100px, 700px));
+    /*grid-template-columns: repeat(2, minmax(100px, 500px));*/
+    /*grid-row-gap: 30px;*/
+    /*grid-column-gap: 50px;*/
 }
 
 .content {
@@ -15,11 +15,17 @@
     text-align: center;
 }
 
+.category_description {
+    margin: 0 auto -20px;
+    width: min(95%, 700px);
+}
+
 .text {
-    display: flex;
+    padding-top: 4px;
+    margin-left: 2px;
     position: relative;
-    justify-content: center;
-    font-size: 16px;
+    text-align: left;
+    font-size: 22px;
 }
 
 /*
@@ -42,7 +48,8 @@
     width: 20px;
     object-fit: cover;
     transition: all 0.5s;
-    filter: invert(1); /* убрать при другом варианте */
+    filter: invert(0); /* убрать при другом варианте */
+    /*z-index: 5;*/
 }
 
 .price_switch_active {
@@ -337,19 +344,17 @@
 
 .description {
     padding-top: 3px;
+    margin-left: -2px;
     text-align: left;
     cursor: default;
     z-index: 0;
-    color: #eeeeee;
+    color: black;
     transition: color 0.25s;
+    font-size: 20px;
 }
 
 .button_5:first-child {
     padding-top: 15px;
-}
-
-.detailed {
-    color: white;
 }
 
 .button_2:hover .detailed {
@@ -358,7 +363,8 @@
 }
 
 .detailed {
-    /*color: black*/
-    color: white;
+    color: black;
+    text-decoration: underline;
+    /*color: white;*/
     border-bottom: 1px solid white;
 }
