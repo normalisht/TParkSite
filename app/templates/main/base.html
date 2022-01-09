@@ -37,6 +37,7 @@
             width: 1em;
             height: 4em;
         }
+
         .loader {
             display: flex;
             position: relative;
@@ -49,20 +50,24 @@
             -webkit-animation-delay: -0.16s;
             animation-delay: -0.16s;
         }
+
         .loader:before,
         .loader:after {
             position: absolute;
             top: 0;
             content: '';
         }
+
         .loader:before {
             left: -1.5em;
             -webkit-animation-delay: -0.32s;
             animation-delay: -0.32s;
         }
+
         .loader:after {
             left: 1.5em;
         }
+
         @-webkit-keyframes load1 {
             0%,
             80%,
@@ -75,6 +80,7 @@
                 height: 5em;
             }
         }
+
         @keyframes load1 {
             0%,
             80%,
@@ -150,86 +156,92 @@
             </a>
         </div>
         <div id='navigation_buttons' class="block_buttons">
-            <div class="button_main"
-                 data-modal-window-toggle="#services-modal-win">
-                <div id="services-button">
-                    Услуги
+            <div style="display: flex; margin-top: 15px;">
+                <div class="button_main"
+                     data-modal-window-toggle="#services-modal-win">
+                    <div id="services-button">
+                        Услуги
+                    </div>
+                    <!--Модальные окно/выпадающее меню -->
+                    <div id="services-modal-win" class="modal submenu">
+                        <div class="modal-window">
+                            {% for category in categories %}
+                                {% if category.status %}
+                                    <div class="modal-item submenu-item">
+                                        <a href="{{ url_for('main.category') }}?category_id={{ category.id }}">
+                                            {{ category.name }}
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                            <close class="btn-close-modal-window">
+                                <img src="{{ url_for('static', filename='cross.png') }}" alt="X">
+                            </close>
+                        </div>
+                        <div class="overlay"></div>
+                    </div>
                 </div>
-                <!--Модальные окно/выпадающее меню -->
-                <div id="services-modal-win" class="modal submenu">
-                    <div class="modal-window">
-                        {% for category in categories %}
-                            {% if category.status %}
-                                <div class="modal-item submenu-item">
-                                    <a href="{{ url_for('main.category') }}?category_id={{ category.id }}">
-                                        {{ category.name }}
+                <a id="about-us-button" class="button_main button_main_middle about_a"
+                   href="{{ url_for('main.about') }}">
+                    <div href="{{ url_for('main.about') }}" class="">
+                        О нас
+                    </div>
+                </a>
+                <div class="button_main" data-modal-window-toggle="#contacts-modal-win">
+                    <div id="contact-button">
+                        Контакты
+                    </div>
+                    <div id="contacts-modal-win" class="modal submenu contacts">
+                        <div class="modal-window">
+                            <div class="modal-item submenu-item">
+                                <div class="geolocation" style="align-items: center">
+                                    <a href="{{ geolocation }}" target="_blank" style="color: black">Мы на карте
+                                        <img id="geo" class="geo" src="{{ url_for('static', filename='geo.png') }}"
+                                             alt="">
                                     </a>
                                 </div>
-                            {% endif %}
-                        {% endfor %}
-                        <close class="btn-close-modal-window">
-                            <img src="{{ url_for('static', filename='cross.png') }}" alt="X">
-                        </close>
+                            </div>
+                            <div class="modal-item submenu-item">
+                                <div class="address">Адрес: {{ address }}</div>
+                            </div>
+                            {% for number in phone_numbers %}
+                                <div class="modal-item submenu-item">
+                                    <a style='text-decoration: none'
+                                       href="https://wa.me/7{{ number }}">+7{{ number }}</a>
+                                </div>
+                            {% endfor %}
+                            <div class="modal-item submenu-item media">
+                                <div class="social">
+                                    <ul class="social-icons">
+                                        <li><a class="vk" href="{{ vk }}" target="_blank"><i class="fa fa-vk"></i></a>
+                                        </li>
+                                        <li><a class="whatsapp" href="https://wa.me/7{{ number }}" target="_blank">
+                                            <i class="fa fa-whatsapp"></i></a></li>
+                                        <li><a class="insta" href="{{ insta }}" target="_blank"><i
+                                                class="fa fa-instagram"></i></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <close class="btn-close-modal-window">
+                                <img src="{{ url_for('static', filename='cross.png') }}" alt="X">
+                            </close>
+                        </div>
+                        <div class="overlay"></div>
                     </div>
-                    <div class="overlay"></div>
+                    <!--конец модальных окон-->
                 </div>
             </div>
-            <a id="about-us-button" class="button_main button_main_middle about_a" href="{{ url_for('main.about') }}">
-                <div href="{{ url_for('main.about') }}" class="">
-                    О нас
-                </div>
-            </a>
-            <div class="button_main" data-modal-window-toggle="#contacts-modal-win">
-                <div id="contact-button">
-                    Контакты
-                </div>
-                <div id="contacts-modal-win" class="modal submenu contacts">
-                    <div class="modal-window">
-                        <div class="modal-item submenu-item">
-                            <div class="geolocation" style="align-items: center">
-                                <a href="{{ geolocation }}" target="_blank" style="color: black">Мы на карте
-                                    <img id="geo" class="geo" src="{{ url_for('static', filename='geo.png') }}" alt="">
-                                </a>
-                            </div>
-                        </div>
-                        <div class="modal-item submenu-item">
-                            <div class="address">Адрес: {{ address }}</div>
-                        </div>
-                        {% for number in phone_numbers %}
-                            <div class="modal-item submenu-item">
-                                <a style='text-decoration: none' href="https://wa.me/7{{ number }}">+7{{ number }}</a>
-                            </div>
-                        {% endfor %}
-                        <div class="modal-item submenu-item media">
-                            <div class="social">
-                                <ul class="social-icons">
-                                    <li><a class="vk" href="{{ vk }}" target="_blank"><i class="fa fa-vk"></i></a></li>
-                                    <li><a class="whatsapp" href="https://wa.me/7{{ number }}" target="_blank">
-                                        <i class="fa fa-whatsapp"></i></a></li>
-                                    <li><a class="insta" href="{{ insta }}" target="_blank"><i
-                                            class="fa fa-instagram"></i></a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <close class="btn-close-modal-window">
-                            <img src="{{ url_for('static', filename='cross.png') }}" alt="X">
-                        </close>
-                    </div>
-                    <div class="overlay"></div>
-                </div>
-                <!--конец модальных окон-->
+            <div id="phone_numbers" class="block_numbers">
+                <div>+7(920)898-46-80</div>
+                <div>+7(920)898-46-80</div>
             </div>
         </div>
 
         <div id="upper_block_info" class="block_info">
             <div class='name'>
-                <div>Тренинг-Парк</div>
-                <div>&nbsp;Дмитрия Сергеева</div>
-            </div>
-            <div id="phone_numbers" class="block_numbers">
-                <div>+7(920)898-46-80</div>
-                <div>+7(920)898-46-80</div>
+                <div>Тренинг-парк</div>
+                <div>Дмитрия Сергеева</div>
             </div>
         </div>
     </div>

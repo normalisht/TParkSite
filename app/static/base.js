@@ -209,11 +209,12 @@ function generate_desktop_upper() {
         logo = document.getElementById('block_logo')
 
     phone_numbers.style.display = 'flex'
-    block_info.append(phone_numbers)
+    navigation_buttons.append(phone_numbers)
 
-    phone_numbers.style.flexDirection =
-        block_info.firstElementChild.style.flexDirection = 'row'
-    block_info.firstElementChild.style.alignItems = 'left'
+    phone_numbers.style.flexDirection = 'row'
+    block_info.firstElementChild.style.flexDirection = 'column'
+    navigation_buttons.style.flexDirection = 'column'
+    block_info.firstElementChild.style.alignItems = 'center'
 
     block_info.firstElementChild.lastElementChild.innerHTML = ' ' +
         block_info.firstElementChild.lastElementChild.innerHTML

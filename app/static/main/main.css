@@ -6,6 +6,7 @@
     --body-background-color: #4acfeb;
     --primary-big-font: clamp(16px, 1.3vw, 25px);
     --primary-font-family: Arial, sans-serif;
+    --primary-content-width: 900px;
     --modal_window_time: none;
     --vw: none;
     --vh: none;
@@ -50,8 +51,7 @@ img {
 
 .upper {
     padding-top: 5px;
-    width: 100%;
-    max-width: 1400px;
+    width: min(100%, var(--primary-content-width));
     margin: 0 auto;
     /*background-color: var(--background-color);*/
     position: sticky;
@@ -168,13 +168,12 @@ img {
 .block_info {
     display: flex;
     position: relative;
-    margin-right: 1vw;
     flex-direction: column;
     justify-content: space-evenly;
     align-items: center;
     width: calc(100% / 3);
 !important;
-    font-size: var(--primary-big-font);
+    font-size: 20px;
     font-family: var(--primary-font-family);
 }
 
