@@ -24,7 +24,7 @@
 
 
 .block_text {
-    max-width: 600px;
+    min-width: clamp(150px, 10vw, 20vw);
     text-align: center;
     margin: 10px  auto;
     font-size: 1.2rem;
