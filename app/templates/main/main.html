@@ -21,6 +21,36 @@
 {% endblock %}
 
 {% block app_content %}
+    <div class="events">
+        <div class="block_slider">
+            <div class="slider">
+                <div class="slider__container">
+                    <div class="slider__wrapper">
+                        <div class="slider__items">
+                            {% for event in events %}
+                                {% set path = "static/images/events/" + event.id|string + "0.png" %}
+                                <div class="slider__item">
+                                    <!-- Контент 1 слайда -->
+                                    <span style="font-size: 60px; position: absolute; right: 20px; top: 15px;
+                                    color: white; z-index: 10">20 ноября
+                                    <div style="position: absolute; z-index: 8; top: 0; width: 100%; height: 100%; background-color: black; opacity: 0.1"></div></span>
+                                    <img class="slider__img" alt=""
+                                         src="{{ url_for('static',filename='/images/events/1.png') }}">
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <a class="slider__control slider__control_prev" href="#" role="button" data-slide="prev"></a>
+                <a class="slider__control slider__control_next" href="#" role="button" data-slide="next"></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="block_content">
+        {{ main_text }}
+    </div>
     <!--Слайдер-->
     <div class="block_slider">
         <div class="slider">
@@ -51,43 +81,4 @@
         </div>
     </div>
 
-    <div class="block_content">
-        {{ main_text }}
-    </div>
-
-    <div class="events">
-        <div class="block_slider">
-            <div class="slider">
-                <div class="slider__container">
-                    <div class="slider__wrapper">
-                        <div class="slider__items">
-                            {% set i = namespace(a=0) %}
-                            {% for event in events %}
-                                {% set path = "static/images/events/" + event.id|string + ".png" %}
-                                <div class="slider__item">
-                                    <div style="width: 100%;">
-                                        <!-- Контент 1 слайда -->
-                                        <span id="event{{ i.a }}" data-date-month="{{ event.date.strftime('%m') }}"
-                                              class="event_info event_date">{{ event.date.strftime('%d') }}
-                                        <div></div></span>
-                                        <span class="event_info event_name">{{ event.name }}
-                                        <div></div></span>
-                                        <img class="slider__img" alt=""
-                                             src="{{ url_for('static',filename='/images/events/1.png') }}">
-                                        <div class="event_text">
-                                            {{ event.description }}
-                                        </div>
-                                    </div>
-                                </div>
-                                {% set i.a = i.a + 1 %}
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-
-                <a class="slider__control slider__control_prev" href="#" role="button" data-slide="prev"></a>
-                <a class="slider__control slider__control_next" href="#" role="button" data-slide="next"></a>
-            </div>
-        </div>
-    </div>
 {% endblock %}
