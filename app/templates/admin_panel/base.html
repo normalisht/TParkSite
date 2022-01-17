@@ -1,17 +1,164 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
+<html id="html" lang="ru">
+<head id="head">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="stylesheet" href="{{ url_for('static', filename='main/main.css') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename="favicon.ico") }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='slider.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='contacts/contacts.css') }}">
+    {% block link %}{% endblock %}
+
+    <script defer src="{{ url_for('static', filename='plugins/jquery.min.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='plugins/hammer.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='plugins/mobile-detect.min.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='base.js') }}"></script>
+    <script defer type="text/javascript" src="{{ url_for('static', filename='modal_window.js') }}"></script>
+    {% block scripts %}{% endblock %}
+    <script>
+        window.addEventListener('load', function () {
+            let preloader = document.getElementById('preloader')
+
+            preloader.style.opacity = '0'
+            setTimeout(() => {
+                preloader.style.display = 'none'
+            }, 900)
+
+        })
+
+        {#        window.addEventListener('unload', function () {
+                    let preloader = document.getElementById('preloader')
+                    preloader.style.display = 'block'
+                    preloader.style.opacity = '1'
+                })#}
+    </script>
+
     {% if title %}
         <title>{{ title }}</title>
     {% else %}
         <title>Т-Парк</title>
     {% endif %}
-    {% block scripts %}{% endblock %}
 </head>
-<body>
 
-{% block app_content %}{% endblock %}
+<body id="body">
+
+{% set geolocation = contacts_data.geolocation %}
+{% set address = contacts_data.address %}
+{% set phone_numbers = contacts_data.phone_numbers %}
+{% set vk = contacts_data.media[0] %}
+{% set geolocation = contacts_data.media[1] %}
+
+
+<div id="preloader" class="preloader">
+    <div class="loader-container circle-pulse-multiple">
+        <div class="loader">
+            <div class="circle-1"></div>
+            <div class="circle-2"></div>
+            <div class="circle-3"></div>
+        </div>
+    </div>
+    <div class="preloader-overlay"></div>
+</div>
+
+<div id="upper_container" class="upper_container">
+    <div id="upper" class="upper">
+        <div id="block_logo" class="block_logo">
+            <a href="{{ url_for('main.index') }}">
+                <img id="logo" class="img_logo" src="{{ url_for('static', filename='logo.png') }}" alt="">
+            </a>
+        </div>
+        <div id='navigation_buttons' class="block_buttons">
+            <div class="button_main"
+                 data-modal-window-toggle="#services-modal-win">
+                <div id="services-button">
+                    Услуги
+                </div>
+                <!--Модальные окно/выпадающее меню -->
+                <div id="services-modal-win" class="modal submenu">
+                    <div class="modal-window">
+                        {% for category in categories %}
+                            {% if category.status %}
+                                <div class="modal-item submenu-item">
+                                    <a href="{{ url_for('main.category') }}?category_id={{ category.id }}">
+                                        {{ category.name }}
+                                    </a>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                        <close class="btn-close-modal-window">
+                            <img src="{{ url_for('static', filename='cross.png') }}" alt="X">
+                        </close>
+                    </div>
+                    <div class="overlay"></div>
+                </div>
+            </div>
+            <a id="about-us-button" class="button_main button_main_middle about_a" href="{{ url_for('main.about') }}">
+                <div href="{{ url_for('main.about') }}" class="">
+                    О нас
+                </div>
+            </a>
+            <div class="button_main" data-modal-window-toggle="#contacts-modal-win">
+                <div id="contact-button">
+                    Контакты
+                </div>
+                <div id="contacts-modal-win" class="modal submenu contacts">
+                    <div class="modal-window">
+                        <div class="modal-item submenu-item">
+                            <div class="geolocation" style="align-items: center">
+                                <a href="{{ geolocation }}" target="_blank" style="color: black">Мы на карте
+                                    <img id="geo" class="geo" src="{{ url_for('static', filename='geo.png') }}" alt="">
+                                </a>
+                            </div>
+                        </div>
+                        <div class="modal-item submenu-item">
+                            <div class="address">Адрес: {{ address }}</div>
+                        </div>
+                        {% for number in phone_numbers %}
+                            <div class="modal-item submenu-item">
+                                <a style='text-decoration: none' href="https://wa.me/7{{ number }}">+7{{ number }}</a>
+                            </div>
+                        {% endfor %}
+                        <div class="modal-item submenu-item media">
+                            <div class="social">
+                                <ul class="social-icons">
+                                    <li><a class="vk" href="{{ vk }}" target="_blank"><i class="fa fa-vk"></i></a></li>
+                                    <li><a class="whatsapp" href="https://wa.me/7{{ number }}" target="_blank">
+                                        <i class="fa fa-whatsapp"></i></a></li>
+                                    <li><a class="insta" href="{{ insta }}" target="_blank"><i
+                                            class="fa fa-instagram"></i></a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <close class="btn-close-modal-window">
+                            <img src="{{ url_for('static', filename='cross.png') }}" alt="X">
+                        </close>
+                    </div>
+                    <div class="overlay"></div>
+                </div>
+                <!--конец модальных окон-->
+            </div>
+        </div>
+
+        <div id="upper_block_info" class="block_info">
+            <div class='name'>
+                <div>Тренинг-Парк</div>
+                <div>&nbsp;Дмитрия Сергеева</div>
+            </div>
+            <div id="phone_numbers" class="block_numbers">
+                <div>+7(920)898-46-80</div>
+                <div>+7(920)898-46-80</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="main_block" class="main_block">
+    {% block app_content %}{% endblock %}
+</div>
+
+<div id="footer" class="footer">© 2021</div>
 
 </body>
 </html>
