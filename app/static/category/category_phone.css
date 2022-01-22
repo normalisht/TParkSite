@@ -8,7 +8,7 @@
 
 .content {
     min-width: clamp(150px, 10vw, 20vw);
-    max-height: 100vh;
+    /*max-height: 100vh;*/
     text-align: center;
 }
 
@@ -31,7 +31,7 @@
     margin: 0 auto;
     width: calc(100 * var(--vw));
     font-family: 'Arial', sans-serif;
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 500;
     color: #000000;
     /*background: #4acfeb;*/
@@ -45,8 +45,31 @@
 
 .description {
     text-align: left;
+    font-size: 18px;
     margin-left: 0;
     padding-left: 0;
+    color: black;
+}
+
+.detailed {
+    margin-top: 6px;
+    color: black;
+    /*text-decoration: underline !important;*/
+}
+
+.price > div {
+    display: flex;
+    max-width: 50%;
+    align-items: center;
+}
+
+
+.price > div:first-child {
+    text-align: left
+}
+
+.price > div:last-child {
+    text-align: right
 }
 
 .table {
@@ -61,4 +84,13 @@ td {
     position: center;
     vertical-align: top;
     padding-right: 2vw;
+}
+
+.category_description {
+    padding: 2vw 2vw 0;
+}
+
+.category_description .text {
+    text-align: left;
+    font-size: 20px;
 }

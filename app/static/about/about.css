@@ -24,6 +24,7 @@
     grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
     list-style: none;
     padding: 0;
+    margin-bottom: 8px;
 }
 
 .block_img_block > * {
@@ -54,10 +55,12 @@
 
 .block_fil {
     justify-content: center;
-    max-width: 70%;
+    max-width: min(90%, 1000px);
     overflow: hidden;
-    margin: 20px auto;
-    text-align: center;
+    margin: -6px auto 4px;
+    text-align: left;
+    word-wrap: break-word;
+    font-size: 1.1rem;
 }
 
 .block_text_about {
@@ -196,6 +199,7 @@
 
 @media (min-width: 1600px) {
     .block_employees_block {
+        max-width: 1200px;
         margin: 0 auto;
         justify-content: center;
         display: grid;

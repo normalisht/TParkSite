@@ -27,7 +27,7 @@ class Price(db.Model):
 
     def __repr__(self):
         if self.time:
-            return self.price + ' руб/' + self.time
+            return self.price + ' руб<wbr>/<wbr>' + self.time
         else:
             return self.price + ' руб'
 
