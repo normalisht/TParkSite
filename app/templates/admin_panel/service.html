@@ -42,8 +42,8 @@
             <div class="title">Фото</div>
 
             <div class="grid_block_photo">
-                {% set path = "images/sevice/" + service.id|string + ".png" %}
-                <div><img src="{{ url_for("static", filename=path) }}" alt="" class=""></div>
+                {% set path = "images/service/" + service.id|string + ".png" %}
+                <div><img src="{{ url_for("static", filename=path) }}" alt="" class="image"></div>
 
                 <div class="input__wrapper">
                     <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
