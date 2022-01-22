@@ -72,6 +72,7 @@
     display: grid;
     grid-row-gap: 10px;
     margin-bottom:10px;
+    border-bottom: solid;
 }
 
 .category_name {
@@ -164,4 +165,12 @@
 
 .position_employees {
     text-align: left;
+}
+
+
+.grid_element {
+    display: grid;
+    grid-row-gap: 10px;
+    margin-bottom: 10px;
+    border-top: solid;
 }
