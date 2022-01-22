@@ -13,14 +13,12 @@
         <form method="POST">
             <div class="grid_service">
                 <label for="title">Название категории</label>
-                <input type="text" name="title" id="title" class="category_name"
-                       value="{{category.name if category.name}}">
+                <textarea name="title" id="title" class="category_name">{{category.name if category.name}}</textarea>
                 {% for msg in get_flashed_messages() %}
                     <div class="flash">{{msg}}</div>
                 {% endfor %}
                 <label for="input_desc">Описание</label>
-                <input type="text" id="input_desc" name="input_desc" class="description"
-                       value="{{category.description if category.description}}">
+                <textarea id="input_desc" name="input_desc" class="description">{{category.description if category.description}}</textarea>
                 <label for="checkbox_1">Отображать</label>
                 <input type="radio" id="checkbox_1" class="checkbox" name="mycheckbox" value="1" {{"checked" if
                 category.status else ""}}/>
