@@ -1,4 +1,5 @@
 import datetime
+import os
 
 from flask import render_template, flash, redirect, url_for, request, jsonify, current_app
 from wtforms import TextAreaField
@@ -70,6 +71,16 @@ def menu():
     return render_template('admin_panel/menu.html', title='Меню', categories=categories)
 
 
+# Все ивенты
+@bp.route('/events', methods=['GET'])
+# @login_required
+def events():
+
+    events = Event.query.all()
+
+    return render_template('admin_panel/event/events.html', title='Мероприятия',
+                           events=events)
+
 # создание ивента
 @bp.route('/event_create', methods=['GET', 'POST'])
 # @login_required
@@ -86,9 +97,14 @@ def event_create():
         db.session.add(event)
         db.session.commit()
 
-        # return redirect(url_for('admin_panel.events'))
+        photo = request.files['photo']
+        photo.save(os.path.join(os.getcwd(), '{}.png'.format(
+            Event.query.filter_by(title=title, link=link).first().id
+        )))
 
-    return render_template('admin_panel/event_create.html', title='Создание мероприятия')
+        return redirect(url_for('admin_panel.events'))
+
+    return render_template('admin_panel/event/event_create.html', title='Создание мероприятия')
 
 
 # радактирование ивента
@@ -106,17 +122,21 @@ def event_edit(id):
 
         date = datetime.datetime(int(date[0]), int(date[1]), int(date[2]), 22)
 
-        print(123)
         setattr(event, 'title', title)
         setattr(event, 'description', description)
         setattr(event, 'date', date)
         setattr(event, 'link', link)
 
+        photo = request.files['photo']
+        photo.save(os.path.join(os.getcwd(), '{}.png'.format(
+            Event.query.filter_by(title=title, link=link).first().id
+        )))
+
         db.session.commit()
 
-        # return redirect(url_for('admin_panel.events'))
+        return redirect(url_for('admin_panel.events'))
 
-    return render_template('admin_panel/event_edit.html', event=event,
+    return render_template('admin_panel/event/event_edit.html', event=event,
                            title='Редактирование мероприятия')
 
 
@@ -127,15 +147,6 @@ def texts():
 
     return render_template('admin_panel/texts.html', title='Описания/Тексты',
                            texts=texts)
-
-
-@bp.route('/events', methods=['GET'])
-@login_required
-def events():
-    events = Event.query.all()
-
-    return render_template('admin_panel/events.html', title='Мероприятия',
-                           events=events)
 
 
 @bp.route('/employees', methods=['GET'])
