@@ -79,6 +79,8 @@
     display: flex;
     align-content: center;
     margin-bottom: 10px;
+    height: 10vh;
+
 }
 
 .block_image {
@@ -87,11 +89,14 @@
 }
 
 .image {
-    width: 100%;
-    height: 100%;
-
+    width: clamp(250px, 10vw, 30vw);
+    height: clamp(250px, 10vw, 30vw);
+    display: flex;
+    align-items: center;
 
 }
+
+
 
 
 .button_events {

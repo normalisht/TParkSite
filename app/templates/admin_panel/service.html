@@ -20,12 +20,12 @@
                                value="{{ service.name}}">
 
                         <label for="input_desc">Краткое описание</label>
-                        <input type="text" name="input_short_desc" id="input_short_desc" class="category_name"
-                               value="{{ service.short_description }}">
+                        <textarea  name="input_short_desc" id="input_short_desc" class="category_name"
+                               >{{ service.short_description }}</textarea>
 
                         <label for="input_desc">Описание</label>
-                        <input type="text" name="input_desc" id="input_desc" class="category_name"
-                               value="{{ service.description }}">
+                        <textarea  name="input_desc" id="input_desc" class="category_name"
+                               >{{ service.description }}</textarea>
 
                         <label for="input_price">Цена</label>
                         <input type="text" name="input_price" id="input_price" class="category_name"
@@ -42,8 +42,8 @@
             <div class="title">Фото</div>
 
             <div class="grid_block_photo">
-                {% set path = "images/sevice/" + service.id|string + ".png" %}
-                <div><img src="{{ url_for("static", filename=path) }}" alt="" class=""></div>
+                {% set path = "images/service/" + service.id|string + ".png" %}
+                <div><img src="{{ url_for("static", filename=path) }}" alt="" class="image"></div>
 
                 <div class="input__wrapper">
                     <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
