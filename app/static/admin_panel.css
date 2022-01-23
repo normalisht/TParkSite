@@ -72,6 +72,7 @@
     display: grid;
     grid-row-gap: 10px;
     margin-bottom:10px;
+    border-bottom: solid;
 }
 
 .category_name {
@@ -177,3 +178,9 @@
     height: 150px;
 }
 
+.grid_element {
+    display: grid;
+    grid-row-gap: 10px;
+    margin-bottom: 10px;
+    border-top: solid;
+}
