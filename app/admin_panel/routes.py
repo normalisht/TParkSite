@@ -1,3 +1,5 @@
+import datetime
+
 from flask import render_template, flash, redirect, url_for, request, jsonify, current_app
 from wtforms import TextAreaField
 from wtforms.validators import Length
@@ -68,6 +70,56 @@ def menu():
     return render_template('admin_panel/menu.html', title='Меню', categories=categories)
 
 
+# создание ивента
+@bp.route('/event_create', methods=['GET', 'POST'])
+# @login_required
+def event_create():
+    if request.method == 'POST':
+        title = request.form.get('title')
+        date = request.form.get('date').split('-')
+        description = request.form.get('description')
+        link = request.form.get('link')
+
+        date = datetime.datetime(int(date[0]), int(date[1]), int(date[2]), 22)
+
+        event = Event(title=title, date=date, description=description, link=link)
+        db.session.add(event)
+        db.session.commit()
+
+        # return redirect(url_for('admin_panel.events'))
+
+    return render_template('admin_panel/event_create.html', title='Создание мероприятия')
+
+
+# радактирование ивента
+@bp.route('/event_edit/<int:id>', methods=['GET', 'POST'])
+# @login_required
+def event_edit(id):
+
+    event = Event.query.filter_by(id=id).first_or_404()
+
+    if request.method == 'POST':
+        title = request.form.get('title')
+        date = request.form.get('date').split('-')
+        description = request.form.get('description')
+        link = request.form.get('link')
+
+        date = datetime.datetime(int(date[0]), int(date[1]), int(date[2]), 22)
+
+        print(123)
+        setattr(event, 'title', title)
+        setattr(event, 'description', description)
+        setattr(event, 'date', date)
+        setattr(event, 'link', link)
+
+        db.session.commit()
+
+        # return redirect(url_for('admin_panel.events'))
+
+    return render_template('admin_panel/event_edit.html', event=event,
+                           title='Редактирование мероприятия')
+
+
 @bp.route('/texts', methods=['GET'])
 # @login_required
 def texts():
@@ -107,7 +159,7 @@ def category():
                            category=category, services=services)
 
 
-@bp.route('/service_test', methods=['GET','POST'])
+@bp.route('/service_test', methods=['GET', 'POST'])
 # @login_required
 def service_test():
     service_id = request.args.get('service_id')
@@ -123,14 +175,6 @@ def service_test():
     db.session.commit()
     return render_template('admin_panel/service.html', title='{}'.format(service.name),
                            category=category, service=service)
-
-
-@bp.route('/service', methods=['GET'])
-@login_required
-def comments():
-    comments = Comment.query.all()
-
-    return render_template('admin_panel/comments.html', title='Отзывы', comments=comments)
 
 
 '''json запросы'''
