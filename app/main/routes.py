@@ -4,6 +4,7 @@ from app import db
 from app.main.functions import get_categories, get_contacts_data
 from app.models import Text, Event, Category, ServiceCategory, Service, Employee, Partner, Price
 from sqlalchemy import create_engine
+from flask_ckeditor import CKEditor
 
 engine = create_engine("sqlite:///T_Park.db")
 
@@ -100,7 +101,7 @@ def category_test():
                 element.service.status = 1
             else:
                 element.service.status = 0
-        category.description = request.form.get('input_desc')
+        category.description = request.form.get('ckeditor')
         category.name = request.form.get('title')
         db.session.commit()
     return render_template('admin_panel/category.html', title='{}'.format(category.name),
