@@ -36,13 +36,18 @@ def main():
 def category():
     try:
         category_id = request.args.get('category_id')
-
+        path = url_for('static',filename='/images/category/1.png') #путь нормально прописать и это работает
+        try:
+            open(path)
+            a = 1
+        except:
+            a = 0
         category = Category.query.filter_by(id=category_id).first()
         services = category.services.all()
         if category.status == 1:
             return render_template('main/category.html', category=category, category_id=category_id,
                                    services=services, categories=get_categories(),
-                                   contacts_data=get_contacts_data())
+                                   contacts_data=get_contacts_data(), a=a)
         else:
             return redirect(url_for('main.index'))
     except:
