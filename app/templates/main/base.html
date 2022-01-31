@@ -205,9 +205,13 @@
                                 <div class="address">Адрес: {{ address }}</div>
                             </div>
                             {% for number in phone_numbers %}
-                                <div class="modal-item submenu-item">
+                                <div class="modal-item submenu-item"
+                                     onclick="copy_number('+7' + {{ number }}, this)">
                                     <a style='text-decoration: none'
-                                       href="https://wa.me/7{{ number }}">+7{{ number }}</a>
+                                       href="#">+7{{ number }}</a>
+                                    <img style='object-fit: cover; width: 20px; height: 20px; margin-bottom: -2px; margin-left: -6px;'
+                                         src="{{ url_for('static', filename='copy.png') }}" alt=""
+                                         >
                                 </div>
                             {% endfor %}
                             <div class="modal-item submenu-item media">
@@ -241,8 +245,11 @@
                 <div>Дмитрия Сергеева</div>
             </div>
             <div id="phone_numbers" class="block_numbers">
-                <div>+7(920)898-46-80</div>
-                <div>+7(920)898-46-80</div>
+                <div onclick="copy_number('+7(945)759-46-80', this)"
+                     title="Нажмите чтобы скопировать">+7(945)759-46-80</div>
+                <div onclick="copy_number('+7(968)898-73-22', this)"
+                     title="Нажмите чтобы скопировать">+7(968)898-73-22</div>
+
             </div>
         </div>
     </div>

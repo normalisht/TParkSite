@@ -308,3 +308,18 @@ document.addEventListener('DOMContentLoaded', function () {
         element.innerHTML = content
     })
 })
+
+function copy_number(number, el) {
+    let tmp = $("<textarea>");
+    $("body").append(tmp);
+    tmp.val(number).select();
+    document.execCommand("copy");
+    tmp.remove();
+
+    el.setAttribute('title', 'Скопировано')
+
+    el.onmouseover = function() {
+        el.setAttribute('title', 'Нажмите, чтобы скопировать')
+    }
+}
+
