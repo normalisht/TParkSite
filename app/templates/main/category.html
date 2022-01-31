@@ -9,9 +9,10 @@
 
 {% block app_content %}
 
-    <h1>{{ category.name }}</h1>
+    <h1>{{ category.name |safe }}</h1>
     <div class="container">
         <div class="data">
+            {% set path = url_for('static',filename='/images/staff/1.png') %}
             <div class="block_slider">
                 <div class="slider">
                     <div class="slider__container">
@@ -20,7 +21,7 @@
                                 {% for i in range(3) %}
                                     <div class="slider__item">
                                         <img class="slider__img" alt=""
-                                             src="{{ url_for('static',filename='/images/staff/1.png' ) }}">
+                                             src={{path}}>
                                     </div>
                                     <div class="slider__item">
                                         <img class="slider__img" alt=""
@@ -35,37 +36,49 @@
                 </div>
             </div>
         </div>
+
         <div class="category_description">
             <div class="text">
-                {{ category.description if category.description }}
+                {{ category.description |safe if category.description |safe }}
             </div>
         </div>
+
         <div id="buttons" class="buttons">
             {% for element in services %}
                 {% set service = element.service %}
                 {% if service.status == true %}
-                    <div id="{{ service.id }}" class="button_5" status="0">
+                    <div id="{{ service.id }}" class="button" status="0"
+                         style="cursor: {% if service.short_description != None %}pointer{% else %}default{% endif %}">
                         <div class="content">
-                            <div class="price" style="display: flex; justify-content: space-between; margin-right: 8px">
+                            <div class="price">
                                 <div>{{ service.name }}</div>
-                                <div style="display: flex;">
-                                    <div style="margin-right: 5px;">{{ service.prices[0] }}</div>
+                                <div class="cost" style="display: flex;">
+                                    <div id="prices{{ service.name }}"></div>
                                     {% if service.short_description %}
                                         <img class="price_switch" src="{{ url_for('static', filename='down.svg') }}"
                                              alt="">
                                     {% endif %}
+                                    <script>
+                                        x = document.getElementById('prices{{ service.name }}')
+                                        x.innerHTML = `{{ service.prices[0] }}`
+                                        x.innerHTML = x.textContent
+                                    </script>
                                 </div>
                             </div>
                             {% if service.short_description %}
                                 <div class="description">
                                     {% if service.short_description != None %}
-                                        <br>{{ service.short_description }}
+                                        {{ service.short_description }}
                                     {% endif %}
                                     <br>
-                                    <a style="color: black;" class="more"
-                                       href="{{ url_for('main.service') }}?service_id={{ service.id }}">
-                                        Подробнее
-                                    </a>
+                                    <div class="more">
+                                        <div>
+                                            <a class='detailed'
+                                               href="{{ url_for('main.service') }}?service_id={{ service.id }}">
+                                                Подробнее...
+                                            </a>
+                                        </div>
+                                    </div>
                                 </div>
                             {% endif %}
                         </div>

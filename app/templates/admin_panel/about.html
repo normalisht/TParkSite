@@ -1,0 +1,126 @@
+{% extends "admin_panel/base.html" %}
+
+{% block scripts %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel.css') }}">
+{% endblock %}
+
+{% block app_content %}
+
+    <div class="title">Страница О НАС</div>
+    <div class="div_grid_panel">
+        <div class="grid_panel">
+            <div>
+                <div class="grid_block">
+                    <div>
+                        <div class="title">Текст</div>
+                        <form>
+                            <label for="title">О нас</label>
+                            <input type="text" name="title" id="title" class=""
+                                   value="{{ filosofi.text if filosofi.text }}">
+                            <input type="submit" value="Подтвердить">
+                        </form>
+                    </div>
+                </div>
+
+                <div class="grid_block">
+                    <div>
+                        <form>
+                            <label for="title">Что есть</label>
+                            <input type="text" name="title" id="title" class=""
+                                   value="{{ about.text if about.text }}">
+                            <input type="submit" value="Подтвердить">
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="title">Партнёры</div>
+                {% for partner in partners %}
+                    <div class="grid_block_photo">
+                        {% set path = "/images/partner/" + partner.id|string + ".png" %}
+                        <figure class="img__employ">
+                            <img src="{{ url_for("static", filename=path) }}" alt="{{ partner.name }}" class="partimg">
+                            <figcaption>
+                                <div class="title">Ссылка на партнера</div>
+                            </figcaption>
+                            <form>
+                                <figcaption>
+                                    <input type="text" name="title" id="title" class=""
+                                           value="{{ partner.link if partner.link }}">
+                                </figcaption>
+                                <figcaption>
+                                    <input type="submit" value="Подтвердить">
+                                </figcaption>
+                            </form>
+                        </figure>
+
+                        <div class="input__wrapper">
+                            <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
+                            <label for="block_photo" class="button">
+                                <span class="input__file_button">Изменить</span>
+                            </label>
+                        </div>
+                        <div class="input__wrapper" id="delete_photo">
+                            <label for="block_photo" class="button">
+                                <span class="input__file_button">Удалить</span>
+                            </label>
+                        </div>
+
+                        <div class="checkbox"></div>
+                    </div>
+                {% endfor %}
+
+                <div class="title">Сотрудники</div>
+                {% for employee in employees %}
+                    <div class="grid_block_photo">
+                        {% set path = "images/employee/" + employee.id|string + "0.png" %}
+                        <figure class="img__employ">
+                            <img src="{{ url_for("static", filename=path) }}" alt="" class="emplimg">
+                            <form>
+                                <figcaption>ФИО</figcaption>
+                                <figcaption>
+                                    <input type="text" name="title" id="title" class=""
+                                           value="{{ employee.name if employee.name }}">
+                                </figcaption>
+                                <figcaption>
+                                    <input type="submit" value="Подтвердить">
+                                </figcaption>
+                            </form>
+                            <form>
+                                <figcaption>
+                                    <figcaption>Должность</figcaption>
+                                    <input type="text" name="title" id="title" class=""
+                                           value="{{ employee.position if employee.position }}">
+                                </figcaption>
+                                <figcaption>
+                                    <input type="submit" value="Подтвердить">
+                                </figcaption>
+                            </form>
+                        </figure>
+
+                        <div class="input__wrapper">
+                            <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
+                            <label for="block_photo" class="button">
+                                <span class="input__file_button">Изменить</span>
+                            </label>
+                        </div>
+                        <div class="input__wrapper" id="delete_photo">
+                            <label for="block_photo" class="button">
+                                <span class="input__file_button">Удалить</span>
+                            </label>
+                        </div>
+
+                        <div class="checkbox"></div>
+                    </div>
+                {% endfor %}
+
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+{% endblock %}

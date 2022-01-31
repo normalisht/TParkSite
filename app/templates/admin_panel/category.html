@@ -1,0 +1,69 @@
+{% extends "main/base.html" %}
+
+{% block scripts %}
+<link rel="stylesheet" href="{{ url_for('static', filename='admin_panel.css') }}">
+{% endblock %}
+
+{% block app_content %}
+{{ ckeditor.load() }}
+{% set title = ckeditor %}
+<div class="title">Категории услуг</div>
+
+<div class="grid_panel">
+    <div>
+        <form method="POST">
+            <div class="grid_service">
+                <label for="title">Название категории</label>
+                <textarea name="title" id="title" class="category_name">{{category.name if category.name}}</textarea>
+                {% for msg in get_flashed_messages() %}
+                    <div class="flash">{{msg}}</div>
+                {% endfor %}
+                <label for="input_desc">Описание</label>
+                {{ ckeditor.create(value=category.description|safe if category.description|safe) }}
+                <label for="checkbox_1">Отображать</label>
+                <input type="radio" id="checkbox_1" class="checkbox" name="mycheckbox" value="1" {{"checked" if
+                category.status else ""}}/>
+                <label for="checkbox_2">Скрыть</label>
+                <input type="radio" id="checkbox_2" class="checkbox" name="mycheckbox" value="0" {{"checked" if
+                category.status == 0 else ""}}/>
+                {% for element in services %}
+                    <div class="grid_element">
+                        {% set service = element.service %}
+                        <a href="{{ url_for('main.service_test') }}?service_id={{ service.id }}">{{ service.name if service.name }}</a>
+                        Отображать
+                        <input type="radio" class="checkbox" name="service_checkbox_{{service.id}}" value="1" {{"checked" if
+                        service.status else ""}}/>
+                        Скрыть
+                        <input type="radio" class="checkbox" name="service_checkbox_{{service.id}}" value="0" {{"checked" if
+                        service.status == 0 else ""}}/>
+                    </div>
+                {% endfor %}
+            </div>
+            <input type="submit" value="Подтвердить">
+        </form>
+    </div>
+    <div>
+        <div class="title">Фото</div>
+        <div class="grid_block">
+            {% set path = "images/category/" + category.id|string + "0.png" %}
+            <div class="images"><img src="{{ url_for('static', filename=path) }}" alt="" class="images"></div>
+
+            <div class="input__wrapper">
+                <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
+                <label for="block_photo" class="button">
+                    <span class="input__file_button">Изменить</span>
+                </label>
+            </div>
+            <div class="button_delete" id="delete_photo">
+                <label for="block_photo" class="button">
+                    <span class="input__file_button">Удалить</span>
+                </label>
+            </div>
+
+            <div class="checkbox"></div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

@@ -27,7 +27,7 @@ class Price(db.Model):
 
     def __repr__(self):
         if self.time:
-            return self.price + ' руб/' + self.time
+            return self.price + ' руб / ' + self.time
         else:
             return self.price + ' руб'
 
@@ -84,7 +84,7 @@ class Admin(UserMixin, db.Model):
 
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True, index=True, unique=True)
-    name = db.Column(db.String(128))
+    title = db.Column(db.String(128))
     date = db.Column(db.Date)
     link = db.Column(db.String(1024))  # ссылка на мероприятие(соц сеть или левый сайт)
     description = db.Column(db.Text)

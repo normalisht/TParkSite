@@ -1,14 +1,21 @@
+import datetime
+import os
+
 from flask import render_template, flash, redirect, url_for, request, jsonify, current_app
+from wtforms import TextAreaField
+from wtforms.validators import Length
+
 from app.admin_panel import bp
 from app import db
 from flask_login import login_user, logout_user, current_user, login_required
-from app.models import Admin, Category, Service, Employee, Text, Comment, ServiceCategory, Event
+from app.models import Admin, Category, Service, Employee, Text, Comment, ServiceCategory, Event, Partner
 from werkzeug.urls import url_parse
 import json
 
 
 # авторизация админа
 @bp.route('/', methods=['GET', 'POST'])
+@bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
@@ -24,7 +31,7 @@ def login():
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('main.index')
         return redirect(next_page)
-    return render_template('admin_panel/login.html', title='Авторизация')
+    return render_template('admin_panel/../templates/аdmin_panel/login.html', title='Авторизация')
 
 
 # выход
@@ -34,30 +41,112 @@ def logout():
     return redirect(url_for('main.index'))
 
 
+@bp.route('/main', methods=['GET'])
+# @login_required
+def main():
+    main_text = Text.query.filter_by(title="main_text").first().text
+    events = Event.query.all()
+
+    return render_template('admin_panel/main.html', title='Главная страница', main_text=main_text, events=events)
+
+
+@bp.route('/about', methods=['GET'])
+# @login_required
+def about():  # Косяк поправил(было мейн)
+
+    employees = Employee.query.all()
+    about = Text.query.filter_by(title='about').first()
+    filosofi = Text.query.filter_by(title='filosofi').first()
+    partners = Partner.query.all()
+
+    return render_template('admin_panel/about.html', title='О НАС', employees=employees,
+                           filosofi=filosofi, about=about, partners=partners)
+
+
 @bp.route('/menu', methods=['GET'])
-@login_required
+# @login_required
 def menu():
     categories = Category.query.all()
 
     return render_template('admin_panel/menu.html', title='Меню', categories=categories)
 
 
+# Все ивенты
+@bp.route('/events', methods=['GET'])
+# @login_required
+def events():
+
+    events = Event.query.all()
+
+    return render_template('admin_panel/event/events.html', title='Мероприятия',
+                           events=events)
+
+# создание ивента
+@bp.route('/event_create', methods=['GET', 'POST'])
+# @login_required
+def event_create():
+    if request.method == 'POST':
+        title = request.form.get('title')
+        date = request.form.get('date').split('-')
+        description = request.form.get('description')
+        link = request.form.get('link')
+
+        date = datetime.datetime(int(date[0]), int(date[1]), int(date[2]), 22)
+
+        event = Event(title=title, date=date, description=description, link=link)
+        db.session.add(event)
+        db.session.commit()
+
+        photo = request.files['photo']
+        photo.save(os.path.join(os.getcwd(), '{}.png'.format(
+            Event.query.filter_by(title=title, link=link).first().id
+        )))
+
+        return redirect(url_for('admin_panel.events'))
+
+    return render_template('admin_panel/event/event_create.html', title='Создание мероприятия')
+
+
+# радактирование ивента
+@bp.route('/event_edit/<int:id>', methods=['GET', 'POST'])
+# @login_required
+def event_edit(id):
+
+    event = Event.query.filter_by(id=id).first_or_404()
+
+    if request.method == 'POST':
+        title = request.form.get('title')
+        date = request.form.get('date').split('-')
+        description = request.form.get('description')
+        link = request.form.get('link')
+
+        date = datetime.datetime(int(date[0]), int(date[1]), int(date[2]), 22)
+
+        setattr(event, 'title', title)
+        setattr(event, 'description', description)
+        setattr(event, 'date', date)
+        setattr(event, 'link', link)
+
+        photo = request.files['photo']
+        photo.save(os.path.join(os.getcwd(), '{}.png'.format(
+            Event.query.filter_by(title=title, link=link).first().id
+        )))
+
+        db.session.commit()
+
+        return redirect(url_for('admin_panel.events'))
+
+    return render_template('admin_panel/event/event_edit.html', event=event,
+                           title='Редактирование мероприятия')
+
+
 @bp.route('/texts', methods=['GET'])
-@login_required
+# @login_required
 def texts():
     texts = Text.query.all()
 
     return render_template('admin_panel/texts.html', title='Описания/Тексты',
                            texts=texts)
-
-
-@bp.route('/events', methods=['GET'])
-@login_required
-def events():
-    events = Event.query.all()
-
-    return render_template('admin_panel/events.html', title='Мероприятия',
-                           events=events)
 
 
 @bp.route('/employees', methods=['GET'])
@@ -81,23 +170,22 @@ def category():
                            category=category, services=services)
 
 
-@bp.route('/service', methods=['GET'])
-@login_required
-def service():
-    id = request.args.get('id')
+@bp.route('/service_test', methods=['GET', 'POST'])
+# @login_required
+def service_test():
+    service_id = request.args.get('service_id')
 
     service = Service.query.filter_by(id=id).first()
-
-    return render_template('admin_panel/service.html', title='{}'.format(category.name),
+    if request.method == 'POST':
+        if request.form.get('mycheckbox') == '1':
+            service.status = 1
+        else:
+            service.status = 0
+    service.description = request.form.get('input_desc')
+    service.name = request.form.get('title')
+    db.session.commit()
+    return render_template('admin_panel/service.html', title='{}'.format(service.name),
                            category=category, service=service)
-
-
-@bp.route('/service', methods=['GET'])
-@login_required
-def comments():
-    comments = Comment.query.all()
-
-    return render_template('admin_panel/comments.html', title='Отзывы', comments=comments)
 
 
 '''json запросы'''
@@ -300,18 +388,18 @@ def update_employee():
 
 # обновляет данные тексте
 @bp.route('/update_text', methods=['POST'])
-@login_required
+# @login_required
 def update_text():
     text = Text.query.filter_by(id=request.form['id']).first()
 
-    if getattr(text, 'title') != request.form['title']:
-        setattr(text, 'title', request.form['title'])
+    # if getattr(text, 'title') != request.form['title']:
+    #     setattr(text, 'title', request.form['title'])
 
     if getattr(text, 'text') != request.form['text']:
         setattr(text, 'text', request.form['text'])
 
-    if getattr(text, 'photo') != request.form['photo']:
-        setattr(text, 'photo', request.form['photo'])
+    # if getattr(text, 'photo') != request.form['photo']:
+    #     setattr(text, 'photo', request.form['photo'])
 
     return jsonify({'result': 'success'})
 
