@@ -12,29 +12,31 @@
     <h1>{{ category.name |safe }}</h1>
     <div class="container">
         <div class="data">
-            {% set path = url_for('static',filename='/images/staff/1.png') %}
-            <div class="block_slider">
-                <div class="slider">
-                    <div class="slider__container">
-                        <div class="slider__wrapper">
-                            <div class="slider__items">
-                                {% for i in range(3) %}
-                                    <div class="slider__item">
-                                        <img class="slider__img" alt=""
-                                             src={{path}}>
-                                    </div>
-                                    <div class="slider__item">
-                                        <img class="slider__img" alt=""
-                                             src="{{ url_for('static',filename='/images/staff/2.png' ) }}">
-                                    </div>
-                                {% endfor %}
+            {% if a == 1 %}
+                {% set path = url_for('static',filename='/images/staff/1.png') %}
+                <div class="block_slider">
+                    <div class="slider">
+                        <div class="slider__container">
+                            <div class="slider__wrapper">
+                                <div class="slider__items">
+                                    {% for i in range(3) %}
+                                        <div class="slider__item">
+                                            <img class="slider__img" alt=""
+                                                src={{path}}>
+                                        </div>
+                                        <div class="slider__item">
+                                            <img class="slider__img" alt=""
+                                                src="{{ url_for('static',filename='/images/staff/2.png' ) }}">
+                                        </div>
+                                    {% endfor %}
+                                </div>
                             </div>
                         </div>
+                        <a class="slider__control slider__control_prev" href="#" role="button" data-slide="prev"></a>
+                        <a class="slider__control slider__control_next" href="#" role="button" data-slide="next"></a>
                     </div>
-                    <a class="slider__control slider__control_prev" href="#" role="button" data-slide="prev"></a>
-                    <a class="slider__control slider__control_next" href="#" role="button" data-slide="next"></a>
                 </div>
-            </div>
+            {% endif %}
         </div>
 
         <div class="category_description">
