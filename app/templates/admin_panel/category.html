@@ -5,7 +5,8 @@
 {% endblock %}
 
 {% block app_content %}
-
+{{ ckeditor.load() }}
+{% set title = ckeditor %}
 <div class="title">Категории услуг</div>
 
 <div class="grid_panel">
@@ -18,7 +19,7 @@
                     <div class="flash">{{msg}}</div>
                 {% endfor %}
                 <label for="input_desc">Описание</label>
-                <textarea id="input_desc" name="input_desc" class="description">{{category.description if category.description}}</textarea>
+                {{ ckeditor.create(value=category.description|safe if category.description|safe) }}
                 <label for="checkbox_1">Отображать</label>
                 <input type="radio" id="checkbox_1" class="checkbox" name="mycheckbox" value="1" {{"checked" if
                 category.status else ""}}/>

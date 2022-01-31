@@ -9,9 +9,10 @@
 
 {% block app_content %}
 
-    <h1>{{ category.name }}</h1>
+    <h1>{{ category.name |safe }}</h1>
     <div class="container">
         <div class="data">
+            {% set path = url_for('static',filename='/images/staff/1.png') %}
             <div class="block_slider">
                 <div class="slider">
                     <div class="slider__container">
@@ -20,7 +21,7 @@
                                 {% for i in range(3) %}
                                     <div class="slider__item">
                                         <img class="slider__img" alt=""
-                                             src="{{ url_for('static',filename='/images/staff/1.png' ) }}">
+                                             src={{path}}>
                                     </div>
                                     <div class="slider__item">
                                         <img class="slider__img" alt=""
@@ -38,7 +39,7 @@
 
         <div class="category_description">
             <div class="text">
-                {{ category.description if category.description }}
+                {{ category.description |safe if category.description |safe }}
             </div>
         </div>
 
