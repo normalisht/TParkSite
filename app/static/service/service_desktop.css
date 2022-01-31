@@ -13,7 +13,7 @@
     width: max-content;
     margin: 10px auto;
     border-radius: 2px;
-    font-size: 1.6rem;
+    font-size: var(--primary-font-size);
     padding: 4px;
 }
 
@@ -43,7 +43,7 @@
     max-width: 600px;
     text-align: center;
     margin: 10px  auto;
-    font-size: 1.3rem;
+    font-size: var(--primary-font-size);
 }
 
 

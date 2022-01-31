@@ -175,6 +175,8 @@ function generate_mobile_upper() {
     logo.style.width = block_info.style.width = '50%'
     // navigation_buttons.style.width = '100%'
 
+    phone_numbers.style.flexDirection = 'row'
+
     block_info.style.flexDirection =
         block_info.firstElementChild.style.flexDirection = 'column'
 
@@ -197,7 +199,7 @@ function generate_mobile_upper() {
     upper.after(phone_numbers)
     upper.style.justifyContent = 'space-around'
 
-    phone_numbers.style.display = 'none'
+    // phone_numbers.style.display = 'none'
 }
 
 function generate_desktop_upper() {
@@ -209,9 +211,9 @@ function generate_desktop_upper() {
         logo = document.getElementById('block_logo')
 
     phone_numbers.style.display = 'flex'
-    navigation_buttons.append(phone_numbers)
+    block_info.append(phone_numbers)
 
-    phone_numbers.style.flexDirection = 'row'
+    phone_numbers.style.flexDirection = 'column'
     block_info.firstElementChild.style.flexDirection = 'column'
     navigation_buttons.style.flexDirection = 'column'
     block_info.firstElementChild.style.alignItems = 'center'
@@ -251,12 +253,15 @@ function detected_phone() {
         if (detect.phone()) {
             add_css_file('/app/static/main/phone.css')
             generate_mobile_upper()
+            document.documentElement.style.setProperty('--primary-font-size', `16px`)
         } else if (detect.tablet()) {
             add_css_file('/app/static/main/desktop.css')
+            document.documentElement.style.setProperty('--primary-font-size', `20px`)
         }
     } else {
         add_css_file('/app/static/main/desktop.css')
         add_js_file('/app/static/base_desktop.js')
+        document.documentElement.style.setProperty('--primary-font-size', `24px`)
     }
 }
 

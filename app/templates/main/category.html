@@ -47,13 +47,13 @@
             {% for element in services %}
                 {% set service = element.service %}
                 {% if service.status == true %}
-                    <div id="{{ service.id }}" class="button_5" status="0"
+                    <div id="{{ service.id }}" class="button" status="0"
                          style="cursor: {% if service.short_description != None %}pointer{% else %}default{% endif %}">
                         <div class="content">
-                            <div class="price" style="display: flex; justify-content: space-between; margin-right: 8px">
+                            <div class="price">
                                 <div>{{ service.name }}</div>
-                                <div style="display: flex;">
-                                    <div id="prices{{ service.name }}" style="margin-right: 5px;"></div>
+                                <div class="cost" style="display: flex;">
+                                    <div id="prices{{ service.name }}"></div>
                                     {% if service.short_description %}
                                         <img class="price_switch" src="{{ url_for('static', filename='down.svg') }}"
                                              alt="">

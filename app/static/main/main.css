@@ -4,13 +4,18 @@
     --background-color: rgba(169, 191, 239, 0.15); /*547dd2;*/
     --primary-color: #ffa300; /*fff600*/
     --body-background-color: #4acfeb;
-    --primary-big-font: clamp(16px, 1.3vw, 25px);
+
+
+    /*--primary-big-font: 24px;*/
+    /*--primary-small-font: 24px;*/
+    --primary-font-size: 16px;
     --primary-font-family: Arial, sans-serif;
+
+
     --primary-content-width: 900px;
     --modal_window_time: none;
     --vw: none;
     --vh: none;
-    --font-size: 1 rem;
 }
 
 html {
@@ -77,7 +82,7 @@ img {
     /*background-color: var(--background-color);*/
     /*margin-top: 10px;*/
     color: #a8a8a8;
-    font-size: 14px;
+    font-size: calc(var(--primary-small-font) * 0.6);
 }
 
 .upper_white {
@@ -101,23 +106,12 @@ img {
     width: 100%;
     z-index: 2;
     background-color: var(--background-color);
-    padding-bootom: 10px;
 }
 
 
 .events {
     margin: 0 auto;
     width: 100%;
-    padding-top: 10px;
-}
-
-.block_text_event {
-    position: absolute;
-    margin: 0 auto;
-    left: 0;
-    bottom: 0;
-    color: white;
-    z-index:3;
 }
 
 .block {
@@ -173,8 +167,7 @@ img {
     justify-content: space-evenly;
     align-items: center;
     width: calc(100% / 3);
-!important;
-    font-size: 20px;
+    font-size: var(--primary-font-size);
     font-family: var(--primary-font-family);
 }
 
@@ -184,24 +177,19 @@ img {
 
 .block_numbers {
     display: flex;
-    justify-content: space-evenly;
     margin: auto;
-    font-size: var(--primary-big-font);
+    font-size: calc(0.8 * var(--primary-font-size));
     font-family: var(--primary-font-family);
-}
-
-.block_numbers > div:first-child {
-    margin-right: 15px;
 }
 
 .block_content {
     justify-content: center;
-    max-width: min(95%, 1400px);
+    max-width: min(95%, 900px);
     overflow: hidden;
     margin: 5px auto 0;
     text-align: left;
     word-wrap: break-word;
-    font-size: 1.2rem;
+    font-size: var(--primary-font-size);
 }
 
 .img_logo {
@@ -230,25 +218,6 @@ img {
     transform: translate(-50%, 20px);
     opacity: 0.7;
     transition: .3s;
-}
-
-.next_menu {
-    position: relative;
-    padding: 10px 15px;
-    font-family: 'Kaushan Script', cursive;
-    font-size: 1.5em;
-    line-height: 1;
-    letter-spacing: 3px;
-}
-
-.next_menu:before {
-    content: "";
-}
-
-
-.next_menu:hover:before {
-    transform: translate(-50%, 0);
-    opacity: 1;
 }
 
 .modal {

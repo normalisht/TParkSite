@@ -60,7 +60,7 @@
     margin: -6px auto 4px;
     text-align: left;
     word-wrap: break-word;
-    font-size: 1.1rem;
+    font-size: var(--primary-font-size);
 }
 
 .block_text_about {

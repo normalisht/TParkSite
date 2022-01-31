@@ -11,7 +11,7 @@
 }
 
 .price {
-    font-size: 20px;
+    font-size: var(--primary-font-size);
 }
 
 .block_img {
@@ -27,7 +27,7 @@
     padding: 2px;
     margin: 10px auto;
     border-radius: 2px;
-    font-size: 1.5rem;
+    font-size: var(--primary-font-size);
     word-wrap: break-word;
 }
 
@@ -45,6 +45,6 @@
     min-width: clamp(150px, 10vw, 20vw);
     text-align: center;
     margin: 10px auto;
-    font-size: 1.2rem;
+    font-size: var(--primary-font-size);
 }
 

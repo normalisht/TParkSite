@@ -3,20 +3,17 @@
 .img_logo {
     max-width: 150px;
     max-height: 100px;
-    margin-right: 2vw;
-}
-
-.block_numbers {
-    --primary-big-font: 1.3rem;
+    margin-left: 50%;
+    transform: translate(-50%, 0);
 }
 
 .block_info {
     text-align: center;
-    font-size: 1.25rem;
+    font-size: calc(1.2 * var(--primary-font-size));
 }
 
 .block_buttons {
-    font-size: 1.5rem;
+    font-size: calc(1.2 * var(--primary-font-size));
     margin: 0 auto;
 }
 
@@ -26,8 +23,20 @@
     height: min-content;
 }
 
+.block_numbers {
+    font-size: calc(1 * var(--primary-font-size));
+    margin-bottom: 2px;
+}
+
+.block_numbers > div {
+    text-align: center;
+    width: 50%;
+}
+
+
 .event_info {
-    font-size: 35px;
+    text-align: center;
+    font-size: 30px;
     position: absolute;
     color: white;
     z-index: 10;
@@ -51,14 +60,12 @@
 }
 
 .event_name {
-    left: 0;
-    top: calc(clamp(200px, (var(--vh, 1vh) * 45), 800px) - 49px);
+    left: 15px;
+    top: calc(clamp(200px, (var(--vh, 1vh) * 45), 800px) - 50px);
 }
 
 .event_text {
-    width: 100%;
-    font-size: 1.3rem;
-    margin-top: -18px;
-    margin-bottom: 8px;
-    margin-left: 5px;
+    width: 95%;
+    font-size: var(--primary-font-size);
+    margin: 0px auto 4px;
 }

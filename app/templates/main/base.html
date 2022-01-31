@@ -156,7 +156,7 @@
             </a>
         </div>
         <div id='navigation_buttons' class="block_buttons">
-            <div style="display: flex; margin-top: 15px;">
+            <div style="display: flex;">
                 <div class="button_main"
                      data-modal-window-toggle="#services-modal-win">
                     <div id="services-button">
@@ -174,9 +174,9 @@
                                     </div>
                                 {% endif %}
                             {% endfor %}
-                            <close class="btn-close-modal-window">
-                                <img src="{{ url_for('static', filename='cross.png') }}" alt="X">
-                            </close>
+{#                            <close class="btn-close-modal-window">#}
+{#                                <img src="{{ url_for('static', filename='cross.png') }}" alt="X">#}
+{#                            </close>#}
                         </div>
                         <div class="overlay"></div>
                     </div>
@@ -223,25 +223,26 @@
                                     </ul>
                                 </div>
                             </div>
-                            <close class="btn-close-modal-window">
+{#                            <close class="btn-close-modal-window">
                                 <img src="{{ url_for('static', filename='cross.png') }}" alt="X">
-                            </close>
+                            </close>#}
                         </div>
                         <div class="overlay"></div>
                     </div>
                     <!--конец модальных окон-->
                 </div>
             </div>
-            <div id="phone_numbers" class="block_numbers">
-                <div>+7(920)898-46-80</div>
-                <div>+7(920)898-46-80</div>
-            </div>
+
         </div>
 
         <div id="upper_block_info" class="block_info">
             <div class='name'>
                 <div>Тренинг-парк</div>
                 <div>Дмитрия Сергеева</div>
+            </div>
+            <div id="phone_numbers" class="block_numbers">
+                <div>+7(920)898-46-80</div>
+                <div>+7(920)898-46-80</div>
             </div>
         </div>
     </div>

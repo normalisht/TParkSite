@@ -5,8 +5,8 @@
     position: relative;
     justify-content: center;
     display: grid;
-    grid-template-columns: calc(var(--vw) * 100);
-    font-family: Arial, serif;
+    grid-template-columns: calc(var(--vw, 1vw) * 100);
+    font-family: var(--primary-font-family);
 }
 
 .data {
@@ -32,6 +32,11 @@ h1 {
     text-decoration: none;
     color: #3c5850;
     cursor: default;
+}
+
+.price {
+    display: flex;
+    justify-content: space-between;
 }
 
 .active {

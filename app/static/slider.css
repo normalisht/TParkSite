@@ -27,6 +27,7 @@
 .slider__items {
     display: flex;
     transition: transform 0.5s ease;
+    justify-content: flex-start;
 }
 
 .slider__img {
@@ -49,31 +50,12 @@
     transition: none;
 }
 
-@media (max-width: 768px) {
-    .slider__item {
-        flex: 0 0 100%;
-        max-width: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: black;
-        font-size: 7rem;
-    }
-}
-
-/* на больших экранах (ширина больше 1200px) – 3 слайда */
-@media (min-width: 768px) {
-    .slider__item {
-        flex: var(--primary-flex);
-        max-width: var(--primary-width);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: black;
-        font-size: 7rem;
-        /*border-left: 1px solid black;  из за нах анимация сползает*/
-        /*border-right: 1px solid black; но при желении можно исправть*/
-    }
+.slider__item {
+    flex: var(--primary-flex);
+    max-width: var(--primary-width);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
 }
 
 /* кнопки влево и вправо */

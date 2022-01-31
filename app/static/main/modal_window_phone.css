@@ -34,7 +34,6 @@
 }
 
 .modal-window {
-    font-size: 2rem;
     overflow: hidden;
     position: absolute;
     min-height: 100vh;
@@ -43,7 +42,7 @@
     box-shadow: 0 10px 15px rgba(0, 0, 0, .4);
     background-color: rgba(255, 255, 255, 0.99);
     transition: var(--modal_window_time, 500ms) ease; /* подключается из js */
-    padding: clamp(10px, 2vw, 20px);
+    padding: 5px;
 }
 
 .modal-item {
@@ -51,10 +50,10 @@
     transition: .3s linear;
     text-decoration: none;
     text-align: left;
-    padding: 8px 10px 2px 12px;
+    padding: 5px 5px 2px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.35);
-    font-size: 2rem;
-    font-family: 'Kurale', serif;
+    font-size: calc(1.4 * var(--primary-font-size));
+    font-family: var(--primary-font-family);
 }
 
 .modal-item > a {
@@ -62,12 +61,12 @@
     color: #000000;
 }
 
-.modal-item:nth-last-child(2) {
+.modal-item:last-child {
     border-bottom: 0;
 }
 
 .modal-item:first-child {
-    max-width: 95%;
+    padding-top: 2px;
     border-bottom: 1px;
 }
 
@@ -95,7 +94,7 @@
 }
 
 .contacts .modal-item {
-    font-size: 1.7rem;
+    font-size: calc(1.4 * var(--primary-font-size));
 }
 
 .social-icons {

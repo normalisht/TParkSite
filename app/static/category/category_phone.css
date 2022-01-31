@@ -27,25 +27,21 @@
     transform: rotate(-180deg);
 }
 
-.button_5 {
+.button {
     margin: 0 auto;
-    width: calc(100 * var(--vw));
-    font-family: 'Arial', sans-serif;
-    font-size: 16px;
-    font-weight: 500;
+    width: calc(95 * var(--vw));
+    font-size: var(--primary-font-size);
     color: #000000;
-    /*background: #4acfeb;*/
     border-bottom:  1px solid rgba(0, 0, 0, 0.35);
-    /*box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.2);*/
     transition: all 0.3s ease-in-out 0s;
     cursor: pointer;
     outline: none;
-    padding: 10px;
+    padding: 10px 0 4px;
 }
 
 .description {
     text-align: left;
-    font-size: 18px;
+    font-size: calc(0.9 * var(--primary-font-size));
     margin-left: 0;
     padding-left: 0;
     color: black;
@@ -54,43 +50,22 @@
 .detailed {
     margin-top: 6px;
     color: black;
-    /*text-decoration: underline !important;*/
 }
 
 .price > div {
     display: flex;
-    max-width: 50%;
     align-items: center;
 }
 
-
 .price > div:first-child {
-    text-align: left
-}
-
-.price > div:last-child {
-    text-align: right
-}
-
-.table {
-    font-family: 'Roboto', sans-serif;
-    font-size: 14px;
-    border-collapse: collapse;
-    min-width: clamp(160px, 30vw, 80vw);
-    word-break: break-all;
-}
-
-td {
-    position: center;
-    vertical-align: top;
-    padding-right: 2vw;
+    margin-right: 5px;
 }
 
 .category_description {
-    padding: 2vw 2vw 0;
+    padding: calc(2 * var(--vw, 1vw)) calc(2 * var(--vw, 1vw)) 0;
 }
 
 .category_description .text {
     text-align: left;
-    font-size: 20px;
+    font-size: var(--primary-font-size);
 }

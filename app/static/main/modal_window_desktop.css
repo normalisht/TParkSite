@@ -35,7 +35,7 @@
     text-align: left;
     padding: 8px 10px 2px 12px;
     border-bottom: 1px solid #b7b7b7;
-    font-size: 1.3rem;
+    font-size: var(--primary-font-size);
     font-family: 'Arial', serif;
     cursor: pointer;
 }
@@ -48,8 +48,8 @@
     transition: border-bottom-color 0.05s ease;
 }
 
-.submenu-item:nth-last-child(2),
-.submenu-item:nth-last-child(2):hover {
+.submenu-item:last-child,
+.submenu-item:last-child:hover {
     border-bottom: 0;
 }
 
