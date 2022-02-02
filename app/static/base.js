@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', set_vw)
-window.addEventListener('resize', set_vw)
+// window.addEventListener('resize', set_vw)
 window.addEventListener('orientationchange', set_vw)
 
 
@@ -13,7 +13,7 @@ window.addEventListener('resize', main_block_height)
 window.addEventListener("orientationchange", main_block_height)
 window.addEventListener("change", main_block_height)
 
-window.addEventListener('resize', generate_upper)
+// window.addEventListener('resize', generate_upper)
 window.addEventListener("orientationchange", generate_upper)
 document.addEventListener("DOMContentLoaded", generate_upper)
 
@@ -101,28 +101,16 @@ function buttons_position() {
     buttons.style.boxSizing = 'border-box'
 
     let el = document.getElementById('for_nav_btns')
-    // let bottom_coord = buttons.offsetTop + buttons.offsetHeight
-    let  padding_top = 0, padding_bottom = 0
 
     if (document.documentElement.scrollTop <= el.offsetTop) {
         buttons.style.position = 'relative'
         buttons.style.margin = 'auto'
 
-        if (generate_upper.type == 'mobile') {
+        el.style.height = '0'
+        el.style.width = '0'
 
-            if (12 - document.documentElement.scrollTop + bottom_coord > 0)
-                padding_bottom = Math.min(12 - document.documentElement.scrollTop + bottom_coord, 12)
-            else padding_bottom = 0
-
-            if (document.documentElement.scrollTop + 5 - buttons.offsetTop > 0)
-                padding_top = Math.min(document.documentElement.scrollTop + 5 - buttons.offsetTop, 5)
-            else padding_top = 5
-
-            buttons.style.paddingBottom = '12px'
-            buttons.style.paddingTop = 0 + 'px'
-            el.style.height = '0'
-            el.style.width = '0'
-            el.style.paddingBottom = '0'
+        if (generate_upper.type == 'desktop') {
+            el.style.minWidth = '0'
         }
     }
 
@@ -131,22 +119,13 @@ function buttons_position() {
         buttons.style.position = 'fixed'
         buttons.style.top = buttons.style.left = buttons.style.right = '0'
 
-        if (generate_upper.type == 'mobile') {
-            el.style.height = buttons.offsetHeight + 'px'
-            el.style.width = buttons.offsetWidth + 'px'
-
-            if (12 - document.documentElement.scrollTop + bottom_coord > 0)
-                padding_bottom = Math.min(12 - document.documentElement.scrollTop + bottom_coord, 12)
-            else padding_bottom = 0
-
-            if (document.documentElement.scrollTop + 5 - buttons.scrollTop > 0)
-                padding_top = Math.min(document.documentElement.scrollTop + 5 - buttons.offsetTop, 5)
-            else padding_top = 0
-
-            buttons.style.paddingBottom = padding_bottom + 'px'
-            buttons.style.paddingTop = '0px'
+        el.style.height = buttons.offsetHeight + 'px'
+        el.style.width = buttons.offsetWidth + 'px'
+        if (generate_upper.type == 'desktop') {
+            el.style.minWidth = 360 + 'px'
         }
     }
+
 }
 
 generate_upper.type = null
@@ -185,7 +164,8 @@ function generate_mobile_upper() {
         block_info.firstElementChild.lastElementChild.innerHTML.slice(0)
 
 
-    navigation_buttons.style.paddingBottom = '12px'
+    // navigation_buttons.style.paddingBottom = '12px'
+    document.getElementById('main_block').style.marginTop = 12 + 'px'
 
     let el
     if (!document.getElementById('for_nav_btns')) {
