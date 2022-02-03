@@ -29,7 +29,7 @@
 
 .button {
     margin: 0 auto;
-    width: calc(95 * var(--vw));
+    width: calc(100 * var(--vw, 1vw) - 34px);
     font-size: var(--primary-font-size);
     color: #000000;
     border-bottom:  1px solid rgba(0, 0, 0, 0.35);
@@ -62,10 +62,10 @@
 }
 
 .category_description {
-    padding: calc(2 * var(--vw, 1vw)) calc(2 * var(--vw, 1vw)) 0;
+    width: calc(100 * var(--vw, 1vw) - 34px);
+    margin: auto;
 }
 
 .category_description .text {
-    text-align: left;
     font-size: var(--primary-font-size);
 }

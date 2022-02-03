@@ -5,8 +5,8 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    width: calc(100 * var(--vw, 1vw));
+    height: calc(100 * var(--vh, 1vh));
     align-items: center;
     justify-content: center;
     visibility: hidden;
@@ -50,7 +50,7 @@
     transition: .3s linear;
     text-decoration: none;
     text-align: left;
-    padding: 5px 5px 2px;
+    padding: 5px 8px 2px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.35);
     font-size: calc(1.4 * var(--primary-font-size));
     font-family: var(--primary-font-family);
