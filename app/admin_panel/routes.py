@@ -18,7 +18,7 @@ import json
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('main.index'))
+        return redirect(url_for('admin_panel.main'))
 
     if request.method == 'POST':
         admin = Admin.query.filter_by(email=request.form.get('email').lower()).first()
@@ -58,15 +58,6 @@ def about():  # Косяк поправил(было мейн)
 
     return render_template('admin_panel/about.html', title='О НАС', employees=employees,
                            filosofi=filosofi, about=about, partners=partners)
-
-
-@bp.route('/menu', methods=['GET'])
-# @login_required
-def menu():
-    categories = Category.query.all()
-
-    return render_template('admin_panel/menu.html', title='Меню', categories=categories)
-
 
 # Все ивенты
 @bp.route('/events', methods=['GET'])
@@ -140,24 +131,6 @@ def event_edit(id):
                            title='Редактирование мероприятия')
 
 
-@bp.route('/texts', methods=['GET'])
-# @login_required
-def texts():
-    texts = Text.query.all()
-
-    return render_template('admin_panel/texts.html', title='Описания/Тексты',
-                           texts=texts)
-
-
-@bp.route('/employees', methods=['GET'])
-@login_required
-def employees():
-    employees = Employee.query.all()
-
-    return render_template('admin_panel/employees.html', title='Содрудники',
-                           employees=employees)
-
-
 @bp.route('/category', methods=['GET'])
 @login_required
 def category():
@@ -175,7 +148,7 @@ def category():
 def service_test():
     service_id = request.args.get('service_id')
 
-    service = Service.query.filter_by(id=id).first()
+    service = Service.query.filter_by(id=service_id).first()
     if request.method == 'POST':
         if request.form.get('mycheckbox') == '1':
             service.status = 1
@@ -198,24 +171,24 @@ def service_test():
 @login_required
 def update_service():
     service = Service.query.filter_by(id=request.form['id']).first()
-
-    if getattr(service, 'name') != request.form['name']:
-        setattr(service, 'name', request.form['name'])
-
-    if getattr(service, 'price') != int(request.form['price']):
-        setattr(service, 'price', int(request.form['price']))
-
-    if getattr(service, 'short_description') != request.form['short_description']:
-        setattr(service, 'short_description', request.form['short_description'])
-
-    if getattr(service, 'description') != request.form['description']:
-        setattr(service, 'description', request.form['description'])
-
-    if getattr(service, 'number') != int(request.form['number']):
-        setattr(service, 'number', int(request.form['number']))
-
-    if getattr(service, 'status') != bool(int(request.form['status'])):
-        setattr(service, 'status', bool(int(request.form['status'])))
+    #
+    # if getattr(service, 'name') != request.form['name']:
+    #     setattr(service, 'name', request.form['name'])
+    #
+    # if getattr(service, 'price') != int(request.form['price']):
+    #     setattr(service, 'price', int(request.form['price']))
+    #
+    # if getattr(service, 'short_description') != request.form['short_description']:
+    #     setattr(service, 'short_description', request.form['short_description'])
+    #
+    # if getattr(service, 'description') != request.form['description']:
+    #     setattr(service, 'description', request.form['description'])
+    #
+    # if getattr(service, 'number') != int(request.form['number']):
+    #     setattr(service, 'number', int(request.form['number']))
+    #
+    # if getattr(service, 'status') != bool(int(request.form['status'])):
+    #     setattr(service, 'status', bool(int(request.form['status'])))
 
     return jsonify({'result': 'success'})
 
