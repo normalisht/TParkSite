@@ -13,6 +13,12 @@
 }
 
 
+.category_title {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    font-size: calc(var(--primary-font-size) * 1.3);
+}
+
 .price_switch {
     top: 8px;
     right: -1px;
@@ -59,7 +65,13 @@
 
 .price > div:first-child {
     margin-right: 5px;
+    text-align: left;
 }
+
+.price > div:last-child {
+    /*text-align: right;*/
+}
+
 
 .category_description {
     width: calc(100 * var(--vw, 1vw) - 34px);

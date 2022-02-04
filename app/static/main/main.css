@@ -12,7 +12,7 @@
     --primary-font-family: Arial, sans-serif;
 
 
-    --primary-content-width: 900px;
+    --primary-content-width: 960px;
     --modal_window_time: none;
     --vw: none;
     --vh: none;
@@ -189,7 +189,7 @@ img {
 
 .block_content {
     justify-content: center;
-    max-width: min(95%, 900px);
+    max-width: min(95%, 960px);
     overflow: hidden;
     margin: 5px auto 0;
     text-align: left;
