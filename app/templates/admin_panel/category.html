@@ -46,8 +46,8 @@
         <div>
             <div class="title">Фото</div>
             <div class="grid_block">
-                {% set path = "images/category/" + category.id|string + "/" + files[0] %}
-                <div class="images"><img src="{{ url_for('static', filename=path) }}" alt="" class="images"></div>
+                {% for photo in files %}
+                <div class="images"><img src="{{ url_for('static',filename='/images/category/' + category.id|string  + '/' + photo) }}" alt="" class="images"></div>
 
                 <div class="input__wrapper">
                     <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
@@ -60,6 +60,7 @@
                         <span class="input__file_button">Удалить</span>
                     </label>
                 </div>
+                {% endfor %}
 
                 <div class="checkbox"></div>
             </div>

@@ -45,9 +45,11 @@ def category():
             path = os.path.join(os.getcwd(), files[0])
             open(path)
             a = 1
+            os.chdir('../../../../../')
         except:
             a = 0
             files = []
+            print('1')
         category = Category.query.filter_by(id=category_id).first()
         services = category.services.all()
         if category.status == 1:
@@ -106,6 +108,7 @@ def category_test():
         os.chdir('app/static/images/category/{}'.format(category_id))
         temp = os.getcwd()
         files = listdir(temp)
+        os.chdir('../../../../../')
     except:
         files = []
     if request.method == 'POST':
