@@ -1,6 +1,8 @@
 from flask import render_template, flash, redirect, url_for, request, jsonify, current_app
 from app.main import bp
 from app import db
+import os
+from os import listdir
 from app.main.functions import get_categories, get_contacts_data
 from app.models import Text, Event, Category, ServiceCategory, Service, Employee, Partner, Price
 from sqlalchemy import create_engine
@@ -36,7 +38,10 @@ def main():
 def category():
     try:
         category_id = request.args.get('category_id')
-        path = url_for('static',filename='/images/category/1.png') #путь нормально прописать и это работает
+        os.chdir('app/static/images/category/{}'.format(category_id))
+        temp = os.getcwd()
+        files = listdir(temp)
+        path = os.path.join(os.getcwd(), files[0])
         try:
             open(path)
             a = 1
@@ -47,7 +52,7 @@ def category():
         if category.status == 1:
             return render_template('main/category.html', category=category, category_id=category_id,
                                    services=services, categories=get_categories(),
-                                   contacts_data=get_contacts_data(), a=a)
+                                   contacts_data=get_contacts_data(), a=a, files=files)
         else:
             return redirect(url_for('main.index'))
     except:
