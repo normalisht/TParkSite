@@ -1,6 +1,8 @@
 from flask import render_template, flash, redirect, url_for, request, jsonify, current_app
 from app.main import bp
 from app import db
+import os
+from os import listdir
 from app.main.functions import get_categories, get_contacts_data
 from app.models import Text, Event, Category, ServiceCategory, Service, Employee, Partner, Price
 from sqlalchemy import create_engine
@@ -36,18 +38,24 @@ def main():
 def category():
     try:
         category_id = request.args.get('category_id')
-        path = url_for('static',filename='/images/category/1.png') #путь нормально прописать и это работает
         try:
+            os.chdir('app/static/images/category/{}'.format(category_id))
+            temp = os.getcwd()
+            files = listdir(temp)
+            path = os.path.join(os.getcwd(), files[0])
             open(path)
             a = 1
+            os.chdir('../../../../../')
         except:
             a = 0
+            files = []
+            print('1')
         category = Category.query.filter_by(id=category_id).first()
         services = category.services.all()
         if category.status == 1:
             return render_template('main/category.html', category=category, category_id=category_id,
                                    services=services, categories=get_categories(),
-                                   contacts_data=get_contacts_data(), a=a)
+                                   contacts_data=get_contacts_data(), a=a, files=files)
         else:
             return redirect(url_for('main.index'))
     except:
@@ -96,6 +104,13 @@ def category_test():
     category_id = request.args.get('category_id')
     category = Category.query.filter_by(id=category_id).first()
     services = category.services.all()
+    try:
+        os.chdir('app/static/images/category/{}'.format(category_id))
+        temp = os.getcwd()
+        files = listdir(temp)
+        os.chdir('../../../../../')
+    except:
+        files = []
     if request.method == 'POST':
         if request.form.get('mycheckbox') == '1':
             category.status = 1
@@ -110,4 +125,4 @@ def category_test():
         category.name = request.form.get('title')
         db.session.commit()
     return render_template('admin_panel/category.html', title='{}'.format(category.name),
-                           category=category, services=services, contacts_data=get_contacts_data())
+                           category=category, services=services, contacts_data=get_contacts_data(), files=files)
