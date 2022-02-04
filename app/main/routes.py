@@ -2,6 +2,7 @@ from flask import render_template, flash, redirect, url_for, request, jsonify, c
 from app.main import bp
 from app import db
 import os
+import datetime
 from os import listdir
 from app.main.functions import get_categories, get_contacts_data
 from app.models import Text, Event, Category, ServiceCategory, Service, Employee, Partner, Price
@@ -126,3 +127,23 @@ def category_test():
         db.session.commit()
     return render_template('admin_panel/category.html', title='{}'.format(category.name),
                            category=category, services=services, contacts_data=get_contacts_data(), files=files)
+
+
+@bp.route('/category_create', methods=['GET', 'POST'])
+# @login_required
+def category_create():
+    if request.method == 'POST':
+        title = request.form.get('title')
+        description = request.form.get('description')
+
+        category = Category(name=title, description=description, status=1)
+        db.session.add(category)
+        db.session.commit()
+
+        photo = request.files['photo']
+        photo.save(os.path.join(os.getcwd(), '{}.png'.format(
+            Category.query.filter_by(name=title).first().id
+        )))
+
+
+    return render_template('admin_panel/category_create.html', title='Создание категории')
