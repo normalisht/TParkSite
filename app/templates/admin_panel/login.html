@@ -1,10 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "admin_panel/base.html" %}
 
-</body>
-</html>
+{% block app_content %}
+
+    <link rel="stylesheet"  href="{{ url_for('static', filename='admin_panel/login.css')}}">
+
+    <div class="content">
+        <div class="block_4">
+            <form action="{{ url_for('admin_panel.login') }}" method="post" class="form">
+                <div class="form_group">
+                    <label>
+                        <input name="email" type="text" class="form_control">
+                    </label>
+                </div>
+                <div class="form_group">
+                    <label>
+                        <input name="password" type="password" class="form_control">
+                    </label>
+                </div>
+                <p><input type="submit" value="Войти"></p>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

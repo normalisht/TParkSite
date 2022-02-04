@@ -26,12 +26,9 @@ def login():
             flash('Неверный пароль или email', 'warning')
             return redirect(url_for('admin_panel.login'))
 
-        login_user(admin, remember=request.form.get('remember'))
-        next_page = request.args.get('next')
-        if not next_page or url_parse(next_page).netloc != '':
-            next_page = url_for('main.index')
-        return redirect(next_page)
-    return render_template('admin_panel/../templates/аdmin_panel/login.html', title='Авторизация')
+        return redirect(url_for('admin_panel.main'))
+
+    return render_template('admin_panel/login.html', title='Авторизация')
 
 
 # выход
@@ -108,11 +105,11 @@ def event_create():
 
 
 # радактирование ивента
-@bp.route('/event_edit/<int:id>', methods=['GET', 'POST'])
+@bp.route('/event_edit/<id>', methods=['GET', 'POST'])
 # @login_required
 def event_edit(id):
 
-    event = Event.query.filter_by(id=id).first_or_404()
+    event = Event.query.filter_by(id=id).first()
 
     if request.method == 'POST':
         title = request.form.get('title')
@@ -127,10 +124,13 @@ def event_edit(id):
         setattr(event, 'date', date)
         setattr(event, 'link', link)
 
-        photo = request.files['photo']
-        photo.save(os.path.join(os.getcwd(), '{}.png'.format(
-            Event.query.filter_by(title=title, link=link).first().id
-        )))
+        try:
+            photo = request.files['photo']
+            photo.save(os.path.join(os.getcwd(), '{}.png'.format(
+                Event.query.filter_by(title=title, link=link).first().id
+            )))
+        except:
+            pass
 
         db.session.commit()
 

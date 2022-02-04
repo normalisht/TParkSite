@@ -1,0 +1,253 @@
+@charset "UTF-8";
+
+.down_block a {
+    text-decoration: none;
+    color: #0044ff;
+}
+
+@media(hover: hover) {
+    .down_block a:hover {
+        color: #00289e;
+        text-decoration: underline;
+    }
+}
+
+.content {
+
+}
+
+.block_4 {
+    margin-top: 10px;
+    margin-left: auto;
+}
+
+.img {
+    width: 166px;
+    height:43px;
+
+}
+
+h1 {
+    text-align: center;
+    margin: 5px auto;
+}
+
+h2 {
+    color: #cbc8c8;
+}
+
+.form {
+    margin: auto;
+    width: 280px;
+    padding: 32px;
+    border-radius: 10px;
+    box-shadow: 2px 4px 16px #ccc;
+    font-family: sans-serif;
+    letter-spacing: 1px;
+}
+
+.form_button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    letter-spacing: 1px;
+    color :#fff ;
+    background-color: #0071f0;
+    outline: none;
+    cursor: pointer;
+    transition: 0.3s;
+    font: 600 16px Roboto;
+}
+
+.form_group {
+    position: relative;
+    margin-bottom: 32px;
+}
+
+.form_input {
+    width: 100%;
+    border: none;
+    padding-bottom: 3px;
+    margin-bottom: 3px;
+    border-bottom: 1px solid #cccccc;
+    background-color: transparent;
+    outline: none;
+    transition: 0.3s;
+}
+
+.form_label {
+    position: absolute;
+    top: 0;
+    z-index: -1;
+    color: #9e9e9e;
+    transition: 0.3s;
+}
+
+.form_label_weight {
+    position: absolute;
+    z-index: -1;
+    color: #9e9e9e;
+    transition: 0.3s;
+    top: -18px;
+    font-size: 14px;
+
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+
+@media screen {
+    .form_button:active {
+        box-shadow: 0 2px 3px #0044ff;
+        background-color: #0044ff;
+    }
+}
+
+
+
+    /*Download avatar*/
+.input__wrapper_2 {
+    width: 100%;
+    position: relative;
+    margin: 0 0 15px;
+    transition: all 0.3s ease;
+}
+
+.input__file {
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+}
+
+.input__file_button_text_2 {
+    line-height: 1;
+    font: 600 16px Roboto;
+    padding: 10px 20px;
+    color: #ffffff ;
+    margin: 0 auto;
+    text-decoration: none;
+}
+
+.input__file_button_2 {
+    width: 100%;
+    max-width: 290px;
+    height: 40px;
+    background: #0071f0;
+    color: #fff;
+    font-size: 1.125rem;
+    font-weight: 700;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    border: 0 solid;
+    box-shadow: inset 0 0 20px rgba(255, 255, 255, 0);
+    outline: #0071f0 solid 0;
+    text-shadow: none;
+    transition: all 500ms cubic-bezier(0.19, 1,0.22, 1);
+}
+
+.input__file_button_2:hover {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0)
+
+}
+
+@media screen {
+    .input__file_button_2:active {
+        box-shadow: 0 2px 3px #0044ff;
+        background-color: #0044ff;
+    }
+}
+
+
+
+.input__file-icon {
+    width: 35px;
+    height: 35px;
+}
+
+
+
+
+.down_block {
+    display: block;
+    margin: 0 auto;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: auto;
+    padding: 32px;
+    letter-spacing: 1px;
+}
+
+.submit {
+    justify-content: center;
+    text-align: center;
+    margin: 0 auto;
+    font: 400 16px Roboto;
+    -webkit-user-select: none;
+}
+
+.custom-checkbox {
+    position: absolute;
+    z-index: -1;
+    opacity: 0;
+}
+
+/* для элемента label, связанного с .custom-checkbox */
+.custom-checkbox+label {
+    display: inline-flex;
+    align-items: center;
+    user-select: none;
+}
+
+/* создание в label псевдоэлемента before со следующими стилями */
+.custom-checkbox+label::before {
+    content: '';
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
+    flex-grow: 0;
+    border: 1px solid #adb5bd;
+    border-radius: 0.25em;
+    margin-right: 0.5em;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 50% 50%;
+}
+
+/* стили при наведении курсора на checkbox */
+@media(hover: hover) {
+    .custom-checkbox:not(:disabled):not(:checked) + label:hover::before {
+        border-color: #b3d7ff;
+    }
+}
+
+/* стили для активного чекбокса (при нажатии на него) */
+.custom-checkbox:not(:disabled):active+label::before {
+    background-color: #b3d7ff;
+    border-color: #b3d7ff;
+}
+
+/* стили для чекбокса, находящегося в состоянии checked */
+.custom-checkbox:checked+label::before {
+    border-color: #0b76ef;
+    background-color: #0b76ef;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23fff' d='M6.564.75l-3.59 3.612-1.538-1.55L0 4.26 2.974 7.25 8 2.193z'/%3e%3c/svg%3e");
+}
+
+/* стили для чекбокса, находящегося в состоянии disabled */
+.custom-checkbox:disabled+label::before {
+    background-color: #e9ecef;
+}

@@ -1,0 +1,20 @@
+@charset "UTF-8";
+
+.block_event {
+    font-size: var(--primary-font-size);
+}
+
+.events {
+    margin: 10px auto;
+}
+
+.event {
+    display: flex;
+    margin: 10px;
+    justify-content: center;
+}
+
+a {
+    font-size: 22px;
+    color: #000000;
+}

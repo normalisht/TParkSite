@@ -1,27 +1,27 @@
 {% extends "admin_panel/base.html" %}
 
 {% block scripts %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel/event_create.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel/events.css') }}">
 {% endblock %}
 
 {% block app_content %}
 
-    <div>
-        <div class="new_event">
-
+    <div class="block_event">
+        <div class="new_event event">
+            <a href="{{ url_for('admin_panel.event_create') }}">Создать новое событие</a>
         </div>
         <div class="events">
             {% for event in events %}
-                <a href="{{ url_for('admin_panel.event_edit', id=event.id )}}">
-                    <div class="event">
+                <div class="event">
+                    <a href="{{ url_for('admin_panel.event_edit', id=event.id ) }}">
                         <div class="title">
                             {{ event.title }}
                         </div>
                         <div class="date">
-                            {{ event.date }}
+                            {{ event.date.strftime('%d.%m.%Y') }}
                         </div>
-                    </div>
-                </a>
+                    </a>
+                </div>
             {% endfor %}
         </div>
     </div>
