@@ -38,15 +38,16 @@ def main():
 def category():
     try:
         category_id = request.args.get('category_id')
-        os.chdir('app/static/images/category/{}'.format(category_id))
-        temp = os.getcwd()
-        files = listdir(temp)
-        path = os.path.join(os.getcwd(), files[0])
         try:
+            os.chdir('app/static/images/category/{}'.format(category_id))
+            temp = os.getcwd()
+            files = listdir(temp)
+            path = os.path.join(os.getcwd(), files[0])
             open(path)
             a = 1
         except:
             a = 0
+            files = []
         category = Category.query.filter_by(id=category_id).first()
         services = category.services.all()
         if category.status == 1:
@@ -101,6 +102,12 @@ def category_test():
     category_id = request.args.get('category_id')
     category = Category.query.filter_by(id=category_id).first()
     services = category.services.all()
+    try:
+        os.chdir('app/static/images/category/{}'.format(category_id))
+        temp = os.getcwd()
+        files = listdir(temp)
+    except:
+        files = []
     if request.method == 'POST':
         if request.form.get('mycheckbox') == '1':
             category.status = 1
@@ -115,4 +122,4 @@ def category_test():
         category.name = request.form.get('title')
         db.session.commit()
     return render_template('admin_panel/category.html', title='{}'.format(category.name),
-                           category=category, services=services, contacts_data=get_contacts_data())
+                           category=category, services=services, contacts_data=get_contacts_data(), files=files)
