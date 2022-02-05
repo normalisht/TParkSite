@@ -7,6 +7,10 @@
     transform: translate(-50%, 0);
 }
 
+.block_content {
+    width: calc(100 * var(--vw, 1vw) - 34px);
+}
+
 .block_info {
     text-align: center;
     font-size: calc(1.2 * var(--primary-font-size));
@@ -60,12 +64,12 @@
 }
 
 .event_name {
-    left: 15px;
-    top: calc(clamp(200px, (var(--vh, 1vh) * 45), 800px) - 50px);
+    left: 0;
+    top: calc(clamp(200px, (var(--vh, 1vh) * 45), 800px) - 42px);
 }
 
 .event_text {
-    width: 95%;
+    width: calc(100% - 34px);
     font-size: var(--primary-font-size);
-    margin: 0 auto 4px;
+    margin: 0 auto;
 }

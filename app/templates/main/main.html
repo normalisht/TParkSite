@@ -39,7 +39,7 @@
                                         <span class="event_info event_name">{{ event.title }}
                                         <div></div></span>
                                         <img class="slider__img" alt=""
-                                             src="{{ url_for('static',filename='/images/events/1.png') }}">
+                                             src="{{ url_for('static',filename='/images/events/' + event.id|string + '.png') }}">
                                         <div class="event_text">
                                             {{ event.description }}
                                         </div>

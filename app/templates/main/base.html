@@ -146,7 +146,7 @@
 {% set address = contacts_data.address %}
 {% set phone_numbers = contacts_data.phone_numbers %}
 {% set vk = contacts_data.media[0] %}
-{% set geolocation = contacts_data.media[1] %}
+{% set insta = contacts_data.media[1] %}
 
 
 <div id="upper_container" class="upper_container">
@@ -219,7 +219,7 @@
                                     <ul class="social-icons">
                                         <li><a class="vk" href="{{ vk }}" target="_blank"><i class="fa fa-vk"></i></a>
                                         </li>
-                                        <li><a class="whatsapp" href="https://wa.me/7{{ number }}" target="_blank">
+                                        <li><a class="whatsapp" href="https://wa.me/7{{ phone_numbers[0] }}" target="_blank">
                                             <i class="fa fa-whatsapp"></i></a></li>
                                         <li><a class="insta" href="{{ insta }}" target="_blank"><i
                                                 class="fa fa-instagram"></i></a>

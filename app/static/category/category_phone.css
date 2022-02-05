@@ -13,6 +13,12 @@
 }
 
 
+.category_title {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    font-size: calc(var(--primary-font-size) * 1.3);
+}
+
 .price_switch {
     top: 8px;
     right: -1px;
@@ -29,7 +35,7 @@
 
 .button {
     margin: 0 auto;
-    width: calc(95 * var(--vw));
+    width: calc(100 * var(--vw, 1vw) - 34px);
     font-size: var(--primary-font-size);
     color: #000000;
     border-bottom:  1px solid rgba(0, 0, 0, 0.35);
@@ -59,13 +65,19 @@
 
 .price > div:first-child {
     margin-right: 5px;
+    text-align: left;
 }
 
+.price > div:last-child {
+    /*text-align: right;*/
+}
+
+
 .category_description {
-    padding: calc(2 * var(--vw, 1vw)) calc(2 * var(--vw, 1vw)) 0;
+    width: calc(100 * var(--vw, 1vw) - 34px);
+    margin: auto;
 }
 
 .category_description .text {
-    text-align: left;
     font-size: var(--primary-font-size);
 }

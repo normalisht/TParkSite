@@ -9,25 +9,22 @@
 
 {% block app_content %}
 
-    <h1>{{ category.name |safe }}</h1>
+    <div class="category_title">{{ category.name |safe }}</div>
     <div class="container">
         <div class="data">
             {% if a == 1 %}
-                {% set path = url_for('static',filename='/images/staff/1.png') %}
                 <div class="block_slider">
                     <div class="slider">
                         <div class="slider__container">
                             <div class="slider__wrapper">
                                 <div class="slider__items">
                                     {% for i in range(3) %}
-                                        <div class="slider__item">
-                                            <img class="slider__img" alt=""
-                                                src={{path}}>
-                                        </div>
-                                        <div class="slider__item">
-                                            <img class="slider__img" alt=""
-                                                src="{{ url_for('static',filename='/images/staff/2.png' ) }}">
-                                        </div>
+                                        {% for photo in files %}
+                                            <div class="slider__item">
+                                                <img class="slider__img" alt=""
+                                                    src="{{ url_for('static',filename='/images/category/' + category.id|string  + '/' + photo)}}">
+                                            </div>
+                                        {% endfor %}
                                     {% endfor %}
                                 </div>
                             </div>
@@ -41,7 +38,7 @@
 
         <div class="category_description">
             <div class="text">
-                {{ category.description |safe if category.description |safe }}
+                {{ category.description |safe if category.description }}
             </div>
         </div>
 
