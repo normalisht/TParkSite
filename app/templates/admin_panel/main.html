@@ -2,6 +2,7 @@
 
 {% block scripts %}
     <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='modal_window_desktop.css') }}">
 {% endblock %}
 
 {% block app_content %}
@@ -39,9 +40,11 @@
         </div>
     </a>
 
-    <div class="title">Главная страница</div>
+
     <div class="div_grid_panel">
+
         <div class="grid_panel">
+            <div class="title">Главная страница</div>
             <div>
                 <div class="title">Текст</div>
                 <div class="grid_block">
@@ -84,30 +87,32 @@
                     </div>
                 {% endfor %}
 
-                <div class="input__wrapper">
-                    <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
-                    <label for="block_photo" class="button">
-                        <span class="input__file_button">Добавить</span>
-                       {#Тут нужен JS#}
-                    </label>
-                </div>
+
 
                 <div class="grid_block_photo">
+
                     <div class="input__wrapper" id="delete_photo">
 
                     </div>
-                    <div class="input__wrapper" id="delete_photo">
-
+                    <div class="input__wrapper">
+                        <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
+                        <label for="block_photo" class="button">
+                            <span class="input__file_button">Добавить</span>
+                            {#Тут нужен JS#}
+                        </label>
                     </div>
                     <div class="input__wrapper_2" id="delete_photo">
                         <label for="block_photo" class="button">
                             <a class="input__file_button" href="{{ url_for('admin_panel.events') }}">Events</a>
                         </label>
                     </div>
+
+
                 </div>
             </div>
         </div>
     </div>
+
 
 
 
