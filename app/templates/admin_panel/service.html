@@ -8,36 +8,47 @@
 
 
     <div class="grid_panel">
-        <div>
-            <div class="title">Текст</div>
-            <div class="grid_block">
+        <div class="title">Текст</div>
+        <div class="grid_block">
 
-                <div>
-                    <form method="POST">
+            <div>
+                <form method="POST">
 
-                        <label for="title">Название услуги</label>
-                        <input type="text" name="title" id="title" class="category_name"
-                               value="{{ service.name}}">
+                    <label for="title">Название услуги</label>
+                    <input type="text" name="title" id="title" class="category_name"
+                           value="{{ service.name }}">
 
-                        <label for="input_desc">Краткое описание</label>
-                        <textarea  name="input_short_desc" id="input_short_desc" class="category_name"
-                               >{{ service.short_description }}</textarea>
+                    <label for="input_desc">Краткое описание</label>
+                    <textarea name="input_short_desc" id="input_short_desc" class="category_name"
+                    >{{ service.short_description }}</textarea>
 
-                        <label for="input_desc">Описание</label>
-                        <textarea  name="input_desc" id="input_desc" class="category_name"
-                               >{{ service.description }}</textarea>
+                    <label for="input_desc">Описание</label>
+                    <textarea name="input_desc" id="input_desc" class="category_name"
+                    >{{ service.description }}</textarea>
 
-                        <label for="input_price">Цена</label>
-                        <input type="text" name="input_price" id="input_price" class="category_name"
-                               value="{{ service.price }}">
+                    <label for="input_price">Цена</label>
+                    <input type="text" name="input_price" id="input_price" class="category_name"
+                           value="{{ service.price }}">
 
-                        <label for="input_check"></label>
-                        <input type="checkbox" name="input_check" id="input_check" class="category_name"
-                        value="{{ service.next }}">
+                    <label for="select">Категория</label>
 
-                        <input type="submit" value="Подтвердить">
-                    </form>
-                </div>
+
+                    <select name="select" class="category_name">
+
+                        {% for categories in service.categories %}
+                            <option value="0">0</option>
+                        {% endfor %}
+                    </select>
+
+                    <div>
+                        <input type="checkbox" name="input_check" id="input_check">
+                        <label for="input_check">Подробнее</label>
+                    </div>
+
+
+                    <input type="submit" value="Подтвердить">
+
+                </form>
 
             </div>
         </div>
