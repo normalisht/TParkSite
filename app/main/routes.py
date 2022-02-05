@@ -95,10 +95,11 @@ def service_create():
         title = request.form.get('title')
         short_description = request.form.get('short_description')
         description = request.form.get('description')
+        price = request.form.get('price')
         next = request.form.get('next')
 
-        service = Service(name=title, description=description, short_description=short_description,
-                           next=next, status=1)
+        service = Service(name=title, description=description, short_description=short_description, price=price,
+                          next=next, status=1)
         db.session.add(service)
         db.session.commit()
 
@@ -120,9 +121,6 @@ def about():
     return render_template('main/about.html', employees=employees,
                            filosofi=filosofi, about=about, partners=partners,
                            categories=get_categories(), contacts_data=get_contacts_data())
-
-
-
 
 
 @bp.route('/category_test', methods=['GET', 'POST'])
