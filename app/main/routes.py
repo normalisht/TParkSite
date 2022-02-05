@@ -88,6 +88,28 @@ def service_test():
                            category=category, service=service, contacts_data=get_contacts_data())
 
 
+@bp.route('/service_create', methods=['GET', 'POST'])
+# @login_required
+def service_create():
+    if request.method == 'POST':
+        title = request.form.get('title')
+        short_description = request.form.get('short_description')
+        description = request.form.get('description')
+        next = request.form.get('next')
+
+        service = Service(name=title, description=description, short_description=short_description,
+                           next=next, status=1)
+        db.session.add(service)
+        db.session.commit()
+
+        photo = request.files['photo']
+        photo.save(os.path.join(os.getcwd(), '{}.png'.format(
+            Service.query.filter_by(name=title).first().id
+        )))
+
+    return render_template('admin_panel/service_create.html', title='Создание услуги')
+
+
 @bp.route('/about_2', methods=['GET'])
 def about():
     employees = Employee.query.all()
@@ -98,6 +120,9 @@ def about():
     return render_template('main/about.html', employees=employees,
                            filosofi=filosofi, about=about, partners=partners,
                            categories=get_categories(), contacts_data=get_contacts_data())
+
+
+
 
 
 @bp.route('/category_test', methods=['GET', 'POST'])
@@ -144,6 +169,5 @@ def category_create():
         photo.save(os.path.join(os.getcwd(), '{}.png'.format(
             Category.query.filter_by(name=title).first().id
         )))
-
 
     return render_template('admin_panel/category_create.html', title='Создание категории')
