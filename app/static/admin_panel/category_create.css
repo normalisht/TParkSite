@@ -1,0 +1,21 @@
+@charset "UTF-8";
+
+.form {
+    display: flex;
+    justify-content: center;
+}
+
+.form_container {
+}
+
+input {
+    display: flex;
+    flex-direction: column;
+    margin: 5px;
+    padding: 2px;
+}
+
+#description {
+    margin: 5px;
+    padding: 2px;
+}
