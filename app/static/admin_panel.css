@@ -19,6 +19,7 @@
     margin: 0 auto;
     display: grid;
     grid-template-columns: 45vw;
+    justify-content: center;
 
 }
 
@@ -34,6 +35,7 @@
     grid-template-columns: 50% 25% 25%;
     min-height:100px;
     align-self: center;
+    margin-bottom: 10px;
 }
 
 .input__wrapper {
@@ -82,7 +84,6 @@
     display: flex;
     align-content: center;
     margin-bottom: 10px;
-    height: 10vh;
 
 }
 
