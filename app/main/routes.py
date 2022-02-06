@@ -85,13 +85,11 @@ def service_test():
                 a = ServiceCategory(service_id=service_id, category_id=elem.id)
                 for i in ServiceCategory.query.all():
                     if str(i.service_id) == str(a.service_id) and str(i.category_id) == str(a.category_id):
-                        ServiceCategory.query.filter_by(service_id = i.service_id, category_id = i.category_id).delete()
+                        ServiceCategory.query.filter_by(service_id=i.service_id, category_id=i.category_id).delete()
                         db.session.commit()
                     else:
                         pass
-        db.session.add(a)
-        db.session.commit()
-
+                db.session.add(a)
 
         service.short_description = request.form.get('input_short_desc')
         service.description = request.form.get('input_desc')
@@ -99,10 +97,9 @@ def service_test():
         service.name = request.form.get('title')
 
         db.session.commit()
-
-
+        for_check = ServiceCategory.query.filter_by(service_id=service_id, category_id=)
     return render_template('admin_panel/service.html', title='{}'.format(service.name),
-                           category=category, categories=categories_all, service=service,
+                           category=category, categories=categories_all, service=service, for_check=for_check,
                            contacts_data=get_contacts_data())
 
 
@@ -166,7 +163,7 @@ def category_change():
                 element.service.status = 0
         if request.form['delete_category']:
             try:
-                shutil.rmtree('app/static/images/category/{}'.format(category_id),ignore_errors=True)
+                shutil.rmtree('app/static/images/category/{}'.format(category_id), ignore_errors=True)
             except:
                 pass
             Category.query.filter_by(id=category_id).delete()
