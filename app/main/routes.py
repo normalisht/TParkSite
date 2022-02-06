@@ -88,10 +88,9 @@ def service_test():
         else:
             service.next = 0
         for elem in categories_all:
-            if request.form.get(elem) == categories_all:
+            if request.form.get(elem) == '1':
                 service.categories = request.form.get(elem)
-
-
+                service_category = ServiceCategory( )
 
         service.short_description = request.form.get('input_short_desc')
         service.description = request.form.get('input_desc')
