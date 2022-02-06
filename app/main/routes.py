@@ -8,6 +8,7 @@ from app.main.functions import get_categories, get_contacts_data
 from app.models import Text, Event, Category, ServiceCategory, Service, Employee, Partner, Price
 from sqlalchemy import create_engine
 from flask_ckeditor import CKEditor
+import shutil
 
 engine = create_engine("sqlite:///T_Park.db")
 
@@ -123,6 +124,14 @@ def category_change():
                 element.service.status = 1
             else:
                 element.service.status = 0
+        if request.form['delete_category']:
+            try:
+                shutil.rmtree('app/static/images/category/{}'.format(category_id),ignore_errors=True)
+            except:
+                pass
+            Category.query.filter_by(id=category_id).delete()
+            db.session.commit()
+            return redirect(url_for('main.index'))
 
         category.description = request.form.get('ckeditor')
         category.name = request.form.get('title')

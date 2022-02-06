@@ -24,9 +24,9 @@
                         <input type="radio" id="checkbox_2" class="checkbox" name="mycheckbox" value="0" {{ "checked" if
                         category.status == 0 else "" }}/>
                     </div>
-                    <div class="button_delete" id="delete_category" name="delete_category" value="Delete">
+                    <div class="button_delete" id="delete_category">
                         <label for="block_photo" class="button">
-                            <span class="input__file_button">Удалить категорию</span>
+                            <input type ="submit" span class="input__file_button"  name="delete_category" value="Удалить категорию"></span>
                         </label>
                     </div>
                     <label for="input_desc">Описание</label>
