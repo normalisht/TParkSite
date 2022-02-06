@@ -226,6 +226,13 @@ label {
 }
 
 .submit_button {
-    font-size: 20px;
-    margin-left: 22.5vw;
+    font-size: 30px;
+}
+
+.grid_block_images {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    min-height:100px;
+    align-self: center;
+    row-gap: 30px;
 }
