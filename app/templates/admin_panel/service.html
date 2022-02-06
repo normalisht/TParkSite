@@ -33,17 +33,21 @@
                     <label for="select">Категория</label>
 
 
-                    <select name="select" class="category_name">
+                    <select name="categories" class="category_name"  multiple>
 
-                        {% for categories in service.categories %}
-                            <option value="0">0</option>
+                        {% for categories in categories %}
+                            <option value="{{ categories.name }}">{{ categories.name }}</option>
                         {% endfor %}
                     </select>
 
-                    <div>
-                        <input type="checkbox" style="height: 10px; width:10px; border: 1px solid"
-                               name="input_check" id="input_check">
-                        <label for="input_check">Подробнее</label>
+                    <div class="grid_checkbox">
+                        <input type="radio" id="checkbox_1" class="checkbox" name="checkbox" value="1" {{ "checked" if
+                        service.next else "" }}/>
+                        <input type="radio" id="checkbox_2" class="checkbox" name="checkbox" value="0" {{ "checked" if
+                        service.next == 0 else "" }}/>
+                        <label for="checkbox_1">С Подробнее</label>
+                        <label for="checkbox_2">Без Подробнее</label>
+
                     </div>
 
 
@@ -62,7 +66,7 @@
                 <div><img src="{{ url_for("static", filename=path) }}" alt="" class="image"></div>
 
                 <div class="input__wrapper">
-                    <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
+                    <input type="file" name="photo" id="photo" class="input input__file">
                     <label for="block_photo" class="button">
                         <span class="input__file_button">Изменить</span>
                     </label>
