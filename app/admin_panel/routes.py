@@ -2,14 +2,11 @@ import datetime
 import os
 
 from flask import render_template, flash, redirect, url_for, request, jsonify, current_app
-from wtforms import TextAreaField
-from wtforms.validators import Length
 
 from app.admin_panel import bp
 from app import db
 from flask_login import login_user, logout_user, current_user, login_required
 from app.models import Admin, Category, Service, Employee, Text, Comment, ServiceCategory, Event, Partner
-from werkzeug.urls import url_parse
 import json
 
 
@@ -132,7 +129,7 @@ def event_edit(id):
 
 
 @bp.route('/category', methods=['GET'])
-@login_required
+# @login_required
 def category():
     id = request.args.get('id')
 

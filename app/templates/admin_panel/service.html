@@ -39,7 +39,7 @@
                             <option value="{{ categories.name }}">{{ categories.name }}</option>
                         {% endfor %}
                     </select>
-
+                
                     <div class="grid_checkbox">
                         <input type="radio" id="checkbox_1" class="checkbox" name="checkbox" value="1" {{ "checked" if
                         service.next else "" }}/>
@@ -47,6 +47,7 @@
                         service.next == 0 else "" }}/>
                         <label for="checkbox_1">С Подробнее</label>
                         <label for="checkbox_2">Без Подробнее</label>
+
                     </div>
 
 
