@@ -4,7 +4,7 @@
     align-items: flex-start;
     white-space: normal;
     display: grid;
-    grid-template-columns: repeat(1, minmax(100px, 600px));
+    grid-template-columns: repeat(1, minmax(100px, 960px));
     /*grid-template-columns: repeat(2, minmax(100px, 500px));*/
     /*grid-row-gap: 30px;*/
     /*grid-column-gap: 50px;*/

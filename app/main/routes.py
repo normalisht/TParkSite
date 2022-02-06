@@ -18,23 +18,15 @@ engine = create_engine("sqlite:///T_Park.db")
 @bp.route('/TPark', methods=['GET'])
 def index():
     main_text = Text.query.filter_by(title="main_text").first().text
-    events = Event.query.all()
+    events = Event.query.order_by(Event.date).all()
 
     if len(events) == 0:
         pass
     elif len(events) < 3:
         events = events * 3
-    return render_template('main/main.html', main_text=main_text, events=events[::-1],
+
+    return render_template('main/main.html', main_text=main_text, events=events[1:] + events[:1],
                            categories=get_categories(), contacts_data=get_contacts_data())
-
-
-@bp.route('/admin_panel/main', methods=['GET'])
-def main():
-    main_text = Text.query.filter_by(title="main_text").first()
-    events = Event.query.all()
-
-    return render_template('admin_panel/main.html', title='Главная страница', main_text=main_text, events=events,
-                           contacts_data=get_contacts_data())
 
 
 @bp.route('/category', methods=['GET'])
@@ -180,9 +172,11 @@ def category_create():
 
         photo = request.files['photo']
         category_id = category.id
-        os.chdir('app/static/images/category'.format(category_id))
+        os.makedirs('app/static/images/category/{}'.format(category_id))
+        os.chdir('app/static/images/category/{}'.format(category_id))
         photo.save(os.path.join(os.getcwd(), '{}.png'.format(
             Category.query.filter_by(name=title).first().id
         )))
+        os.chdir('../../../../../')
 
     return render_template('admin_panel/category_create.html', title='Создание категории')

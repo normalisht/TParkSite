@@ -26,7 +26,7 @@
             <div class="slider">
                 <div class="slider__container">
                     <div class="slider__wrapper">
-                        <div class="slider__items">
+                        <div class="slider__items" id="event_items">
                             {% set i = namespace(a=0) %}
                             {% for event in events %}
                                 {% set path = "static/images/events/" + event.id|string + ".png" %}

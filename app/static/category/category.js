@@ -67,3 +67,22 @@ document.addEventListener('DOMContentLoaded', function () {
         })
     })
 })
+
+document.addEventListener('DOMContentLoaded', function () {
+    let services = $('.price')
+
+    services.each(function (index, element) {
+
+
+        if (+$(element).outerHeight() > 20) {
+
+            let el_text = $(element).find('.cost').children().first(),
+                text = el_text.html()
+
+            text = text.split(' / ').join("<br>")
+            el_text.html(text)
+
+            el_text.css('text-align', 'center')
+        }
+    })
+})
