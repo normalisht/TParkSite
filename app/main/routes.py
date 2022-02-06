@@ -79,13 +79,24 @@ def service_test():
     service_id = request.args.get('service_id')
 
     service = Service.query.filter_by(id=service_id).first()
+    categories = Category.query.all()
     if request.method == 'POST':
+        if request.form.get('checkbox') == '1':
+            service.next = 1
+        else:
+            service.next = 0
+
+        service.short_description = request.form.get('input_short_desc')
         service.description = request.form.get('input_desc')
         service.price = request.form.get('input_price')
         service.name = request.form.get('title')
+        # if request.files['photo']:
+        #     photo = request.files['photo']
+        #     photo.save(os.path.join(os.getcwd(), 'service_id.png'.format(service.number)))
+        # service.categories = request.form.get('categories')
         db.session.commit()
     return render_template('admin_panel/service.html', title='{}'.format(service.name),
-                           category=category, service=service, contacts_data=get_contacts_data())
+                           category=category, categories=categories, service=service, contacts_data=get_contacts_data())
 
 
 @bp.route('/service_create', methods=['GET', 'POST'])
