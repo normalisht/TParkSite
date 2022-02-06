@@ -33,13 +33,13 @@
                     <label for="select">Категория</label>
 
 
-                    <select name="select" class="category_name" multiple>
+                    <select name="categories" class="category_name"  multiple>
 
                         {% for categories in categories %}
                             <option value="{{ categories.name }}">{{ categories.name }}</option>
                         {% endfor %}
                     </select>
-                
+
                     <div class="grid_checkbox">
                         <input type="radio" id="checkbox_1" class="checkbox" name="checkbox" value="1" {{ "checked" if
                         service.next else "" }}/>

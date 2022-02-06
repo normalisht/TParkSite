@@ -79,7 +79,7 @@ def service_test():
     service_id = request.args.get('service_id')
 
     service = Service.query.filter_by(id=service_id).first()
-    categories = Category.query.all()
+    categories_all = Category.query.all()
     if request.method == 'POST':
         if request.form.get('checkbox') == '1':
             service.next = 1
@@ -96,7 +96,7 @@ def service_test():
         # service.categories = request.form.get('categories')
         db.session.commit()
     return render_template('admin_panel/service.html', title='{}'.format(service.name),
-                           category=category, categories=categories, service=service, contacts_data=get_contacts_data())
+                           category=category, categories=categories_all, service=service, contacts_data=get_contacts_data())
 
 
 @bp.route('/service_create', methods=['GET', 'POST'])
