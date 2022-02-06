@@ -201,9 +201,23 @@
     text-align: center;
 }
 
+.grid_category {
+    display: grid;
+    grid-template-columns: 22.5vw 22.5vw;
+    text-align: left;
+    justify-content: left;
+    margin-bottom: 20px;
+
+}
+
 label {
     font-size: 20px;
     font-weight: bold;
+}
+
+.label_1 {
+    font-size: 18px;
+
 }
 
 .service_name {

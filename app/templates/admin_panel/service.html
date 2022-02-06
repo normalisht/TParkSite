@@ -30,26 +30,27 @@
                     <input type="text" name="input_price" id="input_price" class="category_name"
                            value="{{ service.price }}">
 
-                    <label for="select">Категория</label>
+                    <label for="select">Категории</label>
 
-
-                    <select name="categories" class="category_name"  multiple>
-
+                    <div class="grid_category">
                         {% for categories in categories %}
-                            <option value="{{ categories.name }}">{{ categories.name }}</option>
+                            <label for="category" class="label_1">{{ categories.name }}</label>
+                            <input type="radio" id="category" class="checkbox" {{ "checked" if
+                        service.categories == categories }}>
+
                         {% endfor %}
-                    </select>
+                    </div>
 
                     <div class="grid_checkbox">
+
+                        <label for="checkbox_1">С Подробнее</label>
+                        <label for="checkbox_2">Без Подробнее</label>
                         <input type="radio" id="checkbox_1" class="checkbox" name="checkbox" value="1" {{ "checked" if
                         service.next else "" }}/>
                         <input type="radio" id="checkbox_2" class="checkbox" name="checkbox" value="0" {{ "checked" if
                         service.next == 0 else "" }}/>
-                        <label for="checkbox_1">С Подробнее</label>
-                        <label for="checkbox_2">Без Подробнее</label>
 
                     </div>
-
 
                     <input type="submit" value="Подтвердить">
 

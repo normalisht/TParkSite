@@ -1,4 +1,6 @@
 from flask import render_template, flash, redirect, url_for, request, jsonify, current_app
+from typing import List
+
 from app.main import bp
 from app import db
 import os
@@ -80,11 +82,16 @@ def service_test():
 
     service = Service.query.filter_by(id=service_id).first()
     categories_all = Category.query.all()
+    list = request.form.get('category')
     if request.method == 'POST':
         if request.form.get('checkbox') == '1':
             service.next = 1
         else:
             service.next = 0
+        for i in categories_all:
+
+            if list[i] == '1':
+                service.categories = list[i]
 
         service.short_description = request.form.get('input_short_desc')
         service.description = request.form.get('input_desc')
@@ -93,10 +100,11 @@ def service_test():
         # if request.files['photo']:
         #     photo = request.files['photo']
         #     photo.save(os.path.join(os.getcwd(), 'service_id.png'.format(service.number)))
-        # service.categories = request.form.get('categories')
+
         db.session.commit()
     return render_template('admin_panel/service.html', title='{}'.format(service.name),
-                           category=category, categories=categories_all, service=service, contacts_data=get_contacts_data())
+                           category=category, categories=categories_all, service=service,
+                           contacts_data=get_contacts_data())
 
 
 @bp.route('/service_create', methods=['GET', 'POST'])
