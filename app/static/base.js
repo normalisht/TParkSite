@@ -317,4 +317,3 @@ document.addEventListener('DOMContentLoaded', function () {
     setTimeout(function () {slider_items.css({'height': slider_item_active.outerHeight() + 'px'}, 1000)},
         100)
 })
-
