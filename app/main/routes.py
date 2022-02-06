@@ -156,8 +156,12 @@ def category_create():
         db.session.commit()
 
         photo = request.files['photo']
+        category_id = category.id
+        os.makedirs('app/static/images/category/{}'.format(category_id))
+        os.chdir('app/static/images/category/{}'.format(category_id))
         photo.save(os.path.join(os.getcwd(), '{}.png'.format(
             Category.query.filter_by(name=title).first().id
         )))
+        os.chdir('../../../../../')
 
     return render_template('admin_panel/category_create.html', title='Создание категории')
