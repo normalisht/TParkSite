@@ -100,8 +100,9 @@ def about():
                            categories=get_categories(), contacts_data=get_contacts_data())
 
 
-@bp.route('/category_test', methods=['GET', 'POST'])
-def category_test():
+@bp.route('/category_change', methods=['GET', 'POST'])
+# @login_required
+def category_change():
     category_id = request.args.get('category_id')
     category = Category.query.filter_by(id=category_id).first()
     services = category.services.all()
@@ -122,6 +123,7 @@ def category_test():
                 element.service.status = 1
             else:
                 element.service.status = 0
+
         category.description = request.form.get('ckeditor')
         category.name = request.form.get('title')
         db.session.commit()

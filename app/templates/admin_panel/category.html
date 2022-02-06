@@ -24,6 +24,11 @@
                         <input type="radio" id="checkbox_2" class="checkbox" name="mycheckbox" value="0" {{ "checked" if
                         category.status == 0 else "" }}/>
                     </div>
+                    <div class="button_delete" id="delete_category" name="delete_category" value="Delete">
+                        <label for="block_photo" class="button">
+                            <span class="input__file_button">Удалить категорию</span>
+                        </label>
+                    </div>
                     <label for="input_desc">Описание</label>
                     {{ ckeditor.create(value=category.description|safe if category.description) }}
                 </div>
@@ -46,7 +51,7 @@
             </div>
         <div>
             <div class="title">Фото</div>
-            <div class="grid_block">
+            <div class="grid_block_images">
                 {% for photo in files %}
                 <div class="images"><img src="{{ url_for('static',filename='/images/category/' + category.id|string  + '/' + photo) }}" alt="" class="images"></div>
 
@@ -62,10 +67,10 @@
                     </label>
                 </div>
                 {% endfor %}
-                <br>
-                <div class="checkbox"></div>
+                <div>
+                    <input type="submit" value="Подтвердить" class="submit_button">
+                </div>
             </div>
-            <input type="submit" value="Подтвердить" class="submit_button">
             </form>
         </div>
     </div>
