@@ -82,24 +82,21 @@ def service_test():
 
     service = Service.query.filter_by(id=service_id).first()
     categories_all = Category.query.all()
-    list = request.form.get('category')
     if request.method == 'POST':
         if request.form.get('checkbox') == '1':
             service.next = 1
         else:
             service.next = 0
-        for i in categories_all:
+        for elem in categories_all:
+            if request.form.get(elem) == categories_all:
+                service.categories = request.form.get(elem)
 
-            if list[i] == '1':
-                service.categories = list[i]
+
 
         service.short_description = request.form.get('input_short_desc')
         service.description = request.form.get('input_desc')
         service.price = request.form.get('input_price')
         service.name = request.form.get('title')
-        # if request.files['photo']:
-        #     photo = request.files['photo']
-        #     photo.save(os.path.join(os.getcwd(), 'service_id.png'.format(service.number)))
 
         db.session.commit()
     return render_template('admin_panel/service.html', title='{}'.format(service.name),

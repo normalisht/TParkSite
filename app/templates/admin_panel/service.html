@@ -35,8 +35,7 @@
                     <div class="grid_category">
                         {% for categories in categories %}
                             <label for="category" class="label_1">{{ categories.name }}</label>
-                            <input type="radio" id="category" class="checkbox" {{ "checked" if
-                        service.categories == categories }}>
+                            <input type="radio" id="category" name="{{ categories.name }}" class="checkbox"  value="{{ categories.name }}">
 
                         {% endfor %}
                     </div>
