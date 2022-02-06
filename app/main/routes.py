@@ -81,9 +81,17 @@ def service_test():
         else:
             service.next = 0
         for elem in categories_all:
-            if request.form.get(elem) == '1':
-                service.categories = request.form.get(elem)
-                service_category = ServiceCategory( )
+            if request.form.get(str(elem.id)) == str(elem.id):
+                a = ServiceCategory(service_id=service_id, category_id=elem.id)
+                for i in ServiceCategory.query.all():
+                    if str(i.service_id) == str(a.service_id) and str(i.category_id) == str(a.category_id):
+                        ServiceCategory.query.filter_by(service_id = i.service_id, category_id = i.category_id).delete()
+                        db.session.commit()
+                    else:
+                        pass
+        db.session.add(a)
+        db.session.commit()
+
 
         service.short_description = request.form.get('input_short_desc')
         service.description = request.form.get('input_desc')
@@ -91,6 +99,8 @@ def service_test():
         service.name = request.form.get('title')
 
         db.session.commit()
+
+
     return render_template('admin_panel/service.html', title='{}'.format(service.name),
                            category=category, categories=categories_all, service=service,
                            contacts_data=get_contacts_data())
