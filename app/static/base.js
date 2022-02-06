@@ -22,11 +22,11 @@ document.addEventListener('DOMContentLoaded', function() {
     $('.slider__control_prev').each(function (index, element) {
         element.click()
     })
-    setTimeout(function() {
-        $('.slider__control_next').each(function (index, element) {
-            element.click()
-        })
-    }, 300)
+    // setTimeout(function() {
+    //     $('.slider__control_next').each(function (index, element) {
+    //         element.click()
+    //     })
+    // }, 1000)
 })
 
 
@@ -302,4 +302,19 @@ function copy_number(number, el) {
         el.setAttribute('title', 'Нажмите, чтобы скопировать')
     }
 }
+
+document.addEventListener('click', function () {
+    let slider_items = $('#event_items'),
+        slider_item_active = slider_items.find('.slider__item_active')
+
+    slider_items.css({'height': slider_item_active.outerHeight() + 'px'}, 1000)
+})
+
+document.addEventListener('DOMContentLoaded', function () {
+    let slider_items = $('#event_items'),
+        slider_item_active = slider_items.find('.slider__item_active')
+
+    setTimeout(function () {slider_items.css({'height': slider_item_active.outerHeight() + 'px'}, 1000)},
+        100)
+})
 

@@ -26,7 +26,7 @@
 
 .slider__items {
     display: flex;
-    transition: transform 0.5s ease;
+    transition: 1s ease;
     justify-content: flex-start;
 }
 
@@ -58,11 +58,15 @@
     align-items: flex-start;
 }
 
+.slider__item_active {
+    height: min-content;
+}
+
 /* кнопки влево и вправо */
 
 .slider__control {
     position: absolute;
-    top: 50%;
+    top: calc(clamp(200px, (var(--vh, 1vh) * 45), 800px) / 2);
     display: flex;
     align-items: center;
     justify-content: center;

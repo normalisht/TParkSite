@@ -1,11 +1,14 @@
 import datetime
 import os
+from os import listdir
 
 from flask import render_template, flash, redirect, url_for, request, jsonify, current_app
 
 from app.admin_panel import bp
 from app import db
 from flask_login import login_user, logout_user, current_user, login_required
+
+from app.main.functions import get_categories
 from app.models import Admin, Category, Service, Employee, Text, Comment, ServiceCategory, Event, Partner
 import json
 
@@ -38,33 +41,21 @@ def logout():
 @bp.route('/main', methods=['GET'])
 # @login_required
 def main():
-    main_text = Text.query.filter_by(title="main_text").first().text
-    events = Event.query.all()
+    main_text = Text.query.filter_by(title="main_text").first()
 
-    return render_template('admin_panel/main.html', title='Главная страница', main_text=main_text, events=events)
+    return render_template('admin_panel/main.html', title='Главная страница', main_text=main_text,
+                           categories=get_categories())
 
-
-@bp.route('/about', methods=['GET'])
-# @login_required
-def about():  # Косяк поправил(было мейн)
-
-    employees = Employee.query.all()
-    about = Text.query.filter_by(title='about').first()
-    filosofi = Text.query.filter_by(title='filosofi').first()
-    partners = Partner.query.all()
-
-    return render_template('admin_panel/about.html', title='О НАС', employees=employees,
-                           filosofi=filosofi, about=about, partners=partners)
 
 # Все ивенты
 @bp.route('/events', methods=['GET'])
 # @login_required
 def events():
-
     events = Event.query.all()
 
     return render_template('admin_panel/event/events.html', title='Мероприятия',
                            events=events)
+
 
 # создание ивента
 @bp.route('/event_create', methods=['GET', 'POST'])
@@ -96,7 +87,6 @@ def event_create():
 @bp.route('/event_edit/<id>', methods=['GET', 'POST'])
 # @login_required
 def event_edit(id):
-
     event = Event.query.filter_by(id=id).first()
 
     if request.method == 'POST':
@@ -128,16 +118,52 @@ def event_edit(id):
                            title='Редактирование мероприятия')
 
 
-@bp.route('/category', methods=['GET'])
-# @login_required
-def category():
-    id = request.args.get('id')
-
-    category = Category.query.filter_by(id=id).first()
+@bp.route('/category_test', methods=['GET', 'POST'])
+def category_test():
+    category_id = request.args.get('category_id')
+    category = Category.query.filter_by(id=category_id).first()
     services = category.services.all()
-
+    try:
+        os.chdir('app/static/images/category/{}'.format(category_id))
+        temp = os.getcwd()
+        files = listdir(temp)
+        os.chdir('../../../../../')
+    except:
+        files = []
+    if request.method == 'POST':
+        if request.form.get('mycheckbox') == '1':
+            category.status = 1
+        else:
+            category.status = 0
+        for element in services:
+            if request.form.get('service_checkbox_' + str(element.service.id)) == '1':
+                element.service.status = 1
+            else:
+                element.service.status = 0
+        category.description = request.form.get('ckeditor')
+        category.name = request.form.get('title')
+        db.session.commit()
     return render_template('admin_panel/category.html', title='{}'.format(category.name),
-                           category=category, services=services)
+                           category=category, services=services, files=files)
+
+
+@bp.route('/category_create', methods=['GET', 'POST'])
+# @login_required
+def category_create():
+    if request.method == 'POST':
+        title = request.form.get('title')
+        description = request.form.get('description')
+
+        category = Category(name=title, description=description, status=1)
+        db.session.add(category)
+        db.session.commit()
+
+        photo = request.files['photo']
+        photo.save(os.path.join(os.getcwd(), '{}.png'.format(
+            Category.query.filter_by(name=title).first().id
+        )))
+
+    return render_template('admin_panel/category_create.html', title='Создание категории')
 
 
 @bp.route('/service_test', methods=['GET', 'POST'])
@@ -147,15 +173,45 @@ def service_test():
 
     service = Service.query.filter_by(id=service_id).first()
     if request.method == 'POST':
-        if request.form.get('mycheckbox') == '1':
-            service.status = 1
-        else:
-            service.status = 0
-    service.description = request.form.get('input_desc')
-    service.name = request.form.get('title')
-    db.session.commit()
-    return render_template('admin_panel/service.html', title='{}'.format(service.name),
-                           category=category, service=service)
+        service.description = request.form.get('input_desc')
+        service.price = request.form.get('input_price')
+        service.name = request.form.get('title')
+        db.session.commit()
+    return render_template('admin_panel/service.html', title='{}'.format(service.name), service=service)
+
+
+@bp.route('/service_create', methods=['GET', 'POST'])
+# @login_required
+def service_create():
+    if request.method == 'POST':
+        title = request.form.get('title')
+        short_description = request.form.get('short_description')
+        description = request.form.get('description')
+        price = request.form.get('price')
+        next = request.form.get('next')
+
+        service = Service(name=title, description=description, short_description=short_description, price=price,
+                          next=next, status=1)
+        db.session.add(service)
+        db.session.commit()
+
+        photo = request.files['photo']
+        photo.save(os.path.join(os.getcwd(), '{}.png'.format(
+            Service.query.filter_by(name=title).first().id
+        )))
+
+    return render_template('admin_panel/service_create.html', title='Создание услуги')
+
+
+@bp.route('/about_2', methods=['GET'])
+def about():
+    employees = Employee.query.all()
+    about = Text.query.filter_by(title='about').first()
+    filosofi = Text.query.filter_by(title='filosofi').first()
+    partners = Partner.query.all()
+
+    return render_template('main/about.html', employees=employees,
+                           filosofi=filosofi, about=about, partners=partners)
 
 
 '''json запросы'''

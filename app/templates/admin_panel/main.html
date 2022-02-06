@@ -2,7 +2,8 @@
 
 {% block scripts %}
     <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='modal_window_desktop.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='main/main.css') }}">
+    <script defer type="text/javascript" src="{{ url_for('static', filename='modal_window.js') }}"></script>
 {% endblock %}
 
 {% block app_content %}
@@ -18,17 +19,12 @@
                 <div id="services-modal-win" class="modal submenu">
                     <div class="modal-window">
                         {% for category in categories %}
-                            {% if category.status %}
-                                <div class="modal-item submenu-item">
-                                    <a href="{{ url_for('admin_panel.category') }}?category_id={{ category.id }}">
-                                        {{ category.name }}
-                                    </a>
-                                </div>
-                            {% endif %}
+                            <div class="modal-item submenu-item">
+                                <a href="{{ url_for('admin_panel.category_test') }}?category_id={{ category.id }}">
+                                    {{ category.name }}
+                                </a>
+                            </div>
                         {% endfor %}
-                        {#                            <close class="btn-close-modal-window"># }
-{#                                <img src="{{ url_for('static', filename='cross.png') }}" alt="X">#}
-                        {#                            </close>#}
                     </div>
                     <div class="overlay"></div>
                 </div>
@@ -39,80 +35,78 @@
                     О нас
                 </div>
             </a>
-        </div></div>
+        </div>
+    </div>
 
-            <div class="div_grid_panel">
+    <div class="div_grid_panel">
 
-                <div class="grid_panel">
-                    <div class="title">Главная страница</div>
+        <div class="grid_panel">
+            <div class="title">Главная страница</div>
+            <div>
+                <div class="title">Текст</div>
+                <div class="grid_block">
                     <div>
-                        <div class="title">Текст</div>
-                        <div class="grid_block">
-                            <div>{{ main_text.title }}</div>
-                            <div>
-                                <form>
-                                    <label for="title">Текст главной страницы</label>
-                                    <textarea name="title" id="title" class="category_name">
-                            {{ main_text.text }}
+                        <form>
+                            <label for="title">Текст главной страницы</label>
+                            <textarea name="title" id="title" class="category_name">
+                                {{ main_text.text }}
                             </textarea>
-                                    <input type="submit" value="Подтвердить">
-                                </form>
-                            </div>
-
-                        </div>
+                            <input type="submit" value="Подтвердить">
+                        </form>
                     </div>
 
-                    <div>
-                        <div class="title">Фото</div>
-                        {% set i = 0 %}
-                        {% for i in range(3) %}
-                            <div class="grid_block_photo">
-                                {% set path = "images/staff/" + i|string + ".png" %}
-                                <div class="block_image"><img src="{{ url_for("static", filename=path) }}" alt=""
-                                                              class="image">
-                                </div>
-
-                                <div class="input__wrapper">
-                                    <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
-                                    <label for="block_photo" class="button">
-                                        <span class="input__file_button">Изменить</span>
-                                    </label>
-                                </div>
-                                <div class="input__wrapper" id="delete_photo">
-                                    <label for="block_photo" class="button">
-                                        <span class="input__file_button">Удалить</span>
-                                    </label>
-                                </div>
-
-                                <div class="checkbox"></div>
-                            </div>
-                        {% endfor %}
-
-
-
-                        <div class="grid_block_photo">
-
-                            <div class="input__wrapper" id="delete_photo">
-
-                            </div>
-                            <div class="input__wrapper">
-                                <input type="button" name="block_photo" id="photo" class="input input__file" multiple>
-                                <label for="block_photo" class="button">
-                                    <span class="input__file_button">Добавить</span>
-                                    {#Тут нужен JS#}
-                                </label>
-                            </div>
-                            <div class="input__wrapper_2" id="delete_photo">
-                                <label for="block_photo" class="button">
-                                    <a class="input__file_button" href="{{ url_for('admin_panel.events') }}">Events</a>
-                                </label>
-                            </div>
-
-
-                        </div>
-                    </div>
                 </div>
             </div>
+
+            <div>
+                <div class="title">Фото</div>
+                {% set i = 0 %}
+                {% for i in range(3) %}
+                    <div class="grid_block_photo">
+                        {% set path = "images/staff/" + i|string + ".png" %}
+                        <div class="block_image"><img src="{{ url_for("static", filename=path) }}" alt=""
+                                                      class="image">
+                        </div>
+
+                        <div class="input__wrapper">
+                            <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
+                            <label for="block_photo" class="button">
+                                <span class="input__file_button">Изменить</span>
+                            </label>
+                        </div>
+                        <div class="input__wrapper" id="delete_photo">
+                            <label for="block_photo" class="button">
+                                <span class="input__file_button">Удалить</span>
+                            </label>
+                        </div>
+
+                        <div class="checkbox"></div>
+                    </div>
+                {% endfor %}
+
+                <div class="grid_block_photo">
+
+                    <div class="input__wrapper" id="delete_photo">
+
+                    </div>
+                    <div class="input__wrapper">
+                        <input type="button" name="block_photo" id="photo" class="input input__file" multiple>
+                        <label for="block_photo" class="button">
+                            <span class="input__file_button">Добавить</span>
+                            {#Тут нужен JS#}
+                        </label>
+                    </div>
+                    <div class="input__wrapper_2" id="delete_photo">
+                        <label for="block_photo" class="button">
+                            <a class="input__file_button" href="{{ url_for('admin_panel.events') }}">Events</a>
+                        </label>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 
