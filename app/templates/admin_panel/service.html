@@ -11,77 +11,78 @@
         <div class="title">Текст</div>
         <div class="grid_block">
 
-            <div>
-                <form method="POST">
 
-                    <label for="title">Название услуги</label>
-                    <input type="text" name="title" id="title" class="category_name"
-                           value="{{ service.name }}">
+            <form method="POST">
 
-                    <label for="input_desc">Краткое описание</label>
-                    <textarea name="input_short_desc" id="input_short_desc" class="category_name"
-                    >{{ service.short_description }}</textarea>
+                <label for="title">Название услуги</label>
+                <input type="text" name="title" id="title" class="category_name"
+                       value="{{ service.name }}">
 
-                    <label for="input_desc">Описание</label>
-                    <textarea name="input_desc" id="input_desc" class="category_name"
-                    >{{ service.description }}</textarea>
+                <label for="input_desc">Краткое описание</label>
+                <textarea name="input_short_desc" id="input_short_desc" class="category_name"
+                >{{ service.short_description }}</textarea>
 
-                    <label for="input_price">Цена</label>
-                    <input type="text" name="input_price" id="input_price" class="category_name"
-                           value="{{ service.price }}">
+                <label for="input_desc">Описание</label>
+                <textarea name="input_desc" id="input_desc" class="category_name"
+                >{{ service.description }}</textarea>
 
-                    <label for="select">Категории</label>
+                <label for="input_price">Цена</label>
+                <input type="text" name="input_price" id="input_price" class="category_name"
+                       value="{{ service.price }}">
 
-                    <div class="grid_category">
-                        {% for categories in categories  and i in categories %}
-                            <label for="category" class="label_1">{{ categories.name }}</label>
-                            <input type="radio" id="category" class="checkbox" name={{ categories.id }}  value={{ categories.id }}
-                                    >
+                <label for="select">Категории</label>
 
-                        {% endfor %}
-                    </div>
+                <div class="grid_category">
+                    {% for categories in categories %}
+                        <label for="category" class="label_1">{{ categories.name }}</label>
+                        <input type="radio" id="category" class="checkbox"
+                               name={{ categories.id }}  value={{ categories.id }}
+                        >
 
-                    <div class="grid_checkbox">
+                    {% endfor %}
+                </div>
 
-                        <label for="checkbox_1">С Подробнее</label>
-                        <label for="checkbox_2">Без Подробнее</label>
-                        <input type="radio" id="checkbox_1" class="checkbox" name="checkbox" value="1" {{ "checked" if
+                <div class="grid_checkbox">
+
+                    <label for="checkbox_1">С Подробнее</label>
+                    <label for="checkbox_2">Без Подробнее</label>
+                    <input type="radio" id="checkbox_1" class="checkbox" name="checkbox" value="1" {{ "checked" if
                         service.next else "" }}/>
-                        <input type="radio" id="checkbox_2" class="checkbox" name="checkbox" value="0" {{ "checked" if
+                    <input type="radio" id="checkbox_2" class="checkbox" name="checkbox" value="0" {{ "checked" if
                         service.next == 0 else "" }}/>
 
-                    </div>
-
-                    <input type="submit" value="Подтвердить">
-
-                </form>
-
-            </div>
-        </div>
-
-        <div>
-            <div class="title">Фото</div>
-
-            <div class="grid_block_photo">
-                {% set path = "images/service/" + service.id|string + ".png" %}
-                <div><img src="{{ url_for("static", filename=path) }}" alt="" class="image"></div>
-
-                <div class="input__wrapper">
-                    <input type="file" name="photo" id="photo" class="input input__file">
-                    <label for="block_photo" class="button">
-                        <span class="input__file_button">Изменить</span>
-                    </label>
-                </div>
-                <div class="input__wrapper" id="delete_photo">
-                    <label for="block_photo" class="button">
-                        <span class="input__file_button">Удалить</span>
-                    </label>
                 </div>
 
-                <div class="checkbox"></div>
-            </div>
+                <input type="submit" value="Подтвердить">
+
+            </form>
 
         </div>
+    </div>
+
+    <div>
+        <div class="title">Фото</div>
+
+        <div class="grid_block_photo">
+            {% set path = "images/service/" + service.id|string + ".png" %}
+            <div><img src="{{ url_for("static", filename=path) }}" alt="" class="image"></div>
+
+            <div class="input__wrapper">
+                <input type="file" name="photo" id="photo" class="input input__file">
+                <label for="block_photo" class="button">
+                    <span class="input__file_button">Изменить</span>
+                </label>
+            </div>
+            <div class="input__wrapper" id="delete_photo">
+                <label for="block_photo" class="button">
+                    <span class="input__file_button">Удалить</span>
+                </label>
+            </div>
+
+            <div class="checkbox"></div>
+        </div>
+
+    </div>
     </div>
 
 {% endblock %}
