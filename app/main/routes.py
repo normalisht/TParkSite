@@ -97,9 +97,9 @@ def service_test():
         service.name = request.form.get('title')
 
         db.session.commit()
-        for_check = ServiceCategory.query.filter_by(service_id=service_id, category_id=)
+
     return render_template('admin_panel/service.html', title='{}'.format(service.name),
-                           category=category, categories=categories_all, service=service, for_check=for_check,
+                           category=category, categories=categories_all, service=service,
                            contacts_data=get_contacts_data())
 
 
