@@ -46,7 +46,6 @@ def main():
     return render_template('admin_panel/main.html', title='Главная страница', main_text=main_text,
                            categories=get_categories())
 
-
 # Все ивенты
 @bp.route('/events', methods=['GET'])
 # @login_required
@@ -225,7 +224,7 @@ def about():
     filosofi = Text.query.filter_by(title='filosofi').first()
     partners = Partner.query.all()
 
-    return render_template('main/about.html', employees=employees,
+    return render_template('admin_panel/about.html', employees=employees,
                            filosofi=filosofi, about=about, partners=partners)
 
 
