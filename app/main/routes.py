@@ -21,6 +21,8 @@ def index():
     main_text = Text.query.filter_by(title="main_text").first().text
     events = Event.query.order_by(Event.date).all()
 
+
+
     if len(events) == 0:
         pass
     elif len(events) < 3:
@@ -68,62 +70,7 @@ def service():
                            contacts_data=get_contacts_data())
 
 
-@bp.route('/service_test', methods=['GET', 'POST'])
-# @login_required
-def service_test():
-    service_id = request.args.get('service_id')
 
-    service = Service.query.filter_by(id=service_id).first()
-    categories_all = Category.query.all()
-    if request.method == 'POST':
-        if request.form.get('checkbox') == '1':
-            service.next = 1
-        else:
-            service.next = 0
-        for elem in categories_all:
-            if request.form.get(str(elem.id)) == str(elem.id):
-                a = ServiceCategory(service_id=service_id, category_id=elem.id)
-                for i in ServiceCategory.query.all():
-                    if str(i.service_id) == str(a.service_id) and str(i.category_id) == str(a.category_id):
-                        ServiceCategory.query.filter_by(service_id=i.service_id, category_id=i.category_id).delete()
-                        db.session.commit()
-                    else:
-                        pass
-                db.session.add(a)
-
-        service.short_description = request.form.get('input_short_desc')
-        service.description = request.form.get('input_desc')
-        service.price = request.form.get('input_price')
-        service.name = request.form.get('title')
-
-        db.session.commit()
-
-    return render_template('admin_panel/service.html', title='{}'.format(service.name),
-                           category=category, categories=categories_all, service=service,
-                           contacts_data=get_contacts_data())
-
-
-@bp.route('/service_create', methods=['GET', 'POST'])
-# @login_required
-def service_create():
-    if request.method == 'POST':
-        title = request.form.get('title')
-        short_description = request.form.get('short_description')
-        description = request.form.get('description')
-        price = request.form.get('price')
-        next = request.form.get('next')
-
-        service = Service(name=title, description=description, short_description=short_description, price=price,
-                          next=next, status=1)
-        db.session.add(service)
-        db.session.commit()
-
-        photo = request.files['photo']
-        photo.save(os.path.join(os.getcwd(), '{}.png'.format(
-            Service.query.filter_by(name=title).first().id
-        )))
-
-    return render_template('admin_panel/service_create.html', title='Создание услуги')
 
 
 @bp.route('/about_2', methods=['GET'])

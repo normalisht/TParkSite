@@ -42,6 +42,20 @@ def logout():
 # @login_required
 def main():
     main_text = Text.query.filter_by(title="main_text").first()
+    photo_number = request.args.get('photo_number')
+
+    try:
+        os.chdir('app/static/images/staff/{}'.format(photo_number))
+        temp = os.getcwd()
+        files = listdir(temp)
+        path = os.path.join(os.getcwd(), files[0])
+        open(path)
+        a = 1
+        os.chdir('../../../../../')
+    except:
+        a = 0
+        files = []
+        print('1')
 
     return render_template('admin_panel/main.html', title='Главная страница', main_text=main_text,
                            categories=get_categories())
@@ -181,6 +195,14 @@ def service_test():
             service.next = 1
         else:
             service.next = 0
+
+        try:
+            os.chdir('app/static/images/service/{}'.format(service_id))
+            temp = os.getcwd()
+            files = listdir(temp)
+            os.chdir('../../../../../')
+        except:
+            files = []
 
         service.short_description = request.form.get('input_short_desc')
         service.description = request.form.get('input_desc')
