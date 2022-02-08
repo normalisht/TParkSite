@@ -57,6 +57,18 @@ def main():
         files = []
         print('1')
 
+    # photo = request.files['photo']
+    #
+    # os.makedirs('app/static/images/staff/{}'.format(photo_number))
+    # os.chdir('app/static/images/staff/{}'.format(photo_number))
+    # photo.save(os.path.join(os.getcwd(), '{}.png'.format(
+    #     Category.query.filter_by(name=title).first().id
+    # )))
+    # os.chdir('../../../../../')
+
+
+
+
     return render_template('admin_panel/main.html', title='Главная страница', main_text=main_text,
                            categories=get_categories())
 

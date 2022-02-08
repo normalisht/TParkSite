@@ -26,7 +26,7 @@
                     </div>
                     <div class="button_delete" id="delete_category">
                         <label for="block_photo" class="button">
-                            <input type ="submit" span class="input__file_button"  name="delete_category" value="Удалить категорию"></span>
+                            <input type ="submit"  class="input__file_button"  name="delete_category" value="Удалить категорию"></span>
                         </label>
                     </div>
                     <label for="input_desc">Описание</label>
@@ -36,7 +36,7 @@
                         <div class="grid_element">
                             {% set service = element.service %}
                             <br>
-                            <a href="{{ url_for('main.service_test') }}?service_id={{ service.id }}" class="service_name">{{ service.name if service.name }}</a>
+                            <a href="{{ url_for('admin_panel.service_test') }}?service_id={{ service.id }}" class="service_name">{{ service.name if service.name }}</a>
                             <div class="grid_checkbox">
                                 <label for="checkbox_{{ service.id }}">Отображать</label>
                                 <label for="checkbox_{{ service.id + 1 }}">Скрыть</label>
