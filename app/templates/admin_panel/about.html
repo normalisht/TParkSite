@@ -34,88 +34,85 @@
                 </div>
             </div>
 
-            <div>
-                <div class="title">Партнёры</div>
+            <div class="">
+                <div class="title">Партнёры</div><br>
                 {% for partner in partners %}
-                    <div class="grid_block_photo">
-                        {% set path = "/images/partner/" + partner.id|string + ".png" %}
-                        <figure class="img__employ">
-                            <img src="{{ url_for("static", filename=path) }}" alt="{{ partner.name }}" class="partimg">
-                            <figcaption>
-                                <div class="title">Ссылка на партнера</div>
-                            </figcaption>
-                            <form>
+                    <div class="partners_map">
+                        <div class="grid_block_photo">
+                            {% set path = "/images/partner/" + partner.id|string + ".png" %}
+                            <figure class="img__employ">
+                                <img src="{{ url_for("static", filename=path) }}" alt="{{ partner.name }}"
+                                     class="partimg">
                                 <figcaption>
-                                    <input type="text" name="title" id="title" class=""
-                                           value="{{ partner.link if partner.link }}">
+                                    <div class="">Ссылка на партнера</div>
                                 </figcaption>
-                                <figcaption>
-                                    <input type="submit" value="Подтвердить">
-                                </figcaption>
-                            </form>
-                        </figure>
+                                <form>
+                                    <figcaption>
+                                        <input type="text" name="title" id="title" class="employ_txt"
+                                               value="{{ partner.link if partner.link }}">
+                                    </figcaption>
+                                </form>
+                            </figure>
 
-                        <div class="input__wrapper">
-                            <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
-                            <label for="block_photo" class="button">
-                                <span class="input__file_button">Изменить</span>
-                            </label>
-                        </div>
-                        <div class="input__wrapper" id="delete_photo">
-                            <label for="block_photo" class="button">
-                                <span class="input__file_button">Удалить</span>
-                            </label>
-                        </div>
+                            <div class="input__wrapper">
+                                <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
+                                <label for="block_photo" class="button">
+                                    <span class="input__file_button">Изменить</span>
+                                </label>
+                            </div>
+                            <div class="input__wrapper" id="delete_photo">
+                                <label for="block_photo" class="button">
+                                    <span class="input__file_button">Удалить</span>
+                                </label>
+                            </div>
 
-                        <div class="checkbox"></div>
+                            <div class="checkbox"></div>
+                        </div>
                     </div>
                 {% endfor %}
-
-                <div class="title">Сотрудники</div>
-                {% for employee in employees %}
-                    <div class="grid_block_photo">
-                        {% set path = "images/employee/" + employee.id|string + "0.png" %}
-                        <figure class="img__employ">
-                            <img src="{{ url_for("static", filename=path) }}" alt="" class="emplimg">
-                            <form>
-                                <figcaption>ФИО</figcaption>
-                                <figcaption>
-                                    <input type="text" name="title" id="title" class=""
-                                           value="{{ employee.name if employee.name }}">
-                                </figcaption>
-                                <figcaption>
-                                    <input type="submit" value="Подтвердить">
-                                </figcaption>
-                            </form>
-                            <form>
-                                <figcaption>
-                                    <figcaption>Должность</figcaption>
-                                    <input type="text" name="title" id="title" class=""
-                                           value="{{ employee.position if employee.position }}">
-                                </figcaption>
-                                <figcaption>
-                                    <input type="submit" value="Подтвердить">
-                                </figcaption>
-                            </form>
-                        </figure>
-
-                        <div class="input__wrapper">
-                            <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
-                            <label for="block_photo" class="button">
-                                <span class="input__file_button">Изменить</span>
-                            </label>
-                        </div>
-                        <div class="input__wrapper" id="delete_photo">
-                            <label for="block_photo" class="button">
-                                <span class="input__file_button">Удалить</span>
-                            </label>
-                        </div>
-
-                        <div class="checkbox"></div>
-                    </div>
-                {% endfor %}
-
             </div>
+
+            <div class="title">Сотрудники</div><br>
+            {% for employee in employees %}
+                <div class="partners_map">
+                <div class="grid_block_photo">
+                    {% set path = "images/employee/" + employee.id|string + ".png" %}
+                    <figure class="img__employ">
+                        <img src="{{ url_for("static", filename=path) }}" alt="" class="emplimg">
+                        <form>
+                            <figcaption>ФИО</figcaption>
+                            <figcaption>
+                                <input type="text" name="title" id="title" class="employ_txt"
+                                       value="{{ employee.name if employee.name }}">
+                            </figcaption>
+                        </form>
+                        <form>
+                            <figcaption>
+                                <figcaption>Должность</figcaption>
+                                <input type="text" name="title" id="title" class="employ_txt"
+                                       value="{{ employee.position if employee.position }}">
+                            </figcaption>
+
+                        </form>
+                    </figure>
+
+                    <div class="input__wrapper">
+                        <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
+                        <label for="block_photo" class="button">
+                            <span class="input__file_button">Подтвердить</span>
+                        </label>
+                    </div>
+                    <div class="input__wrapper" id="delete_photo">
+                        <label for="block_photo" class="button">
+                            <span class="input__file_button">Удалить</span>
+                        </label>
+                    </div>
+
+                    <div class="checkbox"></div>
+                </div>
+                </div>
+            {% endfor %}
+
 
         </div>
     </div>
