@@ -70,9 +70,6 @@ def service():
                            contacts_data=get_contacts_data())
 
 
-
-
-
 @bp.route('/about_2', methods=['GET'])
 def about():
     employees = Employee.query.all()
