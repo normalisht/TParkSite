@@ -167,7 +167,7 @@ def category_change():
                 element.service.status = 1
             else:
                 element.service.status = 0
-        if request.form['delete_category']:
+        if request.form.get('delete_category') == 'Удалить категорию':
             try:
                 shutil.rmtree('app/static/images/category/{}'.format(category_id), ignore_errors=True)
             except:
@@ -175,6 +175,13 @@ def category_change():
             Category.query.filter_by(id=category_id).delete()
             db.session.commit()
             return redirect(url_for('main.index'))
+        for photo in files:
+            if request.form.get('delete_' + str(photo)) == 'Удалить':
+                try:
+                    os.remove('app/static/images/category/{}/'.format(category_id) + str(photo))
+                    return redirect(url_for('admin_panel.category_change', category_id=category_id))
+                except:
+                    pass
 
         category.description = request.form.get('ckeditor')
         category.name = request.form.get('title')
