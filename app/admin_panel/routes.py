@@ -182,6 +182,14 @@ def category_change():
                     return redirect(url_for('admin_panel.category_change', category_id=category_id))
                 except:
                     pass
+            if request.files['add_' + str(photo)]:
+                img = request.files['add_' + str(photo)]
+                print(img)
+                os.chdir('app/static/images/category/{}'.format(category_id))
+                img.save(os.path.join(os.getcwd(), '{}.png'.format(len(files) + 1)))
+                os.chdir('../../../../../')
+                return redirect(url_for('admin_panel.category_change', category_id=category_id))
+
 
         category.description = request.form.get('ckeditor')
         category.name = request.form.get('title')

@@ -56,7 +56,7 @@
                     <div><img src="{{ url_for('static',filename='/images/category/' + category.id|string  + '/' + photo) }}" alt="" class="image"></div>
 
                 <div class="input__wrapper">
-                    <input type ="file"  class="input__file_button" multiple  name="add_photo">
+                    <input type ="file"  class="input__file_button" multiple  name="add_{{ photo }}">
                 </div>
                 <div class="input__wrapper" id="delete_photo">
                     <label for="block_photo" class="button">
