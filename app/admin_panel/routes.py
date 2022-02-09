@@ -46,6 +46,7 @@ def main():
     return render_template('admin_panel/main.html', title='Главная страница', main_text=main_text,
                            categories=get_categories())
 
+
 # Все ивенты
 @bp.route('/events', methods=['GET'])
 # @login_required
