@@ -43,6 +43,7 @@
     min-height:200px;
     align-self: center;
     margin-bottom: 10px;
+
 }
 
 .input__wrapper {
@@ -62,13 +63,6 @@
     position: absolute;
 }
 
-
-.images {
-    width: 30vw;
-    height: 30vw;
-    grid-column-start: 1;
-    grid-column-end: 3;
-}
 
 .checkbox {
     position: relative;
@@ -235,13 +229,6 @@ label {
 
 .submit_button {
     font-size: 30px;
-}
-
-.grid_block_images {
-    display: grid;
-    grid-template-columns: 50% 50%;
-    min-height:100px;
-    align-self: center;
-    row-gap: 30px;
+    margin-left: 18vw;
 }
 
