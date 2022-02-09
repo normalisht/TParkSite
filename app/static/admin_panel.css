@@ -8,6 +8,13 @@
     font-weight: bold;
 }
 
+.block_texts {
+    width: 45vw;
+    min-width:100px;
+    border: 2px solid #000;
+
+}
+
 .div_grid_panel {
     display: flex;
     justify-content: space-around;
@@ -33,7 +40,7 @@
 .grid_block_photo {
     display: grid;
     grid-template-columns: 50% 25% 25%;
-    min-height:100px;
+    min-height:200px;
     align-self: center;
     margin-bottom: 10px;
 }
@@ -93,8 +100,8 @@
 }
 
 .image {
-    width: clamp(250px, 10vw, 30vw);
-    height: clamp(250px, 10vw, 30vw);
+    width: clamp(200px, 10vw, 30vw);
+    height: clamp(200px, 10vw, 30vw);
     display: flex;
     align-items: center;
 
@@ -145,7 +152,8 @@
 /* Типа Кнопка 2*/
 
 .input__file_button {
-
+    min-width: 110px;
+    max-width: 150px;
     text-decoration: none;
     color: black;
     padding: 6px;
@@ -236,3 +244,4 @@ label {
     align-self: center;
     row-gap: 30px;
 }
+

@@ -3,6 +3,7 @@
 {% block scripts %}
     <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='main/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='main/desktop.css') }}">
     <script defer type="text/javascript" src="{{ url_for('static', filename='modal_window.js') }}"></script>
 {% endblock %}
 
@@ -37,7 +38,7 @@
 
             </a>
 
-            <a href="{{ url_for('admin_panel.events') }}">
+            <a class="button_main about_a" href="{{ url_for('admin_panel.events') }}">
             <div class="" href="{{ url_for('admin_panel.events') }}">
                 Events
             </div>
@@ -50,7 +51,7 @@
 
         <div class="grid_panel">
             <div class="title">Главная страница</div>
-            <div>
+            <div class="block_texts">
                 <div class="title">Текст</div>
                 <div class="grid_block">
                     <div>
@@ -66,7 +67,7 @@
                 </div>
             </div>
 
-            <div>
+            <div class="block_texts">
                 <div class="title">Фото</div>
                 {% set i = 0 %}
                 {% set limit = 3 %}
@@ -100,7 +101,7 @@
 
                     </div>
                     <div class="input__wrapper">
-                        <input type="button" name="add_photo" id="add_photo" class="input input__file" multiple>
+                        <input type="button" name="add_photo" id="add_photo" class="input input__file"  value="">
                         <label for="block_photo" class="button">
                             <span class="input__file_button">Добавить</span>
                         </label>
