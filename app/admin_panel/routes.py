@@ -11,6 +11,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 from app.main.functions import get_categories
 from app.models import Admin, Category, Service, Employee, Text, Comment, ServiceCategory, Event, Partner
 import json
+import shutil
 
 
 # авторизация админа
@@ -143,8 +144,9 @@ def event_edit(id):
                            title='Редактирование мероприятия')
 
 
-@bp.route('/category_test', methods=['GET', 'POST'])
-def category_test():
+@bp.route('/category_change', methods=['GET', 'POST'])
+# @login_required
+def category_change():
     category_id = request.args.get('category_id')
     category = Category.query.filter_by(id=category_id).first()
     services = category.services.all()
@@ -165,11 +167,20 @@ def category_test():
                 element.service.status = 1
             else:
                 element.service.status = 0
+        if request.form['delete_category']:
+            try:
+                shutil.rmtree('app/static/images/category/{}'.format(category_id), ignore_errors=True)
+            except:
+                pass
+            Category.query.filter_by(id=category_id).delete()
+            db.session.commit()
+            return redirect(url_for('main.index'))
+
         category.description = request.form.get('ckeditor')
         category.name = request.form.get('title')
         db.session.commit()
     return render_template('admin_panel/category.html', title='{}'.format(category.name),
-                           category=category, services=services, files=files)
+                           category=category, services=services,  files=files)
 
 
 @bp.route('/category_create', methods=['GET', 'POST'])

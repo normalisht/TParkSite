@@ -11,7 +11,7 @@
 
     <div class="grid_panel">
         <div>
-            <form method="POST">
+            <form method="POST" enctype="multipart/form-data">
                 <div class="grid_service">
                     <label for="title">Название категории</label>
                     <textarea name="title" id="title"
@@ -51,19 +51,16 @@
             </div>
         <div>
             <div class="title">Фото</div>
-            <div class="grid_block_images">
+            <div class="grid_block_photo">
                 {% for photo in files %}
-                <div class="images"><img src="{{ url_for('static',filename='/images/category/' + category.id|string  + '/' + photo) }}" alt="" class="images"></div>
+                    <div><img src="{{ url_for('static',filename='/images/category/' + category.id|string  + '/' + photo) }}" alt="" class="image"></div>
 
                 <div class="input__wrapper">
-                    <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
-                    <label for="block_photo" class="button">
-                        <span class="input__file_button">Изменить</span>
-                    </label>
+                    <input type ="file"  class="input__file_button" multiple  name="add_photo">
                 </div>
-                <div class="button_delete" id="delete_photo">
+                <div class="input__wrapper" id="delete_photo">
                     <label for="block_photo" class="button">
-                        <span class="input__file_button">Удалить</span>
+                        <input type ="submit"  class="input__file_button"  name="delete_photo" value="Удалить"></span>
                     </label>
                 </div>
                 {% endfor %}
