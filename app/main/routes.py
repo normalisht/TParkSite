@@ -1,4 +1,6 @@
 from flask import render_template, flash, redirect, url_for, request, jsonify, current_app
+from typing import List
+
 from app.main import bp
 from app import db
 import os
@@ -8,6 +10,7 @@ from app.main.functions import get_categories, get_contacts_data
 from app.models import Text, Event, Category, ServiceCategory, Service, Employee, Partner, Price
 from sqlalchemy import create_engine
 from flask_ckeditor import CKEditor
+import shutil
 
 engine = create_engine("sqlite:///T_Park.db")
 
@@ -17,6 +20,8 @@ engine = create_engine("sqlite:///T_Park.db")
 def index():
     main_text = Text.query.filter_by(title="main_text").first().text
     events = Event.query.order_by(Event.date).all()
+
+
 
     if len(events) == 0:
         pass
@@ -65,53 +70,7 @@ def service():
                            contacts_data=get_contacts_data())
 
 
-@bp.route('/service_test', methods=['GET', 'POST'])
-# @login_required
-def service_test():
-    service_id = request.args.get('service_id')
 
-    service = Service.query.filter_by(id=service_id).first()
-    categories_all = Category.query.all()
-    if request.method == 'POST':
-        if request.form.get('checkbox') == '1':
-            service.next = 1
-        else:
-            service.next = 0
-
-        service.short_description = request.form.get('input_short_desc')
-        service.description = request.form.get('input_desc')
-        service.price = request.form.get('input_price')
-        service.name = request.form.get('title')
-        # if request.files['photo']:
-        #     photo = request.files['photo']
-        #     photo.save(os.path.join(os.getcwd(), 'service_id.png'.format(service.number)))
-        # service.categories = request.form.get('categories')
-        db.session.commit()
-    return render_template('admin_panel/service.html', title='{}'.format(service.name),
-                           category=category, categories=categories_all, service=service, contacts_data=get_contacts_data())
-
-
-@bp.route('/service_create', methods=['GET', 'POST'])
-# @login_required
-def service_create():
-    if request.method == 'POST':
-        title = request.form.get('title')
-        short_description = request.form.get('short_description')
-        description = request.form.get('description')
-        price = request.form.get('price')
-        next = request.form.get('next')
-
-        service = Service(name=title, description=description, short_description=short_description, price=price,
-                          next=next, status=1)
-        db.session.add(service)
-        db.session.commit()
-
-        photo = request.files['photo']
-        photo.save(os.path.join(os.getcwd(), '{}.png'.format(
-            Service.query.filter_by(name=title).first().id
-        )))
-
-    return render_template('admin_panel/service_create.html', title='Создание услуги')
 
 
 @bp.route('/about_2', methods=['GET'])
@@ -126,8 +85,9 @@ def about():
                            categories=get_categories(), contacts_data=get_contacts_data())
 
 
-@bp.route('/category_test', methods=['GET', 'POST'])
-def category_test():
+@bp.route('/category_change', methods=['GET', 'POST'])
+# @login_required
+def category_change():
     category_id = request.args.get('category_id')
     category = Category.query.filter_by(id=category_id).first()
     services = category.services.all()
@@ -148,6 +108,15 @@ def category_test():
                 element.service.status = 1
             else:
                 element.service.status = 0
+        if request.form['delete_category']:
+            try:
+                shutil.rmtree('app/static/images/category/{}'.format(category_id), ignore_errors=True)
+            except:
+                pass
+            Category.query.filter_by(id=category_id).delete()
+            db.session.commit()
+            return redirect(url_for('main.index'))
+
         category.description = request.form.get('ckeditor')
         category.name = request.form.get('title')
         db.session.commit()
