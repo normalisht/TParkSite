@@ -144,6 +144,14 @@ def event_edit(id):
                            title='Редактирование мероприятия')
 
 
+@bp.route('/category', methods=['GET'])
+# @login_required
+def category():
+    categories = Category.query.all()
+
+    return render_template('admin_panel/categories.html', title='Категории',
+                           categories=categories)
+
 @bp.route('/category_change', methods=['GET', 'POST'])
 # @login_required
 def category_change():
