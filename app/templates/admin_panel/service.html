@@ -2,6 +2,7 @@
 
 {% block scripts %}
     <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel.css') }}">
+
 {% endblock %}
 
 {% block app_content %}
@@ -9,10 +10,10 @@
 
     <div class="grid_panel">
         <div class="title">Текст</div>
-        <div class="grid_block">
+        <div class="grid_block partners_map">
 
 
-            <form method="POST">
+            <form method="POST" class="grid_block">
 
                 <label for="title">Название услуги</label>
                 <input type="text" name="title" id="title" class="category_name"
@@ -53,35 +54,36 @@
 
                 </div>
 
-                <input type="submit" value="Подтвердить">
+                <input type="submit" value="Подтвердить" class="input_submit">
 
             </form>
 
         </div>
-    </div>
 
-    <div>
-        <div class="title">Фото</div>
 
-        <div class="grid_block_photo">
-            {% set path = "images/service/" + service.id|string + ".png" %}
-            <div><img src="{{ url_for("static", filename=path) }}" alt="" class="image"></div>
+        <div class="partners_map">
+            <div class="title">Фото</div>
 
-            <div class="input__wrapper">
-                <input type="file" name="photo" id="photo" class="input input__file">
-                <label for="block_photo" class="button">
-                    <span class="input__file_button">Изменить</span>
-                </label>
+            <div class="grid_block_photo">
+                {% set path = "images/service/" + service.id|string + ".png" %}
+                <div><img src="{{ url_for("static", filename=path) }}" alt="" class="image"></div>
+
+                <div class="input__wrapper">
+                    <input type="file" name="photo" id="photo" class="input input__file">
+                    <label for="block_photo" class="button">
+                        <span class="input__file_button">Изменить</span>
+                    </label>
+                </div>
+                <div class="input__wrapper" id="delete_photo">
+                    <label for="block_photo" class="button">
+                        <span class="input__file_button">Удалить</span>
+                    </label>
+                </div>
+
+                <div class="checkbox"></div>
             </div>
-            <div class="input__wrapper" id="delete_photo">
-                <label for="block_photo" class="button">
-                    <span class="input__file_button">Удалить</span>
-                </label>
-            </div>
 
-            <div class="checkbox"></div>
         </div>
-
     </div>
 
 

@@ -4,48 +4,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='main/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='main/desktop.css') }}">
-    <script defer type="text/javascript" src="{{ url_for('static', filename='modal_window.js') }}"></script>
+
 {% endblock %}
 
 {% block app_content %}
 
-    <div id='navigation_buttons' class="block_buttons">
-        <div style="display: flex;">
-            <div class="button_main"
-                 data-modal-window-toggle="#services-modal-win">
-                <div id="services-button">
-                    Услуги
-                </div>
-                <!--Модальные окно/выпадающее меню -->
-                <div id="services-modal-win" class="modal submenu">
-                    <div class="modal-window">
-                        {% for category in categories %}
-                            <div class="modal-item submenu-item">
-                                <a href="{{ url_for('admin_panel.category_test') }}?category_id={{ category.id }}">
-                                    {{ category.name }}
-                                </a>
-                            </div>
-                        {% endfor %}
-                    </div>
-                    <div class="overlay"></div>
-                </div>
-            </div>
-            <a id="about-us-button" class="button_main button_main_middle about_a"
-               href="{{ url_for('admin_panel.about') }}">
-                <div href="{{ url_for('admin_panel.about') }}" class="">
-                    О нас
-                </div>
 
-            </a>
-
-            <a class="button_main about_a" href="{{ url_for('admin_panel.events') }}">
-            <div class="" href="{{ url_for('admin_panel.events') }}">
-                Events
-            </div>
-            </a>
-
-        </div>
-    </div>
 
     <div class="div_grid_panel">
 

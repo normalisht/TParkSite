@@ -67,9 +67,6 @@ def main():
     # )))
     # os.chdir('../../../../../')
 
-
-
-
     return render_template('admin_panel/main.html', title='Главная страница', main_text=main_text,
                            categories=get_categories())
 
@@ -193,12 +190,11 @@ def category_change():
                     os.chdir('../../../../../')
                 return redirect(url_for('admin_panel.category_change', category_id=category_id))
 
-
         category.description = request.form.get('ckeditor')
         category.name = request.form.get('title')
         db.session.commit()
     return render_template('admin_panel/category.html', title='{}'.format(category.name),
-                           category=category, services=services,  files=files)
+                           category=category, services=services, files=files)
 
 
 @bp.route('/category_create', methods=['GET', 'POST'])
@@ -230,11 +226,23 @@ def service_test():
     service_id = request.args.get('service_id')
 
     service = Service.query.filter_by(id=service_id).first()
+    categories_all = Category.query.all()
     if request.method == 'POST':
         if request.form.get('checkbox') == '1':
             service.next = 1
         else:
             service.next = 0
+        for elem in categories_all:
+            if request.form.get(str(elem.id)) == str(elem.id):
+                a = ServiceCategory(service_id = service_id, category_id = elem.id)
+                for i in ServiceCategory.query.all():
+                    if str(i.service_id) == str(a.service_id) and str(i.category_id) == str(a.category_id):
+                        ServiceCategory.query.filter_by(service_id = i.service_id, category_id = i.category_id).delete()
+                        db.session.commit()
+                    else:
+                        pass
+                db.session.add(a)
+        db.session.commit()
 
         try:
             os.chdir('app/static/images/service/{}'.format(service_id))
