@@ -12,7 +12,7 @@
         <div class="grid_block">
 
 
-            <form method="POST">
+            <form method="POST" enctype="multipart/form-data">
 
                 <label for="title">Название услуги</label>
                 <input type="text" name="title" id="title" class="category_name"
@@ -53,9 +53,6 @@
 
                 </div>
 
-                <input type="submit" value="Подтвердить">
-
-            </form>
 
         </div>
     </div>
@@ -68,20 +65,19 @@
             <div><img src="{{ url_for("static", filename=path) }}" alt="" class="image"></div>
 
             <div class="input__wrapper">
-                <input type="file" name="photo" id="photo" class="input input__file">
-                <label for="block_photo" class="button">
-                    <span class="input__file_button">Изменить</span>
-                </label>
+                <input type="file" name="change" id="photo" class="input__file_button" value="Изменить">
             </div>
             <div class="input__wrapper" id="delete_photo">
                 <label for="block_photo" class="button">
-                    <span class="input__file_button">Удалить</span>
+                    <input type ="submit"  class="input__file_button"  name="delete" value="Удалить">
                 </label>
             </div>
 
             <div class="checkbox"></div>
         </div>
+        <input type="submit" value="Подтвердить">
 
+        </form>
     </div>
 
 

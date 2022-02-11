@@ -13,7 +13,7 @@
                 <div class="grid_block">
                     <div>
                         <div class="title">Текст</div>
-                        <form>
+                        <form method="POST">
                             <label for="title">О нас</label>
                             <input type="text" name="title" id="title" class=""
                                    value="{{ filosofi.text if filosofi.text }}">
@@ -24,7 +24,7 @@
 
                 <div class="grid_block">
                     <div>
-                        <form>
+                        <form method="POST">
                             <label for="title">Что есть</label>
                             <input type="text" name="title" id="title" class=""
                                    value="{{ about.text if about.text }}">
@@ -55,14 +55,11 @@
                             </figure>
 
                             <div class="input__wrapper">
-                                <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
-                                <label for="block_photo" class="button">
-                                    <span class="input__file_button">Изменить</span>
-                                </label>
+                                <input type="file" name="change" id="photo" class="input__file_button" value="Изменить">
                             </div>
                             <div class="input__wrapper" id="delete_photo">
                                 <label for="block_photo" class="button">
-                                    <span class="input__file_button">Удалить</span>
+                                    <input type ="submit"  class="input__file_button"  name="delete" value="Удалить">
                                 </label>
                             </div>
 

@@ -64,6 +64,11 @@
                     </label>
                 </div>
                 {% endfor %}
+                {% if not files[0] %}
+                    <div class="input__wrapper">
+                        <input type ="file"  class="input__file_button" multiple  name="add_photo">
+                    </div>
+                {% endif %}
                 <div>
                     <input type="submit" value="Подтвердить" class="submit_button">
                 </div>
