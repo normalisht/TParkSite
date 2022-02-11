@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block app_content %}
-
+{{ ckeditor.load() }}
 
     <div class="grid_panel">
         <div class="title">Текст</div>
@@ -20,11 +20,11 @@
 
                 <label for="input_desc">Краткое описание</label>
                 <textarea name="input_short_desc" id="input_short_desc" class="category_name"
-                >{{ service.short_description }}</textarea>
+                >{{ service.short_description|safe }}</textarea>
 
                 <label for="input_desc">Описание</label>
                 <textarea name="input_desc" id="input_desc" class="category_name"
-                >{{ service.description }}</textarea>
+                >{{ service.description|safe }}</textarea>
 
                 <label for="input_price">Цена</label>
                 <input type="text" name="input_price" id="input_price" class="category_name"
@@ -79,6 +79,7 @@
 
         </form>
     </div>
-
+{{ ckeditor.config(name='input_short_desc')}}
+{{ ckeditor.config(name='input_desc')}}
 
 {% endblock %}
