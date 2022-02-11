@@ -150,6 +150,7 @@ def category():
     return render_template('admin_panel/categories.html', title='Категории',
                            categories=categories)
 
+
 @bp.route('/category_change', methods=['GET', 'POST'])
 # @login_required
 def category_change():
@@ -235,22 +236,30 @@ def service_test():
 
     service = Service.query.filter_by(id=service_id).first()
     categories_all = Category.query.all()
+
+    b = []
+
     if request.method == 'POST':
         if request.form.get('checkbox') == '1':
             service.next = 1
         else:
             service.next = 0
         for elem in categories_all:
+            b.append(0)
             if request.form.get(str(elem.id)) == str(elem.id):
-                a = ServiceCategory(service_id = service_id, category_id = elem.id)
+                a = ServiceCategory(service_id=service_id, category_id=elem.id)
                 for i in ServiceCategory.query.all():
                     if str(i.service_id) == str(a.service_id) and str(i.category_id) == str(a.category_id):
-                        ServiceCategory.query.filter_by(service_id = i.service_id, category_id = i.category_id).delete()
+                        ServiceCategory.query.filter_by(service_id=i.service_id, category_id=i.category_id).delete()
                         db.session.commit()
                     else:
                         pass
                 db.session.add(a)
         db.session.commit()
+        # checking categories(if it in ServiceCategories -> 1)
+        for i in categories_all:
+            if ServiceCategory.query.filter_by(service_id=service_id, category_id=i.id) == service:
+                b[i.id] = 1
 
         try:
             os.chdir('app/static/images/service/{}'.format(service_id))
@@ -270,7 +279,7 @@ def service_test():
         # service.categories = request.form.get('categories')
         db.session.commit()
     return render_template('admin_panel/service.html', title='{}'.format(service.name),
-                           categories=get_categories(), service=service)
+                           categories=get_categories(), service=service, categories_checked=b)
 
 
 @bp.route('/service_create', methods=['GET', 'POST'])

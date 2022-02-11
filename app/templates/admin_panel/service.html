@@ -38,7 +38,7 @@
                         <label for="category" class="label_1">{{ categories.name }}</label>
                         <input type="radio" id="category" class="checkbox"
                                name={{ categories.id }}  value={{ categories.id }}
-                        >
+                                {{ "checked" if categories_checked[categories] == 1 else "" }}>
 
                     {% endfor %}
                 </div>
