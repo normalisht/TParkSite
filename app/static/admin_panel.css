@@ -160,8 +160,8 @@
     text-shadow: 0 0 1px #f5f5f5;
 }
 .input__file_button:active {
-    color:  #e3af28;
-    text-shadow: 0 0 1px  #e3af28;
+    color: #014770;
+    text-shadow: 0 0 1px #014770;
 }
 
 .input_submit {
@@ -254,5 +254,10 @@ label {
 .submit_button {
     font-size: 30px;
     margin-left: 18vw;
+}
+
+.button_about {
+    display: flex;
+    justify-content: center;
 }
 
