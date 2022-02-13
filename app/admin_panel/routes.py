@@ -226,6 +226,10 @@ def category_change():
 
                 return redirect(url_for('admin_panel.category_change', category_id=category_id))
 
+        for elem in services:
+            ServiceCategory.query.filter_by(service_id = elem.service.id).first().number = request.form.get('weight_' + str(elem))
+            db.session.commit()
+
         if request.files.get('add_photo'):
 
             images = request.files.getlist('add_photo')
@@ -243,6 +247,7 @@ def category_change():
         category.description = request.form.get('ckeditor')
         category.name = request.form.get('title')
         db.session.commit()
+        return redirect(url_for('admin_panel.category_change', category_id=category_id))
 
     return render_template('admin_panel/category.html', title='{}'.format(category.name),
                            category=category, services=services, files=files)

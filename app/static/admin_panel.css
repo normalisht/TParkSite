@@ -234,6 +234,7 @@
     text-align: center;
     margin-bottom: 20px;
     grid-column-gap: 50px;
+    grid-row-gap: 50px;
 }
 
 .grid_category {

@@ -39,7 +39,7 @@
 
                 </div>
 
-                {% for element in services|sort(attribute='number') %}
+                {% for element in services %}
                     <div class="grid_element">
                         {% set service = element.service %}
                         <br>
@@ -51,6 +51,8 @@
                             <label for="checkbox_{{ service.id }}">Отображать</label>
                             <input type="checkbox" class="checkbox" name="service_checkbox_{{ service.id }}"
                                    id="checkbox_{{ service.id }}" value="1" {{ "checked" if service.status else "" }}/>
+                            <label for="weight_{{ element }}">Вес услуги</label>
+                            <input type="text" name="weight_{{ element }}" id="weight_{{ element }}"  value="{{ element.number if element.number else "500" }}">
                         </div>
 
                         <br>
