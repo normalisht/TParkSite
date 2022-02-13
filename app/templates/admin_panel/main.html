@@ -21,7 +21,7 @@
                 <div>
                     <label for="title">Текст главной страницы</label>
                     <textarea name="title" id="title" class="category_name">
-                                {{ main_text.text }}
+                                {{ main_text.text|safe }}
                             </textarea>
                     <input type="submit" value="Подтвердить">
                 </div>
