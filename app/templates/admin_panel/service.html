@@ -38,7 +38,7 @@
                     {% for categories in categories %}
 
                         <label for="category" class="label_1">{{ categories.name }}</label>
-                        <input type="radio" id="category" class="checkbox"
+                        <input type="checkbox" id="category" class="checkbox"
                                name={{ categories.id }}  value={{ categories.id }}
                                 {{ "checked" if categories.id == categories_checked[categories.id] else "" }}>
 
@@ -48,11 +48,8 @@
                 <div class="grid_checkbox">
 
                     <label for="checkbox_1">С Подробнее</label>
-                    <label for="checkbox_2">Без Подробнее</label>
-                    <input type="radio" id="checkbox_1" class="checkbox" name="checkbox" value="1" {{ "checked" if
+                    <input type="checkbox" id="checkbox_1" class="checkbox" name="checkbox" value="1" {{ "checked" if
                         service.next else "" }}/>
-                    <input type="radio" id="checkbox_2" class="checkbox" name="checkbox" value="0" {{ "checked" if
-                        service.next == 0 else "" }}/>
 
                 </div>
 
@@ -80,7 +77,7 @@
         </div>
                 <div class="input__wrapper">
                     <input type="submit"  id="Submit" value="Подтвердить" class="input__file">
-                    <label for="submit" class="input__file_button">
+                    <label for="Submit" class="input__file_button">
                         <span class="input__file_button_text_2">Подтвердить</span>
                     </label>
                 </div>
