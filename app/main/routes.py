@@ -51,7 +51,6 @@ def category():
         category = Category.query.filter_by(id=category_id).first()
         services = category.services.order_by(ServiceCategory.number).all()
 
-        print(services)
         if category.status == 1:
             return render_template('main/category.html', category=category, category_id=category_id,
                                    services=services, categories=get_categories(),
