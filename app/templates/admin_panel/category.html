@@ -19,11 +19,8 @@
                               class="category_name" value="{{ category.name if category.name }}">
                     <div class="grid_checkbox">
                         <label for="checkbox_1">Отображать</label>
-                        <label for="checkbox_2">Скрыть</label>
-                        <input type="radio" id="checkbox_1" class="checkbox" name="mycheckbox" value="1" {{ "checked" if
+                        <input type="checkbox" id="checkbox_1" class="checkbox" name="mycheckbox" value="1" {{ "checked" if
                         category.status else "" }}/>
-                        <input type="radio" id="checkbox_2" class="checkbox" name="mycheckbox" value="0" {{ "checked" if
-                        category.status == 0 else "" }}/>
                     </div>
                     <div class="input__wrapper">
                         <input type="submit" id="delete_category" class="input__file" name="delete_category" value="Удалить категорию">
