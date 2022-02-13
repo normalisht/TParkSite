@@ -142,6 +142,14 @@ def event_edit(id):
                            title='Редактирование мероприятия')
 
 
+@bp.route('/category', methods=['GET'])
+# @login_required
+def category():
+    categories = Category.query.all()
+
+    return render_template('admin_panel/categories.html', title='Категории',
+                           categories=categories)
+
 @bp.route('/category_change', methods=['GET', 'POST'])
 # @login_required
 def category_change():
@@ -165,7 +173,7 @@ def category_change():
                 element.service.status = 1
             else:
                 element.service.status = 0
-        if request.form.get('delete_category') == 'Удалить категорию':
+        if request.form.get('delete_category'):
             try:
                 shutil.rmtree('app/static/images/category/{}'.format(category_id), ignore_errors=True)
             except:
@@ -174,19 +182,30 @@ def category_change():
             db.session.commit()
             return redirect(url_for('main.index'))
         for photo in files:
-            if request.form.get('delete_' + str(photo)) == 'Удалить':
+            if request.form.get('delete_' + str(photo)):
                 try:
                     os.remove('app/static/images/category/{}/'.format(category_id) + str(photo))
                     return redirect(url_for('admin_panel.category_change', category_id=category_id))
                 except:
                     pass
             if request.files['add_' + str(photo)]:
-                img = request.files['add_' + str(photo)]
-                print(img)
-                os.chdir('app/static/images/category/{}'.format(category_id))
-                img.save(os.path.join(os.getcwd(), '{}.png'.format(len(files) + 1)))
-                os.chdir('../../../../../')
+                images = request.files.getlist('add_' + str(photo))
+                count = len(files)
+                for img in images:
+                    os.chdir('app/static/images/category/{}'.format(category_id))
+                    img.save(os.path.join(os.getcwd(), '{}.png'.format(count + 1)))
+                    count += 1
+                    os.chdir('../../../../../')
                 return redirect(url_for('admin_panel.category_change', category_id=category_id))
+        if request.files.get('add_photo'):
+            images = request.files.getlist('add_photo')
+            count = len(files)
+            for img in images:
+                os.chdir('app/static/images/category/{}'.format(category_id))
+                img.save(os.path.join(os.getcwd(), '{}.png'.format(count + 1)))
+                count += 1
+                os.chdir('../../../../../')
+            return redirect(url_for('admin_panel.category_change', category_id=category_id))
 
 
         category.description = request.form.get('ckeditor')
@@ -223,7 +242,6 @@ def category_create():
 # @login_required
 def service_test():
     service_id = request.args.get('service_id')
-
     service = Service.query.filter_by(id=service_id).first()
     if request.method == 'POST':
         if request.form.get('checkbox') == '1':
@@ -231,22 +249,24 @@ def service_test():
         else:
             service.next = 0
 
-        try:
-            os.chdir('app/static/images/service/{}'.format(service_id))
-            temp = os.getcwd()
-            files = listdir(temp)
-            os.chdir('../../../../../')
-        except:
-            files = []
+        if request.form.get('delete'):
+            try:
+                os.remove('app/static/images/service/' + str(service.id) + ".png")
+                return redirect(url_for('admin_panel.service_test', service_id=service_id))
+            except:
+                pass
+        if request.files.get('change'):
+            image = request.files.get('change')
+            os.chdir('app/static/images/service')
+            image.save(os.path.join(os.getcwd(), '{}.png'.format(service_id)))
+            os.chdir('../../../../')
+            return redirect(url_for('admin_panel.service_test', service_id=service_id))
+
 
         service.short_description = request.form.get('input_short_desc')
         service.description = request.form.get('input_desc')
         service.price = request.form.get('input_price')
         service.name = request.form.get('title')
-        # if request.files['photo']:
-        #     photo = request.files['photo']
-        #     photo.save(os.path.join(os.getcwd(), 'service_id.png'.format(service.number)))
-        # service.categories = request.form.get('categories')
         db.session.commit()
     return render_template('admin_panel/service.html', title='{}'.format(service.name),
                            categories=get_categories(), service=service)
@@ -282,12 +302,26 @@ def all_services():
     return render_template('admin_panel/all_services.html', services=services)
 
 
-@bp.route('/about_2', methods=['GET'])
+@bp.route('/about_2', methods=['GET', 'POST'])
 def about():
     employees = Employee.query.all()
     about = Text.query.filter_by(title='about').first()
     filosofi = Text.query.filter_by(title='filosofi').first()
     partners = Partner.query.all()
+    if request.method == 'POST':
+        for partner in partners:
+            if request.form.get('delete'):
+                try:
+                    os.remove('app/static/partner/' + str(partner.id) + ".png")
+                    return redirect(url_for('admin_panel.about_2'))
+                except:
+                    pass
+            if request.files.get('change'):
+                image = request.files.get('change')
+                os.chdir('app/static/images/partner')
+                image.save(os.path.join(os.getcwd(), '{}.png'.format(partner.id)))
+                os.chdir('../../../../')
+                return redirect(url_for('admin_panel.about_2'))
 
     return render_template('admin_panel/about.html', employees=employees,
                            filosofi=filosofi, about=about, partners=partners)
