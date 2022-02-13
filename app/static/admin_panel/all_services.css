@@ -1,0 +1,22 @@
+@charset "UTF-8";
+
+.services {
+    margin: 10px auto;
+}
+
+.service {
+    display: flex;
+    margin: auto;
+    justify-content: center;
+}
+
+.service > a {
+    font-size: var(--primary-font-size);
+    color: #000000;
+    text-decoration: none;
+    text-align: left;
+
+}
+
+.service > a > div {
+}
