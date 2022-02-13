@@ -165,7 +165,7 @@
                     <!--Модальные окно/выпадающее меню -->
                     <div id="services-modal-win" class="modal submenu">
                         <div class="modal-window">
-                            {% for category in categories %}
+                            {% for category in categories|sort(attribute='number') %}
                                 {% if category.status %}
                                     <div class="modal-item submenu-item">
                                         <a href="{{ url_for('main.category') }}?category_id={{ category.id }}">

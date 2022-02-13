@@ -31,6 +31,8 @@
                             <span class="input__file_button_text_2">Удалить категорию</span>
                         </label>
                     </div>
+                    <label for="weight">Вес категории</label>
+                    <textarea name="weight" id="weight" class="category_name">{{ category.number if category.number }}</textarea>
                     <label for="input_desc">Описание</label>
                     {{ ckeditor.create(value=category.description|safe if category.description) }}
                 </div>
@@ -86,7 +88,7 @@
                 {% endif %}
                 <div class="input__wrapper">
                     <input type="submit"  id="Submit" value="Подтвердить" class="input__file">
-                    <label for="submit" class="input__file_button">
+                    <label for="Submit" class="input__file_button">
                         <span class="input__file_button_text_2">Подтвердить</span>
                     </label>
                 </div>

@@ -208,6 +208,7 @@ def category_change():
                 os.chdir('../../../../../')
             return redirect(url_for('admin_panel.category_change', category_id=category_id))
 
+        category.number = request.form.get('weight')
         category.description = request.form.get('ckeditor')
         category.name = request.form.get('title')
         db.session.commit()
