@@ -8,12 +8,12 @@
 {% endblock %}
 
 {% block app_content %}
+    {{ ckeditor.load() }}
 
 
+    <div class="div_grid_panel">
 
-    <div class="grid_panel">
-
-        <div class="grid_block partners_map">
+        <div class="grid_panel partners_map">
             <div class="title">Главная страница</div>
 
                 <div class="title">Текст</div>
@@ -21,17 +21,17 @@
                     <div>
                         <form>
                             <label for="title">Текст главной страницы</label>
-                            <textarea name="title" id="title" class="category_name">
+                            <textarea name="title_text" id="title" class="category_name">
                                 {{ main_text.text }}
                             </textarea>
-                            <input type="submit" value="Подтвердить">
+                            <input type="submit" class="submit" value="Подтвердить">
                         </form>
                     </div>
 
                 </div>
 
 
-            <div class="block_texts">
+            <div >
                 <div class="title">Фото</div>
                 {% set i = 0 %}
                 {% set limit = 3 %}
@@ -73,6 +73,8 @@
                 </div>
             </div>
         </div>
+        {{ ckeditor.config(name='title_text') }}
+
     </div>
 
 
