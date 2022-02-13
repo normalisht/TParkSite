@@ -32,7 +32,7 @@ def create_app(config_class=Config):
     app.config.from_object(config_class)
 
     db.init_app(app)
-    migrate.init_app(app, db)
+    migrate.init_app(app, db, render_as_batch=True)
     mail.init_app(app)
     bootstrap.init_app(app)
     moment.init_app(app)

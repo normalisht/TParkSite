@@ -12,7 +12,6 @@ class Service(db.Model):
     name = db.Column(db.String(128))
     short_description = db.Column(db.String(512))  # краткое описание
     description = db.Column(db.Text)  # полное описание
-    number = db.Column(db.Integer, index=True)  # порядковый номер
     status = db.Column(db.BOOLEAN())  # отображение клиентам
     next = db.Column(db.BOOLEAN())   # есть ли переход на дальнейшую страницу
     categories = db.relationship('ServiceCategory', backref='service', lazy='dynamic')
@@ -37,14 +36,15 @@ class Category(db.Model):
     name = db.Column(db.String(128))
     description = db.Column(db.Text)
     status = db.Column(db.BOOLEAN())  # отображение клиентам
-    number = db.Column(db.Integer, index=True)  # порядковый номер
     services = db.relationship('ServiceCategory', backref='category', lazy='dynamic')
+    number = db.Column(db.Integer, index=True, default=30)
 
 
 class ServiceCategory(db.Model):
     id = db.Column(db.Integer, primary_key=True, index=True, unique=True)
     service_id = db.Column(db.ForeignKey('service.id'))
     category_id = db.Column(db.ForeignKey('category.id'))
+    number = db.Column(db.Integer, default=500)  # порядковый номер
 
 
 class Employee(db.Model):
