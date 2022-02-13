@@ -247,10 +247,7 @@ def service_test():
 
     b = [0]
 
-    for i in categories_all:
-        b.insert(i.id, 0)
-        if ServiceCategory.query.filter_by(service_id=service_id, category_id=i.id).first():
-            b.insert(i.id, i.id)
+
 
     if request.method == 'POST':
         if request.form.get('checkbox') == '1':
@@ -289,6 +286,12 @@ def service_test():
         service.price = request.form.get('input_price')
         service.name = request.form.get('title')
         db.session.commit()
+
+    for i in categories_all:
+        b.insert(i.id, 0)
+        if ServiceCategory.query.filter_by(service_id=service_id, category_id=i.id).first():
+            b.insert(i.id, i.id)
+
     return render_template('admin_panel/service.html', title='{}'.format(service.name),
                            categories=get_categories(), service=service, categories_checked=b)
 
