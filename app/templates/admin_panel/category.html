@@ -34,7 +34,7 @@
                     <label for="input_desc">Описание</label>
                     {{ ckeditor.create(value=category.description|safe if category.description) }}
                 </div>
-                {% for element in services %}
+                {% for element in services|sort(attribute='number') %}
                     <div class="grid_element">
                         {% set service = element.service %}
                         <br>
@@ -64,17 +64,24 @@
                             alt="" class="image"></div>
 
                     <div class="input__wrapper">
-                        <input type="file" class="input__file_button" multiple name="add_{{ photo }}">
+                        <input type="file" class="input__file" id = "add_{{ photo }}" multiple name="add_{{ photo }}">
+                        <label for="add_{{ photo }}" class="input__file_button">
+                            <span class="input__file_button_text_2">Добавить</span>
+                        </label>
                     </div>
-                    <div class="input__wrapper" id="delete_photo">
-                        <label for="block_photo" class="button">
-                            <input type="submit" class="input__file_button" name="delete_{{ photo }}" value="Удалить">
+                    <div class="input__wrapper">
+                        <input type="submit"  id ="delete_{{ photo }}" class="input__file" name="delete_{{ photo }}" value="Удалить">
+                        <label for="delete_{{ photo }}" class="input__file_button">
+                            <span class="input__file_button_text_2">Удалить</span>
                         </label>
                     </div>
                 {% endfor %}
                 {% if not files[0] %}
                     <div class="input__wrapper">
-                        <input type ="file"  class="input__file_button" multiple  name="add_photo">
+                        <input type ="file" id = "Blank_file"  multiple  name="add_photo" class="input__file">
+                        <label for="Blank_file" class="input__file_button">
+                            <span class="input__file_button_text_2">Добавить</span>
+                        </label>
                     </div>
                 {% endif %}
                 <div>

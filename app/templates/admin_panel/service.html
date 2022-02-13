@@ -65,13 +65,16 @@
 
 
             <div class="input__wrapper">
-                <input type="file" name="change" id="photo" class="input__file_button" value="Изменить">
-            </div>
-            <div class="input__wrapper" id="delete_photo">
-                <label for="block_photo" class="button">
-                    <input type="submit" class="input__file_button" name="delete" value="Удалить">
+                <input type="file" name="change" id="photo" class="input__file" value="Изменить">
+                <label for="photo" class="input__file_button">
+                    <span class="input__file_button_text_2">Изменить</span>
                 </label>
-
+            </div>
+            <div class="input__wrapper">
+                    <input type="submit" class="input__file" id="delete_photo" name="delete" value="Удалить">
+                    <label for="delete_photo" class="input__file_button">
+                        <span class="input__file_button_text_2">Удалить</span>
+                    </label>
             </div>
 
         </div>
