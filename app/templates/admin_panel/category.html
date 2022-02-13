@@ -8,12 +8,12 @@
     <div class="grid_panel">
         <div>
             <form method="POST" enctype="multipart/form-data"
-                  action="{{  url_for('admin_panel.category_change') }}?category_id={{ category.id }}">
+                  action="{{ url_for('admin_panel.category_change') }}?category_id={{ category.id }}">
                 <div class="grid_service">
 
                     <label for="title">Название категории</label>
-                    <textarea name="title" id="title"
-                              class="category_name">{{ category.name if category.name }}</textarea>
+                    <input type="text" name="title" id="title"
+                           class="category_name" value="{{ category.name if category.name }}">
 
                     <div class="grid_checkbox">
                         <label for="checkbox_1">Отображать</label>
@@ -37,23 +37,20 @@
 
                 </div>
 
-                {% for element in services|sort(attribute='number') %}
+                {% for element in services %}
                     <div class="grid_element">
                         {% set service = element.service %}
-                        <br>
-
-                        <a href="{{ url_for('admin_panel.service_test') }}?service_id={{ service.id }}"
-                           class="service_name">{{ service.name if service.name }}</a>
 
                         <div class="grid_checkbox">
-
-                            <label for="checkbox_{{ service.id }}">Отображать</label>
-                            <input type="checkbox" class="checkbox" name="service_checkbox_{{ service.id }}"
-                                   id="checkbox_{{ service.id }}" value="1" {{ "checked" if service.status else "" }}/>
+                            <a href="{{ url_for('admin_panel.service_test') }}?service_id={{ service.id }}"
+                               class="service_name">{{ service.name if service.name }}</a>
+                            <div>
+                                <label for="checkbox_{{ service.id }}"></label>
+                                <input type="checkbox" class="checkbox" name="service_checkbox_{{ service.id }}"
+                                       id="checkbox_{{ service.id }}"
+                                       value="1" {{ "checked" if service.status else "" }}/>
+                            </div>
                         </div>
-
-                        <br>
-
                     </div>
                 {% endfor %}
 

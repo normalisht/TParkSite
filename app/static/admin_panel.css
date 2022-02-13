@@ -62,18 +62,12 @@
 
 
 .checkbox {
-    position: relative;
-    appearance: auto;
     -webkit-appearance: checkbox;
-    margin-left: 11vw;
-}
-
-.description {
 }
 
 .grid_service {
     display: grid;
-    grid-row-gap: 20px;
+    grid-row-gap: 10px;
     margin-bottom: 10px;
     text-align: center;
 }
@@ -81,9 +75,8 @@
 .category_name {
     display: flex;
     align-content: center;
-    margin-bottom: 10px;
-    width: 300px;
-    height: 200px;
+    width: min(300px, 95%);
+    padding: 2px;
 }
 
 .block_image {
@@ -209,18 +202,20 @@
 }
 
 .grid_element {
-    display: grid;
+    display: block;
     grid-row-gap: 10px;
-    margin-bottom: 10px;
-    border-top: solid;
-    text-align: center;
+    border-bottom: 1px solid;
 }
 
 .grid_checkbox {
     display: grid;
-    grid-template-columns: 22.5vw 22.5vw;
-    text-align: center;
-    margin-bottom: 20px;
+    grid-template-columns: 200px 1fr;
+    padding: 5px;
+    margin: auto;
+}
+
+.grid_checkbox > a {
+    color: black;
 }
 
 .grid_category {
@@ -233,10 +228,6 @@
 }
 
 
-label {
-    font-size: 20px;
-    font-weight: bold;
-}
 
 .label_1 {
     font-size: 18px;
@@ -244,8 +235,7 @@ label {
 }
 
 .service_name {
-    font-size: 20px;
-    font-weight: bold;
+    font-size: var(--primary-font-size);
 }
 
 .submit_button {
