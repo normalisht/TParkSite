@@ -29,7 +29,7 @@
                         </label>
                     </div>
                     <label for="weight">Вес категории</label>
-                    <input type="text" name="weight" id="weight" class="category_name" value="{{ category.number if category.number }}">
+                    <input type="text" name="weight" id="weight" class="category_name" value="{{ category.number if category.number else "30" }}">
                     <label for="input_desc">Описание</label>
                     {{ ckeditor.create(value=category.description|safe if category.description) }}
                 </div>
