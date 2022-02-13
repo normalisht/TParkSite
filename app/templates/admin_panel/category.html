@@ -25,10 +25,10 @@
                         <input type="radio" id="checkbox_2" class="checkbox" name="mycheckbox" value="0" {{ "checked" if
                         category.status == 0 else "" }}/>
                     </div>
-                    <div class="button_delete" id="delete_category">
-                        <label for="block_photo" class="button">
-                            <input type="submit" class="input__file_button" name="delete_category"
-                                   value="Удалить категорию">
+                    <div class="input__wrapper">
+                        <input type="submit" id="delete_category" class="input__file" name="delete_category" value="Удалить категорию">
+                        <label for="delete_category" class="input__file_button">
+                            <span class="input__file_button_text_2">Удалить категорию</span>
                         </label>
                     </div>
                     <label for="input_desc">Описание</label>
@@ -79,13 +79,16 @@
                 {% if not files[0] %}
                     <div class="input__wrapper">
                         <input type ="file" id = "Blank_file"  multiple  name="add_photo" class="input__file">
-                        <label for="Blank_file" class="input__file_button">
+                        <label for="blank_file" class="input__file_button">
                             <span class="input__file_button_text_2">Добавить</span>
                         </label>
                     </div>
                 {% endif %}
-                <div>
-                    <input type="submit" value="Подтвердить" class="submit_button">
+                <div class="input__wrapper">
+                    <input type="submit"  id="Submit" value="Подтвердить" class="input__file">
+                    <label for="submit" class="input__file_button">
+                        <span class="input__file_button_text_2">Подтвердить</span>
+                    </label>
                 </div>
             </div>
             </form>
