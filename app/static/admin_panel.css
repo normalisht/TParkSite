@@ -39,7 +39,7 @@
     width: 100%;
     align-self: center;
     margin-bottom: 30px;
-
+    grid-column-gap: 30px;
 
 }
 
