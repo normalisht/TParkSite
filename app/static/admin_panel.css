@@ -66,7 +66,7 @@
     position: relative;
     appearance: auto;
     -webkit-appearance: checkbox;
-    margin-left: 11vw;
+    margin-left: 5vw;
 }
 
 .description {
@@ -230,9 +230,10 @@
 
 .grid_checkbox {
     display: grid;
-    grid-template-columns: 22.5vw 22.5vw;
+    grid-template-columns: 15vw 15vw 15vw;
     text-align: center;
     margin-bottom: 20px;
+    grid-column-gap: 50px;
 }
 
 .grid_category {

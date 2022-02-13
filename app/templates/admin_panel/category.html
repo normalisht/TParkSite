@@ -44,11 +44,10 @@
                         {% set service = element.service %}
                         <br>
 
-                        <a href="{{ url_for('admin_panel.service_test') }}?service_id={{ service.id }}"
-                           class="service_name">{{ service.name if service.name }}</a>
 
                         <div class="grid_checkbox">
-
+                            <a href="{{ url_for('admin_panel.service_test') }}?service_id={{ service.id }}"
+                               class="service_name">{{ service.name if service.name }}</a>
                             <label for="checkbox_{{ service.id }}">Отображать</label>
                             <input type="checkbox" class="checkbox" name="service_checkbox_{{ service.id }}"
                                    id="checkbox_{{ service.id }}" value="1" {{ "checked" if service.status else "" }}/>
@@ -88,7 +87,7 @@
 
                         {% if not files[0] %}
                             <div class="input__wrapper">
-                                <input type="file" id="Blank_file" multiple name="add_photo" class="input__file">
+                                <input type="file" id="blank_file" multiple name="add_photo" class="input__file">
                                 <label for="blank_file" class="input__file_button">
                                     <span class="input__file_button_text_2">Добавить</span>
                                 </label>
