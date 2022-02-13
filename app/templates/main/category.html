@@ -43,7 +43,7 @@
         </div>
 
         <div id="buttons" class="buttons">
-            {% for element in services|sort(attribute='number') %}
+            {% for element in services %}
                 {% set service = element.service %}
                 {% if service.status == true %}
                     <div id="{{ service.id }}" class="button" status="0"

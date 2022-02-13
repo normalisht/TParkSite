@@ -49,7 +49,7 @@ def category():
             files = []
             print('1')
         category = Category.query.filter_by(id=category_id).first()
-        services = category.services.all()
+        services = category.services.order_by(ServiceCategory.number).all()
 
         print(services)
         if category.status == 1:
