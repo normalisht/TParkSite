@@ -68,10 +68,7 @@ def main():
     # os.chdir('../../../../../')
 
 
-
-
-    return render_template('admin_panel/main.html', title='Главная страница', main_text=main_text,
-                           categories=get_categories())
+    return render_template('admin_panel/main.html', title='Главная страница', main_text=main_text)
 
 
 # Все ивенты
@@ -276,6 +273,13 @@ def service_create():
         )))
 
     return render_template('admin_panel/service_create.html', title='Создание услуги')
+
+
+@bp.route('/all_services', methods=['GET'])
+def all_services():
+    services = Service.query.all()
+
+    return render_template('admin_panel/all_services.html', services=services)
 
 
 @bp.route('/about_2', methods=['GET'])
