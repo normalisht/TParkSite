@@ -256,15 +256,18 @@ def service_test():
         else:
             service.next = 0
         for elem in categories_all:
+            a = ServiceCategory(service_id=service_id, category_id=elem.id)
             if request.form.get(str(elem.id)) == str(elem.id):
-                a = ServiceCategory(service_id=service_id, category_id=elem.id)
                 for i in ServiceCategory.query.all():
                     if str(i.service_id) == str(a.service_id) and str(i.category_id) == str(a.category_id):
                         ServiceCategory.query.filter_by(service_id=i.service_id, category_id=i.category_id).delete()
                         db.session.commit()
-                    else:
-                        pass
                 db.session.add(a)
+            else:
+                for i in ServiceCategory.query.all():
+                    if str(i.service_id) == str(a.service_id) and str(i.category_id) == str(a.category_id):
+                        ServiceCategory.query.filter_by(service_id=i.service_id, category_id=i.category_id).delete()
+                        db.session.commit()
 
         db.session.commit()
         # checking categories(if it in ServiceCategories -> 1)
