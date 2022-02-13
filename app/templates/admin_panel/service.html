@@ -6,14 +6,15 @@
 {% endblock %}
 
 {% block app_content %}
-
+    {{ ckeditor.load() }}
 
     <div class="grid_panel">
         <div class="title">Текст</div>
         <div class="grid_block partners_map">
 
 
-            <form method="POST" class="grid_block">
+            <form method="POST" enctype="multipart/form-data" class="grid_block">
+
 
                 <label for="title">Название услуги</label>
                 <input type="text" name="title" id="title" class="category_name"
@@ -21,11 +22,11 @@
 
                 <label for="input_desc">Краткое описание</label>
                 <textarea name="input_short_desc" id="input_short_desc" class="category_name"
-                >{{ service.short_description }}</textarea>
+                >{{ service.short_description|safe }}</textarea>
 
                 <label for="input_desc">Описание</label>
                 <textarea name="input_desc" id="input_desc" class="category_name"
-                >{{ service.description }}</textarea>
+                >{{ service.description|safe }}</textarea>
 
                 <label for="input_price">Цена</label>
                 <input type="text" name="input_price" id="input_price" class="category_name"
@@ -35,10 +36,11 @@
 
                 <div class="grid_category">
                     {% for categories in categories %}
+
                         <label for="category" class="label_1">{{ categories.name }}</label>
                         <input type="radio" id="category" class="checkbox"
                                name={{ categories.id }}  value={{ categories.id }}
-                                {{ "checked" if categories_checked[categories] == 1 else "" }}>
+                                {{ "checked" if categories.id == categories_checked[categories.id] else "" }}>
 
                     {% endfor %}
                 </div>
@@ -54,37 +56,32 @@
 
                 </div>
 
-                <input type="submit" value="Подтвердить" class="input_submit">
 
-            </form>
 
-        </div>
 
 
         <div class="partners_map">
             <div class="title">Фото</div>
 
-            <div class="grid_block_photo">
-                {% set path = "images/service/" + service.id|string + ".png" %}
-                <div><img src="{{ url_for("static", filename=path) }}" alt="" class="image"></div>
 
-                <div class="input__wrapper">
-                    <input type="file" name="photo" id="photo" class="input input__file">
-                    <label for="block_photo" class="button">
-                        <span class="input__file_button">Изменить</span>
-                    </label>
-                </div>
-                <div class="input__wrapper" id="delete_photo">
-                    <label for="block_photo" class="button">
-                        <span class="input__file_button">Удалить</span>
-                    </label>
-                </div>
+            <div class="input__wrapper">
+                <input type="file" name="change" id="photo" class="input__file_button" value="Изменить">
+            </div>
+            <div class="input__wrapper" id="delete_photo">
+                <label for="block_photo" class="button">
+                    <input type="submit" class="input__file_button" name="delete" value="Удалить">
+                </label>
 
-                <div class="checkbox"></div>
             </div>
 
         </div>
-    </div>
 
+        <input type="submit" value="Подтвердить">
+
+        </form>
+
+    </div>
+    {{ ckeditor.config(name='input_short_desc') }}
+    {{ ckeditor.config(name='input_desc') }}
 
 {% endblock %}

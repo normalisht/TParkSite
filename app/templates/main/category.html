@@ -67,7 +67,7 @@
                             {% if service.short_description %}
                                 <div class="description">
                                     {% if service.short_description != None %}
-                                        {{ service.short_description }}
+                                        {{ service.short_description|safe }}
                                     {% endif %}
                                     <br>
                                     <div class="more">
