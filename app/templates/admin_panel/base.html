@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="stylesheet" href="{{ url_for('static', filename='main/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='main/desktop.css') }}">
-    <script defer type="text/javascript" src="{{ url_for('static', filename='modal_window.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel.css') }}">
     <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename="favicon.ico") }}"/>
     {% block link %}{% endblock %}
 
@@ -21,6 +21,20 @@
     {% else %}
         <title>Т-Парк</title>
     {% endif %}
+
+    <script>
+        let detect = new MobileDetect(window.navigator.userAgent)
+
+        let link = document.createElement('link')
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.media = 'all';
+
+        link.href = detect.mobile() ? '/app/static/admin_panel/phone_admin_panel.css' :
+            '/app/static/admin_panel/desktop_admin_panel.css.css'
+
+        document.head.append(link)
+    </script>
 </head>
 
 <body id="body">
