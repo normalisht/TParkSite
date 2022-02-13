@@ -44,13 +44,8 @@
                            class="service_name">{{ service.name if service.name }}</a>
                         <div class="grid_checkbox">
                             <label for="checkbox_{{ service.id }}">Отображать</label>
-                            <label for="checkbox_{{ service.id + 1 }}">Скрыть</label>
-                            <input type="radio" class="checkbox" name="service_checkbox_{{ service.id }}"
-                                   id="checkbox_{{ service.id }}" value="1" {{ "checked" if
-                            service.status else "" }}/>
-                            <input type="radio" class="checkbox" name="service_checkbox_{{ service.id }}"
-                                   id="checkbox_{{ service.id + 1 }}" value="0" {{ "checked" if
-                            service.status == 0 else "" }}/>
+                            <input type="checkbox" class="checkbox" name="service_checkbox_{{ service.id }}"
+                                   id="checkbox_{{ service.id }}" value="1" {{ "checked" if service.status else "" }}/>
                         </div>
                         <br>
                     </div>
