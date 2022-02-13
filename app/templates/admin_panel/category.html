@@ -15,8 +15,8 @@
             <form method="POST" enctype="multipart/form-data">
                 <div class="grid_service">
                     <label for="title">Название категории</label>
-                    <textarea name="title" id="title"
-                              class="category_name">{{ category.name if category.name }}</textarea>
+                    <input type="text" name="title" id="title"
+                              class="category_name" value="{{ category.name if category.name }}">
                     <div class="grid_checkbox">
                         <label for="checkbox_1">Отображать</label>
                         <label for="checkbox_2">Скрыть</label>
@@ -32,7 +32,7 @@
                         </label>
                     </div>
                     <label for="weight">Вес категории</label>
-                    <textarea name="weight" id="weight" class="category_name">{{ category.number if category.number }}</textarea>
+                    <input type="text" name="weight" id="weight" class="category_name" value="{{ category.number if category.number }}">
                     <label for="input_desc">Описание</label>
                     {{ ckeditor.create(value=category.description|safe if category.description) }}
                 </div>
