@@ -245,7 +245,12 @@ def service_test():
     service = Service.query.filter_by(id=service_id).first()
     categories_all = Category.query.all()
 
-    b = []
+    b = [0]
+
+    for i in categories_all:
+        b.insert(i.id, 0)
+        if ServiceCategory.query.filter_by(service_id=service_id, category_id=i.id).first():
+            b.insert(i.id, i.id)
 
     if request.method == 'POST':
         if request.form.get('checkbox') == '1':
@@ -253,7 +258,6 @@ def service_test():
         else:
             service.next = 0
         for elem in categories_all:
-            b.append(0)
             if request.form.get(str(elem.id)) == str(elem.id):
                 a = ServiceCategory(service_id=service_id, category_id=elem.id)
                 for i in ServiceCategory.query.all():
@@ -263,11 +267,9 @@ def service_test():
                     else:
                         pass
                 db.session.add(a)
+
         db.session.commit()
         # checking categories(if it in ServiceCategories -> 1)
-        for i in categories_all:
-            if ServiceCategory.query.filter_by(service_id=service_id, category_id=i.id) == service:
-                b[i.id] = 1
 
         if request.form.get('delete'):
             try:
@@ -281,7 +283,6 @@ def service_test():
             image.save(os.path.join(os.getcwd(), '{}.png'.format(service_id)))
             os.chdir('../../../../')
             return redirect(url_for('admin_panel.service_test', service_id=service_id))
-
 
         service.short_description = request.form.get('input_short_desc')
         service.description = request.form.get('input_desc')
