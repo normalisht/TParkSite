@@ -9,8 +9,9 @@
     {{ ckeditor.load() }}
 
     <div class="grid_panel">
-        <div class="title">Текст</div>
+
         <div class="grid_block partners_map">
+            <div class="title">Текст</div>
 
 
             <form method="POST" enctype="multipart/form-data" class="grid_block">
@@ -53,10 +54,13 @@
 
                 </div>
 
-
+                <div class="title">Фото</div>
                 <div class="grid_block_photo">
-                    <div class="title">Фото</div>
 
+                    {% set path = "images/service/" + service.id|string + ".png" %}
+                    <div class="block_image"><img src="{{ url_for("static", filename=path) }}" alt=""
+                                                  class="image">
+                    </div>
 
                     <div class="input__wrapper">
                         <input type="file" name="change" id="photo" class="input__file" value="Изменить">

@@ -21,6 +21,7 @@
 
 .grid_panel {
     display: grid;
+    min-width: 45vw;
     grid-template-columns: min(95%, 960px);
     justify-content: center;
 }
