@@ -39,36 +39,52 @@ def logout():
     return redirect(url_for('main.index'))
 
 
-@bp.route('/main', methods=['GET'])
+@bp.route('/main', methods=['GET', 'POST'])
 # @login_required
 def main():
     main_text = Text.query.filter_by(title="main_text").first()
-    photo_number = request.args.get('photo_number')
 
     try:
-        os.chdir('app/static/images/staff/{}'.format(photo_number))
+        os.chdir('app/static/images/staff/')
         temp = os.getcwd()
         files = listdir(temp)
         path = os.path.join(os.getcwd(), files[0])
         open(path)
-        a = 1
-        os.chdir('../../../../../')
+        os.chdir('../../../../')
     except:
-        a = 0
         files = []
-        print('1')
 
-    # photo = request.files['photo']
-    #
-    # os.makedirs('app/static/images/staff/{}'.format(photo_number))
-    # os.chdir('app/static/images/staff/{}'.format(photo_number))
-    # photo.save(os.path.join(os.getcwd(), '{}.png'.format(
-    #     Category.query.filter_by(name=title).first().id
-    # )))
-    # os.chdir('../../../../../')
+    if request.method == 'POST':
+        for photo in files:
+            if request.form.get('delete_' + str(photo)):
+                try:
+                    os.remove('app/static/images/staff/' + str(photo))
+                    return redirect(url_for('admin_panel.main'))
+                except:
+                    pass
+            if request.files.get('change_' + str(photo)):
+                image = request.files.get('change_' + str(photo))
+                os.chdir('app/static/images/staff')
+                image.save(os.path.join(os.getcwd(), '{}.png'.format(os.path.splitext(photo)[0])))
+                os.chdir('../../../../')
+                return redirect(url_for('admin_panel.main'))
+        if files[0] != '0.png':
+            name = 0
+        elif files[1] != '1.png':
+            name = 1
+        else:
+            name = 2
+        if request.files.get('add_photo'):
+            images = request.files.get('add_photo')
+            os.chdir('app/static/images/staff/')
+            images.save(os.path.join(os.getcwd(), '{}.png'.format(name)))
+            os.chdir('../../../../')
+
+            return redirect(url_for('admin_panel.main'))
+
 
     return render_template('admin_panel/main.html', title='Главная страница', main_text=main_text,
-                           categories=get_categories())
+                           categories=get_categories(), files=files)
 
 
 # Все ивенты
@@ -210,6 +226,10 @@ def category_change():
 
                 return redirect(url_for('admin_panel.category_change', category_id=category_id))
 
+        for elem in services:
+            ServiceCategory.query.filter_by(service_id = elem.service.id).first().number = request.form.get('weight_' + str(elem))
+            db.session.commit()
+
         if request.files.get('add_photo'):
 
             images = request.files.getlist('add_photo')
@@ -223,9 +243,11 @@ def category_change():
 
             return redirect(url_for('admin_panel.category_change', category_id=category_id))
 
+        category.number = request.form.get('weight')
         category.description = request.form.get('ckeditor')
         category.name = request.form.get('title')
         db.session.commit()
+        return redirect(url_for('admin_panel.category_change', category_id=category_id))
 
     return render_template('admin_panel/category.html', title='{}'.format(category.name),
                            category=category, services=services, files=files)
@@ -271,15 +293,18 @@ def service_test():
         else:
             service.next = 0
         for elem in categories_all:
+            a = ServiceCategory(service_id=service_id, category_id=elem.id)
             if request.form.get(str(elem.id)) == str(elem.id):
-                a = ServiceCategory(service_id=service_id, category_id=elem.id)
                 for i in ServiceCategory.query.all():
                     if str(i.service_id) == str(a.service_id) and str(i.category_id) == str(a.category_id):
                         ServiceCategory.query.filter_by(service_id=i.service_id, category_id=i.category_id).delete()
                         db.session.commit()
-                    else:
-                        pass
                 db.session.add(a)
+            else:
+                for i in ServiceCategory.query.all():
+                    if str(i.service_id) == str(a.service_id) and str(i.category_id) == str(a.category_id):
+                        ServiceCategory.query.filter_by(service_id=i.service_id, category_id=i.category_id).delete()
+                        db.session.commit()
 
         db.session.commit()
         # checking categories(if it in ServiceCategories -> 1)

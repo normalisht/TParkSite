@@ -6,7 +6,7 @@
     <div class="title">Категории услуг</div>
 
     <div class="grid_panel">
-        <div>
+        <div class="grid_block partners_map">
             <form method="POST" enctype="multipart/form-data"
                   action="{{ url_for('admin_panel.category_change') }}?category_id={{ category.id }}">
                 <div class="grid_service">
@@ -15,13 +15,11 @@
                     <input type="text" name="title" id="title"
                            class="category_name" value="{{ category.name if category.name }}">
 
+
                     <div class="grid_checkbox">
                         <label for="checkbox_1">Отображать</label>
-                        <label for="checkbox_2">Скрыть</label>
-                        <input type="radio" id="checkbox_1" class="checkbox" name="mycheckbox" value="1" {{ "checked" if
+                        <input type="checkbox" id="checkbox_1" class="checkbox" name="mycheckbox" value="1" {{ "checked" if
                         category.status else "" }}/>
-                        <input type="radio" id="checkbox_2" class="checkbox" name="mycheckbox" value="0" {{ "checked" if
-                        category.status == 0 else "" }}/>
                     </div>
 
                     <div class="input__wrapper">
@@ -32,9 +30,12 @@
                         </label>
                     </div>
 
+                    <label for="weight">Вес категории</label>
+                    <input type="text" name="weight" id="weight" class="little_input"
+                           value="{{ category.number if category.number else " 30" }}">
+
                     <label for="input_desc">Описание</label>
                     {{ ckeditor.create(value=category.description|safe if category.description) }}
-
                 </div>
 
                 {% for element in services %}
@@ -53,7 +54,6 @@
                         </div>
                     </div>
                 {% endfor %}
-
                 <div>
                     <div class="title">Фото</div>
 
@@ -83,21 +83,21 @@
 
                         {% if not files[0] %}
                             <div class="input__wrapper">
-                                <input type="file" id="Blank_file" multiple name="add_photo" class="input__file">
+                                <input type="file" id="blank_file" multiple name="add_photo" class="input__file">
                                 <label for="blank_file" class="input__file_button">
                                     <span class="input__file_button_text_2">Добавить</span>
                                 </label>
                             </div>
                         {% endif %}
 
-                        <div class="input__wrapper">
-                            <input type="submit" id="Submit" value="Подтвердить" class="input__file">
-                            <label for="Submit" class="input__file_button">
-                                <span class="input__file_button_text_2">Подтвердить</span>
-                            </label>
-                        </div>
-
                     </div>
+
+                </div>
+                <div class="input__wrapper">
+                    <input type="submit" id="Submit" value="Подтвердить" class="input__file">
+                    <label for="Submit" class="input__file_button">
+                        <span class="input__file_button_text_2">Подтвердить</span>
+                    </label>
                 </div>
             </form>
         </div>

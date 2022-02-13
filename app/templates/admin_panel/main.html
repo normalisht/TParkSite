@@ -1,62 +1,62 @@
 {% extends "admin_panel/base.html" %}
 
 {% block scripts %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='main/main.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='main/desktop.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='admin_panel.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='main/main.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='main/desktop.css') }}">
 
 {% endblock %}
 
 {% block app_content %}
+{{ ckeditor.load() }}
 
 
-
-    <div class="div_grid_panel">
-
-        <div class="grid_panel">
+<div class="grid_panel">
+    <form method="POST" enctype="multipart/form-data">
+        <div class="grid_block partners_map">
             <div class="title">Главная страница</div>
-            <div class="block_texts">
-                <div class="title">Текст</div>
-                <div class="grid_block">
-                    <div>
-                        <form>
-                            <label for="title">Текст главной страницы</label>
-                            <textarea name="title" id="title" class="category_name">
-                                {{ main_text.text }}
-                            </textarea>
-                            <input type="submit" value="Подтвердить">
-                        </form>
-                    </div>
 
+            <div class="title">Текст</div>
+            <div class="grid_block">
+                <div>
+                    <label for="title">Текст главной страницы</label>
+                    <textarea name="title" id="title" class="category_name">
+                                {{ main_text.text|safe }}
+                            </textarea>
+                    <input type="submit" value="Подтвердить">
                 </div>
+
             </div>
+
 
             <div class="block_texts">
                 <div class="title">Фото</div>
-                {% set i = 0 %}
-                {% set limit = 3 %}
-                {% for i in range(limit) %}
-                    <div class="grid_block_photo">
-                        {% set path = "images/staff/" + i|string + ".png" %}
-                        <div class="block_image"><img src="{{ url_for("static", filename=path) }}" alt=""
-                                                      class="image">
-                        </div>
-
-                        <div class="input__wrapper">
-                            <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
-                            <label for="block_photo" class="button">
-                                <span class="input__file_button">Изменить</span>
-                            </label>
-                        </div>
-
-                        <div class="input__wrapper" id="delete_photo" name="delete_photo">
-                            <label for="block_photo" class="button">
-                                <input type="submit" class="input__file_button" value="Удалить">
-                            </label>
-                        </div>
-
-                        <div class="checkbox"></div>
+                {% for photo in files %}
+                <div class="grid_block_photo">
+                    <div class="block_image">
+                        <img src="{{ url_for('static',filename='/images/staff/' + photo) }}" alt=""
+                             class="image">
                     </div>
+
+                    <div class="input__wrapper">
+                        <input type="file" name="change_{{ photo }}" id="change_{{ photo }}" class="input__file"
+                               value="Изменить">
+                        <label for="change_{{ photo }}" class="input__file_button">
+                            <span class="input__file_button_text_2">Изменить</span>
+                        </label>
+                    </div>
+
+                    <div class="input__wrapper">
+                        <input type="submit" id="delete_{{ photo }}" class="input__file"
+                               name="delete_{{ photo }}"
+                               value="Удалить">
+                        <label for="delete_{{ photo }}" class="input__file_button">
+                            <span class="input__file_button_text_2">Удалить</span>
+                        </label>
+                    </div>
+
+                    <div class="checkbox"></div>
+                </div>
                 {% endfor %}
 
                 <div class="grid_block_photo">
@@ -64,18 +64,21 @@
                     <div class="input__wrapper" id="delete_photo">
 
                     </div>
-                    <div class="input__wrapper">
-                        <input type="button" name="add_photo" id="add_photo" class="input input__file"  value="">
-                        <label for="block_photo" class="button">
-                            <span class="input__file_button">Добавить</span>
-                        </label>
-                    </div>
+                    {% if not files[2] %}
+                        <div class="input__wrapper">
+                            <input type="file" id="blank_file" name="add_photo" class="input__file">
+                            <label for="blank_file" class="input__file_button">
+                                <span class="input__file_button_text_2">Добавить</span>
+                            </label>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
-        </div>
-    </div>
+</div>
+    </form>
+</div>
 
-
+{{ ckeditor.config(name='title') }}
 
 
 {% endblock %}
