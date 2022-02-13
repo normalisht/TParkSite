@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block app_content %}
-{{ ckeditor.load() }}
+    {{ ckeditor.load() }}
     <div class="title">Страница О НАС</div>
     <div class="div_grid_panel">
         <div class="grid_panel">
@@ -15,28 +15,33 @@
                     <div>
                         <div class="title">Текст</div>
                         <form method="POST">
-                            <label for="title">О нас</label>
+                            <label for="title">
+                                <center>О нас</center><br>
+                            </label>
                             <textarea name="title" id="title" class=""
                             >{{ filosofi.text|safe if filosofi.text }}</textarea>
-                            <input type="submit" value="Подтвердить">
+                            <input type="submit" value="Подтвердить" class="confirm_text">
                         </form>
                     </div>
                 </div>
-
+                <br>
                 <div class="grid_block">
                     <div>
                         <form method="POST">
-                            <label for="title">Что есть</label>
+                            <label for="title">
+                                <center>Что есть</center><br>
+                            </label>
                             <textarea name="about_text" id="about_text" class=""
                             >{{ about.text|safe if about.text }}</textarea>
-                            <input type="submit" value="Подтвердить">
+                            <input type="submit" value="Подтвердить" class="confirm_text">
                         </form>
                     </div>
                 </div>
             </div>
 
             <div class="">
-                <div class="title">Партнёры</div><br>
+                <div class="title">Партнёры</div>
+                <br>
                 <label for="block_photo" class="button_about">
                     <span class="input__file_button">Добавить</span>
                 </label>
@@ -62,9 +67,14 @@
                             <div class="input__wrapper">
                                 <input type="file" name="change" id="photo" class="input__file_button" value="Изменить">
                             </div>
-                            <div class="input__wrapper" id="delete_photo">
+                            <div class="input__wrapper">
                                 <label for="block_photo" class="button">
-                                    <input type ="submit"  class="input__file_button"  name="delete" value="Удалить">
+                                    <span class="input__file_button">Подтвердить</span>
+                                </label>
+                            </div>
+                            <div class="input__delete" id="delete_photo">
+                                <label for="block_photo" class="button">
+                                    <input type="submit" class="input__file_button" name="delete" value="Удалить">
                                 </label>
                             </div>
 
@@ -74,50 +84,51 @@
                 {% endfor %}
             </div>
 
-            <div class="title">Сотрудники</div><br>
+            <div class="title">Сотрудники</div>
+            <br>
             <label for="block_photo" class="button_about">
                 <span class="input__file_button">Добавить</span>
             </label>
             <br><br>
             {% for employee in employees %}
                 <div class="partners_map">
-                <div class="grid_block_photo">
-                    {% set path = "images/employee/" + employee.id|string + ".png" %}
-                    <figure class="img__employ">
-                        <img src="{{ url_for("static", filename=path) }}" alt="" class="emplimg">
-                        <form>
-                            <figcaption>ФИО</figcaption>
-                            <figcaption>
-                                <input type="text" name="title" id="title" class="employ_txt"
-                                       value="{{ employee.name if employee.name }}">
-                            </figcaption>
-                        </form>
-                        <form>
-                            <figcaption>
-                                <figcaption>Должность</figcaption>
-                                <input type="text" name="title" id="title" class="employ_txt"
-                                       value="{{ employee.position if employee.position }}">
-                            </figcaption>
+                    <div class="grid_block_photo">
+                        {% set path = "images/employee/" + employee.id|string + ".png" %}
+                        <figure class="img__employ">
+                            <img src="{{ url_for("static", filename=path) }}" alt="" class="emplimg">
+                            <form>
+                                <figcaption>ФИО</figcaption>
+                                <figcaption>
+                                    <input type="text" name="title" id="title" class="employ_txt"
+                                           value="{{ employee.name if employee.name }}">
+                                </figcaption>
+                            </form>
+                            <form>
+                                <figcaption>
+                                    <figcaption>Должность</figcaption>
+                                    <input type="text" name="title" id="title" class="employ_txt"
+                                           value="{{ employee.position if employee.position }}">
+                                </figcaption>
 
-                        </form>
-                    </figure>
+                            </form>
+                        </figure>
 
-                    <div class="input__wrapper">
-                        <input type="file" name="change" id="photo" class="input__file_button" value="Изменить">
-                    </div>
-                    <div class="input__wrapper">
-                        <label for="block_photo" class="button">
-                            <span class="input__file_button">Подтвердить</span>
-                        </label>
-                    </div>
-                    <div class="input__wrapper" id="delete_photo">
-                        <label for="block_photo" class="button">
-                            <input type ="submit"  class="input__file_button"  name="delete" value="Удалить">
-                        </label>
-                    </div>
+                        <div class="input__wrapper">
+                            <input type="file" name="change" id="photo" class="input__file_button" value="Изменить">
+                        </div>
+                        <div class="input__wrapper">
+                            <label for="block_photo" class="button">
+                                <span class="input__file_button">Подтвердить</span>
+                            </label>
+                        </div>
+                        <div class="input__delete" id="delete_photo">
+                            <label for="block_photo" class="button">
+                                <input type="submit" class="input__file_button" name="delete" value="Удалить">
+                            </label>
+                        </div>
 
-                    <div class="checkbox"></div>
-                </div>
+                        <div class="checkbox"></div>
+                    </div>
                 </div>
             {% endfor %}
 
@@ -125,7 +136,7 @@
         </div>
     </div>
 
-{{ ckeditor.config(name='title')}}
-{{ ckeditor.config(name='about_text')}}
+    {{ ckeditor.config(name='title') }}
+    {{ ckeditor.config(name='about_text') }}
 
 {% endblock %}

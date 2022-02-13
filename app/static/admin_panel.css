@@ -198,6 +198,7 @@
 
 .employ_txt {
     width: 160px;
+    border-radius: 4px;
 }
 
 .emplimg {
@@ -206,7 +207,7 @@
 }
 
 .partimg {
-    width: 150px;
+    width: 180px;
     height: 150px;
 }
 
@@ -261,3 +262,14 @@ label {
     justify-content: center;
 }
 
+.confirm_text {
+    float: right;
+}
+
+.input__delete {
+    position: relative;
+    appearance: auto;
+    -webkit-appearance: checkbox;
+    margin-left: 34vw;
+    margin-bottom: 2vw;
+}
