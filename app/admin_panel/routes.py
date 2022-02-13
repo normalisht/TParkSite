@@ -67,8 +67,8 @@ def main():
     # )))
     # os.chdir('../../../../../')
 
-
-    return render_template('admin_panel/main.html', title='Главная страница', main_text=main_text)
+    return render_template('admin_panel/main.html', title='Главная страница', main_text=main_text,
+                           categories=get_categories())
 
 
 # Все ивенты
@@ -150,6 +150,7 @@ def category():
     return render_template('admin_panel/categories.html', title='Категории',
                            categories=categories)
 
+
 @bp.route('/category_change', methods=['GET', 'POST'])
 # @login_required
 def category_change():
@@ -207,12 +208,11 @@ def category_change():
                 os.chdir('../../../../../')
             return redirect(url_for('admin_panel.category_change', category_id=category_id))
 
-
         category.description = request.form.get('ckeditor')
         category.name = request.form.get('title')
         db.session.commit()
     return render_template('admin_panel/category.html', title='{}'.format(category.name),
-                           category=category, services=services,  files=files)
+                           category=category, services=services, files=files)
 
 
 @bp.route('/category_create', methods=['GET', 'POST'])
@@ -243,11 +243,30 @@ def category_create():
 def service_test():
     service_id = request.args.get('service_id')
     service = Service.query.filter_by(id=service_id).first()
+    categories_all = Category.query.all()
+
+    b = [0]
+
+
+
     if request.method == 'POST':
         if request.form.get('checkbox') == '1':
             service.next = 1
         else:
             service.next = 0
+        for elem in categories_all:
+            if request.form.get(str(elem.id)) == str(elem.id):
+                a = ServiceCategory(service_id=service_id, category_id=elem.id)
+                for i in ServiceCategory.query.all():
+                    if str(i.service_id) == str(a.service_id) and str(i.category_id) == str(a.category_id):
+                        ServiceCategory.query.filter_by(service_id=i.service_id, category_id=i.category_id).delete()
+                        db.session.commit()
+                    else:
+                        pass
+                db.session.add(a)
+
+        db.session.commit()
+        # checking categories(if it in ServiceCategories -> 1)
 
         if request.form.get('delete'):
             try:
@@ -262,14 +281,19 @@ def service_test():
             os.chdir('../../../../')
             return redirect(url_for('admin_panel.service_test', service_id=service_id))
 
-
         service.short_description = request.form.get('input_short_desc')
         service.description = request.form.get('input_desc')
         service.price = request.form.get('input_price')
         service.name = request.form.get('title')
         db.session.commit()
+
+    for i in categories_all:
+        b.insert(i.id, 0)
+        if ServiceCategory.query.filter_by(service_id=service_id, category_id=i.id).first():
+            b.insert(i.id, i.id)
+
     return render_template('admin_panel/service.html', title='{}'.format(service.name),
-                           categories=get_categories(), service=service)
+                           categories=get_categories(), service=service, categories_checked=b)
 
 
 @bp.route('/service_create', methods=['GET', 'POST'])

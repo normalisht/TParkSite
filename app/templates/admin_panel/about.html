@@ -2,6 +2,7 @@
 
 {% block scripts %}
     <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel.css') }}">
+
 {% endblock %}
 
 {% block app_content %}
@@ -36,6 +37,10 @@
 
             <div class="">
                 <div class="title">Партнёры</div><br>
+                <label for="block_photo" class="button_about">
+                    <span class="input__file_button">Добавить</span>
+                </label>
+                <br><br>
                 {% for partner in partners %}
                     <div class="partners_map">
                         <div class="grid_block_photo">
@@ -70,6 +75,10 @@
             </div>
 
             <div class="title">Сотрудники</div><br>
+            <label for="block_photo" class="button_about">
+                <span class="input__file_button">Добавить</span>
+            </label>
+            <br><br>
             {% for employee in employees %}
                 <div class="partners_map">
                 <div class="grid_block_photo">

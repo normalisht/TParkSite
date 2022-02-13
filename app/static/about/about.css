@@ -53,11 +53,11 @@
     justify-content: center;
 }
 
-.block_fil {
+.block_content {
     justify-content: center;
-    max-width: min(90%, 1000px);
+    max-width: min(95%, 960px);
     overflow: hidden;
-    margin: -6px auto 4px;
+    margin: 5px auto 0;
     text-align: left;
     word-wrap: break-word;
     font-size: var(--primary-font-size);

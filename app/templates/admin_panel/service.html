@@ -2,17 +2,19 @@
 
 {% block scripts %}
     <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel.css') }}">
+
 {% endblock %}
 
 {% block app_content %}
-{{ ckeditor.load() }}
+    {{ ckeditor.load() }}
 
     <div class="grid_panel">
         <div class="title">Текст</div>
-        <div class="grid_block">
+        <div class="grid_block partners_map">
 
 
-            <form method="POST" enctype="multipart/form-data">
+            <form method="POST" enctype="multipart/form-data" class="grid_block">
+
 
                 <label for="title">Название услуги</label>
                 <input type="text" name="title" id="title" class="category_name"
@@ -34,10 +36,11 @@
 
                 <div class="grid_category">
                     {% for categories in categories %}
+
                         <label for="category" class="label_1">{{ categories.name }}</label>
                         <input type="radio" id="category" class="checkbox"
                                name={{ categories.id }}  value={{ categories.id }}
-                        >
+                                {{ "checked" if categories.id == categories_checked[categories.id] else "" }}>
 
                     {% endfor %}
                 </div>
@@ -54,32 +57,31 @@
                 </div>
 
 
-        </div>
-    </div>
 
-    <div>
-        <div class="title">Фото</div>
 
-        <div class="grid_block_photo">
-            {% set path = "images/service/" + service.id|string + ".png" %}
-            <div><img src="{{ url_for("static", filename=path) }}" alt="" class="image"></div>
+
+        <div class="partners_map">
+            <div class="title">Фото</div>
+
 
             <div class="input__wrapper">
                 <input type="file" name="change" id="photo" class="input__file_button" value="Изменить">
             </div>
             <div class="input__wrapper" id="delete_photo">
                 <label for="block_photo" class="button">
-                    <input type ="submit"  class="input__file_button"  name="delete" value="Удалить">
+                    <input type="submit" class="input__file_button" name="delete" value="Удалить">
                 </label>
+
             </div>
 
-            <div class="checkbox"></div>
         </div>
+
         <input type="submit" value="Подтвердить">
 
         </form>
+
     </div>
-{{ ckeditor.config(name='input_short_desc')}}
-{{ ckeditor.config(name='input_desc')}}
+    {{ ckeditor.config(name='input_short_desc') }}
+    {{ ckeditor.config(name='input_desc') }}
 
 {% endblock %}
