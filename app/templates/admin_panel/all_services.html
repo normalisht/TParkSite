@@ -9,7 +9,7 @@
     <div class="services">
         {% for service in services %}
             <div class="service">
-                <a class="" href="">
+                <a class="" href="{{ url_for('admin_panel.service_test') }}?service_id={{ service.id }}">
                     {{ service.name }} – {{ service.prices[0] }}
                 </a>
             </div>

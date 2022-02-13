@@ -2,21 +2,19 @@
 
 .services {
     margin: 10px auto;
+    width: min(95%, 360px);
+
 }
 
 .service {
     display: flex;
     margin: auto;
-    justify-content: center;
+    justify-content: left;
 }
 
 .service > a {
     font-size: var(--primary-font-size);
     color: #000000;
-    text-decoration: none;
     text-align: left;
-
-}
-
-.service > a > div {
+    margin-bottom: 5px;
 }
