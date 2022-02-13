@@ -36,6 +36,7 @@
     display: grid;
     grid-template-columns: 50% 25% 25%;
     min-height: 200px;
+    width: 100%;
     align-self: center;
     margin-bottom: 30px;
 
@@ -84,6 +85,15 @@
     margin-bottom: 10px;
     width: 300px;
     height: 200px;
+
+}
+
+.little_input {
+    display: flex;
+    align-content: center;
+    margin-bottom: 10px;
+    width: 300px;
+    height: 30px;
 
 }
 
@@ -150,6 +160,7 @@
     padding: 6px;
     border: 2px solid;
     border-radius: 2px;
+    margin-bottom:10px;
 }
 
 .input__file_button:hover {

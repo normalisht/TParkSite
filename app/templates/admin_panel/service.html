@@ -17,7 +17,7 @@
 
 
                 <label for="title">Название услуги</label>
-                <input type="text" name="title" id="title" class="category_name"
+                <input type="text" name="title" id="title" class="little_input"
                        value="{{ service.name }}">
 
                 <label for="input_desc">Краткое описание</label>
@@ -29,7 +29,7 @@
                 >{{ service.description|safe }}</textarea>
 
                 <label for="input_price">Цена</label>
-                <input type="text" name="input_price" id="input_price" class="category_name"
+                <input type="text" name="input_price" id="input_price" class="little_input"
                        value="{{ service.price }}">
 
                 <label for="select">Категории</label>
@@ -54,38 +54,37 @@
                 </div>
 
 
+                <div class="grid_block_photo">
+                    <div class="title">Фото</div>
 
 
+                    <div class="input__wrapper">
+                        <input type="file" name="change" id="photo" class="input__file" value="Изменить">
+                        <label for="photo" class="input__file_button">
+                            <span class="input__file_button_text_2">Изменить</span>
+                        </label>
+                    </div>
+                    <div class="input__wrapper">
+                        <input type="submit" class="input__file" id="delete_photo" name="delete" value="Удалить">
+                        <label for="delete_photo" class="input__file_button">
+                            <span class="input__file_button_text_2">Удалить</span>
+                        </label>
+                    </div>
 
-        <div class="partners_map">
-            <div class="title">Фото</div>
-
-
-            <div class="input__wrapper">
-                <input type="file" name="change" id="photo" class="input__file" value="Изменить">
-                <label for="photo" class="input__file_button">
-                    <span class="input__file_button_text_2">Изменить</span>
-                </label>
-            </div>
-            <div class="input__wrapper">
-                    <input type="submit" class="input__file" id="delete_photo" name="delete" value="Удалить">
-                    <label for="delete_photo" class="input__file_button">
-                        <span class="input__file_button_text_2">Удалить</span>
-                    </label>
-            </div>
-
-        </div>
+                </div>
                 <div class="input__wrapper">
-                    <input type="submit"  id="Submit" value="Подтвердить" class="input__file">
+                    <input type="submit" id="Submit" value="Подтвердить" class="input__file">
                     <label for="Submit" class="input__file_button">
                         <span class="input__file_button_text_2">Подтвердить</span>
                     </label>
                 </div>
 
-        </form>
+            </form>
+
+        </div>
+        {{ ckeditor.config(name='input_short_desc') }}
+        {{ ckeditor.config(name='input_desc') }}
 
     </div>
-    {{ ckeditor.config(name='input_short_desc') }}
-    {{ ckeditor.config(name='input_desc') }}
 
 {% endblock %}
