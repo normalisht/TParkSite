@@ -41,7 +41,7 @@
                                         <img class="slider__img" alt=""
                                              src="{{ url_for('static',filename='/images/events/' + event.id|string + '.png') }}">
                                         <div class="event_text">
-                                            {{ event.description }}
+                                            {{ event.description|safe }}
                                         </div>
                                     </div>
                                 </div>
@@ -58,7 +58,7 @@
     </div>
 
     <div class="block_content">
-        {{ main_text }}
+        {{ main_text|safe }}
     </div>
     <!--Слайдер-->
     <div class="block_slider">
