@@ -38,11 +38,10 @@
     display: grid;
     grid-template-columns: 50% 25% 25%;
     min-height: 200px;
-    width: 100%;
     align-self: center;
     margin-bottom: 30px;
-    grid-column-gap: 30px;
-
+    grid-column-gap: 8%;
+    justify-content: center;
 }
 
 .input__wrapper {
@@ -113,8 +112,8 @@
 }
 
 .image {
-    width: clamp(200px, 10vw, 30vw);
-    height: clamp(200px, 10vw, 30vw);
+    width: clamp(150px, 15vw, 300px);
+    height: clamp(150px, 15vw, 300px);
     display: flex;
     align-items: center;
 
