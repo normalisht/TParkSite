@@ -12,77 +12,76 @@
     {{ ckeditor.load() }}
 
 
-    <div class="div_grid_panel">
+    <div class="grid_panel">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="grid_block partners_map">
+                <div class="title">Главная страница</div>
 
-        <div class="grid_panel partners_map">
-            <div class="title">Главная страница</div>
+                <div class="title">Текст</div>
+                <div class="grid_block">
+                    <div>
 
-            <div class="title">Текст</div>
-            <div class="grid_block">
-                <div>
-                    <form>
                         <label for="title">Текст главной страницы</label>
-                        <textarea name="title_text" id="title" class="category_name">
-                            {{ main_text.text }}
-                        </textarea>
-                        <input type="submit" class="submit" value="Подтвердить">
-                    </form>
+                        <textarea name="title" id="title" class="category_name">
+                                {{ main_text.text|safe }}
+                            </textarea>
+                        <input type="submit" value="Подтвердить">r
+                    </div>
+
                 </div>
 
             </div>
 
-        </div>
 
+            <div>
+                <div class="title">Фото</div>
+                {% for photo in files %}
+                    <div class="grid_block_photo">
+                        <div class="block_image">
+                            <img src="{{ url_for('static',filename='/images/staff/' + photo) }}" alt=""
+                                 class="image">
+                        </div>
 
-        <div>
-            <div class="title">Фото</div>
-            {% for photo in files %}
+                        <div class="input__wrapper">
+                            <input type="file" name="change_{{ photo }}" id="change_{{ photo }}" class="input__file"
+                                   value="Изменить">
+                            <label for="change_{{ photo }}" class="input__file_button">
+                                <span class="input__file_button_text_2">Изменить</span>
+                            </label>
+                        </div>
+
+                        <div class="input__wrapper">
+                            <input type="submit" id="delete_{{ photo }}" class="input__file"
+                                   name="delete_{{ photo }}"
+                                   value="Удалить">
+                            <label for="delete_{{ photo }}" class="input__file_button">
+                                <span class="input__file_button_text_2">Удалить</span>
+                            </label>
+                        </div>
+
+                        <div class="checkbox"></div>
+                    </div>
+                {% endfor %}
+
                 <div class="grid_block_photo">
-                    <div class="block_image">
-                        <img src="{{ url_for('static',filename='/images/staff/' + photo) }}" alt=""
-                             class="image">
-                    </div>
 
-                    <div class="input__wrapper">
-                        <input type="file" name="change_{{ photo }}" id="change_{{ photo }}" class="input__file"
-                               value="Изменить">
-                        <label for="change_{{ photo }}" class="input__file_button">
-                            <span class="input__file_button_text_2">Изменить</span>
-                        </label>
-                    </div>
+                    <div class="input__wrapper" id="delete_photo">
 
-                    <div class="input__wrapper">
-                        <input type="submit" id="delete_{{ photo }}" class="input__file"
-                               name="delete_{{ photo }}"
-                               value="Удалить">
-                        <label for="delete_{{ photo }}" class="input__file_button">
-                            <span class="input__file_button_text_2">Удалить</span>
-                        </label>
                     </div>
-
-                    <div class="checkbox"></div>
+                    {% if not files[2] %}
+                        <div class="input__wrapper">
+                            <input type="file" id="blank_file" name="add_photo" class="input__file">
+                            <label for="blank_file" class="input__file_button">
+                                <span class="input__file_button_text_2">Добавить</span>
+                            </label>
+                        </div>
+                    {% endif %}
                 </div>
-            {% endfor %}
-
-            <div class="grid_block_photo">
-
-                <div class="input__wrapper" id="delete_photo">
-
-                </div>
-                {% if not files[2] %}
-                    <div class="input__wrapper">
-                        <input type="file" id="blank_file" name="add_photo" class="input__file">
-                        <label for="blank_file" class="input__file_button">
-                            <span class="input__file_button_text_2">Добавить</span>
-                        </label>
-                    </div>
-                {% endif %}
             </div>
-        </div>
+        </form>
     </div>
-    {{ ckeditor.config(name='title_text') }}
+
 
     {{ ckeditor.config(name='title') }}
-
 
 {% endblock %}

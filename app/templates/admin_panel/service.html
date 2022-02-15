@@ -39,7 +39,7 @@
                     {% for categories in categories %}
 
                         <label for="category" class="label_1">{{ categories.name }}</label>
-                        <input type="checkbox" id="category" class="checkbox"
+                        <input type="checkbox" id="category" class="checkbox_category"
                                name={{ categories.id }}  value={{ categories.id }}
                                 {{ "checked" if categories.id == categories_checked[categories.id] else "" }}>
 
