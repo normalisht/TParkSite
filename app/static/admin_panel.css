@@ -1,9 +1,7 @@
 
 .title {
     text-align: center;
-    padding: 0.5em;
-    font-size: 30px;
-    font-weight: bold;
+    font-size: calc(var(--primary-font-size) * 1.2);
 }
 
 .block_texts {
@@ -37,7 +35,6 @@
     display: grid;
     grid-template-columns: 1fr;
     align-self: center;
-    margin-bottom: 30px;
     justify-content: center;
 }
 
@@ -89,16 +86,23 @@
 }
 
 .block_image {
-    max-width: 20vw;
-    max-height: 20vh;
+    display: flex;
+    justify-content: center;
+    margin: 15px auto;
+    overflow: hidden;
+    height: clamp(200px, 45vh, 800px);
+    max-height: 400px;
+    width: 100%;
 }
 
 .image {
-    width: clamp(150px, 15vw, 300px);
-    height: clamp(150px, 15vw, 300px);
+    position: relative;
+    object-fit: cover;
+    height: clamp(200px, 45vh, 800px);
+    width: 100%;
     display: flex;
     align-items: center;
-
+    justify-content: center;
 }
 
 

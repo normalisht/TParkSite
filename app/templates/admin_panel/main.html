@@ -23,9 +23,9 @@
 
                         <label for="title">Текст главной страницы</label>
                         <textarea name="title" id="title" class="category_name">
-                                {{ main_text.text|safe }}
-                            </textarea>
-                        <input type="submit" value="Подтвердить">r
+                            {{ main_text.text|safe }}
+                        </textarea>
+                        <input type="submit" value="Подтвердить">
                     </div>
 
                 </div>
@@ -34,7 +34,7 @@
 
 
             <div>
-                <div class="title">Фото</div>
+                <div class="title">Фотографии</div>
                 {% for photo in files %}
                     <div class="grid_block_photo">
                         <div class="block_image">
@@ -58,8 +58,6 @@
                                 <span class="input__file_button_text_2">Удалить</span>
                             </label>
                         </div>
-
-                        <div class="checkbox"></div>
                     </div>
                 {% endfor %}
 
