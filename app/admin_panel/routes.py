@@ -263,15 +263,19 @@ def category_create():
         category = Category(name=title, description=description, status=1)
         db.session.add(category)
         db.session.commit()
-        photo = request.files.getlist('photo')
-        count = 0
         category_id = category.id
         os.makedirs('app/static/images/category/{}'.format(category_id))
-        os.chdir('app/static/images/category/{}'.format(category_id))
-        for file in photo:
-            file.save(os.path.join(os.getcwd(), '{}.png'.format(count)))
-            count += 1
-        os.chdir('../../../../../')
+        try:
+            photo = request.files.getlist('photo')
+            count = 0
+            os.chdir('app/static/images/category/{}'.format(category_id))
+            if photo[0]:
+                for file in photo:
+                    file.save(os.path.join(os.getcwd(), '{}.png'.format(count)))
+                    count += 1
+            os.chdir('../../../../../')
+        except:
+            pass
 
     return render_template('admin_panel/category_create.html', title='Создание категории')
 
