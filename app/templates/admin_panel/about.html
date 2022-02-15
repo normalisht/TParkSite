@@ -20,7 +20,7 @@
                             </label>
                             <textarea name="title" id="title" class=""
                             >{{ filosofi.text|safe if filosofi.text }}</textarea>
-                            <input type="submit" value="Подтвердить" class="confirm_text">
+                            <input type="submit" value="Сохранить" class="confirm_text">
                         </form>
                     </div>
                 </div>
@@ -33,7 +33,7 @@
                             </label>
                             <textarea name="about_text" id="about_text" class=""
                             >{{ about.text|safe if about.text }}</textarea>
-                            <input type="submit" value="Подтвердить" class="confirm_text">
+                            <input type="submit" value="Сохранить" class="confirm_text">
                         </form>
                     </div>
                 </div>
@@ -47,35 +47,34 @@
                 </label>
                 <br><br>
                 {% for partner in partners %}
-                    <div class="partners_map">
+                    <div class="partners_map_1">
                         <div class="grid_block_photo">
                             {% set path = "/images/partner/" + partner.id|string + ".png" %}
                             <figure class="img__employ">
-                                <img src="{{ url_for("static", filename=path) }}" alt="{{ partner.name }}"
-                                     class="partimg">
+                                <center><img src="{{ url_for("static", filename=path) }}" alt="{{ partner.name }}"
+                                             class="partimg"></center>
                                 <figcaption>
-                                    <div class="">Ссылка на партнера</div>
+                                    <div class="ss"><center>Ссылка на партнера</center></div>
                                 </figcaption>
                                 <form>
-                                    <figcaption>
+                                    <figcaption><center>
                                         <input type="text" name="title" id="title" class="employ_txt"
                                                value="{{ partner.link if partner.link }}">
-                                    </figcaption>
+                                        </center></figcaption>
                                 </form>
                             </figure>
 
                             <div class="input__wrapper">
+
                                 <input type="file" name="change" id="photo" class="input__file" value="Изменить">
                                 <label for="photo" class="input__file_button">
                                     <span class="input__file_button_text_2">Изменить</span>
                                 </label>
-                            </div>
-                            <div class="input__wrapper">
+
                                 <label  class="input__file_button">
-                                    <span class="input__file_button_text_2">Подтвердить</span>
+                                    <span class="input__file_button_text_2">Сохранить</span>
                                 </label>
-                            </div>
-                            <div class="input__delete_1">
+
                                 <input type="submit" class="input__file" id="delete" name="delete" value="Удалить">
                                 <label for="delete" class="input__file_button">
                                     <span class="input__file_button_text_2">Удалить</span>
@@ -95,11 +94,12 @@
             </label>
             <br><br>
             {% for employee in employees %}
-                <div class="partners_map">
+                <div class="partners_map_1">
                     <div class="grid_block_photo">
                         {% set path = "images/employee/" + employee.id|string + ".png" %}
                         <figure class="img__employ">
-                            <img src="{{ url_for("static", filename=path) }}" alt="" class="emplimg">
+                            <center><img src="{{ url_for("static", filename=path) }}" alt="" class="emplimg"></center>
+                            <center>
                             <form>
                                 <figcaption>ФИО</figcaption>
                                 <figcaption>
@@ -115,6 +115,7 @@
                                 </figcaption>
 
                             </form>
+                            </center>
                         </figure>
 
                         <div class="input__wrapper">
@@ -122,13 +123,11 @@
                             <label for="photo" class="input__file_button">
                                 <span class="input__file_button_text_2">Изменить</span>
                             </label>
-                        </div>
-                        <div class="input__wrapper">
+
                             <label  class="input__file_button">
-                                <span class="input__file_button_text_2">Подтвердить</span>
+                                <span class="input__file_button_text_2">Сохранить</span>
                             </label>
-                        </div>
-                        <div class="input__delete_2">
+
                             <input type="submit" class="input__file" id="delete" name="delete" value="Удалить">
                             <label for="delete" class="input__file_button">
                                 <span class="input__file_button_text_2">Удалить</span>
