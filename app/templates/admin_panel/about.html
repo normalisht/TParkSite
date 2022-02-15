@@ -1,7 +1,7 @@
 {% extends "admin_panel/base.html" %}
 
 {% block scripts %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel/about.css') }}">
 
 {% endblock %}
 
@@ -71,18 +71,18 @@
                                 </label>
                             </div>
                             <div class="input__wrapper">
-                                <label for="block_photo" class="button">
-                                    <span class="input__file_button">Подтвердить</span>
+                                <label  class="input__file_button">
+                                    <span class="input__file_button_text_2">Подтвердить</span>
                                 </label>
                             </div>
-                            <div class="input__delete">
-                                <input type="submit" class="input__file" id="delete_photo" name="delete" value="Удалить">
-                                <label for="delete_photo" class="input__file_button">
+                            <div class="input__delete_1">
+                                <input type="submit" class="input__file" id="delete" name="delete" value="Удалить">
+                                <label for="delete" class="input__file_button">
                                     <span class="input__file_button_text_2">Удалить</span>
                                 </label>
                             </div>
 
-                            <div class="checkbox"></div>
+
                         </div>
                     </div>
                 {% endfor %}
@@ -124,18 +124,17 @@
                             </label>
                         </div>
                         <div class="input__wrapper">
-                            <label for="block_photo" class="button">
-                                <span class="input__file_button">Подтвердить</span>
+                            <label  class="input__file_button">
+                                <span class="input__file_button_text_2">Подтвердить</span>
                             </label>
                         </div>
-                        <div class="input__delete">
-                            <input type="submit" class="input__file" id="delete_photo" name="delete" value="Удалить">
-                            <label for="delete_photo" class="input__file_button">
+                        <div class="input__delete_2">
+                            <input type="submit" class="input__file" id="delete" name="delete" value="Удалить">
+                            <label for="delete" class="input__file_button">
                                 <span class="input__file_button_text_2">Удалить</span>
                             </label>
                         </div>
 
-                        <div class="checkbox"></div>
                     </div>
                 </div>
             {% endfor %}
