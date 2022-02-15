@@ -1,6 +1,8 @@
 {% extends "admin_panel/base.html" %}
 
 {% block app_content %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel/category.css') }}">
+
     {{ ckeditor.load() }}
     {% set title = ckeditor %}
     <div class="title">Категории услуг</div>
@@ -16,8 +18,8 @@
                            class="category_name" value="{{ category.name if category.name }}">
 
 
-                    <div class="grid_checkbox">
-                        <label for="checkbox_1">Отображать</label>
+                    <div class="category_status_block">
+                        <label for="checkbox_1">Отображать/Скрыть</label>
                         <input type="checkbox" id="checkbox_1" class="checkbox" name="mycheckbox" value="1" {{ "checked" if
                         category.status else "" }}/>
                     </div>
@@ -30,7 +32,7 @@
                         </label>
                     </div>
 
-                    <label for="weight">Вес категории</label>
+                    <label for="weight">Порядковый номер вывода категории</label>
                     <input type="text" name="weight" id="weight" class="little_input"
                            value="{{ category.number if category.number else " 30" }}">
 
@@ -96,7 +98,7 @@
                 <div class="input__wrapper">
                     <input type="submit" id="Submit" value="Подтвердить" class="input__file">
                     <label for="Submit" class="input__file_button">
-                        <span class="input__file_button_text_2">Подтвердить</span>
+                        <span class="input__file_button_text_2">Сохранить изменения</span>
                     </label>
                 </div>
             </form>

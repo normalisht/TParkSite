@@ -1,0 +1,7 @@
+@charset "UTF-8";
+
+.category_status_block {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    text-align: left;
+}

@@ -17,7 +17,7 @@
             {% for event in events %}
                 <div class="event">
                     <a href="{{ url_for('admin_panel.event_edit', id=event.id ) }}">
-                        <div class="title">
+                        <div class="title_event">
                             {{ event.title }}
                         </div>
                         <div class="date">
