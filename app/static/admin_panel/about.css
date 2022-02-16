@@ -17,6 +17,7 @@
     min-width: 45vw;
     grid-template-columns: min(95%, 960px);
     justify-content: center;
+    margin-top:10px;
 }
 
 .grid_block {
