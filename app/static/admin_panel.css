@@ -234,7 +234,7 @@
 .grid_category {
     display: grid;
     min-width: 250px;
-    grid-template-columns: 30vw 30vw;
+    grid-template-columns: 30vw 15vw;
     text-align: left;
     justify-content: left;
     margin-bottom: 20px;
