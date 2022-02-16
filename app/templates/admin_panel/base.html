@@ -46,9 +46,13 @@
         <div style="display: flex;">
             <div class="button_main"
                  data-modal-window-toggle="#services-modal-win">
-                <div id="services-button">
-                    Услуги
-                </div>
+                <a id="about-us-button" class="button_main  about_a"
+                   href="{{ url_for('admin_panel.category') }}">
+                    <div href="{{ url_for('admin_panel.category') }}" class="">
+                        Категории
+                    </div>
+
+                </a>
                 <!--Модальные окно/выпадающее меню -->
                 <div id="services-modal-win" class="modal submenu">
                     <div class="modal-window">
