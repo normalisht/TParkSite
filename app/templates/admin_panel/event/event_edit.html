@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block app_content %}
-
+{{ ckeditor.load() }}
     <form class="form" method="post" action="{{ url_for('admin_panel.event_edit', id=event.id) }}">
         <div class="form_container">
 
@@ -25,7 +25,7 @@
 
             <label for="description"></label>
             <textarea name="description" id="description" autocomplete="off"
-                      placeholder="Описание" cols="50" rows="20">{{ event.description }}
+                      placeholder="Описание" cols="50" rows="20">{{ event.description|safe }}
             </textarea>
 
             <input type="submit" value="Сохранить изменения">
@@ -33,4 +33,5 @@
 
     </form>
 
+{{ ckeditor.config(name='description') }}
 {% endblock %}
