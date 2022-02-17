@@ -151,14 +151,11 @@
     .position_employees {
         text-align: left;
     }
-    /*.block_employees figcaption {
-        margin-left: auto;
-        margin-right: auto;
-        width: 100%;
-    }
+
     .block_employees_block > * {
-        height: 31.1rem;
+        height: 27.1rem;
     }
+    /*
     .name_employees {
         margin-top: -25px;
         text-align: center;

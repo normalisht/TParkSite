@@ -11,7 +11,7 @@
     <div class="grid_panel">
 
         <div class="grid_block partners_map">
-            <div class="title">Текст</div>
+
 
 
             <form method="POST" enctype="multipart/form-data" class="grid_block">
@@ -39,7 +39,7 @@
                     {% for categories in categories %}
 
                         <label for="category" class="label_1">{{ categories.name }}</label>
-                        <input type="checkbox" id="category" class="checkbox_category"
+                        <input type="checkbox" id="category" class="checkbox"
                                name={{ categories.id }}  value={{ categories.id }}
                                 {{ "checked" if categories.id == categories_checked[categories.id] else "" }}>
 
