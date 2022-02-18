@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block app_content %}
-
+{{ ckeditor.load() }}
     <form class="form" method="post" action="{{ url_for('admin_panel.event_create') }}" enctype="multipart/form-data">
         <div class="form_container">
 
@@ -28,5 +28,5 @@
         </div>
 
     </form>
-
+{{ ckeditor.config(name='description') }}
 {% endblock %}

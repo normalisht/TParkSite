@@ -17,11 +17,13 @@
                     <input type="text" name="title" id="title"
                            class="category_name" value="{{ category.name if category.name }}">
 
-
-                    <div class="category_status_block">
-                        <label for="checkbox_1">Отображать/Скрыть</label>
-                        <input type="checkbox" id="checkbox_1" class="checkbox" name="mycheckbox" value="1" {{ "checked" if
+                    <div style="text-align: left;">
+                        <div class="grid_checkbox">
+                            <label for="checkbox_1" style="text-align: left;">Отображать/Скрыть</label>
+                            <input style="margin-left: 0;" type="checkbox" id="checkbox_1" class="checkbox"
+                                   name="mycheckbox" value="1" {{ "checked" if
                         category.status else "" }}/>
+                        </div>
                     </div>
 
                     <div class="input__wrapper">
