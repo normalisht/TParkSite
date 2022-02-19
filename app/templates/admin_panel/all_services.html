@@ -1,19 +1,25 @@
 {% extends "admin_panel/base.html" %}
 
 {% block scripts %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel/events.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel/all_services.css') }}">
 {% endblock %}
 
 {% block app_content %}
 
-    <div class="services">
-        {% for service in services %}
-            <div class="service">
-                <a class="" href="{{ url_for('admin_panel.service_test') }}?service_id={{ service.id }}">
-                    {{ service.name }} – {{ service.prices[0] }}
-                </a>
-            </div>
-        {% endfor %}
+    <div class="block_event">
+        <div class="new_event event">
+            <a href="{{ url_for('admin_panel.service_create') }}">Создать новую услугу</a>
+        </div>
+        <div class="events">
+            {% for service in services %}
+                <div class="event">
+                    <a class="title" href="{{ url_for('admin_panel.service_test') }}?service_id={{ service.id }}">
+                        {{ service.name }} – {{ service.prices[0] }}
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 
 {% endblock %}

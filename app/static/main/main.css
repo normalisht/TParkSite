@@ -108,7 +108,7 @@ p {
 }
 
 .main_block {
-    margin: 0 auto;
+    margin: 0 auto 10px;
     width: 100%;
     z-index: 2;
     /*background-color: var(--background-color);*/
