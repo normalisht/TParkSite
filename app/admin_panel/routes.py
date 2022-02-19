@@ -384,19 +384,16 @@ def about():
             if request.form.get('delete'):
                 try:
                     os.remove('app/static/partner/' + str(partner.id) + ".png")
-                    return redirect(url_for('admin_panel.about_2'))
+                    return redirect(url_for('admin_panel.about'))
                 except:
                     pass
-            if request.files.get('change'):
-                image = request.files.get('change')
-                print('a')
+            if request.files.get('partner_' + str(partner.id) + '_photo'):
+                image = request.files.get('partner_' + str(partner.id) + '_photo')
                 os.chdir('app/static/images/partner')
-                print('a')
                 image.save(os.path.join(os.getcwd(), '{}.png'.format(partner.id)))
                 os.chdir('../../../../')
-                return redirect(url_for('admin_panel.about_2'))
-            if request.form.get(str(partner)):
-                partner.link = request.form.get(str(partner))
+                return redirect(url_for('admin_panel.about'))
+            partner.link = request.form.get('partner_' + str(partner.id) + '_link')
         if request.form.get('about_text'):
             about.text = request.form.get('about_text')
         if request.form.get('filosofi_text'):

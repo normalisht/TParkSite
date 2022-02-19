@@ -40,13 +40,13 @@
             </div>
 
             <div class="">
-                <form method="POST">
                 <div class="title">Партнёры</div>
                 <br>
                 <label for="block_photo" class="button_about">
                     <span class="input__file_button">Добавить</span>
                 </label>
                 <br><br>
+                <form method="POST" enctype="multipart/form-data">
                 {% for partner in partners %}
                     <div class="partners_map_1">
                         <div class="grid_block_photo">
@@ -57,18 +57,16 @@
                                 <figcaption>
                                     <div class="ss"><center>Ссылка на партнера</center></div>
                                 </figcaption>
-                                <form>
-                                    <figcaption><center>
-                                        <input type="text" name="{{ partner }}" id="{{ partner }}" class="employ_txt"
-                                               value="{{ partner.link if partner.link }}">
-                                        </center></figcaption>
-                                </form>
+                                <figcaption><center>
+                                    <input type="text" name="partner_{{ partner.id }}_link" id="partner_{{ partner.id }}_link" class="employ_txt"
+                                           value="{{ partner.link if partner.link }}">
+                                </center></figcaption>
                             </figure>
 
                             <div class="input__wrapper">
 
-                                <input type="file" name="change" id="photo" class="input__file" value="Изменить">
-                                <label for="photo" class="input__file_button">
+                                <input type="file" name="partner_{{ partner.id }}_photo" id="partner_{{ partner.id }}_photo" class="input__file" value="Изменить">
+                                <label for="partner_{{ partner.id }}_photo" class="input__file_button">
                                     <span class="input__file_button_text_2">Изменить</span>
                                 </label>
 
@@ -96,7 +94,7 @@
                 <span class="input__file_button">Добавить</span>
             </label>
             <br><br>
-            <form method="POST">
+            <form method="POST" enctype="multipart/form-data">
             {% for employee in employees %}
                 <div class="partners_map_1">
                     <div class="grid_block_photo">
@@ -107,14 +105,14 @@
                             <form>
                                 <figcaption>ФИО</figcaption>
                                 <figcaption>
-                                    <input type="text" name="title" id="title" class="employ_txt"
+                                    <input type="text" name="employee_{{ employee.id }}_name" id="employee_{{ employee.id }}_name" class="employ_txt"
                                            value="{{ employee.name if employee.name }}">
                                 </figcaption>
                             </form>
                             <form>
                                 <figcaption>
                                     <figcaption>Должность</figcaption>
-                                    <input type="text" name="title" id="title" class="employ_txt"
+                                    <input type="text" name="employee_{{ employee.id }}_position" id="title" class="employee_{{ employee.id }}_position"
                                            value="{{ employee.position if employee.position }}">
                                 </figcaption>
 
@@ -141,8 +139,8 @@
                     </div>
                 </div>
             {% endfor %}
-
             </form>
+
         </div>
     </div>
 
