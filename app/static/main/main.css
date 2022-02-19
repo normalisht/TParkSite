@@ -51,6 +51,10 @@ img {
     user-select: none; /* чтобы картинки не выделялись при выделении текста */
 }
 
+p {
+    margin: 0;
+}
+
 .upper_container {
     width: 100%;
     background-color: white;
