@@ -42,11 +42,18 @@
                     {{ ckeditor.create(value=category.description|safe if category.description) }}
                 </div>
 
+                {% set i = namespace(a=0) %}
                 {% for element in services %}
                     <div class="grid_element">
                         {% set service = element.service %}
 
-                        <div class="grid_checkbox">
+                        <div class="grid_checkbox_2">
+                            <div>
+                                <label>
+                                    <input class="service_number" type="number" min="0"
+                                           name="service_number_{{ service.id }}" value="{{ numbers[i.a] }}">
+                                </label>
+                            </div>
                             <a href="{{ url_for('admin_panel.service_test') }}?service_id={{ service.id }}"
                                class="service_name">{{ service.name if service.name }}</a>
                             <div>
@@ -57,6 +64,7 @@
                             </div>
                         </div>
                     </div>
+                    {% set i.a = i.a + 1 %}
                 {% endfor %}
                 <div>
                     <div class="title">Фото</div>

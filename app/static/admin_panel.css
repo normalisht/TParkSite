@@ -227,7 +227,15 @@
     margin: auto;
 }
 
-.grid_checkbox > a {
+.grid_checkbox_2 {
+    display: grid;
+    grid-template-columns: 55px 200px 1fr;
+    padding: 5px;
+    margin: auto;
+}
+
+.grid_checkbox > a,
+.grid_checkbox_2 > a {
     color: black;
 }
 
@@ -273,4 +281,8 @@
     -webkit-appearance: checkbox;
     margin-left: 34vw;
     margin-bottom: 2vw;
+}
+
+.service_number {
+    max-width: 50px;
 }

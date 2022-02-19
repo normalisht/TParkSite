@@ -82,7 +82,6 @@ def main():
 
             return redirect(url_for('admin_panel.main'))
 
-
     return render_template('admin_panel/main.html', title='Главная страница', main_text=main_text,
                            categories=get_categories(), files=files)
 
@@ -173,6 +172,10 @@ def category_change():
     category_id = request.args.get('category_id')
     category = Category.query.filter_by(id=category_id).first()
     services = category.services.order_by(ServiceCategory.number).all()
+    numbers = []  # хранит порядковые номера услуг
+
+    for element in services:
+        numbers.append(element.number)
 
     try:
         os.chdir('app/static/images/category/{}'.format(category_id))
@@ -193,6 +196,9 @@ def category_change():
                 element.service.status = 1
             else:
                 element.service.status = 0
+
+            number = request.form.get('service_number_' + str(element.service.id))
+
 
         if request.form.get('delete_category'):
             try:
@@ -227,7 +233,8 @@ def category_change():
                 return redirect(url_for('admin_panel.category_change', category_id=category_id))
 
         for elem in services:
-            ServiceCategory.query.filter_by(service_id = elem.service.id).first().number = request.form.get('weight_' + str(elem))
+            ServiceCategory.query.filter_by(service_id=elem.service.id).first().number = request.form.get(
+                'weight_' + str(elem))
             db.session.commit()
 
         if request.files.get('add_photo'):
@@ -250,7 +257,8 @@ def category_change():
         return redirect(url_for('admin_panel.category_change', category_id=category_id))
 
     return render_template('admin_panel/category.html', title='{}'.format(category.name),
-                           category=category, services=services, files=files)
+                           category=category, services=services, files=files,
+                           numbers=numbers)
 
 
 @bp.route('/category_create', methods=['GET', 'POST'])
@@ -288,8 +296,6 @@ def service_test():
     categories_all = Category.query.all()
 
     b = [0]
-
-
 
     if request.method == 'POST':
         if request.form.get('checkbox') == '1':
