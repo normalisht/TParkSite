@@ -380,20 +380,44 @@ def about():
     filosofi = Text.query.filter_by(title='filosofi').first()
     partners = Partner.query.all()
     if request.method == 'POST':
+        print(request.form)
         for partner in partners:
-            if request.form.get('delete'):
+            if request.form.get('partner_' + str(partner.id) + '_delete'):
                 try:
-                    os.remove('app/static/partner/' + str(partner.id) + ".png")
-                    return redirect(url_for('admin_panel.about'))
+                    os.remove('app/static/images/partner/' + str(partner.id) + ".png")
                 except:
                     pass
-            if request.files.get('partner_' + str(partner.id) + '_photo'):
-                image = request.files.get('partner_' + str(partner.id) + '_photo')
-                os.chdir('app/static/images/partner')
-                image.save(os.path.join(os.getcwd(), '{}.png'.format(partner.id)))
-                os.chdir('../../../../')
+                Partner.query.filter_by(id=partner.id).delete()
+                db.session.commit()
                 return redirect(url_for('admin_panel.about'))
-            partner.link = request.form.get('partner_' + str(partner.id) + '_link')
+            if request.form.get('partner_' + str(partner.id) + '_save'):
+                if request.files.get('partner_' + str(partner.id) + '_photo'):
+                    image = request.files.get('partner_' + str(partner.id) + '_photo')
+                    os.chdir('app/static/images/partner')
+                    image.save(os.path.join(os.getcwd(), '{}.png'.format(partner.id)))
+                    os.chdir('../../../../')
+                    return redirect(url_for('admin_panel.about'))
+                partner.link = request.form.get('partner_' + str(partner.id) + '_link')
+        for employee in employees:
+            if request.form.get('employee_' + str(employee.id) + '_delete'):
+                try:
+                    os.remove('app/static/images/employee/' + str(employee.id) + ".png")
+                except:
+                    pass
+                Employee.query.filter_by(id=employee.id).delete()
+                db.session.commit()
+                return redirect(url_for('admin_panel.about'))
+            if request.form.get('employee_' + str(employee.id) + '_save'):
+                if request.files.get('employee_' + str(employee.id) + '_photo'):
+                    image = request.files.get('employee_' + str(employee.id) + '_photo')
+                    os.chdir('app/static/images/employee')
+                    image.save(os.path.join(os.getcwd(), '{}.png'.format(employee.id)))
+                    os.chdir('../../../../')
+                    return redirect(url_for('admin_panel.about'))
+                if request.form.get('employee_' + str(employee.id) + '_name'):
+                    employee.name = request.form.get('employee_' + str(employee.id) + '_name')
+                if request.form.get('employee_' + str(employee.id) + '_position'):
+                    employee.position = request.form.get('employee_' + str(employee.id) + '_position')
         if request.form.get('about_text'):
             about.text = request.form.get('about_text')
         if request.form.get('filosofi_text'):

@@ -70,13 +70,13 @@
                                     <span class="input__file_button_text_2">Изменить</span>
                                 </label>
 
-                                <input type="submit" id="Submit" value="Сохранить" class="input__file">
-                                <label for="Submit" class="input__file_button">
+                                <input type="submit" id="partner_{{ partner.id }}_save" value="Сохранить" class="input__file" name="partner_{{ partner.id }}_save">
+                                <label for="partner_{{ partner.id }}_save" class="input__file_button">
                                     <span class="input__file_button_text_2">Сохранить</span>
                                 </label>
 
-                                <input type="submit" class="input__file" id="delete" name="delete" value="Удалить">
-                                <label for="delete" class="input__file_button">
+                                <input type="submit" class="input__file" id="partner_{{ partner.id }}_delete" name="partner_{{ partner.id }}_delete">
+                                <label for="partner_{{ partner.id }}_delete" class="input__file_button">
                                     <span class="input__file_button_text_2">Удалить</span>
                                 </label>
                             </div>
@@ -102,36 +102,33 @@
                         <figure class="img__employ">
                             <center><img src="{{ url_for("static", filename=path) }}" alt="" class="emplimg"></center>
                             <center>
-                            <form>
                                 <figcaption>ФИО</figcaption>
                                 <figcaption>
                                     <input type="text" name="employee_{{ employee.id }}_name" id="employee_{{ employee.id }}_name" class="employ_txt"
                                            value="{{ employee.name if employee.name }}">
                                 </figcaption>
-                            </form>
-                            <form>
                                 <figcaption>
                                     <figcaption>Должность</figcaption>
                                     <input type="text" name="employee_{{ employee.id }}_position" id="title" class="employee_{{ employee.id }}_position"
                                            value="{{ employee.position if employee.position }}">
                                 </figcaption>
 
-                            </form>
                             </center>
                         </figure>
 
                         <div class="input__wrapper">
-                            <input type="file" name="change" id="photo" class="input__file" value="Изменить">
-                            <label for="photo" class="input__file_button">
+                            <input type="file" name="employee_{{ employee.id }}_photo" id="employee_{{ employee.id }}_photo" class="input__file" value="Изменить">
+                            <label for="employee_{{ employee.id }}_photo" class="input__file_button">
                                 <span class="input__file_button_text_2">Изменить</span>
                             </label>
 
-                            <label  class="input__file_button">
+                            <input type="submit" id="employee_{{ employee.id }}_save" value="Сохранить" class="input__file" name="employee_{{ employee.id }}_save">
+                            <label for="employee_{{ employee.id }}_save" class="input__file_button">
                                 <span class="input__file_button_text_2">Сохранить</span>
                             </label>
 
-                            <input type="submit" class="input__file" id="delete" name="delete" value="Удалить">
-                            <label for="delete" class="input__file_button">
+                            <input type="submit" class="input__file" id="employee_{{ employee.id }}_delete" name="employee_{{ employee.id }}_delete" value="Удалить">
+                            <label for="employee_{{ employee.id }}_delete" class="input__file_button">
                                 <span class="input__file_button_text_2">Удалить</span>
                             </label>
                         </div>
