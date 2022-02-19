@@ -389,10 +389,20 @@ def about():
                     pass
             if request.files.get('change'):
                 image = request.files.get('change')
+                print('a')
                 os.chdir('app/static/images/partner')
+                print('a')
                 image.save(os.path.join(os.getcwd(), '{}.png'.format(partner.id)))
                 os.chdir('../../../../')
                 return redirect(url_for('admin_panel.about_2'))
+            if request.form.get(str(partner)):
+                partner.link = request.form.get(str(partner))
+        if request.form.get('about_text'):
+            about.text = request.form.get('about_text')
+        if request.form.get('filosofi_text'):
+            filosofi.text = request.form.get('filosofi_text')
+
+        db.session.commit()
 
     return render_template('admin_panel/about.html', employees=employees,
                            filosofi=filosofi, about=about, partners=partners)

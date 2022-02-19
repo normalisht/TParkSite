@@ -18,7 +18,7 @@
                             <label for="title">
                                 <center>О нас</center><br>
                             </label>
-                            <textarea name="title" id="title" class=""
+                            <textarea name="filosofi_text" id="filosofi_text" class=""
                             >{{ filosofi.text|safe if filosofi.text }}</textarea>
                             <input type="submit" value="Сохранить" class="confirm_text">
                         </form>
@@ -28,7 +28,7 @@
                 <div class="grid_block">
                     <div>
                         <form method="POST">
-                            <label for="title">
+                            <label for="about_text">
                                 <center>Что есть</center><br>
                             </label>
                             <textarea name="about_text" id="about_text" class=""
@@ -40,6 +40,7 @@
             </div>
 
             <div class="">
+                <form method="POST">
                 <div class="title">Партнёры</div>
                 <br>
                 <label for="block_photo" class="button_about">
@@ -58,7 +59,7 @@
                                 </figcaption>
                                 <form>
                                     <figcaption><center>
-                                        <input type="text" name="title" id="title" class="employ_txt"
+                                        <input type="text" name="{{ partner }}" id="{{ partner }}" class="employ_txt"
                                                value="{{ partner.link if partner.link }}">
                                         </center></figcaption>
                                 </form>
@@ -71,7 +72,8 @@
                                     <span class="input__file_button_text_2">Изменить</span>
                                 </label>
 
-                                <label  class="input__file_button">
+                                <input type="submit" id="Submit" value="Сохранить" class="input__file">
+                                <label for="Submit" class="input__file_button">
                                     <span class="input__file_button_text_2">Сохранить</span>
                                 </label>
 
@@ -85,6 +87,7 @@
                         </div>
                     </div>
                 {% endfor %}
+                </form>
             </div>
 
             <div class="title">Сотрудники</div>
@@ -93,6 +96,7 @@
                 <span class="input__file_button">Добавить</span>
             </label>
             <br><br>
+            <form method="POST">
             {% for employee in employees %}
                 <div class="partners_map_1">
                     <div class="grid_block_photo">
@@ -138,11 +142,11 @@
                 </div>
             {% endfor %}
 
-
+            </form>
         </div>
     </div>
 
-    {{ ckeditor.config(name='title') }}
+    {{ ckeditor.config(name='filosofi_text') }}
     {{ ckeditor.config(name='about_text') }}
 
 {% endblock %}
