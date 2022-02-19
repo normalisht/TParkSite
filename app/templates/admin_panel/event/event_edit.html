@@ -5,12 +5,10 @@
 {% endblock %}
 
 {% block app_content %}
-{{ ckeditor.load() }}
-    <form class="form" method="post" action="{{ url_for('admin_panel.event_edit', id=event.id) }}">
+    {{ ckeditor.load() }}
+    <form class="form" method="POST" enctype="multipart/form-data"
+          action="{{ url_for('admin_panel.event_edit')}}?event_id={{ event.id }}">
         <div class="form_container">
-
-            <img src="" alt="">
-            <input type="file" name="photo" id="photo">
 
             <label for="title"></label>
             <input type="text" name="title" id="title" placeholder="Название"
@@ -28,10 +26,22 @@
                       placeholder="Описание" cols="50" rows="20">{{ event.description|safe }}
             </textarea>
 
-            <input type="submit" value="Сохранить изменения">
+            <div class="input__wrapper" style="margin-top: 10px;">
+                <input type="file" name="change" id="photo" class="input__file" value="Изменить">
+                <label for="photo" class="input__file_button">
+                    <span class="input__file_button_text_2">Изменить фото</span>
+                </label>
+            </div>
+
+            <div class="input__wrapper">
+                <input name="submit" id="submit" type="submit" value="Сохранить изменения" class="input__file">
+                <label for="submit" class="input__file_button">
+                    <span class="input__file_button_text_2">Сохранить изменения</span>
+                </label>
+            </div>
         </div>
 
     </form>
 
-{{ ckeditor.config(name='description') }}
+    {{ ckeditor.config(name='description') }}
 {% endblock %}

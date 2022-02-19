@@ -11,7 +11,6 @@
 
     {{ ckeditor.load() }}
 
-
     <div class="grid_panel">
         <form method="POST" enctype="multipart/form-data">
             <div class="grid_block partners_map">
@@ -25,13 +24,15 @@
                         <textarea name="title" id="title" class="category_name">
                             {{ main_text.text|safe }}
                         </textarea>
-                        <input type="submit" value="Подтвердить">
+                        <div class="input__wrapper" style="margin-top: 10px;">
+                            <input name="submit" id="submit" type="submit" value="Сохранить изменения" class="input__file">
+                            <label for="submit" class="input__file_button">
+                                <span class="input__file_button_text_2">Сохранить изменения</span>
+                            </label>
+                        </div>
                     </div>
-
                 </div>
-
             </div>
-
 
             <div>
                 <div class="title">Фотографии</div>

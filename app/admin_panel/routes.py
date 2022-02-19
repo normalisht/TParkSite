@@ -55,6 +55,11 @@ def main():
         files = []
 
     if request.method == 'POST':
+
+        setattr(main_text, 'text', request.form.get('title'))
+
+        db.session.commit()
+
         for photo in files:
             if request.form.get('delete_' + str(photo)):
                 try:
@@ -123,9 +128,11 @@ def event_create():
 
 
 # радактирование ивента
-@bp.route('/event_edit/<id>', methods=['GET', 'POST'])
+@bp.route('/event_edit', methods=['GET', 'POST'])
 # @login_required
-def event_edit(id):
+def event_edit():
+    id = request.args.get('event_id')
+
     event = Event.query.filter_by(id=id).first()
 
     if request.method == 'POST':
@@ -142,10 +149,11 @@ def event_edit(id):
         setattr(event, 'link', link)
 
         try:
-            photo = request.files['photo']
-            photo.save(os.path.join(os.getcwd(), '{}.png'.format(
-                Event.query.filter_by(title=title, link=link).first().id
-            )))
+            if request.files.get('change'):
+                image = request.files.get('change')
+                os.chdir('app/static/images/events')
+                image.save(os.path.join(os.getcwd(), '{}.png'.format(event.id)))
+                os.chdir('../../../../')
         except:
             pass
 

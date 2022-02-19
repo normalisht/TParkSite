@@ -1,19 +1,61 @@
-{% extends "admin_panel/base.html" %}
+<!DOCTYPE html>
+<html id="html" lang="ru">
+<head id="head">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="stylesheet" href="{{ url_for('static', filename='main/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='main/desktop.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel.css') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename="favicon.ico") }}"/>
+    {% block link %}{% endblock %}
 
-{% block app_content %}
+    <script defer src="{{ url_for('static', filename='plugins/jquery.min.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='plugins/hammer.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='plugins/mobile-detect.min.js') }}"></script>
 
-    <link rel="stylesheet"  href="{{ url_for('static', filename='admin_panel/login.css')}}">
+    {% block scripts %}{% endblock %}
+
+    {% if title %}
+        <title>{{ title }}</title>
+    {% else %}
+        <title>Т-Парк</title>
+    {% endif %}
+
+    <script>
+        let detect = new MobileDetect(window.navigator.userAgent)
+
+        let link = document.createElement('link')
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.media = 'all';
+
+        link.href = detect.mobile() ? '/app/static/admin_panel/phone_admin_panel.css' :
+            '/app/static/admin_panel/desktop_admin_panel.css.css'
+
+        document.head.append(link)
+    </script>
+</head>
+
+<body id="body">
+
+
+<div id="main_block" class="main_block">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel/login.css') }}">
 
     <div class="content">
         <div class="block_4">
             <form action="{{ url_for('admin_panel.login') }}" method="post" class="form">
                 <div class="form_group">
                     <label>
+                        Логин
                         <input name="email" type="text" class="form_control">
                     </label>
                 </div>
                 <div class="form_group">
                     <label>
+                        Пароль
                         <input name="password" type="password" class="form_control">
                     </label>
                 </div>
@@ -22,4 +64,7 @@
         </div>
     </div>
 
-{% endblock %}
+</div>
+
+</body>
+</html>

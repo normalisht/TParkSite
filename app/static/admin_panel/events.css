@@ -2,6 +2,8 @@
 
 .block_event {
     font-size: var(--primary-font-size);
+    margin: 0 auto;
+    max-width: 960px;
 }
 
 .events {
@@ -20,5 +22,9 @@ a {
 }
 
 .title_event {
+    font-size: calc(var(--primary-font-size) * 1.1);
+}
 
+.date {
+    font-size: calc(var(--primary-font-size) * 1.1);
 }

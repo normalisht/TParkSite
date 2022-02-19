@@ -2,9 +2,6 @@
 
 {% block scripts %}
     <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel/events.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='main/main.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='main/desktop.css') }}">
-    <script defer type="text/javascript" src="{{ url_for('static', filename='modal_window.js') }}"></script>
 {% endblock %}
 
 {% block app_content %}
@@ -16,7 +13,7 @@
         <div class="events">
             {% for event in events %}
                 <div class="event">
-                    <a href="{{ url_for('admin_panel.event_edit', id=event.id ) }}">
+                    <a href="{{ url_for('admin_panel.event_edit')}}?event_id={{ event.id }}">
                         <div class="title_event">
                             {{ event.title }}
                         </div>

@@ -1,3 +1,27 @@
+@charset "UTF-8";
+
+.block_buttons {
+    margin-bottom: 10px;
+}
+
+.button_main {
+    font-size: var(--primary-font-size);
+    border: none;
+    border-right: 1px solid black;
+    width: min(120px, 25vw)
+}
+
+.button_main:first-child {
+    border: none;
+}
+
+.button_main:nth-child(2) {
+    border-left: 1px solid black;
+}
+
+.button_main:last-child {
+    border-right: 0;
+}
 
 .title {
     text-align: center;
