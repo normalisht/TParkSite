@@ -241,9 +241,8 @@
 
 .grid_category {
     display: grid;
-    max-width: 80vw;
     min-width: 60vw;
-    grid-template-columns: 40vw 1fr;
+    grid-template-columns: 75% 1fr;
     text-align: left;
     justify-content: left;
     margin-bottom: 20px;
