@@ -160,7 +160,7 @@ def event_edit(id):
 @bp.route('/category', methods=['GET'])
 # @login_required
 def category():
-    categories = Category.query.all()
+    categories = Category.query.order_by(Category.number).all()
 
     return render_template('admin_panel/categories.html', title='Категории',
                            categories=categories)
@@ -198,7 +198,8 @@ def category_change():
                 element.service.status = 0
 
             number = request.form.get('service_number_' + str(element.service.id))
-
+            if number:
+                setattr(element, 'number', number)
 
         if request.form.get('delete_category'):
             try:
@@ -231,11 +232,6 @@ def category_change():
                     os.chdir('../../../../../')
 
                 return redirect(url_for('admin_panel.category_change', category_id=category_id))
-
-        for elem in services:
-            ServiceCategory.query.filter_by(service_id=elem.service.id).first().number = request.form.get(
-                'weight_' + str(elem))
-            db.session.commit()
 
         if request.files.get('add_photo'):
 
