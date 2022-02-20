@@ -11,7 +11,7 @@
     max-width: 50vw;
     min-width: 100px;
     width: max-content;
-    margin: 10px auto;
+    margin: auto;
     border-radius: 2px;
     font-size: var(--primary-font-size);
     padding: 4px;
@@ -22,9 +22,7 @@
     margin: 0 auto;
     grid-template-columns: 1fr;
     align-items: center;
-    border-radius: 5px;
-    max-width:90vw;
-    min-height: 55vh;
+    max-width: 960px;
     /*background-color:var(--body-background-color);*/
     /*box-shadow: 2px 4px 16px #ccc;*/
     z-index:2;
@@ -37,7 +35,11 @@
     margin: 0 auto;
 }
 
-
+.category_title {
+    padding-top: 4px;
+    text-align: center;
+    font-size: calc(var(--primary-font-size) * 1.2);
+}
 
 .block_text {
     max-width: 960px;

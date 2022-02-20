@@ -14,9 +14,13 @@
     font-size: var(--primary-font-size);
 }
 
-.block_img {
+.category_title {
 
+    padding-top: 4px;
+    padding-bottom: 4px;
+    font-size: calc(var(--primary-font-size) * 1.3);
 }
+
 
 .block_price {
     display: block;

@@ -21,7 +21,7 @@ def index():
     main_text = Text.query.filter_by(title="main_text").first().text
     events = Event.query.order_by(Event.date).all()
 
-
+    len_slider = len(os.listdir('app/static/images/staff'))
 
     if len(events) == 0:
         pass
@@ -29,7 +29,8 @@ def index():
         events = events * 3
 
     return render_template('main/main.html', main_text=main_text, events=events[1:] + events[:1],
-                           categories=get_categories(), contacts_data=get_contacts_data())
+                           categories=get_categories(), contacts_data=get_contacts_data(),
+                           len_slider=len_slider)
 
 
 @bp.route('/category', methods=['GET'])
@@ -68,6 +69,7 @@ def service():
     service = Service.query.filter_by(id=service_id).first()
 
     return render_template('main/service.html', service=service, categories=get_categories(),
+                           files=os.path.isfile('app/static/images/service/{}.png'.format(service_id)),
                            contacts_data=get_contacts_data())
 
 

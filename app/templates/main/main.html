@@ -68,18 +68,11 @@
             <div class="slider__container">
                 <div class="slider__wrapper">
                     <div class="slider__items">
-                        {% for i in range(3) %}
+                        {% for i in range(len_slider) %}
                             <div class="slider__item">
                                 <img class="slider__img" alt=""
-                                     src="{{ url_for('static',filename='/images/staff/1.png' ) }}">
-                            </div>
-                            <div class="slider__item">
-                                <img class="slider__img" alt=""
-                                     src="{{ url_for('static',filename='/images/staff/2.png' ) }}">
-                            </div>
-                            <div class="slider__item">
-                                <img class="slider__img" alt=""
-                                     src="{{ url_for('static',filename='/images/staff/0.png' ) }}">
+                                     src="{{ url_for('static',
+                                     filename='/images/staff/' + i|string + '.png' ) }}">
                             </div>
                         {% endfor %}
                     </div>
