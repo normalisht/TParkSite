@@ -86,6 +86,7 @@ class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True, index=True, unique=True)
     title = db.Column(db.String(128))
     date = db.Column(db.Date)
+    text_color = db.Column(db.String(16))
     link = db.Column(db.String(1024))  # ссылка на мероприятие(соц сеть или левый сайт)
     description = db.Column(db.Text)
 

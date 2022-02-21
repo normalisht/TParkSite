@@ -21,6 +21,11 @@
             <input type="text" name="link" id="link" placeholder="Ссылка"
                    value="{{ event.link }}">
 
+            <label for="color" style="display: flex; align-items: center;">
+                <div>Цвет текста на фото</div>
+                <input type="color" name="color" id="color" value="{{ event.text_color }}">
+            </label>
+
             <label for="description"></label>
             <textarea name="description" id="description" autocomplete="off"
                       placeholder="Описание" cols="50" rows="20">{{ event.description|safe }}
@@ -30,6 +35,13 @@
                 <input type="file" name="change" id="photo" class="input__file" value="Изменить">
                 <label for="photo" class="input__file_button">
                     <span class="input__file_button_text_2">Изменить фото</span>
+                </label>
+            </div>
+
+            <div class="input__wrapper">
+                <input name="delete" id="delete" type="submit" value="Сохранить изменения" class="input__file">
+                <label for="delete" class="input__file_button">
+                    <span class="input__file_button_text_2">Удалить событие</span>
                 </label>
             </div>
 

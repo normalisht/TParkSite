@@ -34,11 +34,13 @@
                                     <div style="width: 100%;">
                                         <!-- Контент 1 слайда -->
                                         <span id="event{{ i.a }}" data-date-month="{{ event.date.strftime('%m') }}"
-                                              class="event_info event_date">{{ event.date.strftime('%d') }}
+                                              class="event_info event_date"
+                                              style="color: {{ event.text_color }}">{{ event.date.strftime('%d') }}
                                         <div></div></span>
-                                        <span class="event_info event_name">{{ event.title }}
+                                        <span class="event_info event_name"
+                                              style="color: {{ event.text_color }}">{{ event.title }}
                                         <div></div></span>
-                                        <a href="http://{{ event.link }}">
+                                        <a href="{{ event.link }}">
                                             <img class="slider__img" alt=""
                                                  src="{{ url_for('static',filename='/images/events/' + event.id|string + '.png') }}">
                                         </a>

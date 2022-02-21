@@ -110,10 +110,11 @@ def event_create():
         date = request.form.get('date').split('-')
         description = request.form.get('description')
         link = request.form.get('link')
+        color = request.form.get('color')
 
         date = datetime.datetime(int(date[0]), int(date[1]), int(date[2]), 22)
 
-        event = Event(title=title, date=date, description=description, link=link)
+        event = Event(title=title, date=date, description=description, link=link, text_color=color)
         db.session.add(event)
         db.session.commit()
 
@@ -140,6 +141,7 @@ def event_edit():
         date = request.form.get('date').split('-')
         description = request.form.get('description')
         link = request.form.get('link')
+        color = request.form.get('color')
 
         date = datetime.datetime(int(date[0]), int(date[1]), int(date[2]), 22)
 
@@ -147,6 +149,7 @@ def event_edit():
         setattr(event, 'description', description)
         setattr(event, 'date', date)
         setattr(event, 'link', link)
+        setattr(event, 'color', color)
 
         try:
             if request.files.get('change'):
@@ -159,7 +162,12 @@ def event_edit():
 
         db.session.commit()
 
-        # return redirect(url_for('admin_panel.events'))
+
+        if request.form.get('delete'):
+            db.session.delete(event)
+            db.session.commit()
+
+            return redirect(url_for('admin_panel.events'))
 
     return render_template('admin_panel/event/event_edit.html', event=event,
                            title='Редактирование мероприятия')
