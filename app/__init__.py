@@ -13,7 +13,7 @@ from flask_login import LoginManager
 from flask_ckeditor import CKEditor
 
 db = SQLAlchemy()
-migrate = Migrate()
+# migrate = Migrate()
 bootstrap = Bootstrap()
 mail = Mail()
 moment = Moment()
