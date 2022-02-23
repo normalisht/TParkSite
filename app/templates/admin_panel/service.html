@@ -28,10 +28,16 @@
                 <textarea name="input_short_desc" id="input_short_desc" class="category_name"
                 >{{ service.short_description|safe }}</textarea>
 
-
                 <label for="input_price">Цена</label>
+
+                <div class="grid_block_price">
+
                 <input type="text" name="input_price" id="input_price" class="little_input"
                        value="{{ service.price }}">
+                <span>руб</span>
+                <input type="text" name="input_price" id="input_price" class="little_input"
+                       value="{{ service.time }}">
+                </div>
 
                 <label for="select">Категории</label>
 
@@ -62,9 +68,11 @@
                 <div class="grid_block_photo">
 
                     {% set path = "images/service/" + service.id|string + ".png" %}
+                    {% if path %}
                     <div class="block_image"><img src="{{ url_for("static", filename=path) }}" alt=""
                                                   class="image">
                     </div>
+                    {% endif %}
 
                     <div class="input__wrapper">
                         <input type="file" name="change" id="photo" class="input__file" value="Изменить">

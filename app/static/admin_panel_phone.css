@@ -7,3 +7,13 @@
     margin-bottom: 20px;
     margin-left: 10px;
 }
+
+.grid_block_price {
+    display: grid;
+    grid-template-columns: 25vw 10vw 25vw;
+    text-align: left;
+    justify-items: center;
+    align-items: baseline;
+    min-width: 40px;
+    margin-top:10px;
+}
