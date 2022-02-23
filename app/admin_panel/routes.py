@@ -348,6 +348,7 @@ def service_test():
         service.description = request.form.get('input_desc')
         service.price = request.form.get('input_price')
         service.name = request.form.get('title')
+        service.time = request.form.get('input_price_time')
         db.session.commit()
 
     for i in categories_all:
@@ -356,7 +357,8 @@ def service_test():
             b.insert(i.id, i.id)
 
     return render_template('admin_panel/service.html', title='{}'.format(service.name),
-                           categories=get_categories(), service=service, categories_checked=b)
+                           categories=get_categories(),service=service, categories_checked=b,
+                           files=os.path.isfile('app/static/images/service/{}.png'.format(service_id)))
 
 
 @bp.route('/service_create', methods=['GET', 'POST'])
@@ -367,10 +369,11 @@ def service_create():
         short_description = request.form.get('short_description')
         description = request.form.get('description')
         price = request.form.get('price')
+
         next = request.form.get('next')
 
         service = Service(name=title, description=description, short_description=short_description, price=price,
-                          next=next, status=1)
+                           next=next, status=1)
         db.session.add(service)
         db.session.commit()
 

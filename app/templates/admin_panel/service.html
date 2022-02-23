@@ -35,7 +35,7 @@
                 <input type="text" name="input_price" id="input_price" class="little_input"
                        value="{{ service.price }}">
                 <span>руб</span>
-                <input type="text" name="input_price" id="input_price" class="little_input"
+                <input type="text" name="input_price" id="input_price_time" class="little_input"
                        value="{{ service.time }}">
                 </div>
 
@@ -68,7 +68,7 @@
                 <div class="grid_block_photo">
 
                     {% set path = "images/service/" + service.id|string + ".png" %}
-                    {% if path %}
+                    {% if files %}
                     <div class="block_image"><img src="{{ url_for("static", filename=path) }}" alt=""
                                                   class="image">
                     </div>
