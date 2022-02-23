@@ -45,7 +45,7 @@
                 <form method="POST" enctype="multipart/form-data">
                     <input type="submit" name="partner_add" id="partner_add" class="input__file">
                     <label for="partner_add" class="button_about">
-                    <span class="input__file_button">Добавить</span>
+                        <span class="input__file_button"><div class="input__file_button_text_2">Добавить</div></span>
                 </label>
                 <br><br>
                 {% for partner in partners %}
@@ -68,7 +68,7 @@
 
                                 <input type="file" name="partner_{{ partner.id }}_photo" id="partner_{{ partner.id }}_photo" class="input__file" value="Изменить">
                                 <label for="partner_{{ partner.id }}_photo" class="input__file_button">
-                                    <span class="input__file_button_text_2">Изменить</span>
+                                    <span class="input__file_button_text_2">Изменить фото</span>
                                 </label>
 
                                 <input type="submit" id="partner_{{ partner.id }}_save" value="Сохранить" class="input__file" name="partner_{{ partner.id }}_save">
@@ -94,7 +94,7 @@
             <form method="POST" enctype="multipart/form-data">
                 <input type="submit" name="employee_add" id="employee_add" class="input__file">
                 <label for="employee_add" class="button_about">
-                    <span class="input__file_button">Добавить</span>
+                    <span class="input__file_button"><div class="input__file_button_text_2">Добавить</div></span>
                 </label>
             <br><br>
             {% for employee in employees %}

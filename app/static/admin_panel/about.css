@@ -63,8 +63,8 @@
 
 .input__file_button {
     min-width: 80px;
-    max-width: 150px;
-    max-height: 38px;
+    width: 135px;
+    max-height: 48px;
     text-decoration: none;
     color: black;
     padding: 6px;
@@ -119,6 +119,7 @@
     min-height: 300px;
     width: 10%;
     height: 10%;
+    max-width: 310px;
 }
 
 
@@ -194,3 +195,8 @@
 }
 
 
+.input__file_button_text_2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
