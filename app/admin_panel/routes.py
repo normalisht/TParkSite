@@ -391,9 +391,19 @@ def all_services():
 
 @bp.route('/about_2', methods=['GET', 'POST'])
 def about():
-    employees = Employee.query.all()
     about = Text.query.filter_by(title='about').first()
     filosofi = Text.query.filter_by(title='filosofi').first()
+    if Partner.query.filter_by(name='temp').first():
+        pass
+    else:
+        db.session.add(Partner(name='temp'))
+        db.session.commit()
+    if Employee.query.filter_by(name='temp').first():
+        pass
+    else:
+        db.session.add(Employee(name='temp'))
+        db.session.commit()
+    employees = Employee.query.all()
     partners = Partner.query.all()
     if request.method == 'POST':
         for partner in partners:
@@ -434,13 +444,25 @@ def about():
                 if request.form.get('employee_' + str(employee.id) + '_position'):
                     employee.position = request.form.get('employee_' + str(employee.id) + '_position')
         if request.form.get('partner_add'):
-            temp_partner = Partner()
-            db.session.add(temp_partner)
+            temp = Partner.query.filter_by(name='temp').first()
+            image = request.files.get('partner_add_photo')
+            os.chdir('app/static/images/partner')
+            image.save(os.path.join(os.getcwd(), '{}.png'.format(temp.id)))
+            os.chdir('../../../../')
+            temp.name = ""
+            temp.link = request.form.get('partner_' + str(temp.id) + '_link')
+            db.session.add(temp)
             db.session.commit()
             return redirect(url_for('admin_panel.about'))
         if request.form.get('employee_add'):
-            temp_employee = Employee()
-            db.session.add(temp_employee)
+            temp = Employee.query.filter_by(name='temp').first()
+            image = request.files.get('employee_add_photo')
+            os.chdir('app/static/images/employee')
+            image.save(os.path.join(os.getcwd(), '{}.png'.format(temp.id)))
+            os.chdir('../../../../')
+            temp.name = request.form.get('employee_' + str(temp.id) + '_name')
+            temp.position = request.form.get('employee_' + str(temp.id) + '_position')
+            db.session.add(temp)
             db.session.commit()
             return redirect(url_for('admin_panel.about'))
         if request.form.get('about_text'):
