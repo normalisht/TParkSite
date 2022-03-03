@@ -36,7 +36,7 @@
     <div class="block_employees_block">
         {% for employee in employees %}
             <figure class="block_employees">
-                <img src="{{ url_for('static', filename='/images/employee/123' + '.png') }}"
+                <img src="{{ url_for('static', filename='/images/employee/' + employee.id|string + '.png') }}"
                      alt="" class="img_img_img">
                 <figcaption>
                     <div class="name_employees">{{ employee.name }}</div>
