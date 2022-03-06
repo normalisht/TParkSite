@@ -15,7 +15,6 @@
     <div class="category_title">Партнёры</div>
     <div class="block_employees_block">
         {% for partner in partners %}
-
             <div class="block_img_partners">
                 <a href="{{ partner.link }}">
                     <img src="{{ url_for('static', filename='/images/partner/' + partner.id|string + '.png') }}"
@@ -28,7 +27,7 @@
     </div>
 
     <!--Что есть-->
-    <div class="category_title" style="margin-top: -85px;">Философия</div>
+    <div class="category_title">Философия</div>
 
     <div class="block_content">{{ about.text|safe }}</div>
 
