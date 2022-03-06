@@ -43,18 +43,49 @@
                 <div class="title">Партнёры</div>
                 <br>
                 <form method="POST" enctype="multipart/form-data">
-                    <input type="submit" name="partner_add" id="partner_add" class="input__file">
-                    <label for="partner_add" class="button_about">
-                    <span class="input__file_button">Добавить</span>
-                </label>
                 <br><br>
                 {% for partner in partners %}
                     <div class="partners_map_1">
                         <div class="grid_block_photo">
-                            {% set path = "/images/partner/" + partner.id|string + ".png" %}
-                            <figure class="img__employ" style="margin: 0;">
-                                <center><img src="{{ url_for("static", filename=path) }}" alt="{{ partner.name }}"
-                                             class="partimg"></center>
+
+                            {% if partner.name != 'temp' %}
+                                {% set path = "/images/partner/" + partner.id|string + ".png" %}
+                                <figure class="img__employ" style="margin: 0;">
+                                    <center><img src="{{ url_for("static", filename=path) }}" alt="{{ partner.name }}"
+                                    class="partimg"></center>
+                                    <figcaption>
+                                        <div class="ss"><center>Ссылка на партнера</center></div>
+                                    </figcaption>
+                                    <figcaption><center>
+                                        <input type="text" name="partner_{{ partner.id }}_link" id="partner_{{ partner.id }}_link" class="employ_txt"
+                                           value="{{ partner.link if partner.link }}">
+                                    </center></figcaption>
+                                </figure>
+                                <div class="input__wrapper">
+
+                                    <input type="file" name="partner_{{ partner.id }}_photo" id="partner_{{ partner.id }}_photo" class="input__file" value="Изменить">
+                                    <label for="partner_{{ partner.id }}_photo" class="input__file_button">
+                                        <span class="input__file_button_text_2">Изменить фото</span>
+                                    </label>
+
+                                    <input type="submit" id="partner_{{ partner.id }}_save" value="Сохранить" class="input__file" name="partner_{{ partner.id }}_save">
+                                    <label for="partner_{{ partner.id }}_save" class="input__file_button">
+                                        <span class="input__file_button_text_2">Сохранить</span>
+                                    </label>
+
+                                    <input type="submit" class="input__file" id="partner_{{ partner.id }}_delete" name="partner_{{ partner.id }}_delete">
+                                    <label for="partner_{{ partner.id }}_delete" class="input__file_button">
+                                        <span class="input__file_button_text_2">Удалить</span>
+                                    </label>
+                                </div>
+                            {% else %}
+                            <figure class="img__employ">
+                                <center>
+                                    <input type="file" name="partner_add_photo" id="partner_add_photo" class="input__file" value="Изменить">
+                                    <label for="partner_add_photo" class="input__file_button">
+                                        <span class="input__file_button_text_2">Добавить фото</span>
+                                    </label>
+                                </center>
                                 <figcaption>
                                     <div class="ss"><center>Ссылка на партнера</center></div>
                                 </figcaption>
@@ -63,26 +94,14 @@
                                            value="{{ partner.link if partner.link }}">
                                 </center></figcaption>
                             </figure>
-
                             <div class="input__wrapper">
-
-                                <input type="file" name="partner_{{ partner.id }}_photo" id="partner_{{ partner.id }}_photo" class="input__file" value="Изменить">
-                                <label for="partner_{{ partner.id }}_photo" class="input__file_button">
-                                    <span class="input__file_button_text_2">Изменить</span>
+                                <input type="submit" id="partner_add" value="Сохранить" class="input__file" name="partner_add">
+                                <label for="partner_add" class="input__file_button">
+                                    <span class="input__file_button_text_2">Добавить</span>
                                 </label>
 
-                                <input type="submit" id="partner_{{ partner.id }}_save" value="Сохранить" class="input__file" name="partner_{{ partner.id }}_save">
-                                <label for="partner_{{ partner.id }}_save" class="input__file_button">
-                                    <span class="input__file_button_text_2">Сохранить</span>
-                                </label>
-
-                                <input type="submit" class="input__file" id="partner_{{ partner.id }}_delete" name="partner_{{ partner.id }}_delete">
-                                <label for="partner_{{ partner.id }}_delete" class="input__file_button">
-                                    <span class="input__file_button_text_2">Удалить</span>
-                                </label>
                             </div>
-
-
+                            {% endif %}
                         </div>
                     </div>
                 {% endfor %}
@@ -92,22 +111,58 @@
             <div class="title">Сотрудники</div>
             <br>
             <form method="POST" enctype="multipart/form-data">
-                <input type="submit" name="employee_add" id="employee_add" class="input__file">
-                <label for="employee_add" class="button_about">
-                    <span class="input__file_button">Добавить</span>
-                </label>
             <br><br>
             {% for employee in employees %}
                 <div class="partners_map_1">
                     <div class="grid_block_photo">
-                        {% set path = "images/employee/" + employee.id|string + ".png" %}
+                        {% if employee.name != 'temp' %}
+                            {% set path = "images/employee/" + employee.id|string + ".png" %}
+                            <figure class="img__employ">
+                                <center><img src="{{ url_for("static", filename=path) }}" alt="" class="emplimg"></center>
+                                <center>
+                                    <figcaption>ФИО</figcaption>
+                                    <figcaption>
+                                        <input type="text" name="employee_{{ employee.id }}_name" id="employee_{{ employee.id }}_name" class="employee_{{ employee.id }}_positio"
+                                           value="{{ employee.name if employee.name and employee.name != 'temp' }}">
+                                    </figcaption>
+                                    <figcaption>
+                                        <figcaption>Должность</figcaption>
+                                        <input type="text" name="employee_{{ employee.id }}_position" id="title" class="employee_{{ employee.id }}_position"
+                                           value="{{ employee.position if employee.position }}">
+                                    </figcaption>
+
+                                </center>
+                            </figure>
+
+                            <div class="input__wrapper">
+                                <input type="file" name="employee_{{ employee.id }}_photo" id="employee_{{ employee.id }}_photo" class="input__file" value="Изменить">
+                                <label for="employee_{{ employee.id }}_photo" class="input__file_button">
+                                    <span class="input__file_button_text_2">Изменить фото</span>
+                                </label>
+
+                                <input type="submit" id="employee_{{ employee.id }}_save" value="Сохранить" class="input__file" name="employee_{{ employee.id }}_save">
+                                <label for="employee_{{ employee.id }}_save" class="input__file_button">
+                                    <span class="input__file_button_text_2">Сохранить</span>
+                                </label>
+
+                                <input type="submit" class="input__file" id="employee_{{ employee.id }}_delete" name="employee_{{ employee.id }}_delete" value="Удалить">
+                                <label for="employee_{{ employee.id }}_delete" class="input__file_button">
+                                    <span class="input__file_button_text_2">Удалить</span>
+                                </label>
+                            </div>
+                        {% else %}
                         <figure class="img__employ">
-                            <center><img src="{{ url_for("static", filename=path) }}" alt="" class="emplimg"></center>
+                            <center>
+                                <input type="file" name="employee_add_photo" id="employee_add_photo" class="input__file" value="Изменить">
+                                <label for="employee_add_photo" class="input__file_button">
+                                    <span class="input__file_button_text_2">Добавить фото</span>
+                                </label>
+                            </center>
                             <center>
                                 <figcaption>ФИО</figcaption>
                                 <figcaption>
                                     <input type="text" name="employee_{{ employee.id }}_name" id="employee_{{ employee.id }}_name" class="employee_{{ employee.id }}_positio"
-                                           value="{{ employee.name if employee.name }}">
+                                           value="{{ employee.name if employee.name and employee.name != 'temp' }}">
                                 </figcaption>
                                 <figcaption>
                                     <figcaption>Должность</figcaption>
@@ -119,22 +174,14 @@
                         </figure>
 
                         <div class="input__wrapper">
-                            <input type="file" name="employee_{{ employee.id }}_photo" id="employee_{{ employee.id }}_photo" class="input__file" value="Изменить">
-                            <label for="employee_{{ employee.id }}_photo" class="input__file_button">
-                                <span class="input__file_button_text_2">Изменить фото</span>
+
+                            <input type="submit" id="employee_add" value="Сохранить" class="input__file" name="employee_add">
+                            <label for="employee_add" class="input__file_button">
+                                <span class="input__file_button_text_2">Добавить</span>
                             </label>
 
-                            <input type="submit" id="employee_{{ employee.id }}_save" value="Сохранить" class="input__file" name="employee_{{ employee.id }}_save">
-                            <label for="employee_{{ employee.id }}_save" class="input__file_button">
-                                <span class="input__file_button_text_2">Сохранить</span>
-                            </label>
-
-                            <input type="submit" class="input__file" id="employee_{{ employee.id }}_delete" name="employee_{{ employee.id }}_delete" value="Удалить">
-                            <label for="employee_{{ employee.id }}_delete" class="input__file_button">
-                                <span class="input__file_button_text_2">Удалить</span>
-                            </label>
                         </div>
-
+                        {% endif %}
                     </div>
                 </div>
             {% endfor %}

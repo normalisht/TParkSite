@@ -75,6 +75,12 @@ def service():
 
 @bp.route('/about_2', methods=['GET'])
 def about():
+    try:
+        Partner.query.filter_by(name='temp').delete()
+        Employee.query.filter_by(name='temp').delete()
+        db.session.commit()
+    except:
+        pass
     employees = Employee.query.all()
     about = Text.query.filter_by(title='about').first()
     filosofi = Text.query.filter_by(title='filosofi').first()
