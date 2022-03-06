@@ -24,7 +24,7 @@
                 <input type="text" name="title" id="title" class="little_input"
                        value="{{ service.name }}">
 
-                <label for="input_desc">Краткое описание</label>
+                <label for="input_short_desc">Краткое описание</label>
                 <textarea name="input_short_desc" id="input_short_desc" class="category_name"
                 >{{ service.short_description|safe }}</textarea>
 
@@ -35,7 +35,7 @@
                 <input type="text" name="input_price" id="input_price" class="little_input"
                        value="{{ service.price }}">
                 <span>руб</span>
-                <input type="text" name="input_price" id="input_price_time" class="little_input"
+                <input type="text" name="input_price_time" id="input_price_time" class="little_input"
                        value="{{ service.time }}">
                 </div>
 
