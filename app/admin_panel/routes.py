@@ -374,6 +374,7 @@ def service_create():
 
         service = Service(name=title, description=description, short_description=short_description,
                           price=price, time=time, next=next, status=1)
+
         db.session.add(service)
         db.session.commit()
 
