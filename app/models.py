@@ -15,7 +15,14 @@ class Service(db.Model):
     status = db.Column(db.BOOLEAN())  # отображение клиентам
     next = db.Column(db.BOOLEAN())   # есть ли переход на дальнейшую страницу
     categories = db.relationship('ServiceCategory', backref='service', lazy='dynamic')
-    prices = db.relationship('Price', backref='service', lazy='dynamic')
+    price = db.Column(db.String(8))
+    time = db.Column(db.String(128))
+
+    def __repr__(self):
+        if self.time:
+            return self.price + ' руб / ' + self.time
+        else:
+            return self.price + ' руб'
 
 
 class Price(db.Model):

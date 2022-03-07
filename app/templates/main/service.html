@@ -11,20 +11,17 @@
     <div class="block_service">
 
         {% if files %}
-        <div class="block_img"><img src="{{ url_for("static", filename=path) }}" alt="" class="img_service"></div>
-        <!--Фото услуги-->
+            <div class="block_img"><img src="{{ url_for("static", filename=path) }}" alt="" class="img_service"></div>
+            <!--Фото услуги-->
         {% endif %}
         <div class="block_price">
-            {% set i = namespace(a=0) %}
-            {% for price in service.prices %}
-                <div id="price{{ i.a }}" class="price"></div>
-                <script>
-                    x = document.getElementById('price{{ i.a }}');
-                    x.innerHTML = `{{ price }}`
-                    x.innerHTML = x.textContent
-                </script>
-                {% set i.a = i.a + 1 %}
-            {% endfor %}
+            <div id="price" class="price"></div>
+            <script>
+                x = document.getElementById('price');
+                x.innerHTML = `{{ price }}`
+                x.innerHTML = x.textContent
+            </script>
+            {% set i.a = i.a + 1 %}
         </div>
 
 

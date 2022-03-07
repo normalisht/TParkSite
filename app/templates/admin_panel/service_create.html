@@ -22,9 +22,14 @@
             <textarea name="description" id="description" autocomplete="off"
                       placeholder="Описание" cols="50" rows="20"></textarea>
 
-            <label for="price"></label>
-            <input type="text" name="price" id="price" autocomplete="off"
-                   placeholder="Цена" />
+            <div class="grid_block_price">
+
+                <input type="text" name="price" id="input_price" class="little_input"
+                       value="">
+                руб /
+                <input type="text" name="price_time" id="input_price_time" class="little_input"
+                       value="">
+            </div>
 
             <input type="submit" value="Создать">
         </div>
