@@ -406,8 +406,8 @@ def about():
     else:
         db.session.add(Employee(name='temp'))
         db.session.commit()
-    employees = Employee.query.all()
-    partners = Partner.query.all()
+    employees = Employee.query.order_by(Employee.id.desc()).all()
+    partners = Partner.query.order_by(Partner.id.desc()).all()
     if request.method == 'POST':
         for partner in partners:
             if request.form.get('partner_' + str(partner.id) + '_delete'):
@@ -448,10 +448,11 @@ def about():
                     employee.position = request.form.get('employee_' + str(employee.id) + '_position')
         if request.form.get('partner_add'):
             temp = Partner.query.filter_by(name='temp').first()
-            image = request.files.get('partner_add_photo')
-            os.chdir('app/static/images/partner')
-            image.save(os.path.join(os.getcwd(), '{}.png'.format(temp.id)))
-            os.chdir('../../../../')
+            if request.files.get('partner_add_photo'):
+                image = request.files.get('partner_add_photo')
+                os.chdir('app/static/images/partner')
+                image.save(os.path.join(os.getcwd(), '{}.png'.format(temp.id)))
+                os.chdir('../../../../')
             temp.name = ""
             temp.link = request.form.get('partner_' + str(temp.id) + '_link')
             db.session.add(temp)
@@ -459,10 +460,11 @@ def about():
             return redirect(url_for('admin_panel.about'))
         if request.form.get('employee_add'):
             temp = Employee.query.filter_by(name='temp').first()
-            image = request.files.get('employee_add_photo')
-            os.chdir('app/static/images/employee')
-            image.save(os.path.join(os.getcwd(), '{}.png'.format(temp.id)))
-            os.chdir('../../../../')
+            if request.files.get('employee_add_photo'):
+                image = request.files.get('employee_add_photo')
+                os.chdir('app/static/images/employee')
+                image.save(os.path.join(os.getcwd(), '{}.png'.format(temp.id)))
+                os.chdir('../../../../')
             temp.name = request.form.get('employee_' + str(temp.id) + '_name')
             temp.position = request.form.get('employee_' + str(temp.id) + '_position')
             db.session.add(temp)
