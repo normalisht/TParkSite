@@ -18,6 +18,13 @@
             <textarea name="short_description" id="short_description" autocomplete="off"
                       placeholder="Краткое описание" cols="50" rows="20"></textarea>
 
+            <div class="grid_checkbox">
+
+                <label for="next">С Подробнее</label>
+                <input type="checkbox" id="next" class="checkbox" name="next" value="1" />
+
+            </div>
+
             <label for="description"></label>
             <textarea name="description" id="description" autocomplete="off"
                       placeholder="Описание" cols="50" rows="20"></textarea>
@@ -30,6 +37,20 @@
                 <input type="text" name="price_time" id="input_price_time" class="little_input"
                        value="">
             </div>
+
+            <label for="select">Категории</label>
+
+            <div class="grid_category">
+                {% for categories in categories %}
+
+                    <label for="category" class="label_1">{{ categories.name }}</label>
+                    <input type="checkbox" id="category" class="checkbox"
+                           name={{ categories.id }}  value={{ categories.id }}
+                            {{ "checked" if categories.id == categories_checked[categories.id] else "" }}>
+
+                {% endfor %}
+            </div>
+
 
             <input type="submit" value="Создать">
         </div>

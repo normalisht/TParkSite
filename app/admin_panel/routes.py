@@ -350,6 +350,17 @@ def service_test():
         service.time = request.form.get('input_price_time')
         db.session.commit()
 
+        if request.form.get('delete_service'):
+            try:
+                shutil.rmtree('app/static/images/service/{}'.format(service_id), ignore_errors=True)
+            except:
+                pass
+
+            Service.query.filter_by(id=service_id).delete()
+            db.session.commit()
+
+            return redirect(url_for('admin_panel.main'))
+
     for i in categories_all:
         b.insert(i.id, 0)
         if ServiceCategory.query.filter_by(service_id=service_id, category_id=i.id).first():
@@ -363,6 +374,11 @@ def service_test():
 @bp.route('/service_create', methods=['GET', 'POST'])
 # @login_required
 def service_create():
+    categories_all = Category.query.all()
+    service_all = Service.query.all()
+    service_number = service_all[-1]
+    service_id = service_number.id + 1
+    b = [0]
     if request.method == 'POST':
         title = request.form.get('title')
         short_description = request.form.get('short_description')
@@ -371,6 +387,22 @@ def service_create():
         time = request.form.get('price_time')
 
         next = request.form.get('next')
+
+        for elem in categories_all:
+            a = ServiceCategory(service_id=service_id, category_id=elem.id)
+            if request.form.get(str(elem.id)) == str(elem.id):
+                for i in ServiceCategory.query.all():
+                    if str(i.service_id) == str(a.service_id) and str(i.category_id) == str(a.category_id):
+                        ServiceCategory.query.filter_by(service_id=i.service_id, category_id=i.category_id).delete()
+                        db.session.commit()
+                db.session.add(a)
+            else:
+                for i in ServiceCategory.query.all():
+                    if str(i.service_id) == str(a.service_id) and str(i.category_id) == str(a.category_id):
+                        ServiceCategory.query.filter_by(service_id=i.service_id, category_id=i.category_id).delete()
+                        db.session.commit()
+
+        db.session.commit()
 
         service = Service(name=title, description=description, short_description=short_description,
                           price=price, time=time, next=next, status=1)
@@ -383,7 +415,8 @@ def service_create():
             Service.query.filter_by(name=title).first().id
         )))
 
-    return render_template('admin_panel/service_create.html', title='Создание услуги')
+    return render_template('admin_panel/service_create.html', title='Создание услуги',
+                           categories=categories_all, categories_checked=b)
 
 
 @bp.route('/all_services', methods=['GET'])
