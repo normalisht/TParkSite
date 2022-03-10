@@ -162,7 +162,6 @@ def event_edit():
 
         db.session.commit()
 
-
         if request.form.get('delete'):
             db.session.delete(event)
             db.session.commit()
@@ -346,8 +345,8 @@ def service_test():
 
         service.short_description = request.form.get('input_short_desc')
         service.description = request.form.get('input_desc')
-        service.price = request.form.get('input_price')
         service.name = request.form.get('title')
+        service.price = request.form.get('input_price')
         service.time = request.form.get('input_price_time')
         db.session.commit()
 
@@ -357,7 +356,7 @@ def service_test():
             b.insert(i.id, i.id)
 
     return render_template('admin_panel/service.html', title='{}'.format(service.name),
-                           categories=get_categories(),service=service, categories_checked=b,
+                           categories=get_categories(), service=service, categories_checked=b,
                            files=os.path.isfile('app/static/images/service/{}.png'.format(service_id)))
 
 
@@ -373,7 +372,7 @@ def service_create():
         next = request.form.get('next')
 
         service = Service(name=title, description=description, short_description=short_description, price=price,
-                           next=next, status=1)
+                          next=next, status=1)
         db.session.add(service)
         db.session.commit()
 
@@ -479,7 +478,6 @@ def about():
 
     return render_template('admin_panel/about.html', employees=employees,
                            filosofi=filosofi, about=about, partners=partners)
-
 
 #
 # '''json запросы'''
