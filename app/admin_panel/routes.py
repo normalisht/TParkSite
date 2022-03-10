@@ -9,7 +9,7 @@ from app import db
 from flask_login import login_user, logout_user, current_user, login_required
 
 from app.main.functions import get_categories
-from app.models import Admin, Category, Service, Employee, Text, Comment, ServiceCategory, Event, Partner
+from app.models import Admin, Category, Service, Employee, Text, Comment, ServiceCategory, Event, Partner, Price
 import json
 import shutil
 
@@ -295,6 +295,7 @@ def category_create():
             os.chdir('../../../../../')
         except:
             pass
+        return redirect(url_for('admin_panel.category'))
 
     return render_template('admin_panel/category_create.html', title='Создание категории')
 
@@ -305,6 +306,7 @@ def service_test():
     service_id = request.args.get('service_id')
     service = Service.query.filter_by(id=service_id).first()
     categories_all = Category.query.all()
+    prices = service.prices.all()
 
     b = [0]
 
@@ -346,9 +348,20 @@ def service_test():
         service.short_description = request.form.get('input_short_desc')
         service.description = request.form.get('input_desc')
         service.name = request.form.get('title')
-        service.price = request.form.get('input_price')
-        service.time = request.form.get('input_price_time')
+        for price in prices:
+            if request.form.get('input_price_' + str(price.id)):
+                price.price = request.form.get('input_price_' + str(price.id))
+            if request.form.get('input_price_time_' + str(price.id)):
+                price.time = request.form.get('input_price_time_' + str(price.id))
+                if price.time == 'Delete':                                        # Костыль, который нужно исправить на нормальную кнопку
+                    Price.query.filter_by(id=price.id).delete()
         db.session.commit()
+
+        if request.form.get('price_add'):
+            temp = Price(service_id=service_id, price=0)
+            db.session.add(temp)
+            db.session.commit()
+            return redirect(url_for('admin_panel.service_test', service_id=service_id))
 
     for i in categories_all:
         b.insert(i.id, 0)
@@ -357,7 +370,7 @@ def service_test():
 
     return render_template('admin_panel/service.html', title='{}'.format(service.name),
                            categories=get_categories(), service=service, categories_checked=b,
-                           files=os.path.isfile('app/static/images/service/{}.png'.format(service_id)))
+                           files=os.path.isfile('app/static/images/service/{}.png'.format(service_id)), prices=prices)
 
 
 @bp.route('/service_create', methods=['GET', 'POST'])
@@ -368,18 +381,26 @@ def service_create():
         short_description = request.form.get('short_description')
         description = request.form.get('description')
         price = request.form.get('price')
+        time = request.form.get('time')
 
         next = request.form.get('next')
 
-        service = Service(name=title, description=description, short_description=short_description, price=price,
+        service = Service(name=title, description=description, short_description=short_description,
                           next=next, status=1)
         db.session.add(service)
         db.session.commit()
+        prices = Price(service_id=service.id, price=price, time=time)
+        db.session.add(prices)
+        db.session.commit()
 
-        photo = request.files['photo']
-        photo.save(os.path.join(os.getcwd(), '{}.png'.format(
-            Service.query.filter_by(name=title).first().id
-        )))
+        try:
+            photo = request.files['photo']
+            photo.save(os.path.join(os.getcwd(), '{}.png'.format(
+                Service.query.filter_by(name=title).first().id
+            )))
+        except:
+            pass
+        return redirect(url_for('admin_panel.all_services'))
 
     return render_template('admin_panel/service_create.html', title='Создание услуги')
 

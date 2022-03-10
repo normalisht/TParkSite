@@ -31,12 +31,19 @@
                 <label for="input_price">Цена</label>
 
                 <div class="grid_block_price">
-
-                <input type="text" name="input_price" id="input_price" class="little_input"
-                       value="{{ service.price }}">
-                <span>руб</span>
-                <input type="text" name="input_price_time" id="input_price_time" class="little_input"
-                       value="{{ service.time }}">
+                    {% for price in prices %}
+                        <input type="text" name="input_price_{{ price.id }}" id="input_price_{{ price.id }}" class="little_input"
+                            value="{{ price.price }}">
+                        <span>руб</span>
+                        <input type="text" name="input_price_time_{{ price.id }}" id="input_price_time_{{ price.id }}" class="little_input"
+                            value="{{ price.time if price.time }}">
+                    {% endfor %}
+                </div>
+                <div class="input__wrapper">
+                    <input type="submit" id="price_add" name="price_add" value="Добавить цену" class="input__file">
+                    <label for="price_add" class="input__file_button">
+                        <span class="input__file_button_text_2">Добавить цену</span>
+                    </label>
                 </div>
 
                 <label for="select">Категории</label>
