@@ -9,7 +9,7 @@ from app import db
 from flask_login import login_user, logout_user, current_user, login_required
 
 from app.main.functions import get_categories
-from app.models import Admin, Category, Service, Employee, Text, Comment, ServiceCategory, Event, Partner, Price
+from app.models import Admin, Category, Service, Employee, Text, Comment, ServiceCategory, Event, Partner
 import json
 import shutil
 
@@ -295,7 +295,6 @@ def category_create():
             os.chdir('../../../../../')
         except:
             pass
-        return redirect(url_for('admin_panel.category'))
 
     return render_template('admin_panel/category_create.html', title='Создание категории')
 
@@ -306,7 +305,6 @@ def service_test():
     service_id = request.args.get('service_id')
     service = Service.query.filter_by(id=service_id).first()
     categories_all = Category.query.all()
-    prices = service.prices.all()
 
     b = [0]
 
@@ -348,15 +346,9 @@ def service_test():
         service.short_description = request.form.get('input_short_desc')
         service.description = request.form.get('input_desc')
         service.name = request.form.get('title')
-        for price in prices:
-            if request.form.get('input_price_' + str(price.id)):
-                price.price = request.form.get('input_price_' + str(price.id))
-            if request.form.get('input_price_time_' + str(price.id)):
-                price.time = request.form.get('input_price_time_' + str(price.id))
-                if price.time == 'Delete':                                        # Костыль, который нужно исправить на нормальную кнопку
-                    Price.query.filter_by(id=price.id).delete()
+        service.price = request.form.get('input_price')
+        service.time = request.form.get('input_price_time')
         db.session.commit()
-
 
         if request.form.get('delete_service'):
             try:
@@ -369,13 +361,6 @@ def service_test():
 
             return redirect(url_for('admin_panel.main'))
 
-        if request.form.get('price_add'):
-            temp = Price(service_id=service_id, price=0)
-            db.session.add(temp)
-            db.session.commit()
-            return redirect(url_for('admin_panel.service_test', service_id=service_id))
-
-
     for i in categories_all:
         b.insert(i.id, 0)
         if ServiceCategory.query.filter_by(service_id=service_id, category_id=i.id).first():
@@ -383,7 +368,7 @@ def service_test():
 
     return render_template('admin_panel/service.html', title='{}'.format(service.name),
                            categories=get_categories(), service=service, categories_checked=b,
-                           files=os.path.isfile('app/static/images/service/{}.png'.format(service_id)), prices=prices)
+                           files=os.path.isfile('app/static/images/service/{}.png'.format(service_id)))
 
 
 @bp.route('/service_create', methods=['GET', 'POST'])
@@ -422,21 +407,13 @@ def service_create():
         service = Service(name=title, description=description, short_description=short_description,
                           price=price, time=time, next=next, status=1)
 
-
         db.session.add(service)
         db.session.commit()
-        prices = Price(service_id=service.id, price=price, time=time)
-        db.session.add(prices)
-        db.session.commit()
 
-        try:
-            photo = request.files['photo']
-            photo.save(os.path.join(os.getcwd(), '{}.png'.format(
-                Service.query.filter_by(name=title).first().id
-            )))
-        except:
-            pass
-        return redirect(url_for('admin_panel.all_services'))
+        photo = request.files['photo']
+        photo.save(os.path.join(os.getcwd(), '{}.png'.format(
+            Service.query.filter_by(name=title).first().id
+        )))
 
     return render_template('admin_panel/service_create.html', title='Создание услуги',
                            categories=categories_all, categories_checked=b)
@@ -463,8 +440,8 @@ def about():
     else:
         db.session.add(Employee(name='temp'))
         db.session.commit()
-    employees = Employee.query.order_by(Employee.id.desc()).all()
-    partners = Partner.query.order_by(Partner.id.desc()).all()
+    employees = Employee.query.all()
+    partners = Partner.query.all()
     if request.method == 'POST':
         for partner in partners:
             if request.form.get('partner_' + str(partner.id) + '_delete'):
@@ -505,11 +482,10 @@ def about():
                     employee.position = request.form.get('employee_' + str(employee.id) + '_position')
         if request.form.get('partner_add'):
             temp = Partner.query.filter_by(name='temp').first()
-            if request.files.get('partner_add_photo'):
-                image = request.files.get('partner_add_photo')
-                os.chdir('app/static/images/partner')
-                image.save(os.path.join(os.getcwd(), '{}.png'.format(temp.id)))
-                os.chdir('../../../../')
+            image = request.files.get('partner_add_photo')
+            os.chdir('app/static/images/partner')
+            image.save(os.path.join(os.getcwd(), '{}.png'.format(temp.id)))
+            os.chdir('../../../../')
             temp.name = ""
             temp.link = request.form.get('partner_' + str(temp.id) + '_link')
             db.session.add(temp)
@@ -517,11 +493,10 @@ def about():
             return redirect(url_for('admin_panel.about'))
         if request.form.get('employee_add'):
             temp = Employee.query.filter_by(name='temp').first()
-            if request.files.get('employee_add_photo'):
-                image = request.files.get('employee_add_photo')
-                os.chdir('app/static/images/employee')
-                image.save(os.path.join(os.getcwd(), '{}.png'.format(temp.id)))
-                os.chdir('../../../../')
+            image = request.files.get('employee_add_photo')
+            os.chdir('app/static/images/employee')
+            image.save(os.path.join(os.getcwd(), '{}.png'.format(temp.id)))
+            os.chdir('../../../../')
             temp.name = request.form.get('employee_' + str(temp.id) + '_name')
             temp.position = request.form.get('employee_' + str(temp.id) + '_position')
             db.session.add(temp)
