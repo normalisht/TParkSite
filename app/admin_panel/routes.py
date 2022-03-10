@@ -368,11 +368,13 @@ def service_create():
         short_description = request.form.get('short_description')
         description = request.form.get('description')
         price = request.form.get('price')
+        time = request.form.get('price_time')
 
         next = request.form.get('next')
 
-        service = Service(name=title, description=description, short_description=short_description, price=price,
-                          next=next, status=1)
+        service = Service(name=title, description=description, short_description=short_description,
+                          price=price, time=time, next=next, status=1)
+
         db.session.add(service)
         db.session.commit()
 
