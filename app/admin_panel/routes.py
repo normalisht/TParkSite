@@ -392,11 +392,7 @@ def service_create():
         description = request.form.get('description')
         price = request.form.get('price')
         time = request.form.get('price_time')
-
-        if request.form.get('checkbox') == '1':
-            next = 1
-        else:
-            next = 0
+        next = 0 if request.form.get('next') is None else 1
 
         for elem in categories_all:
             a = ServiceCategory(service_id=service_id, category_id=elem.id)
