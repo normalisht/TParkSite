@@ -53,18 +53,18 @@
                                 <div>{{ service.name }}</div>
                                 <div class="cost" style="display: flex;">
                                     <div id="prices{{ service.name }}"></div>
-                                    {% if service.short_description %}
+                                    {% if service.short_description or service.next %}
                                         <img class="price_switch" src="{{ url_for('static', filename='down.svg') }}"
                                              alt="">
                                     {% endif %}
                                     <script>
                                         x = document.getElementById('prices{{ service.name }}')
-                                        x.innerHTML = `{{ service.price }}`
+                                        x.innerHTML = `{{ service }}`
                                         x.innerHTML = x.textContent
                                     </script>
                                 </div>
                             </div>
-                            {% if service.short_description %}
+                            {% if service.short_description or service.next %}
                                 <div class="description">
                                     {% if service.short_description != None %}
                                         {{ service.short_description|safe }}

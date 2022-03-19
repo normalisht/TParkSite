@@ -360,7 +360,7 @@ def service_test():
             Service.query.filter_by(id=service_id).delete()
             db.session.commit()
 
-            return redirect(url_for('admin_panel.main'))
+            return redirect(url_for('admin_panel.all_services'))
 
     for i in categories_all:
         b.insert(i.id, 0)
@@ -386,7 +386,6 @@ def service_create():
         description = request.form.get('description')
         price = request.form.get('price')
         time = request.form.get('price_time')
-
         next = request.form.get('next')
 
         for elem in categories_all:
@@ -411,10 +410,16 @@ def service_create():
         db.session.add(service)
         db.session.commit()
 
-        photo = request.files['photo']
-        photo.save(os.path.join(os.getcwd(), '{}.png'.format(
-            Service.query.filter_by(name=title).first().id
-        )))
+        # photo = request.files['photo']
+        # if photo:
+        #     photo.save(os.path.join(os.getcwd(), '{}.png'.format(
+        #         Service.query.filter_by(name=title).first().id
+        #     )))
+
+        x = url_for('admin_panel.service_test') + '?service_id={}'.format(service_id)
+        print(x)
+
+        return redirect(url_for('admin_panel.all_services'))
 
     return render_template('admin_panel/service_create.html', title='Создание услуги',
                            categories=categories_all, categories_checked=b)

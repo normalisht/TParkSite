@@ -10,6 +10,10 @@
     /*grid-column-gap: 50px;*/
 }
 
+.more {
+    margin-top: -27px;
+}
+
 .content {
     min-width: 10vw;
     text-align: center;
