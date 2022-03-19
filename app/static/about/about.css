@@ -199,12 +199,12 @@
 
 @media (min-width: 1600px) {
     .block_employees_block {
-        max-width: 65%;
+        max-width: 1100px;
         margin: 0 auto;
         justify-content: center;
         display: grid;
         grid-gap: 1rem;
-        grid-template-columns: repeat(4, minmax(20rem, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
         list-style: none;
 
     }
