@@ -306,7 +306,6 @@ def service_test():
     service_id = request.args.get('service_id')
     service = Service.query.filter_by(id=service_id).first()
     categories_all = Category.query.all()
-    prices = service.price.all()
 
     b = [0]
 
@@ -348,15 +347,9 @@ def service_test():
         service.short_description = request.form.get('input_short_desc')
         service.description = request.form.get('input_desc')
         service.name = request.form.get('title')
-        for price in prices:
-            if request.form.get('input_price_' + str(price.id)):
-                price.price = request.form.get('input_price_' + str(price.id))
-            if request.form.get('input_price_time_' + str(price.id)):
-                price.time = request.form.get('input_price_time_' + str(price.id))
-                if price.time == 'Delete':                                        # Костыль, который нужно исправить на нормальную кнопку
-                    Price.query.filter_by(id=price.id).delete()
+        service.price = request.form.get('input_price')
+        service.time = request.form.get('input_price_time')
         db.session.commit()
-
 
         if request.form.get('delete_service'):
             try:
@@ -367,14 +360,13 @@ def service_test():
             Service.query.filter_by(id=service_id).delete()
             db.session.commit()
 
-            return redirect(url_for('admin_panel.main'))
+            return redirect(url_for('admin_panel.all_services'))
 
         if request.form.get('price_add'):
             temp = Price(service_id=service_id, price=0)
             db.session.add(temp)
             db.session.commit()
             return redirect(url_for('admin_panel.service_test', service_id=service_id))
-
 
     for i in categories_all:
         b.insert(i.id, 0)
@@ -383,7 +375,7 @@ def service_test():
 
     return render_template('admin_panel/service.html', title='{}'.format(service.name),
                            categories=get_categories(), service=service, categories_checked=b,
-                           files=os.path.isfile('app/static/images/service/{}.png'.format(service_id)), prices=prices)
+                           files=os.path.isfile('app/static/images/service/{}.png'.format(service_id)))
 
 
 @bp.route('/service_create', methods=['GET', 'POST'])
@@ -401,7 +393,10 @@ def service_create():
         price = request.form.get('price')
         time = request.form.get('price_time')
 
-        next = request.form.get('next')
+        if request.form.get('checkbox') == '1':
+            next = 1
+        else:
+            next = 0
 
         for elem in categories_all:
             a = ServiceCategory(service_id=service_id, category_id=elem.id)
@@ -422,11 +417,7 @@ def service_create():
         service = Service(name=title, description=description, short_description=short_description,
                           price=price, time=time, next=next, status=1)
 
-
         db.session.add(service)
-        db.session.commit()
-        prices = Price(service_id=service.id, price=price, time=time)
-        db.session.add(prices)
         db.session.commit()
 
         try:
