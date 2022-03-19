@@ -240,6 +240,7 @@ def category_change():
                 images = request.files.getlist('add_' + str(photo))
                 count = len(files)
 
+
                 for img in images:
                     os.chdir('app/static/images/category/{}'.format(category_id))
                     img.save(os.path.join(os.getcwd(), '{}.png'.format(count + 1)))
@@ -253,8 +254,13 @@ def category_change():
             images = request.files.getlist('add_photo')
             count = len(files)
 
-            for img in images:
+            try:
                 os.chdir('app/static/images/category/{}'.format(category_id))
+            except:
+                os.makedirs('app/static/images/category/{}'.format(category_id))
+                os.chdir('app/static/images/category/{}'.format(category_id))
+
+            for img in images:
                 img.save(os.path.join(os.getcwd(), '{}.png'.format(count + 1)))
                 count += 1
                 os.chdir('../../../../../')
@@ -386,8 +392,6 @@ def service_create():
         description = request.form.get('description')
         price = request.form.get('price')
         time = request.form.get('price_time')
-        next = 0 if request.form.get('next') is None else 1
-
 
         for elem in categories_all:
             a = ServiceCategory(service_id=service_id, category_id=elem.id)
