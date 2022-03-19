@@ -306,7 +306,7 @@ def service_test():
     service_id = request.args.get('service_id')
     service = Service.query.filter_by(id=service_id).first()
     categories_all = Category.query.all()
-    prices = service.prices.all()
+    prices = service.price.all()
 
     b = [0]
 
