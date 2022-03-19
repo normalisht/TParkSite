@@ -84,20 +84,21 @@
 
 /*сотрудники*/
 .name_employees {
+    position: relative;
     text-align: left;
 }
 
 .position_employees {
+    position: relative;
     text-align: left;
 }
 
 
 @media (max-width: 768px){
     .block_employees_block {
-        margin: 0 auto;
+        margin: 0 auto 10px;
         justify-content: center;
         display: grid;
-        grid-gap: 1rem;
         grid-template-columns: repeat(auto-fill, minmax(15.4rem, 1fr));
         list-style: none;
         padding: 0;
@@ -135,21 +136,19 @@
 
 
 @media (max-width: 414px){
-    .img_img_img{
+    .img_img_img {
         box-shadow: none;
-        width: 100%;
+        width: 95%;
+        height: 332px;
         max-width: 415px;
         margin-left: auto;
         margin-right: auto;
         object-fit: cover;
     }
     .block_employees {
-        margin: 0 auto;
+        margin: 0 auto 20px;
         width: 80%;
-        height: 400px;
         background: none;
-        display: grid;
-        grid-gap: 1.2rem;
         grid-template-columns: repeat(auto-fill, minmax(15.4rem, 1fr));
         list-style: none;
         padding: 0;
@@ -157,17 +156,16 @@
     }
 
     .name_employees {
-        margin-top: -10px;
         text-align: left;
-        margin-bottom: -14px;
     }
 
     .position_employees {
         text-align: left;
     }
 
-    .block_employees_block > * {
-        height: 27.1rem;
+    .block_img_partners {
+        margin: 10px auto;
+
     }
 }
 
@@ -175,38 +173,36 @@
 @media (min-width: 1033px) {
     .block_employees_block {
         max-width: 85%;
-        margin: 0 auto;
+        margin: 0 auto 2.5rem;
         justify-content: center;
         display: grid;
-        grid-gap: 1rem;
+        grid-gap: 2.5rem;
         grid-template-columns: repeat(3, minmax(20rem, 1fr));
         list-style: none;
-
     }
 }
 
 @media (max-width: 1032px) and (min-width: 415px) {
     .block_employees_block {
-        margin: 0 auto;
+        margin: 0 auto 2.5rem;
         justify-content: center;
         display: grid;
-        grid-gap: 1.2rem;
+        grid-gap: 3rem;
         grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
         list-style: none;
-
     }
 }
 
 @media (min-width: 1600px) {
     .block_employees_block {
         max-width: 1100px;
-        margin: 0 auto;
+        margin: 0 auto 2.5rem;
         justify-content: center;
         display: grid;
-        grid-gap: 1rem;
+        grid-gap: 2.5rem;
         grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
         list-style: none;
-
+        width: max-content;
     }
 }
 
