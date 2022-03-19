@@ -224,7 +224,7 @@ def category_change():
 
             Category.query.filter_by(id=category_id).delete()
             db.session.commit()
-            return redirect(url_for('main.index'))
+            return redirect(url_for('admin_panel.category'))
 
         for photo in files:
 
@@ -346,6 +346,7 @@ def service_test():
         service.short_description = request.form.get('input_short_desc')
         service.description = request.form.get('input_desc')
         service.name = request.form.get('title')
+
         service.price = request.form.get('input_price')
         service.time = request.form.get('input_price_time')
         db.session.commit()
