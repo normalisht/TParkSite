@@ -4,7 +4,7 @@ import os
 from app import db
 
 def get_categories():
-    return Category.query.all()
+    return Category.query.order_by(Category.number).all()
 
 
 def get_geolocation():
