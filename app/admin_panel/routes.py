@@ -346,6 +346,7 @@ def service_test():
         service.short_description = request.form.get('input_short_desc')
         service.description = request.form.get('input_desc')
         service.name = request.form.get('title')
+
         service.price = request.form.get('input_price')
         service.time = request.form.get('input_price_time')
         db.session.commit()
@@ -385,7 +386,7 @@ def service_create():
         description = request.form.get('description')
         price = request.form.get('price')
         time = request.form.get('price_time')
-        next = 0 if request.form.get('next') == None else 1
+
         for elem in categories_all:
             a = ServiceCategory(service_id=service_id, category_id=elem.id)
             if request.form.get(str(elem.id)) == str(elem.id):
