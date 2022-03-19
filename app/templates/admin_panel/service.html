@@ -16,12 +16,12 @@
         <div class="grid_block partners_map">
 
 
-
             <form method="POST" enctype="multipart/form-data" class="grid_block">
 
 
                 <label for="title">Название услуги</label>
-                <input type="text" name="title" id="title" class="little_input" style="width: 150px; justify-content: left;"
+                <input type="text" name="title" id="title" class="little_input"
+                       style="width: 150px; justify-content: left;"
                        value="{{ service.name }}">
 
                 <label for="input_short_desc">Краткое описание</label>
@@ -31,14 +31,13 @@
                 <label for="input_price">Цена</label>
 
                 <div class="grid_block_price">
-
-                    {% for price in prices %}
-                        <input type="text" name="input_price_{{ price.id }}" id="input_price_{{ price.id }}" class="little_input"
-                            value="{{ price.price }}">
-                        <span>руб</span>
-                        <input type="text" name="input_price_time_{{ price.id }}" id="input_price_time_{{ price.id }}" class="little_input"
-                            value="{{ price.time if price.time }}">
-                    {% endfor %}
+                    <input type="text" name="input_price_{{ service.id }}" id="input_price_{{ service.id }}"
+                           class="little_input"
+                           value="{{ service.price }}">
+                    <div>руб / </div>
+                    <input type="text" name="input_price_time_{{ service.id }}" id="input_price_time_{{ service.id }}"
+                           class="little_input"
+                           value="{{ service.time if service.time }}">
                 </div>
                 <div class="input__wrapper">
                     <input type="submit" id="price_add" name="price_add" value="Добавить цену" class="input__file">
@@ -51,12 +50,12 @@
                 <label for="select">Категории</label>
 
                 <div class="grid_category">
-                    {% for categories in categories %}
+                    {% for category in categories %}
 
-                        <label for="category" class="label_1">{{ categories.name }}</label>
+                        <label for="category" class="label_1">{{ category.name }}</label>
                         <input type="checkbox" id="category" class="checkbox"
-                               name={{ categories.id }}  value={{ categories.id }}
-                                {{ "checked" if categories.id == categories_checked[categories.id] else "" }}>
+                               name={{ category.id }}  value={{ category.id }}
+                                {{ "checked" if category.id == categories_checked[category.id] else "" }}>
 
                     {% endfor %}
                 </div>
@@ -86,9 +85,9 @@
 
                     {% set path = "images/service/" + service.id|string + ".png" %}
                     {% if files %}
-                    <div class="block_image"><img src="{{ url_for("static", filename=path) }}" alt=""
-                                                  class="image">
-                    </div>
+                        <div class="block_image"><img src="{{ url_for("static", filename=path) }}" alt=""
+                                                      class="image">
+                        </div>
                     {% endif %}
 
                     <div class="input__wrapper">

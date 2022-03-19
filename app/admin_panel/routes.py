@@ -224,7 +224,7 @@ def category_change():
 
             Category.query.filter_by(id=category_id).delete()
             db.session.commit()
-            return redirect(url_for('main.index'))
+            return redirect(url_for('admin_panel.category'))
 
         for photo in files:
 
@@ -306,7 +306,6 @@ def service_test():
     service_id = request.args.get('service_id')
     service = Service.query.filter_by(id=service_id).first()
     categories_all = Category.query.all()
-    prices = service.prices.all()
 
     b = [0]
 
@@ -348,15 +347,14 @@ def service_test():
         service.short_description = request.form.get('input_short_desc')
         service.description = request.form.get('input_desc')
         service.name = request.form.get('title')
-        for price in prices:
-            if request.form.get('input_price_' + str(price.id)):
-                price.price = request.form.get('input_price_' + str(price.id))
-            if request.form.get('input_price_time_' + str(price.id)):
-                price.time = request.form.get('input_price_time_' + str(price.id))
-                if price.time == 'Delete':                                        # Костыль, который нужно исправить на нормальную кнопку
-                    Price.query.filter_by(id=price.id).delete()
-        db.session.commit()
 
+        if request.form.get('input_price_' + str(service.id)):
+            service.price = request.form.get('input_price_' + str(service.id))
+        if request.form.get('input_price_time_' + str(service.id)):
+            service.time = request.form.get('input_price_time_' + str(service.id))
+            if service.time == 'Delete':                                        # Костыль, который нужно исправить на нормальную кнопку
+                Price.query.filter_by(id=service.id).delete()
+        db.session.commit()
 
         if request.form.get('delete_service'):
             try:
@@ -375,7 +373,6 @@ def service_test():
             db.session.commit()
             return redirect(url_for('admin_panel.service_test', service_id=service_id))
 
-
     for i in categories_all:
         b.insert(i.id, 0)
         if ServiceCategory.query.filter_by(service_id=service_id, category_id=i.id).first():
@@ -383,7 +380,7 @@ def service_test():
 
     return render_template('admin_panel/service.html', title='{}'.format(service.name),
                            categories=get_categories(), service=service, categories_checked=b,
-                           files=os.path.isfile('app/static/images/service/{}.png'.format(service_id)), prices=prices)
+                           files=os.path.isfile('app/static/images/service/{}.png'.format(service_id)))
 
 
 @bp.route('/service_create', methods=['GET', 'POST'])
