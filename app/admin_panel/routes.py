@@ -386,7 +386,7 @@ def service_create():
         description = request.form.get('description')
         price = request.form.get('price')
         time = request.form.get('price_time')
-        next = request.form.get('next')
+        next = 0 if request.form.get('next') == None else 1
 
         for elem in categories_all:
             a = ServiceCategory(service_id=service_id, category_id=elem.id)
@@ -403,10 +403,8 @@ def service_create():
                         db.session.commit()
 
         db.session.commit()
-
         service = Service(name=title, description=description, short_description=short_description,
                           price=price, time=time, next=next, status=1)
-
         db.session.add(service)
         db.session.commit()
 
@@ -416,10 +414,7 @@ def service_create():
         #         Service.query.filter_by(name=title).first().id
         #     )))
 
-        x = url_for('admin_panel.service_test') + '?service_id={}'.format(service_id)
-        print(x)
-
-        return redirect(url_for('admin_panel.all_services'))
+        return redirect(url_for('admin_panel.service_test') + '?service_id={}'.format(service_id))
 
     return render_template('admin_panel/service_create.html', title='Создание услуги',
                            categories=categories_all, categories_checked=b)
