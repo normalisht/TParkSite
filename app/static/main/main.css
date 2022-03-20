@@ -90,7 +90,7 @@ p {
     /*background-color: var(--background-color);*/
     /*margin-top: 10px;*/
     color: #a8a8a8;
-    font-size: calc(var(--primary-small-font) * 0.6);
+    font-size: calc(var(--primary-font-size) * 0.6);
 }
 
 .upper_white {
