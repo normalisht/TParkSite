@@ -10,9 +10,13 @@
     /*grid-column-gap: 50px;*/
 }
 
-.more {
-    margin-top: -27px;
+.description > p:last-child {
+    margin: 0;
+    margin-block-start: 0;
+    margin-block-end: 0;
+    margin-bottom: -23px;
 }
+
 
 .content {
     min-width: 10vw;
@@ -59,7 +63,7 @@
 
 .description {
     padding-top: 3px;
-    margin-left: -2px;
+    margin-left: 0;
     text-align: left;
     cursor: default;
     z-index: 0;

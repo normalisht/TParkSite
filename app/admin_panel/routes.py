@@ -240,7 +240,6 @@ def category_change():
                 images = request.files.getlist('add_' + str(photo))
                 count = len(files)
 
-
                 for img in images:
                     os.chdir('app/static/images/category/{}'.format(category_id))
                     img.save(os.path.join(os.getcwd(), '{}.png'.format(count + 1)))
@@ -319,27 +318,27 @@ def service_test():
             service.next = 1
         else:
             service.next = 0
-        for elem in categories_all:
-            a = ServiceCategory(service_id=service_id, category_id=elem.id)
-            if request.form.get(str(elem.id)) == str(elem.id):
-                for i in ServiceCategory.query.all():
-                    if str(i.service_id) == str(a.service_id) and str(i.category_id) == str(a.category_id):
-                        ServiceCategory.query.filter_by(service_id=i.service_id, category_id=i.category_id).delete()
-                        db.session.commit()
-                db.session.add(a)
+
+        for category in categories_all:
+            a = ServiceCategory(service_id=service_id, category_id=category.id)
+
+            if request.form.get(str(category.id)) == str(category.id):
+                if not ServiceCategory.query.filter_by(service_id=service_id, category_id=category.id).first():
+                    db.session.add(a)
+                    db.session.commit()
             else:
-                for i in ServiceCategory.query.all():
-                    if str(i.service_id) == str(a.service_id) and str(i.category_id) == str(a.category_id):
-                        ServiceCategory.query.filter_by(service_id=i.service_id, category_id=i.category_id).delete()
-                        db.session.commit()
+                x = ServiceCategory.query.filter_by(service_id=service_id, category_id=category.id).first()
+                if x:
+                    db.session.delete(x)
+                    db.session.commit()
 
         db.session.commit()
+
         # checking categories(if it in ServiceCategories -> 1)
 
         if request.form.get('delete'):
             try:
                 os.remove('app/static/images/service/' + str(service.id) + ".png")
-                return redirect(url_for('admin_panel.service_test', service_id=service_id))
             except:
                 pass
         if request.files.get('change'):
@@ -347,7 +346,6 @@ def service_test():
             os.chdir('app/static/images/service')
             image.save(os.path.join(os.getcwd(), '{}.png'.format(service_id)))
             os.chdir('../../../../')
-            return redirect(url_for('admin_panel.service_test', service_id=service_id))
 
         service.short_description = request.form.get('input_short_desc')
         service.description = request.form.get('input_desc')
@@ -363,15 +361,19 @@ def service_test():
             except:
                 pass
 
+            ServiceCategory.query.filter_by(service_id=service_id).all().delete()
             Service.query.filter_by(id=service_id).delete()
             db.session.commit()
 
             return redirect(url_for('admin_panel.all_services'))
 
+        return redirect(url_for('admin_panel.category_change') + '?category_id={}'.format(service.categories[0].category_id))
+
     for i in categories_all:
-        b.insert(i.id, 0)
         if ServiceCategory.query.filter_by(service_id=service_id, category_id=i.id).first():
             b.insert(i.id, i.id)
+        else:
+            b.insert(i.id, 0)
 
     return render_template('admin_panel/service.html', title='{}'.format(service.name),
                            categories=get_categories(), service=service, categories_checked=b,
@@ -392,20 +394,20 @@ def service_create():
         description = request.form.get('description')
         price = request.form.get('price')
         time = request.form.get('price_time')
+        next = 0 if request.form.get('next') == None else 1
 
-        for elem in categories_all:
-            a = ServiceCategory(service_id=service_id, category_id=elem.id)
-            if request.form.get(str(elem.id)) == str(elem.id):
-                for i in ServiceCategory.query.all():
-                    if str(i.service_id) == str(a.service_id) and str(i.category_id) == str(a.category_id):
-                        ServiceCategory.query.filter_by(service_id=i.service_id, category_id=i.category_id).delete()
-                        db.session.commit()
-                db.session.add(a)
+        for category in categories_all:
+            a = ServiceCategory(service_id=service_id, category_id=category.id)
+            print(a.service_id)
+            if request.form.get(str(category.id)) == str(category.id):
+                if not ServiceCategory.query.filter_by(service_id=service_id, category_id=category.id).first():
+                    db.session.add(a)
+                    db.session.commit()
             else:
-                for i in ServiceCategory.query.all():
-                    if str(i.service_id) == str(a.service_id) and str(i.category_id) == str(a.category_id):
-                        ServiceCategory.query.filter_by(service_id=i.service_id, category_id=i.category_id).delete()
-                        db.session.commit()
+                x = ServiceCategory.query.filter_by(service_id=service_id, category_id=category.id).first()
+                if x:
+                    db.session.remove(x)
+                    db.session.commit()
 
         db.session.commit()
         service = Service(name=title, description=description, short_description=short_description,
