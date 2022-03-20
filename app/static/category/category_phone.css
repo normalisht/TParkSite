@@ -82,6 +82,11 @@
     font-size: var(--primary-font-size);
 }
 
+.cost {
+    justify-content: flex-end;
+    min-width: 30%;
+}
+
 .description > p:last-child {
     margin: 0;
     margin-block-start: 0;

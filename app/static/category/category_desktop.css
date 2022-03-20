@@ -17,6 +17,19 @@
     margin-bottom: -23px;
 }
 
+.cost {
+    min-width: 15%;
+}
+
+.price > div:first-child {
+    text-align: left;
+}
+
+.price > div {
+    display: flex;
+    align-items: center;
+}
+
 
 .content {
     min-width: 10vw;
