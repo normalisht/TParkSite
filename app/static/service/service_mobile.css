@@ -48,7 +48,7 @@
 .block_text {
     min-width: clamp(150px, 10vw, 20vw);
     text-align: center;
-    margin: 0 auto;
+    margin: 0 17px 0 17px;
     font-size: var(--primary-font-size);
 }
 
