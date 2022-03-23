@@ -40,7 +40,7 @@
 
 .event_info {
     text-align: center;
-    font-size: 50px;
+    font-size: 75px;
     position: absolute;
     color: white;
     z-index: 10;
@@ -65,7 +65,7 @@
 
 .event_name {
     left: 15px;
-    top: calc(clamp(200px, (var(--vh, 1vh) * 45), 800px) - 80px);
+    top: calc(clamp(200px, (var(--vh, 1vh) * 45), 800px) - 100px);
 }
 
 .event_text {
