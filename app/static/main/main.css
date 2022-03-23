@@ -83,6 +83,7 @@ p {
     align-items: center;
     text-align: center;
     height: min(10vh, 60px);
+    margin-top: 6px;
     width: 100%;
     background-color: #1c1919;
     /*background-color: var(--background-color);*/
@@ -196,7 +197,7 @@ p {
     justify-content: center;
     max-width: min(95%, 960px);
     overflow: hidden;
-    margin: 5px auto 0;
+    margin: 5px auto 7px;
     text-align: left;
     word-wrap: break-word;
     font-size: var(--primary-font-size);
