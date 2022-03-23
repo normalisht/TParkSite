@@ -16,6 +16,7 @@
 
 .category_title {
     margin: 0 auto;
+    text-align: center;
     padding-top: 4px;
     padding-bottom: 4px;
     font-size: calc(var(--primary-font-size) * 1.3);
