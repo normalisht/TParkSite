@@ -35,8 +35,16 @@
     margin: 0 auto;
 }
 
+.block_img {
+    display:flex;
+    height:clamp(100px,40vh, 400px );
+    width:clamp(200px,40vw, 600px );
+    align-items: center;
+    margin: 0  auto;
+}
+
 .category_title {
-    padding-top: 4px;
+    margin: 5px auto 5px;
     text-align: center;
     font-size: calc(var(--primary-font-size) * 1.2);
 }
