@@ -91,6 +91,7 @@ p {
     /*margin-top: 10px;*/
     color: #a8a8a8;
     font-size: calc(var(--primary-font-size) * 0.6);
+    margin-top: 6px;
 }
 
 .upper_white {
@@ -198,7 +199,7 @@ p {
     justify-content: center;
     max-width: min(95%, 960px);
     overflow: hidden;
-    margin: 5px auto 0;
+    margin: 5px auto 7px;
     text-align: left;
     word-wrap: break-word;
     font-size: var(--primary-font-size);

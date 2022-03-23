@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 close_all()
 
                 description.stop().animate({
-                    'height': `${description.prop('scrollHeight')}`
+                    'height': `${description.prop('scrollHeight')}px`
                 }, time_animation)
                 $(this).attr('status', '1')
 

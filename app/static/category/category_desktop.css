@@ -19,6 +19,8 @@
 
 .cost {
     min-width: 15%;
+    justify-content: flex-end;
+    margin-left: 6px;
 }
 
 .price > div:first-child {
@@ -68,14 +70,13 @@
 
 .button {
     font-size: var(--primary-font-size);
-    padding: 12px 3px 4px;
+    padding: 8px 3px;
     cursor: pointer;
     border-bottom: 1px solid rgba(0, 0, 0, 0.35);
     transition: all 0.25s;
 }
 
 .description {
-    padding-top: 3px;
     margin-left: 0;
     text-align: left;
     cursor: default;
