@@ -15,7 +15,7 @@
             {% for service in services %}
                 <div class="event">
                     <a class="title" href="{{ url_for('admin_panel.service_test') }}?service_id={{ service.id }}">
-                        {{ service.name }} – {{ service.price }}
+                        {{ service.name }} – {{ service }}
                     </a>
                 </div>
             {% endfor %}

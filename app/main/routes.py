@@ -5,6 +5,7 @@ from app.main import bp
 from app import db
 import os
 import datetime
+import time
 from os import listdir
 from app.main.functions import get_categories, get_contacts_data
 from app.models import Text, Event, Category, ServiceCategory, Service, Employee, Partner, Price
@@ -20,17 +21,25 @@ engine = create_engine("sqlite:///T_Park.db")
 def index():
     main_text = Text.query.filter_by(title="main_text").first().text
     events = Event.query.order_by(Event.date).all()
-
+    events_2 = []
+    slider_events = True
     len_slider = len(os.listdir('app/static/images/staff'))
 
-    if len(events) == 0:
-        pass
-    elif len(events) < 3:
-        events = events * 3
+    for event in events:
+        date = datetime.date(int(event.date.strftime('%Y')), int(event.date.strftime('%m')), int(event.date.strftime('%d')))
+        dt = datetime.datetime.combine(date, datetime.time(22, 0))
 
-    return render_template('main/main.html', main_text=main_text, events=events[1:] + events[:1],
+        if dt > datetime.datetime.now():
+            events_2.append(event)
+
+    if len(events_2) == 0:
+        slider_events = False
+    elif len(events_2) < 3:
+        events_2 = events_2 * 3
+
+    return render_template('main/main.html', main_text=main_text, events=events_2[1:] + events_2[:1],
                            categories=get_categories(), contacts_data=get_contacts_data(),
-                           len_slider=len_slider)
+                           len_slider=len_slider, slider_events=slider_events)
 
 
 @bp.route('/category', methods=['GET'])
@@ -89,7 +98,3 @@ def about():
     return render_template('main/about.html', employees=employees,
                            filosofi=filosofi, about=about, partners=partners,
                            categories=get_categories(), contacts_data=get_contacts_data())
-
-
-
-

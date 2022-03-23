@@ -16,12 +16,12 @@
         <div class="grid_block partners_map">
 
 
-
             <form method="POST" enctype="multipart/form-data" class="grid_block">
 
 
                 <label for="title">Название услуги</label>
-                <input type="text" name="title" id="title" class="little_input" style="width: 150px; justify-content: left;"
+                <input type="text" name="title" id="title" class="little_input"
+                       style="width: 150px; justify-content: left;"
                        value="{{ service.name }}">
 
                 <label for="input_short_desc">Краткое описание</label>
@@ -34,7 +34,7 @@
 
                     <input type="text" name="input_price" id="input_price" class="little_input"
                            value="{{ service.price }}">
-                    <span>руб</span>
+                    руб /
                     <input type="text" name="input_price_time" id="input_price_time" class="little_input"
                            value="{{ service.time }}">
 
@@ -43,12 +43,12 @@
                 <label for="select">Категории</label>
 
                 <div class="grid_category">
-                    {% for categories in categories %}
+                    {% for category in categories %}
 
-                        <label for="category" class="label_1">{{ categories.name }}</label>
+                        <label for="category" class="label_1">{{ category.name }}</label>
                         <input type="checkbox" id="category" class="checkbox"
-                               name={{ categories.id }}  value={{ categories.id }}
-                                {{ "checked" if categories.id == categories_checked[categories.id] else "" }}>
+                               name={{ category.id }}  value={{ category.id }}
+                                {{ "checked" if category.id == categories_checked[category.id] else "" }}>
 
                     {% endfor %}
                 </div>
@@ -78,9 +78,9 @@
 
                     {% set path = "images/service/" + service.id|string + ".png" %}
                     {% if files %}
-                    <div class="block_image"><img src="{{ url_for("static", filename=path) }}" alt=""
-                                                  class="image">
-                    </div>
+                        <div class="block_image"><img src="{{ url_for("static", filename=path) }}" alt=""
+                                                      class="image">
+                        </div>
                     {% endif %}
 
                     <div class="input__wrapper">

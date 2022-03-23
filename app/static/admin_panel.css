@@ -276,12 +276,12 @@
 
 .grid_block_price {
     display: grid;
-    grid-template-columns: 8vw 3vw 8vw;
+    grid-template-columns: 100px 50px 100px;
     text-align: left;
     justify-items: center;
     align-items: baseline;
     min-width: 40px;
-    margin-top:10px;
+    margin-top: 10px;
 }
 
 

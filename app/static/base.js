@@ -63,14 +63,14 @@ document.addEventListener('DOMContentLoaded', function () {
 })
 
 function top_footer() {
-    // делает пожвал плавающим(я думаю, что это какой-то костыли)
+    // делает подвал плавающим(я думаю, что это какой-то костыль)
     let footer = $('#footer')
     if (!footer) return
 
     let footer_height = footer.outerHeight(),
-        footer_top = footer.css('margin-top').slice(0, 2)
+        footer_top = footer.css('margin-top').slice(0, -2)
 
-    if (document.documentElement.clientHeight > footer.offset().top + footer_height + footer_top) {
+    if (document.documentElement.clientHeight > $('#upper_container').outerHeight() + $('#main_block').outerHeight() + footer_height + +footer_top) {
         footer_2.style.top = document.documentElement.clientHeight - footer_height - footer_top + 'px'
         footer_2.style.visibility = 'visible'
         footer_2.style.zIndex = '1'
@@ -79,7 +79,8 @@ function top_footer() {
     } else {
         footer.css({
             'visibility': 'visible',
-            'z-index': '1'
+            'z-index': '1',
+            // 'bottom': '0'
         })
         try {
             footer_2.style.visibility = 'hidden'
@@ -265,7 +266,9 @@ function main_block_height() {
     if (upper.outerHeight(true) + main_block.outerHeight(true) < $(window).height()) {
         let height
 
-        height = $(window).height() - footer.outerHeight() - upper.outerHeight(true)
+        console.log(footer.outerHeight())
+
+        height = $(window).height() - footer.outerHeight() * 2 - upper.outerHeight(true)
 
         main_block.css({'min-height': height + 'px'})
     } else {

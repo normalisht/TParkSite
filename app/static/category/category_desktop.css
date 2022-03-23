@@ -10,6 +10,27 @@
     /*grid-column-gap: 50px;*/
 }
 
+.description > p:last-child {
+    margin: 0;
+    margin-block-start: 0;
+    margin-block-end: 0;
+    margin-bottom: -23px;
+}
+
+.cost {
+    min-width: 15%;
+}
+
+.price > div:first-child {
+    text-align: left;
+}
+
+.price > div {
+    display: flex;
+    align-items: center;
+}
+
+
 .content {
     min-width: 10vw;
     text-align: center;
@@ -55,7 +76,7 @@
 
 .description {
     padding-top: 3px;
-    margin-left: -2px;
+    margin-left: 0;
     text-align: left;
     cursor: default;
     z-index: 0;

@@ -174,9 +174,9 @@
                                     </div>
                                 {% endif %}
                             {% endfor %}
-{#                            <close class="btn-close-modal-window"># }
+                            {#                            <close class="btn-close-modal-window"># }
 {#                                <img src="{{ url_for('static', filename='cross.png') }}" alt="X">#}
-{#                            </close>#}
+                            {#                            </close>#}
                         </div>
                         <div class="overlay"></div>
                     </div>
@@ -218,7 +218,8 @@
                                     <ul class="social-icons">
                                         <li><a class="vk" href="{{ vk }}" target="_blank"><i class="fa fa-vk"></i></a>
                                         </li>
-                                        <li><a class="whatsapp" href="https://wa.me/7{{ phone_numbers[0] }}" target="_blank">
+                                        <li><a class="whatsapp" href="https://wa.me/7{{ phone_numbers[0] }}"
+                                               target="_blank">
                                             <i class="fa fa-whatsapp"></i></a></li>
                                         <li><a class="insta" href="{{ insta }}" target="_blank"><i
                                                 class="fa fa-instagram"></i></a>
@@ -226,7 +227,7 @@
                                     </ul>
                                 </div>
                             </div>
-{#                            <close class="btn-close-modal-window">
+                            {#                            <close class="btn-close-modal-window">
                                 <img src="{{ url_for('static', filename='cross.png') }}" alt="X">
                             </close>#}
                         </div>
@@ -244,10 +245,10 @@
                 <div>Дмитрия Сергеева</div>
             </div>
             <div id="phone_numbers" class="block_numbers">
-                <div style="cursor: copy;" onclick="copy_number('+7(945)759-46-80', this)"
-                     title="Нажмите чтобы скопировать">+7(945)759-46-80</div>
-                <div style="cursor: copy;" onclick="copy_number('+7(968)898-73-22', this)"
-                     title="Нажмите чтобы скопировать">+7(968)898-73-22</div>
+                <div style="cursor: copy;" onclick="copy_number('+7{{ phone_numbers[0] }}', this)"
+                    title="Нажмите чтобы скопировать">+7{{ phone_numbers[0] }}</div>
+                <div style="cursor: copy;" onclick="copy_number('+7{{ phone_numbers[1] }}', this)"
+                    title="Нажмите чтобы скопировать">+7{{ phone_numbers[1] }}</div>
 
             </div>
         </div>
