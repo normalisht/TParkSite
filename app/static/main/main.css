@@ -85,7 +85,7 @@ p {
     align-items: center;
     text-align: center;
     height: min(10vh, 40px);
-    margin-top: 6px;
+    margin-top: 12px;
     width: 100%;
     background-color: #1c1919;
     /*background-color: var(--background-color);*/
