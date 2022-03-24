@@ -1,0 +1,13 @@
+@charset "UTF-8";
+
+.title {
+    margin-bottom: 4px;
+}
+
+.grid_block {
+    margin: 0 auto 8px;
+}
+
+.container_about {
+    margin: 8px auto;
+}

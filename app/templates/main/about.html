@@ -2,50 +2,61 @@
 
 {% block app_content %}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='about/about.css') }}">
-
-    <div class="category_title">О нас</div>
-
-    <!--Философия-->
-
-    <div class="block_content">{{ filosofi.text|safe }}</div>
+    <link id="style" rel="stylesheet" href="{{ url_for('static', filename='about/about.css') }}">
+    <script src="{{ url_for('static', filename='about/about.js') }}"></script>
 
 
-    <!--Партнёры-->
-    <div class="category_title">Партнёры</div>
-    <div class="block_employees_block">
-        {% for partner in partners %}
-            <div class="block_img_partners">
-                <a href="{{ partner.link }}">
-                    <img src="{{ url_for('static', filename='/images/partner/' + partner.id|string + '.png') }}"
-                         alt="{{ partner.name }}" class="img_img">
-                </a>
+    <div class="container_max">
+        <div class="block">
+            {#        <div class="title">О нас</div>#}
+            <!--Философия-->
+            <div class="text">{{ filosofi.text|safe }}</div>
+        </div>
+
+        <!--Партнёры-->
+        <div class="container_about">
+            <div class="title">Партнёры</div>
+            <div class="grid_block">
+                {% for partner in partners %}
+                    <div class="img_block">
+                        <a href="{{ partner.link }}">
+                            <img src="{{ url_for('static', filename='/images/partner/' + partner.id|string + '.png') }}"
+                                 alt="{{ partner.name }}" class="partner img">
+                        </a>
+                    </div>
+
+                    <!-- style="width: 200px; height:200px; object-fit: cover" -->
+                {% endfor %}
             </div>
+        </div>
 
-            <!-- style="width: 200px; height:200px; object-fit: cover" -->
-        {% endfor %}
-    </div>
+        <!--Что есть-->
+        <div class="block">
+            <div class="title_2">Философия</div>
+            <div class="text">{{ about.text|safe }}</div>
+        </div>
 
-    <!--Что есть-->
-    <div class="category_title">Философия</div>
+        <div class="container_about">
+            <!--Сотрудники-->
+            <div class="title">Сотрудники</div>
+            <div class="grid_block employees">
 
-    <div class="block_content">{{ about.text|safe }}</div>
-
-    <!--Сотрудники-->
-    <div class="category_title">Сотрудники</div>
-    <div class="block_employees_block">
-        {% for employee in employees %}
-            <div class="block_employees">
-                <img src="{{ url_for('static', filename='/images/employee/' + employee.id|string + '.png') }}"
-                     alt="" class="img_img_img">
-                <div>
-                    <div class="name_employees">{{ employee.name }}</div>
-                </div>
-                <div>
-                    <div class="position_employees">{{ employee.position }}</div>
-                </div>
+                {% for employee in employees %}
+                    <div class="img_block">
+                        <div>
+                            <img src="{{ url_for('static', filename='/images/employee/' + employee.id|string + '.png') }}"
+                                 alt="" class="employees img">
+                        </div>
+                        <div>
+                            <div class="name_employees">{{ employee.name }}</div>
+                        </div>
+                        <div>
+                            <div class="position_employees">{{ employee.position }}</div>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
-        {% endfor %}
+        </div>
     </div>
 
 {% endblock %}

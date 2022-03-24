@@ -92,6 +92,7 @@ p {
     /*margin-top: 10px;*/
     color: #a8a8a8;
     font-size: calc(var(--primary-font-size) * 0.6);
+    margin-top: 6px;
 }
 
 .upper_white {
