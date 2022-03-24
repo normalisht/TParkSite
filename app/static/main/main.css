@@ -84,7 +84,7 @@ p {
     vertical-align: middle;
     align-items: center;
     text-align: center;
-    height: min(10vh, 60px);
+    height: min(10vh, 40px);
     margin-top: 6px;
     width: 100%;
     background-color: #1c1919;
