@@ -1,4 +1,4 @@
-@import url(https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css);
+@import url(https://use.fontawesome.com/releases/v5.0.13/css/all.css);
 
 .social-icons {
     display: flex;
@@ -32,8 +32,8 @@
     color:#25d366;
 }
 
-.social-icons .insta {
-    color: #ff1f7cb0;
+.social-icons .telega{
+    color: #0088cc;
 }
 
 .social-icons a img {
@@ -95,15 +95,9 @@
     background: #337AB7;
 }
 
-.social-icons .insta:hover:after {
-    background: radial-gradient(circle farthest-corner at 35% 90%, #fec564, transparent 50%),
-    radial-gradient(circle farthest-corner at 0 140%, #fec564, transparent 50%),
-    radial-gradient(ellipse farthest-corner at 0 -25%, #5258cf, transparent 50%),
-    radial-gradient(ellipse farthest-corner at 20% -50%, #5258cf, transparent 50%),
-    radial-gradient(ellipse farthest-corner at 100% 0, #893dc2, transparent 50%),
-    radial-gradient(ellipse farthest-corner at 60% -20%, #893dc2, transparent 50%),
-    radial-gradient(ellipse farthest-corner at 100% 100%, #d9317a, transparent),
-    linear-gradient(#6559ca, #bc318f 30%, #e33f5f 50%, #f77638 70%, #fec66d 100%);
+.social-icons .telega:hover:after {
+    background:#0088cc;
+    radial-gradient(white 100%,transparent 0);
 }
 
 .geolocation a{
