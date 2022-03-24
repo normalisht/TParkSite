@@ -54,6 +54,8 @@ img {
 
 p {
     margin: 0;
+    /*margin-block-start: 0;*/
+    /*margin-block-end: 0;*/
 }
 
 .upper_container {
@@ -82,13 +84,15 @@ p {
     vertical-align: middle;
     align-items: center;
     text-align: center;
-    height: min(10vh, 60px);
+    height: min(10vh, 40px);
+    margin-top: 12px;
     width: 100%;
     background-color: #1c1919;
     /*background-color: var(--background-color);*/
     /*margin-top: 10px;*/
     color: #a8a8a8;
-    font-size: calc(var(--primary-small-font) * 0.6);
+    font-size: calc(var(--primary-font-size) * 0.6);
+
 }
 
 .upper_white {
@@ -196,7 +200,7 @@ p {
     justify-content: center;
     max-width: min(95%, 960px);
     overflow: hidden;
-    margin: 5px auto 0;
+    margin: 5px auto 7px;
     text-align: left;
     word-wrap: break-word;
     font-size: var(--primary-font-size);

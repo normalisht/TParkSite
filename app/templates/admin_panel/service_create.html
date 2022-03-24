@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block app_content %}
+    {{ ckeditor.load() }}
 
     <form class="form" method="post" action="{{ url_for('admin_panel.service_create') }}">
         <div class="form_container">
@@ -19,9 +20,8 @@
                       placeholder="Краткое описание" cols="50" rows="20"></textarea>
 
             <div class="grid_checkbox">
-
                 <label for="next">С Подробнее</label>
-                <input type="checkbox" id="next" class="checkbox" name="next" value="1" />
+                <input type="checkbox" id="next" class="checkbox" name="next">
 
             </div>
 
@@ -56,5 +56,8 @@
         </div>
 
     </form>
+
+    {{ ckeditor.config(name='short_description') }}
+    {{ ckeditor.config(name='description') }}
 
 {% endblock %}

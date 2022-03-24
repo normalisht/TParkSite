@@ -1,4 +1,7 @@
 /*Phone*/
+div {
+    margin-top: 0px !important
+}
 
 .block_price {
     margin: 0 auto;
@@ -15,9 +18,11 @@
 }
 
 .category_title {
-
+    margin: 0 auto;
+    text-align: center;
     padding-top: 4px;
     padding-bottom: 4px;
+    text-align: center;
     font-size: calc(var(--primary-font-size) * 1.3);
 }
 
@@ -29,14 +34,13 @@
     justify-content: center;
     width: 100%;
     padding: 2px;
-    margin: 10px auto;
+    margin: 8px auto 8px;
     border-radius: 2px;
     font-size: var(--primary-font-size);
     word-wrap: break-word;
 }
 
 .img_service {
-    position: absolute;
     object-fit: cover;
     width: 100vw;
     left: 0;
@@ -47,8 +51,12 @@
 
 .block_text {
     min-width: clamp(150px, 10vw, 20vw);
-    text-align: center;
-    margin: 10px auto;
+    margin: 0 17px;
     font-size: var(--primary-font-size);
+}
+
+.text_inside {
+    text-align: left;
+
 }
 
