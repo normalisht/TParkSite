@@ -15,6 +15,7 @@ window.addEventListener("change", main_block_height)
 
 // window.addEventListener('resize', generate_upper)
 window.addEventListener("orientationchange", generate_upper)
+window.addEventListener('resize', generate_upper)
 document.addEventListener("DOMContentLoaded", generate_upper)
 
 
@@ -178,7 +179,8 @@ function generate_mobile_upper() {
         document.getElementById('for_nav_btns') : el)
     upper.after(navigation_buttons)
     upper.after(phone_numbers)
-    upper.style.justifyContent = 'space-around'
+    upper.style.width = 'calc(100vw - 34px)'
+    upper.style.justifyContent = 'space-between'
 
     // phone_numbers.style.display = 'none'
 }

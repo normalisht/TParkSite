@@ -34,15 +34,24 @@
 }
 
 .modal-window {
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
     position: absolute;
-    min-height: 100vh;
+    min-height: calc(100 * var(--vh, 1vh));
     z-index: 1000;
-    width: calc(var(--vw, 1vw) * 100); /* vw подключается из js */
+    width: calc(var(--vw, 1vw) * 100 + 8px); /* vw подключается из js */
     box-shadow: 0 10px 15px rgba(0, 0, 0, .4);
     background-color: rgba(255, 255, 255, 0.99);
     transition: var(--modal_window_time, 500ms) ease; /* подключается из js */
     padding: 5px;
+}
+
+.modal_window_img {
+    width: calc(var(--vw, 1vw) * 100 - 17px);
+    /*max-height: calc(25 * var(--vh, 1vh));*/
+    object-fit: cover;
+    margin: 5px 0 0;
 }
 
 .modal-item {
@@ -50,7 +59,8 @@
     transition: .3s linear;
     text-decoration: none;
     text-align: left;
-    padding: 5px 8px 2px;
+    padding: 4px 8px 4px;
+    margin-right: 16px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.35);
     font-size: calc(1.4 * var(--primary-font-size));
     font-family: var(--primary-font-family);

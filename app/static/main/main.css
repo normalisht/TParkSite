@@ -59,14 +59,14 @@ p {
 }
 
 .upper_container {
-    width: 100%;
+    width: calc(var(--vw, 1vw) * 100);
     background-color: white;
 }
 
 .upper {
     padding-top: 5px;
-    width: min(100%, var(--primary-content-width));
-    margin: 0 auto;
+    width: min(var(--vw, 1vw) * 100, 960px);
+    margin: 0 17px;
     /*background-color: var(--background-color);*/
     position: sticky;
     justify-content: space-between;
@@ -88,11 +88,8 @@ p {
     margin-top: 6px;
     width: 100%;
     background-color: #1c1919;
-    /*background-color: var(--background-color);*/
-    /*margin-top: 10px;*/
     color: #a8a8a8;
     font-size: calc(var(--primary-font-size) * 0.6);
-    margin-top: 6px;
 }
 
 .upper_white {
@@ -122,6 +119,7 @@ p {
 .events {
     margin: 0 auto;
     width: 100%;
+    max-width: calc(var(--primary-content-width));
 }
 
 .block {
@@ -174,16 +172,20 @@ p {
     display: flex;
     position: relative;
     flex-direction: column;
-    justify-content: space-evenly;
+    justify-content: space-between;
     align-items: center;
     width: calc(100% / 3);
     font-size: var(--primary-font-size);
     font-family: var(--primary-font-family);
 }
 
-.block_info > div {
-    display: flex;
-}
+
+/*.name {*/
+/*    display: inline-flex;*/
+/*    align-items: flex-end;*/
+/*    position: absolute;*/
+/*    right: 0;*/
+/*}*/
 
 .block_numbers {
     display: flex;
@@ -198,7 +200,7 @@ p {
 
 .block_content {
     justify-content: center;
-    max-width: min(95%, 960px);
+    max-width: 960px;
     overflow: hidden;
     margin: 5px auto 7px;
     text-align: left;

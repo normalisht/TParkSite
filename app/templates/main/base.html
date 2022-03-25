@@ -165,6 +165,8 @@
                     <!--Модальные окно/выпадающее меню -->
                     <div id="services-modal-win" class="modal submenu">
                         <div class="modal-window">
+                            <img id="logo" class="modal_window_img"
+                                 src="{{ url_for('static', filename='logo_2.png') }}" alt="">
                             {% for category in categories %}
                                 {% if category.status %}
                                     <div class="modal-item submenu-item">
@@ -241,14 +243,22 @@
 
         <div id="upper_block_info" class="block_info">
             <div class='name'>
-                <div>Тренинг-парк</div>
-                <div>Дмитрия Сергеева</div>
+{#                <div class="info_name">#}
+                    <div>Тренинг-парк</div>
+                    <div><div>Дмитрия</div><div>Сергеева</div></div>
+{#                </div>#}
             </div>
+{#            <div style="visibility: hidden">#}
+                {#                <div class="info_name">#}
+{#                <div>Тренинг-парк</div>#}
+{#                <div>Дмитрия Сергеева</div>#}
+                {#                </div>#}
+{#            </div>#}
             <div id="phone_numbers" class="block_numbers">
                 <div style="cursor: copy;" onclick="copy_number('+7{{ phone_numbers[0] }}', this)"
-                    title="Нажмите чтобы скопировать">+7{{ phone_numbers[0] }}</div>
+                     title="Нажмите чтобы скопировать">+7{{ phone_numbers[0] }}</div>
                 <div style="cursor: copy;" onclick="copy_number('+7{{ phone_numbers[1] }}', this)"
-                    title="Нажмите чтобы скопировать">+7{{ phone_numbers[1] }}</div>
+                     title="Нажмите чтобы скопировать">+7{{ phone_numbers[1] }}</div>
 
             </div>
         </div>

@@ -9,7 +9,6 @@
     /*width: 80%;*/
     width: min(100vw, var(--primary-content-width));
     margin: 0 auto;
-    display: block;
 }
 
 .slider {

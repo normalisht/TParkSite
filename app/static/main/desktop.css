@@ -2,12 +2,21 @@
 
 /*Desktop*/
 
+.upper_container {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+}
+
+.main_block {
+    /*max-width: var(--primary-content-width);*/
+    /*padding: 17px;*/
+}
+
 .img_logo {
     max-width: 200px;
     max-height: 100px;
     object-fit: cover;
-    margin-left: 50%;
-    transform: translate(-50%, 0);
 }
 
 .block_numbers {
@@ -17,6 +26,19 @@
     margin-top: 5px;
     font-size: calc(var(--primary-font-size) * 0.8);
 }
+
+.block_info {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    text-align: center;
+}
+
+.name {
+    display: flex;
+    align-items: flex-end;
+}
+
 
 .block_numbers > div:last-child {
     padding-top: 2px;
@@ -36,6 +58,18 @@
     transition: background-color 0.4s ease,
     border-color 0.4s ease,
     font-size 0.2s ease;
+}
+
+.desktop_container {
+    margin: 0 17px;
+}
+
+.main_slider {
+    display: flex;
+}
+
+.events {
+    display: flex;
 }
 
 .event_info {

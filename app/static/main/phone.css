@@ -1,10 +1,18 @@
-
 /*Phone*/
 .img_logo {
-    max-width: 150px;
-    max-height: 100px;
-    margin-left: 50%;
-    transform: translate(-50%, 0);
+    /*max-width: 150px;*/
+    /*max-height: 100px;*/
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+}
+
+.upper {
+    /*margin-bottom: 4px;*/
+}
+
+.block_logo {
+    left: 0;
 }
 
 .block_content {
@@ -12,9 +20,19 @@
 }
 
 .block_info {
+    display: grid;
+    justify-content: flex-end;
+    align-items: flex-end;
     text-align: center;
     font-size: calc(1.2 * var(--primary-font-size));
+    right: 0;
+    margin-bottom: 4px;
 }
+
+.name {
+    display: flex;
+}
+
 
 .block_buttons {
     font-size: calc(1.2 * var(--primary-font-size));
@@ -33,8 +51,17 @@
 }
 
 .block_numbers > div {
-    text-align: center;
     width: 50%;
+}
+
+.block_numbers > div:first-child {
+    text-align: left;
+    margin-left: 17px;
+}
+
+.block_numbers > div:last-child {
+    text-align: right;
+    margin-right: 17px;
 }
 
 .event_info {
