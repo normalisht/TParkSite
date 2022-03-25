@@ -9,6 +9,7 @@
 
 .category_title {
     padding-top: 4px;
+    padding-bottom: 4px;
     text-align: center;
     font-size: calc(var(--primary-font-size) * 1.2);
 }
@@ -49,6 +50,7 @@
     justify-content: flex-start;
     text-decoration: none;
     width: 100%;
+    padding-top: 4px;
 }
 
 .more > div > a {

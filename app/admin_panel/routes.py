@@ -260,6 +260,7 @@ def category_change():
                 os.chdir('app/static/images/category/{}'.format(category_id))
 
             for img in images:
+                print(os.getcwd())
                 img.save(os.path.join(os.getcwd(), '{}.png'.format(count + 1)))
                 count += 1
                 os.chdir('../../../../../')
