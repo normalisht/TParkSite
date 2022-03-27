@@ -13,7 +13,7 @@ from flask_login import LoginManager
 from flask_ckeditor import CKEditor
 
 db = SQLAlchemy()
-migrate = Migrate()
+# migrate = Migrate()
 bootstrap = Bootstrap()
 mail = Mail()
 moment = Moment()
@@ -32,7 +32,7 @@ def create_app(config_class=Config):
     app.config.from_object(config_class)
 
     db.init_app(app)
-    migrate.init_app(app, db, render_as_batch=True)
+    # migrate.init_app(app, db, render_as_batch=True)
     mail.init_app(app)
     bootstrap.init_app(app)
     moment.init_app(app)
