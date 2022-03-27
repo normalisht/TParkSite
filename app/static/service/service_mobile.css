@@ -1,4 +1,7 @@
 /*Phone*/
+div {
+    margin-top: 0px !important
+}
 
 .block_price {
     margin: 0 auto;
@@ -16,8 +19,10 @@
 
 .category_title {
     margin: 0 auto;
+    text-align: center;
     padding-top: 4px;
     padding-bottom: 4px;
+    text-align: center;
     font-size: calc(var(--primary-font-size) * 1.3);
 }
 
@@ -36,7 +41,6 @@
 }
 
 .img_service {
-    position: absolute;
     object-fit: cover;
     width: 100vw;
     left: 0;

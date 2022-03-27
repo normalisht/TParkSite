@@ -84,8 +84,8 @@ p {
     vertical-align: middle;
     align-items: center;
     text-align: center;
-    height: min(10vh, 60px);
-    margin-top: 6px;
+    height: min(10vh, 40px);
+    margin-top: 12px;
     width: 100%;
     background-color: #1c1919;
     color: #a8a8a8;
