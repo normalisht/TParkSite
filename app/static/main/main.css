@@ -98,7 +98,7 @@ p {
 }
 
 .container_base {
-    min-height: calc(100% - min(10vh, 40px))
+    min-height: calc(100 * var(--vh, 1vh) - 8px - min(10 * var(--vh, 1vh), 40px))
 }
 
 .block_buttons {
