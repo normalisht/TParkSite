@@ -118,15 +118,16 @@ function activate_modal_window() {
     })
 
     function modal_window_toggle(event) {
-
         let modal_window_btn = event.target.closest('[data-modal-window-toggle]');
 
         if (event.target.tagName.toLowerCase() === 'a' && event.target.classList.contains('modal-link')) return;
 
         if (!modal_window_btn) return;
 
-        if (event.target.tagName.toLowerCase() === 'div' && event.target.classList.contains('modal-item'))
-            event.target.closest('a').click();
+        let modal_window_target = modal_window_btn.getAttribute('data-modal-window-toggle');
+
+        current_modal_window.change_status(modal_window_target)
+
 
         if ((event.target.tagName.toLowerCase() === 'div' && (event.target.classList.contains('modal-item') ||
             event.target.classList.contains('geolocation') || event.target.classList.contains('address') ||
@@ -136,11 +137,7 @@ function activate_modal_window() {
             return;
         }
 
-        console.log(event.target.tagName.toLowerCase())
         event.preventDefault();
-        let modal_window_target = modal_window_btn.getAttribute('data-modal-window-toggle');
-
-        current_modal_window.change_status(modal_window_target)
 
         // если модальное окно активно изменяем url, иначе откатываем
         if (current_modal_window.status)
