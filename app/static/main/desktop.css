@@ -94,12 +94,12 @@
 }
 
 .event_date {
-    right: 20px;
-    top: 15px;
+    right: 0;
+    top: 0;
 }
 
 .event_name {
-    left: 15px;
+    left: 0;
     top: calc(clamp(200px, (var(--vh, 1vh) * 45), 800px) - 100px);
 }
 

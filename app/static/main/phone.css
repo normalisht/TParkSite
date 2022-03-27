@@ -66,7 +66,7 @@
 
 .event_info {
     text-align: center;
-    font-size: 30px;
+    font-size: 40px;
     position: absolute;
     color: white;
     z-index: 10;
@@ -75,6 +75,7 @@
 
 .event_info > div {
     position: absolute;
+    display: flex;
     z-index: -1;
     top: 0;
     left: 0;
@@ -90,8 +91,11 @@
 }
 
 .event_name {
+    max-width: calc(100% - 34px);
+    height: min-content;
+    text-align: left;
     left: 17px;
-    top: calc(clamp(200px, (var(--vh, 1vh) * 45), 800px) - 42px);
+    /*top: calc(clamp(200px, (var(--vh, 1vh) * 45), 800px) - 53px);*/
 }
 
 .event_text {

@@ -8,10 +8,10 @@ window.addEventListener('orientationchange', set_vw)
 // window.addEventListener("orientationchange", top_footer)
 // window.addEventListener("change", top_footer)
 
-document.addEventListener("DOMContentLoaded", main_block_height)
-window.addEventListener('resize', main_block_height)
-window.addEventListener("orientationchange", main_block_height)
-window.addEventListener("change", main_block_height)
+// document.addEventListener("DOMContentLoaded", main_block_height)
+// window.addEventListener('resize', main_block_height)
+// window.addEventListener("orientationchange", main_block_height)
+// window.addEventListener("change", main_block_height)
 
 // window.addEventListener('resize', generate_upper)
 window.addEventListener("orientationchange", generate_upper)
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 set_vw()
 detected_phone()
-main_block_height()
+// main_block_height()
 
 document.addEventListener('scroll', buttons_position)
 
@@ -263,26 +263,26 @@ document.addEventListener('DOMContentLoaded', function () {
         })
     })
 })
-
-function main_block_height() {
-    // если main блок по высоте не достаёт до подвала,
-    // то он увеличивается
-    let main_block = $('#main_block'),
-        footer = $('#footer'),
-        upper = $('#upper_container')
-
-    if (upper.outerHeight(true) + main_block.outerHeight(true) < $(window).height()) {
-        let height
-
-        console.log(footer.outerHeight())
-
-        height = $(window).height() - footer.outerHeight() * 2 - upper.outerHeight(true)
-
-        main_block.css({'min-height': height + 'px'})
-    } else {
-        main_block.css({'min-height': '0'})
-    }
-}
+//
+// function main_block_height() {
+//     // если main блок по высоте не достаёт до подвала,
+//     // то он увеличивается
+//     let main_block = $('#main_block'),
+//         footer = $('#footer'),
+//         upper = $('#upper_container')
+//
+//     if (upper.outerHeight(true) + main_block.outerHeight(true) < $(window).height()) {
+//         let height
+//
+//         console.log(footer.outerHeight())
+//
+//         height = $(window).height() - footer.outerHeight() * 2 - upper.outerHeight(true)
+//
+//         main_block.css({'min-height': height + 'px'})
+//     } else {
+//         main_block.css({'min-height': '0'})
+//     }
+// }
 
 
 
@@ -299,32 +299,39 @@ document.addEventListener('DOMContentLoaded', function () {
         element.innerHTML = content
     })
 })
-
-function copy_number(number, el) {
-    let tmp = $("<textarea>");
-    $("body").append(tmp);
-    tmp.val(number).select();
-    document.execCommand("copy");
-    tmp.remove();
-
-    el.setAttribute('title', 'Скопировано')
-
-    el.onmouseover = function() {
-        el.setAttribute('title', 'Нажмите, чтобы скопировать')
-    }
-}
+//
+// function copy_number(number, el) {
+//     let tmp = $("<textarea>");
+//     $("body").append(tmp);
+//     tmp.val(number).select();
+//     document.execCommand("copy");
+//     tmp.remove();
+//
+//     el.setAttribute('title', 'Скопировано')
+//
+//     el.onmouseover = function() {
+//         el.setAttribute('title', 'Нажмите, чтобы скопировать')
+//     }
+// }
 
 document.addEventListener('click', function () {
     let slider_items = $('#event_items'),
-        slider_item_active = slider_items.find('.slider__item_active')
+        slider_item_active = slider_items.find('.slider__item_active'),
+        name_event = slider_item_active.find('.event_name')
 
     slider_items.css({'height': slider_item_active.outerHeight() + 'px'}, 1000)
+    name_event.css({'bottom': slider_item_active.find('.event_text').outerHeight(true) + 4 + 'px'})
 })
+
+
 
 document.addEventListener('DOMContentLoaded', function () {
     let slider_items = $('#event_items'),
-        slider_item_active = slider_items.find('.slider__item_active')
+        slider_item_active = slider_items.find('.slider__item_active'),
+        name_event = slider_item_active.find('.event_name')
 
-    setTimeout(function () {slider_items.css({'height': slider_item_active.outerHeight() + 'px'}, 1000)},
-        100)
+    slider_items.css({'height': slider_item_active.outerHeight() + 'px'})
+    name_event.css({'bottom': slider_item_active.find('.event_text').outerHeight(true) + 4 + 'px'})
+
 })
+
