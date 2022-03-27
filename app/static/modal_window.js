@@ -121,23 +121,22 @@ function activate_modal_window() {
 
         let modal_window_btn = event.target.closest('[data-modal-window-toggle]');
 
-        console.log(event.target)
-
-        if (event.target.getAttribute('id') === 'services-modal-win') {
-            if (event.target.tagName.toLowerCase() === 'div' && event.target.classList.contains('modal-item'))
-                event.target.closest('a').click();
-
-            if (event.target.tagName.toLowerCase() === 'a' && event.target.classList.contains('modal-link')) return;
-        }
-
-        if (event.target.getAttribute('id') === 'contacts-modal-win') {
-            if (event.target.tagName.toLowerCase() === 'div')
-                event.target.closest('a').click();
-            if (event.target.tagName.toLowerCase() === 'a') return;
-        }
+        if (event.target.tagName.toLowerCase() === 'a' && event.target.classList.contains('modal-link')) return;
 
         if (!modal_window_btn) return;
 
+        if (event.target.tagName.toLowerCase() === 'div' && event.target.classList.contains('modal-item'))
+            event.target.closest('a').click();
+
+        if ((event.target.tagName.toLowerCase() === 'div' && (event.target.classList.contains('modal-item') ||
+            event.target.classList.contains('geolocation') || event.target.classList.contains('address') ||
+            event.target.classList.contains('social'))) || event.target.tagName.toLowerCase() === 'ul' ||
+            event.target.tagName.toLowerCase() === 'li' || event.target.tagName.toLowerCase() === 'i') {
+            event.target.closest('a').click()
+            return;
+        }
+
+        console.log(event.target.tagName.toLowerCase())
         event.preventDefault();
         let modal_window_target = modal_window_btn.getAttribute('data-modal-window-toggle');
 
