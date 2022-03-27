@@ -123,9 +123,18 @@ function activate_modal_window() {
 
         console.log(event.target)
 
-        if (event.target.tagName.toLowerCase() === 'div' && event.target.classList.contains('modal-item'))
-            event.target.closest('a').click();
-        if(event.target.tagName.toLowerCase() === 'a' && event.target.classList.contains('modal-link')) return;
+        if (event.target.getAttribute('id') === 'services-modal-win') {
+            if (event.target.tagName.toLowerCase() === 'div' && event.target.classList.contains('modal-item'))
+                event.target.closest('a').click();
+
+            if (event.target.tagName.toLowerCase() === 'a' && event.target.classList.contains('modal-link')) return;
+        }
+
+        if (event.target.getAttribute('id') === 'contacts-modal-win') {
+            if (event.target.tagName.toLowerCase() === 'div')
+                event.target.closest('a').click();
+            if (event.target.tagName.toLowerCase() === 'a') return;
+        }
 
         if (!modal_window_btn) return;
 
