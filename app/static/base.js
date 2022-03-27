@@ -3,10 +3,10 @@ document.addEventListener('DOMContentLoaded', set_vw)
 window.addEventListener('orientationchange', set_vw)
 
 
-document.addEventListener("DOMContentLoaded", top_footer)
-window.addEventListener('resize', top_footer)
-window.addEventListener("orientationchange", top_footer)
-window.addEventListener("change", top_footer)
+// document.addEventListener("DOMContentLoaded", top_footer)
+// window.addEventListener('resize', top_footer)
+// window.addEventListener("orientationchange", top_footer)
+// window.addEventListener("change", top_footer)
 
 document.addEventListener("DOMContentLoaded", main_block_height)
 window.addEventListener('resize', main_block_height)
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
 })
 
 
-setInterval(top_footer, 1)
+// setInterval(top_footer, 1)
 
 set_vw()
 detected_phone()
@@ -46,13 +46,15 @@ el.style.height = '0'
 
 buttons.after(el)
 
-let footer_2
 function set_vw() {
     let vw = document.documentElement.clientWidth / 100,
         vh = document.documentElement.clientHeight / 100
     document.documentElement.style.setProperty('--vw', `${vw}px`)
     document.documentElement.style.setProperty('--vh', `${vh}px`)
 }
+
+/*
+let footer_2
 document.addEventListener('DOMContentLoaded', function () {
     footer_2 = document.getElementById('footer').cloneNode(true)
     document.getElementById('footer').after(footer_2)
@@ -91,6 +93,7 @@ function top_footer() {
         }
     }
 }
+*/
 
 let butt = document.getElementById('navigation_buttons')
 butt.style.boxSizing = 'border-box'
