@@ -30,7 +30,7 @@ div {
     justify-content: center;
     width: 100%;
     /*padding: 2px;*/
-    margin: 0 auto 2px;
+    margin: 0 auto 4px;
     border-radius: 2px;
     font-size: var(--primary-font-size);
     word-wrap: break-word;

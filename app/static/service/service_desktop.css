@@ -14,7 +14,7 @@
     margin: auto;
     border-radius: 2px;
     font-size: var(--primary-font-size);
-    padding: 4px;
+    padding-bottom: 4px;
 }
 
 .block_service {
