@@ -92,6 +92,7 @@
 
 .event_name {
     max-width: calc(100% - 34px);
+    width: min-content;
     height: min-content;
     text-align: left;
     left: 17px;

@@ -320,18 +320,19 @@ document.addEventListener('click', function () {
         name_event = slider_item_active.find('.event_name')
 
     slider_items.css({'height': slider_item_active.outerHeight() + 'px'}, 1000)
-    name_event.css({'bottom': slider_item_active.find('.event_text').outerHeight(true) + 4 + 'px'})
 })
 
 
-
-document.addEventListener('DOMContentLoaded', function () {
+window.addEventListener('load', function () {
     let slider_items = $('#event_items'),
-        slider_item_active = slider_items.find('.slider__item_active'),
-        name_event = slider_item_active.find('.event_name')
+        slider_item_active = slider_items.find('.slider__item_active')
 
     slider_items.css({'height': slider_item_active.outerHeight() + 'px'})
-    name_event.css({'bottom': slider_item_active.find('.event_text').outerHeight(true) + 4 + 'px'})
+
+    slider_items.find('.slider__item').each(function () {
+        name_event = $(this).find('.event_name')
+        name_event.css({'top': $(this).find('.slider__img').outerHeight(true) - name_event.outerHeight() + 'px'})
+    })
 
 })
 
