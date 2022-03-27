@@ -170,7 +170,7 @@ function generate_mobile_upper() {
 
 
     // navigation_buttons.style.paddingBottom = '12px'
-    document.getElementById('main_block').style.marginTop = 12 + 'px'
+    // document.getElementById('main_block').style.marginTop = 12 + 'px'
 
     let el
     if (!document.getElementById('for_nav_btns')) {

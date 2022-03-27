@@ -170,7 +170,7 @@
                             {% for category in categories %}
                                 {% if category.status %}
                                     <div class="modal-item submenu-item">
-                                        <a href="{{ url_for('main.category') }}?category_id={{ category.id }}">
+                                        <a class="modal-link" href="{{ url_for('main.category') }}?category_id={{ category.id }}">
                                             {{ category.name }}
                                         </a>
                                     </div>

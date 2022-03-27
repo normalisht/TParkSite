@@ -121,7 +121,11 @@ function activate_modal_window() {
 
         let modal_window_btn = event.target.closest('[data-modal-window-toggle]');
 
-        if (event.target.tagName.toLowerCase() === 'a') return;
+        console.log(event.target)
+
+        if (event.target.tagName.toLowerCase() === 'div' && event.target.classList.contains('modal-item'))
+            event.target.closest('a').click();
+        if(event.target.tagName.toLowerCase() === 'a' && event.target.classList.contains('modal-link')) return;
 
         if (!modal_window_btn) return;
 
