@@ -11,7 +11,7 @@
     padding-top: 4px;
     padding-bottom: 4px;
     text-align: center;
-    max-width: calc(var(--primary-content-width) - 34px);
+    width: calc(100 * var(--vw, 1vw) - 34px);
     font-size: calc(var(--primary-font-size) * 1.2);
     margin: 0 auto;
 }
