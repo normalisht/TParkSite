@@ -81,7 +81,7 @@
     text-align: left;
     cursor: default;
     z-index: 0;
-    color: black;
+    /*color: black;*/
     transition: color 0.25s;
     font-size: calc(0.9 * var(--primary-font-size));
 }

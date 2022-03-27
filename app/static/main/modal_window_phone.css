@@ -51,7 +51,7 @@
     width: calc(var(--vw, 1vw) * 100 - 17px);
     /*max-height: calc(25 * var(--vh, 1vh));*/
     object-fit: cover;
-    margin: 5px 0 0;
+    margin: 5px 0 5px;
 }
 
 .modal-item {

@@ -29,7 +29,13 @@
     margin-left: 3px;
     position: relative;
     text-decoration: none;
-    color: #3c5850;
+    /*color: #2d2929;*/
+    /*text-shadow: #ffffff 0 0 1px;*/
+    /*color: #1c2f3b;*/
+    opacity: 0.85;
+    color: black;
+    /*background: linear-gradient(rgba(169, 191, 239, 0.15), rgba(169, 191, 239, 0));*/
+    /*font-weight: bolder;*/
     cursor: default;
 }
 
@@ -56,10 +62,12 @@
 .more > div > a {
     text-decoration: none;
     transition: all 0.2s;
+    color: #0000FF;
 }
 
 .more > div > a:hover {
-    opacity: 0.85;
+    /*opacity: 0.75;*/
+    text-decoration: underline;
 }
 
 .button:last-child {
