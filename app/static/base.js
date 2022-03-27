@@ -197,9 +197,12 @@ function generate_desktop_upper() {
     block_info.append(phone_numbers)
 
     phone_numbers.style.flexDirection = 'column'
+    phone_numbers.style.width = block_info.firstElementChild.offsetWidth + 'px'
     block_info.firstElementChild.style.flexDirection = 'column'
     navigation_buttons.style.flexDirection = 'column'
     block_info.firstElementChild.style.alignItems = 'center'
+
+
 
     block_info.firstElementChild.lastElementChild.innerHTML = ' ' +
         block_info.firstElementChild.lastElementChild.innerHTML

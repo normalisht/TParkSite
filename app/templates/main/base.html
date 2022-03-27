@@ -207,10 +207,10 @@
                                 <div class="address">Адрес: {{ address }}</div>
                             </div>
                             {% for number in phone_numbers %}
-                                <div class="modal-item submenu-item" style="cursor: copy;"
-                                     onclick="copy_number('+7' + {{ number }}, this)">
-                                    <a style='text-decoration: none'
-                                       href="#">+7{{ number }}</a>
+                                <div class="modal-item submenu-item" style="cursor: copy;">
+{#                                     onclick="copy_number('+7' + {{ number }}, this)">#}
+                                    <a style='text-decoration: none' target="_blank"
+                                       href="https://wa.me/7{{ number }}">+7{{ number }}</a>
                                     <img style='object-fit: cover; width: 20px; height: 20px; margin-bottom: -2px; margin-left: -6px;'
                                          src="{{ url_for('static', filename='copy.png') }}" alt="">
                                 </div>
@@ -255,10 +255,14 @@
                 {#                </div>#}
 {#            </div>#}
             <div id="phone_numbers" class="block_numbers">
-                <div style="cursor: copy;" onclick="copy_number('+7{{ phone_numbers[0] }}', this)"
-                     title="Нажмите чтобы скопировать">+7{{ phone_numbers[0] }}</div>
-                <div style="cursor: copy;" onclick="copy_number('+7{{ phone_numbers[1] }}', this)"
-                     title="Нажмите чтобы скопировать">+7{{ phone_numbers[1] }}</div>
+                <div style="cursor: copy;" href="tel:+7{{ phone_numbers[0] }}">
+{#                     onclick="copy_number('+7{{ phone_numbers[0] }}', this)"#}
+{#                     title="Нажмите чтобы скопировать">#}
+                    +7{{ phone_numbers[0] }}</div>
+                <div style="cursor: copy;" href="tel:+7{{ phone_numbers[1] }}">
+{#                     onclick="copy_number('+7{{ phone_numbers[1] }}', this)"#}
+{#                     title="Нажмите чтобы скопировать">#}
+                    +7{{ phone_numbers[1] }}</div>
 
             </div>
         </div>

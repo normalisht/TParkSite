@@ -22,8 +22,10 @@
 .block_numbers {
     display: flex;
     flex-direction: column;
+    /*align-items: flex-end;*/
+    text-align: center;
     padding: 2px;
-    margin-top: 5px;
+    margin: 5px 0 0 0;
     font-size: calc(var(--primary-font-size) * 0.8);
 }
 
@@ -38,7 +40,6 @@
     display: flex;
     align-items: flex-end;
 }
-
 
 .block_numbers > div:last-child {
     padding-top: 2px;
