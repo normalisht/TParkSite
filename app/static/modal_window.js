@@ -121,6 +121,8 @@ function activate_modal_window() {
 
         let modal_window_btn = event.target.closest('[data-modal-window-toggle]');
 
+        if (event.target.tagName.toLowerCase() === 'a') return;
+
         if (!modal_window_btn) return;
 
         event.preventDefault();
