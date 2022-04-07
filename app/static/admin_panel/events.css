@@ -8,12 +8,14 @@
 
 .events {
     margin: 10px auto;
+    flex-direction: column;
 }
 
 .event {
     display: flex;
     margin: 10px 20px;
     justify-content: left;
+
 }
 
 a {
