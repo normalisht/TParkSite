@@ -45,6 +45,27 @@
     height: min-content;
 }
 
+.back_button {
+    font-size: calc(1.5 * var(--primary-font-size));
+    color: black;
+    background-color: white;
+    width: 100%;
+    border-bottom: 4px solid white;
+    text-align: center;
+    padding: 4px;
+}
+
+.back_button_2 {
+    font-size: calc(1.5 * var(--primary-font-size));
+    color: black;
+    display: block;
+    background-color: white;
+    width: 100%;
+    border-bottom: 4px solid white;
+    text-align: center;
+    padding: 4px;
+}
+
 .block_numbers {
     font-size: calc(1 * var(--primary-font-size));
     margin-bottom: 2px;

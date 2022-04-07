@@ -61,6 +61,24 @@
     font-size 0.2s ease;
 }
 
+.back_button {
+    font-size: calc(1 * var(--primary-font-size));
+    display: flex;
+    justify-content: flex-end;
+    color: black;
+    width: 100%;
+    max-width: 960px;
+    position: relative;
+    margin: 0 auto;
+    border-bottom: 0;
+    text-align: center;
+}
+
+.back_button > a {
+    /*display: flex;*/
+    /*background-color: white;*/
+}
+
 .desktop_container {
     margin: 0 17px;
 }

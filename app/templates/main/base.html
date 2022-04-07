@@ -16,89 +16,12 @@
             background-color: #6a7d9b;
         }
 
-
-        .loader_container {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: white;
-            z-index: 100000;
-        }
-
-
-        .loader,
-        .loader:before,
-        .loader:after {
-            background: #02b002;
-            -webkit-animation: load1 1s infinite ease-in-out;
-            animation: load1 1s infinite ease-in-out;
-            width: 1em;
-            height: 4em;
-        }
-
-        .loader {
-            display: flex;
-            position: relative;
-            color: #02b002;
-            text-indent: -9999em;
-            top: 50%;
-            transform: translate(0, -50%);
-            margin: 0 auto;
-            font-size: 11px;
-            -webkit-animation-delay: -0.16s;
-            animation-delay: -0.16s;
-        }
-
-        .loader:before,
-        .loader:after {
-            position: absolute;
-            top: 0;
-            content: '';
-        }
-
-        .loader:before {
-            left: -1.5em;
-            -webkit-animation-delay: -0.32s;
-            animation-delay: -0.32s;
-        }
-
-        .loader:after {
-            left: 1.5em;
-        }
-
-        @-webkit-keyframes load1 {
-            0%,
-            80%,
-            100% {
-                box-shadow: 0 0;
-                height: 4em;
-            }
-            40% {
-                box-shadow: 0 -2em;
-                height: 5em;
-            }
-        }
-
-        @keyframes load1 {
-            0%,
-            80%,
-            100% {
-                box-shadow: 0 0;
-                height: 4em;
-            }
-            40% {
-                box-shadow: 0 -2em;
-                height: 5em;
-            }
-        }
-
     </style>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="stylesheet" href="{{ url_for('static', filename='preloader.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='main/main.css') }}">
     <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename="favicon.ico") }}"/>
     <link rel="stylesheet" href="{{ url_for('static', filename='slider.css') }}">
@@ -121,8 +44,10 @@
 
 <body id="body">
 
-<div id="loader" class="loader_container">
-    <div class="loader">loading</div>
+<div>
+    <div id="loader" class="loader_container">
+        <div class="loader"></div>
+    </div>
 </div>
 
 <script>
@@ -133,13 +58,11 @@
             setTimeout(function () {
                 loader.css('display', 'none')
             }, 500)
-            console.log(loader)
-        }, 300)
+        }, 400)
     })
 
     let loader = document.getElementById('loader')
     loader.offsetTop = 0
-
 </script>
 
 {% set geolocation = contacts_data.geolocation %}
@@ -148,7 +71,7 @@
 {% set vk = contacts_data.media[0] %}
 {% set telega = contacts_data.media[1] %}
 
-<div class="container_base">
+<div id="container_base" class="container_base">
     <div id="upper_container" class="upper_container">
         <div id="upper" class="upper">
             <div id="block_logo" class="block_logo">
@@ -228,7 +151,8 @@
                                                    href="https://api.whatsapp.com/send?phone=7{{ phone_numbers[0] }}"
                                                    target="_blank">
                                                 <i class="fab fa-whatsapp"></i></a></li>
-                                            <li><a class="telega modal-link" href="{{ telega }}" target="_blank"><i
+                                            <li><a class="telega modal-link" href="https://t.me/+79953056461"
+                                                   target="_blank"><i
                                                     class="fab fa-telegram-plane"></i></a>
                                             </li>
                                         </ul>
@@ -281,8 +205,14 @@
         {% block app_content %}{% endblock %}
     </div>
 
+    <div id="back_button" class="back_button">
+        <a onclick="history.back(); return false;">Назад</a>
+    </div>
 </div>
 
+{#<div id="back_button_2" class="back_button_2">#}
+{#    <a onclick="history.back(); return false;">Назад</a>#}
+{#</div>#}
 <div id="footer" class="footer">© 2021</div>
 
 </body>

@@ -15,22 +15,31 @@ window.addEventListener('orientationchange', set_vw)
 
 // window.addEventListener('resize', generate_upper)
 window.addEventListener("orientationchange", generate_upper)
-window.addEventListener('resize', generate_upper)
+// window.addEventListener('resize', generate_upper)
 document.addEventListener("DOMContentLoaded", generate_upper)
 
 
-document.addEventListener('DOMContentLoaded', function() {
-    $('.slider__control_prev').each(function (index, element) {
-        element.click()
-    })
-    // setTimeout(function() {
-    //     $('.slider__control_next').each(function (index, element) {
-    //         element.click()
-    //     })
-    // }, 1000)
+let sc_top = 0
+window.addEventListener('resize', function () {
+    window.scrollTo(0, sc_top)
+})
+
+window.addEventListener('scroll', function () {
+    sc_top = document.documentElement.scrollTop
 })
 
 
+document.addEventListener('DOMContentLoaded', function () {
+    $('.slider__control_prev').each(function (index, element) {
+        element.click()
+    })
+})
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    $('#container_base').css('opacity', 1)
+    $('#footer').css('opacity', 1)
+})
 // setInterval(top_footer, 1)
 
 set_vw()
@@ -97,7 +106,7 @@ function top_footer() {
 
 let butt = document.getElementById('navigation_buttons')
 butt.style.boxSizing = 'border-box'
-let bottom_coord =  butt.offsetTop + butt.offsetHeight
+let bottom_coord = butt.offsetTop + butt.offsetHeight
 
 function buttons_position() {
     // оставляет навигационные кнопки на верху экарана
@@ -134,6 +143,7 @@ function buttons_position() {
 }
 
 generate_upper.type = null
+
 function generate_upper(event) {
     // функция для генерации нужной шапки в зависимости от разрешения экрана
     if (document.documentElement.clientWidth < 900) {
@@ -142,6 +152,7 @@ function generate_upper(event) {
         console.log('mobile')
     } else {
         generate_desktop_upper()
+        window.addEventListener('resize', set_vw)
         generate_upper.type = 'desktop'
         console.log('desk')
     }
@@ -206,7 +217,6 @@ function generate_desktop_upper() {
     block_info.firstElementChild.style.alignItems = 'center'
 
 
-
     block_info.firstElementChild.lastElementChild.innerHTML = ' ' +
         block_info.firstElementChild.lastElementChild.innerHTML
 
@@ -242,7 +252,7 @@ function detected_phone() {
         if (detect.phone()) {
             add_css_file('/app/static/main/phone.css')
             generate_mobile_upper()
-            document.documentElement.style.setProperty('--primary-font-size', `16px`)
+            document.documentElement.style.setProperty('--primary-font-size', `14px`)
         } else if (detect.tablet()) {
             add_css_file('/app/static/main/desktop.css')
             document.documentElement.style.setProperty('--primary-font-size', `20px`)
@@ -285,7 +295,6 @@ document.addEventListener('DOMContentLoaded', function () {
 // }
 
 
-
 let months = ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля',
     'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря']
 
@@ -316,8 +325,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 document.addEventListener('click', function () {
     let slider_items = $('#event_items'),
-        slider_item_active = slider_items.find('.slider__item_active'),
-        name_event = slider_item_active.find('.event_name')
+        slider_item_active = slider_items.find('.slider__item_active')
 
     slider_items.css({'height': slider_item_active.outerHeight() + 'px'}, 1000)
 })
@@ -330,9 +338,93 @@ window.addEventListener('load', function () {
     slider_items.css({'height': slider_item_active.outerHeight() + 'px'})
 
     slider_items.find('.slider__item').each(function () {
-        name_event = $(this).find('.event_name')
+        let name_event = $(this).find('.event_name')
         name_event.css({'top': $(this).find('.slider__img').outerHeight(true) - name_event.outerHeight() + 'px'})
     })
-
 })
+
+let detect = new MobileDetect(window.navigator.userAgent)
+if (detect.mobile()) {
+    let scrollPos = 0,
+        bb_status = false
+    $(window).scroll(function () {
+        let st = $(this).scrollTop();
+        if (st > scrollPos) {
+            if (bb_status) {
+                let bb = $('#back_button')
+                setTimeout(function () {
+                    bb.css('display', 'none')
+                }, 400)
+                bb.animate({'bottom': -bb.outerHeight(true)}, 200)
+                bb_status = false
+            }
+
+        } else {
+            if (!bb_status) {
+                let bb = $('#back_button')
+                bb.css('display', 'block')
+                bb.css('bottom', -bb.height())
+                bb.animate({'bottom': '-4px'}, 200)
+                bb_status = true
+            }
+        }
+        scrollPos = st;
+    });
+
+    document.addEventListener('resize', function () {
+        if (bb_status) {
+            let bb = $('#back_button')
+            bb.css({'bottom': '-4px'})
+        }
+
+        if (!bb_status) {
+            let bb = $('#back_button')
+            bb.css('display', 'none')
+        }
+    })
+
+    $('#back_button').click(function () {
+        history.back(); return false;
+    })
+} else {
+
+    let scrollPos = 0,
+        bb_status = false
+
+    $(window).scroll(function () {
+        let st = $(this).scrollTop();
+        if (st > scrollPos) {
+            if (bb_status) {
+                let bb = $('#back_button')
+                setTimeout(function () {
+                    bb.css('display', 'none')
+                }, 400)
+                bb.animate({'bottom': -bb.outerHeight(true)}, 200)
+                bb_status = false
+            }
+
+        } else {
+            if (!bb_status) {
+                let bb = $('#back_button')
+                bb.css('display', 'block')
+                bb.css('bottom', -bb.height())
+                bb.animate({'bottom': '-4px'}, 200)
+                bb_status = true
+            }
+        }
+        scrollPos = st;
+    });
+
+    document.addEventListener('resize', function () {
+        if (bb_status) {
+            let bb = $('#back_button')
+            bb.css({'bottom': '-4px'})
+        }
+
+        if (!bb_status) {
+            let bb = $('#back_button')
+            bb.css('display', 'none')
+        }
+    })
+}
 
