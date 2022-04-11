@@ -256,7 +256,7 @@ function back_button() {
             bb_2 = $('#back_button_2')
 
         bb.css('position', 'fixed')
-        bb.stop().animate({'bottom': -bb.outerHeight(true)}, 200)
+        bb.stop().animate({'bottom': -bb.outerHeight(true) - 10}, 200)
 
         $(window).scroll(function () {
             let st = $(this).scrollTop()
