@@ -1,50 +1,23 @@
 document.addEventListener('DOMContentLoaded', set_vw)
-// window.addEventListener('resize', set_vw)
 window.addEventListener('orientationchange', set_vw)
 
-
-// document.addEventListener("DOMContentLoaded", top_footer)
-// window.addEventListener('resize', top_footer)
-// window.addEventListener("orientationchange", top_footer)
-// window.addEventListener("change", top_footer)
-
-// document.addEventListener("DOMContentLoaded", main_block_height)
-// window.addEventListener('resize', main_block_height)
-// window.addEventListener("orientationchange", main_block_height)
-// window.addEventListener("change", main_block_height)
-
-// window.addEventListener('resize', generate_upper)
 window.addEventListener("orientationchange", generate_upper)
 // window.addEventListener('resize', generate_upper)
 document.addEventListener("DOMContentLoaded", generate_upper)
-
-
-let sc_top = 0
-window.addEventListener('resize', function () {
-    window.scrollTo(0, sc_top)
-})
-
-window.addEventListener('scroll', function () {
-    sc_top = document.documentElement.scrollTop
-})
-
 
 document.addEventListener('DOMContentLoaded', function () {
     $('.slider__control_prev').each(function (index, element) {
         element.click()
     })
-})
 
-
-document.addEventListener('DOMContentLoaded', function () {
     $('#container_base').css('opacity', 1)
     $('#footer').css('opacity', 1)
+
+    back_button()
 })
-// setInterval(top_footer, 1)
 
 set_vw()
 detected_phone()
-// main_block_height()
 
 document.addEventListener('scroll', buttons_position)
 
@@ -61,48 +34,6 @@ function set_vw() {
     document.documentElement.style.setProperty('--vw', `${vw}px`)
     document.documentElement.style.setProperty('--vh', `${vh}px`)
 }
-
-/*
-let footer_2
-document.addEventListener('DOMContentLoaded', function () {
-    footer_2 = document.getElementById('footer').cloneNode(true)
-    document.getElementById('footer').after(footer_2)
-    footer_2.setAttribute('id', 'footer-2')
-    footer_2.style.display = 'block'
-    footer_2.style.visibility = 'hidden'
-    footer_2.style.zIndex = '-1000'
-    footer_2.style.position = 'absolute'
-})
-
-function top_footer() {
-    // делает подвал плавающим(я думаю, что это какой-то костыль)
-    let footer = $('#footer')
-    if (!footer) return
-
-    let footer_height = footer.outerHeight(),
-        footer_top = footer.css('margin-top').slice(0, -2)
-
-    if (document.documentElement.clientHeight > $('#upper_container').outerHeight() + $('#main_block').outerHeight() + footer_height + +footer_top) {
-        footer_2.style.top = document.documentElement.clientHeight - footer_height - footer_top + 'px'
-        footer_2.style.visibility = 'visible'
-        footer_2.style.zIndex = '1'
-        footer.css({'visibility': 'hidden',
-            'z-index': '-1000'})
-    } else {
-        footer.css({
-            'visibility': 'visible',
-            'z-index': '1',
-            // 'bottom': '0'
-        })
-        try {
-            footer_2.style.visibility = 'hidden'
-            footer_2.style.zIndex = '-1000'
-        } catch (e) {
-
-        }
-    }
-}
-*/
 
 let butt = document.getElementById('navigation_buttons')
 butt.style.boxSizing = 'border-box'
@@ -201,31 +132,39 @@ function generate_mobile_upper() {
 
 function generate_desktop_upper() {
     // шапка переделывается в десктопную версию
-    let phone_numbers = document.getElementById('phone_numbers'),
-        block_info = document.getElementById('upper_block_info'),
-        navigation_buttons = document.getElementById('navigation_buttons'),
-        upper = document.getElementById('upper'),
-        logo = document.getElementById('block_logo')
+    let phone_numbers = $('#phone_numbers'),
+        block_info = $('#upper_block_info'),
+        navigation_buttons = $('#navigation_buttons'),
+        upper = $('#upper'),
+        logo = $('#block_logo')
 
-    phone_numbers.style.display = 'flex'
+    phone_numbers.css('display', 'flex')
     block_info.append(phone_numbers)
 
-    phone_numbers.style.flexDirection = 'column'
-    phone_numbers.style.width = block_info.firstElementChild.offsetWidth + 'px'
-    block_info.firstElementChild.style.flexDirection = 'column'
-    navigation_buttons.style.flexDirection = 'column'
-    block_info.firstElementChild.style.alignItems = 'center'
+    block_info.children().first().css({
+        'flex-direction': 'column',
+        'align-items': 'center',
+    })
 
+    navigation_buttons.css({
+        'flex-direction': 'column',
+        'padding-bottom': 0, 'margin': 'auto'
+    })
 
-    block_info.firstElementChild.lastElementChild.innerHTML = ' ' +
-        block_info.firstElementChild.lastElementChild.innerHTML
+    block_info.find('#dmitry').html(block_info.find('#dmitry').html() + '<span>&nbsp;</span></span>')
 
-    navigation_buttons.style.paddingBottom = '0'
+    upper.children().first().after($('#for_nav_btns'))
+    upper.children().first().after(navigation_buttons)
 
-    upper.firstElementChild.after(document.getElementById('for_nav_btns'))
-    upper.firstElementChild.after(navigation_buttons)
-    navigation_buttons.style.margin = 'auto'
-    block_info.style.width = logo.style.width = 100 / 3 + '%'
+    logo.css('width', 'calc(100% / 3)')
+    block_info.css('width', 'calc(100% / 3)')
+
+    setTimeout(function () {
+        phone_numbers.css({
+            'flex-direction' : 'column',
+            'width':  block_info.find('.name').outerWidth() + 'px'
+        })
+    }, 1)
 }
 
 function add_css_file(path) {
@@ -273,27 +212,6 @@ document.addEventListener('DOMContentLoaded', function () {
         })
     })
 })
-//
-// function main_block_height() {
-//     // если main блок по высоте не достаёт до подвала,
-//     // то он увеличивается
-//     let main_block = $('#main_block'),
-//         footer = $('#footer'),
-//         upper = $('#upper_container')
-//
-//     if (upper.outerHeight(true) + main_block.outerHeight(true) < $(window).height()) {
-//         let height
-//
-//         console.log(footer.outerHeight())
-//
-//         height = $(window).height() - footer.outerHeight() * 2 - upper.outerHeight(true)
-//
-//         main_block.css({'min-height': height + 'px'})
-//     } else {
-//         main_block.css({'min-height': '0'})
-//     }
-// }
-
 
 let months = ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля',
     'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря']
@@ -308,20 +226,6 @@ document.addEventListener('DOMContentLoaded', function () {
         element.innerHTML = content
     })
 })
-//
-// function copy_number(number, el) {
-//     let tmp = $("<textarea>");
-//     $("body").append(tmp);
-//     tmp.val(number).select();
-//     document.execCommand("copy");
-//     tmp.remove();
-//
-//     el.setAttribute('title', 'Скопировано')
-//
-//     el.onmouseover = function() {
-//         el.setAttribute('title', 'Нажмите, чтобы скопировать')
-//     }
-// }
 
 document.addEventListener('click', function () {
     let slider_items = $('#event_items'),
@@ -343,88 +247,61 @@ window.addEventListener('load', function () {
     })
 })
 
-let detect = new MobileDetect(window.navigator.userAgent)
-if (detect.mobile()) {
-    let scrollPos = 0,
-        bb_status = false
-    $(window).scroll(function () {
-        let st = $(this).scrollTop();
-        if (st > scrollPos) {
-            if (bb_status) {
-                let bb = $('#back_button')
-                setTimeout(function () {
-                    bb.css('display', 'none')
-                }, 400)
-                bb.animate({'bottom': -bb.outerHeight(true)}, 200)
-                bb_status = false
+function back_button() {
+    let detect = new MobileDetect(window.navigator.userAgent)
+    if (detect.mobile()) {
+        let scrollPos = 0,
+            bb_status = false,
+            bb = $('#back_button'),
+            bb_2 = $('#back_button_2')
+
+        bb.css('position', 'fixed')
+        bb.stop().animate({'bottom': -bb.outerHeight(true)}, 200)
+
+        $(window).scroll(function () {
+            let st = $(this).scrollTop()
+
+            if (st > scrollPos && !isScrolledIntoView($(bb_2))) {
+                if (bb_status) {
+
+                    bb.stop().animate({'bottom': -bb.outerHeight(true)}, 200)
+                    bb_status = false
+                }
+
+            } else {
+                if (!bb_status && !isScrolledIntoView($(bb_2))) {
+                    bb.addClass('back_button_active')
+                    bb.css({'bottom': -bb.height()})
+                    bb.stop().animate({'bottom': '0'}, 200)
+                    bb_status = true
+                }
             }
+            scrollPos = st;
+        });
 
-        } else {
-            if (!bb_status) {
-                let bb = $('#back_button')
-                bb.css('display', 'block')
-                bb.css('bottom', -bb.height())
-                bb.animate({'bottom': '-4px'}, 200)
-                bb_status = true
-            }
-        }
-        scrollPos = st;
-    });
+        bb.click(function () {
+            history.back();
+            return false;
+        })
 
-    document.addEventListener('resize', function () {
-        if (bb_status) {
-            let bb = $('#back_button')
-            bb.css({'bottom': '-4px'})
-        }
+        bb_2.click(function () {
+            history.back();
+            return false;
+        })
 
-        if (!bb_status) {
-            let bb = $('#back_button')
-            bb.css('display', 'none')
-        }
-    })
+    } else {
 
-    $('#back_button').click(function () {
-        history.back(); return false;
-    })
-} else {
 
-    let scrollPos = 0,
-        bb_status = false
-
-    $(window).scroll(function () {
-        let st = $(this).scrollTop();
-        if (st > scrollPos) {
-            if (bb_status) {
-                let bb = $('#back_button')
-                setTimeout(function () {
-                    bb.css('display', 'none')
-                }, 400)
-                bb.animate({'bottom': -bb.outerHeight(true)}, 200)
-                bb_status = false
-            }
-
-        } else {
-            if (!bb_status) {
-                let bb = $('#back_button')
-                bb.css('display', 'block')
-                bb.css('bottom', -bb.height())
-                bb.animate({'bottom': '-4px'}, 200)
-                bb_status = true
-            }
-        }
-        scrollPos = st;
-    });
-
-    document.addEventListener('resize', function () {
-        if (bb_status) {
-            let bb = $('#back_button')
-            bb.css({'bottom': '-4px'})
-        }
-
-        if (!bb_status) {
-            let bb = $('#back_button')
-            bb.css('display', 'none')
-        }
-    })
+    }
 }
 
+function isScrolledIntoView(elem)
+{
+    let docViewTop = $(window).scrollTop(),
+        docViewBottom = docViewTop + $(window).height(),
+
+        elemTop = $(elem).offset().top,
+        elemBottom = elemTop + $(elem).height();
+
+    return (elemBottom <= docViewBottom) || (elemTop <= docViewBottom);
+}

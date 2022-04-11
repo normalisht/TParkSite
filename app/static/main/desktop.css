@@ -63,20 +63,24 @@
 
 .back_button {
     font-size: calc(1 * var(--primary-font-size));
-    display: flex;
-    justify-content: flex-end;
+    width: var(--primary-content-width);
     color: black;
-    width: 100%;
-    max-width: 960px;
     position: relative;
     margin: 0 auto;
-    border-bottom: 0;
-    text-align: center;
+    z-index: 5;
 }
 
-.back_button > a {
-    /*display: flex;*/
-    /*background-color: white;*/
+.back_button_btn {
+    justify-content: flex-start;
+    padding: 4px 4px 4px 0;
+}
+
+.back_button_btn > a {
+    border-bottom: 2px solid black;
+}
+
+.back_button_2 {
+    display: none;
 }
 
 .desktop_container {
@@ -139,7 +143,7 @@
 
 .block_info > div:first-child > div {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
 }
 
 .address {

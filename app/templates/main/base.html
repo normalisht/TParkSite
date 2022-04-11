@@ -171,11 +171,11 @@
             </div>
 
             <div id="upper_block_info" class="block_info">
-                <div class='name'>
+                <div id="block_info_name" class='name'>
                     {#                <div class="info_name">#}
                     <div>Тренинг-парк</div>
                     <div>
-                        <div>Дмитрия</div>
+                        <div id="dmitry">Дмитрия</div>
                         <div>Сергеева</div>
                     </div>
                     {#                </div>#}
@@ -205,10 +205,24 @@
         {% block app_content %}{% endblock %}
     </div>
 
-    <div id="back_button" class="back_button">
-        <a onclick="history.back(); return false;">Назад</a>
+    <div style="margin: auto 17px;">
+        <div id="back_button" class="back_button">
+            <div class="back_button_btn">
+                <a onclick="history.back(); return false;">❮ Назад</a>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin: auto 17px;">
+        <div class="back_button back_button_2">
+            <div id="back_button_2" class="back_button_btn back_button_btn_2">
+                <a onclick="history.back(); return false;">❮ Назад</a>
+            </div>
+        </div>
     </div>
 </div>
+
+
 
 {#<div id="back_button_2" class="back_button_2">#}
 {#    <a onclick="history.back(); return false;">Назад</a>#}

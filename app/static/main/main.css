@@ -85,7 +85,7 @@ p {
     align-items: center;
     text-align: center;
     height: min(10vh, 40px);
-    margin-top: 8px;
+    margin-top: 4px;
     width: 100%;
     background-color: #1c1919;
     color: #a8a8a8;
@@ -99,7 +99,7 @@ p {
 }
 
 .container_base {
-    min-height: calc(100 * var(--vh, 1vh) - 8px - min(10 * var(--vh, 1vh), 40px))
+    min-height: calc(100 * var(--vh, 1vh) - 8px - min(10 * var(--vh, 1vh), 40px));
 }
 
 .block_buttons {
@@ -113,7 +113,7 @@ p {
 }
 
 .main_block {
-    margin: 0 auto 10px;
+    margin: 0 auto;
     width: 100%;
     z-index: 2;
     /*background-color: var(--background-color);*/
@@ -121,9 +121,9 @@ p {
 
 
 .events {
-    margin: 0 auto;
-    width: 100%;
-    max-width: calc(var(--primary-content-width));
+    /*margin: 0 auto;*/
+    /*width: 100%;*/
+    /*max-width: calc(var(--primary-content-width) - 34px);*/
 }
 
 .block {
@@ -136,22 +136,6 @@ p {
 
 .block_buttons_grid {
     display: grid;
-}
-
-
-.back_button {
-    user-select: none;
-    /*background-color: var(--background-color);*/
-    position: fixed;
-    width: max-content;
-    margin: 4px auto;
-    padding: 0;
-    /*background-color: rgba(0, 0, 0, 0.15);*/
-    color: rgba(0, 0, 0, 0.75);
-    border-bottom: 2px solid rgba(0, 0, 0, 0.35);
-    font-size: var(--primary-font-size);
-    display: none;
-    z-index: 1000;
 }
 
 .back_button:hover {

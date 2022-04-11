@@ -11,6 +11,10 @@
     /*margin-bottom: 4px;*/
 }
 
+.footer {
+    font-size: calc(var(--primary-font-size));
+}
+
 .block_logo {
     left: 0;
 }
@@ -47,23 +51,24 @@
 
 .back_button {
     font-size: calc(1.5 * var(--primary-font-size));
-    color: black;
-    background-color: white;
+    display: block;
     width: 100%;
-    border-bottom: 4px solid white;
-    text-align: center;
-    padding: 4px;
+    color: black;
+    bottom: 0;
+    margin: 0 auto;
+    z-index: 5;
 }
 
-.back_button_2 {
-    font-size: calc(1.5 * var(--primary-font-size));
-    color: black;
+.back_button_btn {
+    display: flex;
+    justify-content: center;
+    padding: 2px 2px 2px 0;
+}
+
+.back_button_active {
     display: block;
+    transform: translateX(-17px);
     background-color: white;
-    width: 100%;
-    border-bottom: 4px solid white;
-    text-align: center;
-    padding: 4px;
 }
 
 .block_numbers {
