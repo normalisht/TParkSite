@@ -164,7 +164,7 @@ function generate_desktop_upper() {
             'flex-direction' : 'column',
             'width':  block_info.find('.name').outerWidth() + 'px'
         })
-    }, 1)
+    }, 50)
 }
 
 function add_css_file(path) {
