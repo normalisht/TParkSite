@@ -50,7 +50,7 @@
 }
 
 .back_button {
-    font-size: calc(1.5 * var(--primary-font-size));
+    font-size: calc(1.2 * var(--primary-font-size));
     display: block;
     width: 100%;
     color: black;
