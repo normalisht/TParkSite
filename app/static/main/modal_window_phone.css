@@ -25,8 +25,8 @@
     position: absolute;
     top: -1px;
     left: -1px;
-    width: 102%;
-    height: 102%;
+    width: calc(100 * var(--vw, 1vw) + 1px);
+    height: calc(100 * var(--vh, 1vh) + 1px);
     z-index: -1;
     opacity: 0;
     background-color: #000;

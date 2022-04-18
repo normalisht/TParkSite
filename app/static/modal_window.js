@@ -80,7 +80,7 @@ function activate_modal_window() {
 
     document.addEventListener('DOMContentLoaded', function () {
 
-        let modal_window_events = document.getElementById('navigation_buttons')
+        let modal_window_events = document.getElementById('upper_buttons')
         modal_window_events.addEventListener('click', modal_window_toggle);
 
         if (!current_modal_window.status)
@@ -109,6 +109,7 @@ function activate_modal_window() {
                 Hammer(modal_window).on('swipe', function () {
                     if (current_modal_window.status) {
                         history.back()
+                        $('.menu-btn').removeClass('active')
                     }
                 })
             }
@@ -130,8 +131,8 @@ function activate_modal_window() {
 
 
         if ((event.target.tagName.toLowerCase() === 'div' && (event.target.classList.contains('modal-item') ||
-            event.target.classList.contains('geolocation') || event.target.classList.contains('address') ||
-            event.target.classList.contains('social'))) || event.target.tagName.toLowerCase() === 'ul' ||
+                event.target.classList.contains('geolocation') || event.target.classList.contains('address') ||
+                event.target.classList.contains('social'))) || event.target.tagName.toLowerCase() === 'ul' ||
             event.target.tagName.toLowerCase() === 'li' || event.target.tagName.toLowerCase() === 'i') {
             event.target.closest('a').click()
             return;
@@ -140,10 +141,13 @@ function activate_modal_window() {
         event.preventDefault();
 
         // если модальное окно активно изменяем url, иначе откатываем
-        if (current_modal_window.status)
+        if (current_modal_window.status) {
             window.location.hash += current_modal_window.modal_window_name
-        else
+            $('.menu-btn').addClass('active')
+        } else {
             history.back()
+            $('.menu-btn').removeClass('active')
+        }
     }
 
     function modal_windows_position() {

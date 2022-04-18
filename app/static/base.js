@@ -14,19 +14,21 @@ document.addEventListener('DOMContentLoaded', function () {
     $('#footer').css('opacity', 1)
 
     back_button()
+
+
 })
 
 set_vw()
 detected_phone()
 
-document.addEventListener('scroll', buttons_position)
+// document.addEventListener('scroll', buttons_position)
 
 let buttons = document.getElementById('navigation_buttons')
 let el = document.createElement('div')
 el.setAttribute('id', 'for_nav_btns')
 el.style.height = '0'
 
-buttons.after(el)
+// buttons.after(el)
 
 function set_vw() {
     let vw = document.documentElement.clientWidth / 100,
@@ -35,58 +37,58 @@ function set_vw() {
     document.documentElement.style.setProperty('--vh', `${vh}px`)
 }
 
-let butt = document.getElementById('navigation_buttons')
-butt.style.boxSizing = 'border-box'
-let bottom_coord = butt.offsetTop + butt.offsetHeight
-
-function buttons_position() {
-    // оставляет навигационные кнопки на верху экарана
-    let buttons = document.getElementById('navigation_buttons')
-
-    buttons.style.boxSizing = 'border-box'
-
-    let el = document.getElementById('for_nav_btns')
-
-    if (document.documentElement.scrollTop <= el.offsetTop) {
-        buttons.style.position = 'relative'
-        buttons.style.margin = 'auto'
-
-        el.style.height = '0'
-        el.style.width = '0'
-
-        if (generate_upper.type == 'desktop') {
-            el.style.minWidth = '0'
-        }
-    }
-
-    if (buttons.offsetTop < document.documentElement.scrollTop) {
-
-        buttons.style.position = 'fixed'
-        buttons.style.top = buttons.style.left = buttons.style.right = '0'
-
-        el.style.height = buttons.offsetHeight + 'px'
-        el.style.width = buttons.offsetWidth + 'px'
-        if (generate_upper.type == 'desktop') {
-            el.style.minWidth = 360 + 'px'
-        }
-    }
-
-}
+// let butt = document.getElementById('navigation_buttons')
+// butt.style.boxSizing = 'border-box'
+// let bottom_coord = butt.offsetTop + butt.offsetHeight
+//
+// function buttons_position() {
+//     // оставляет навигационные кнопки на верху экарана
+//     let buttons = document.getElementById('navigation_buttons')
+//
+//     buttons.style.boxSizing = 'border-box'
+//
+//     let el = document.getElementById('for_nav_btns')
+//
+//     if (document.documentElement.scrollTop <= el.offsetTop) {
+//         buttons.style.position = 'relative'
+//         buttons.style.margin = 'auto'
+//
+//         el.style.height = '0'
+//         el.style.width = '0'
+//
+//         if (generate_upper.type == 'desktop') {
+//             el.style.minWidth = '0'
+//         }
+//     }
+//
+//     if (buttons.offsetTop < document.documentElement.scrollTop) {
+//
+//         buttons.style.position = 'fixed'
+//         buttons.style.top = buttons.style.left = buttons.style.right = '0'
+//
+//         el.style.height = buttons.offsetHeight + 'px'
+//         el.style.width = buttons.offsetWidth + 'px'
+//         if (generate_upper.type == 'desktop') {
+//             el.style.minWidth = 360 + 'px'
+//         }
+//     }
+//
+// }
 
 generate_upper.type = null
 
 function generate_upper(event) {
     // функция для генерации нужной шапки в зависимости от разрешения экрана
-    if (document.documentElement.clientWidth < 900) {
-        generate_mobile_upper()
-        generate_upper.type = 'mobile'
-        console.log('mobile')
-    } else {
-        generate_desktop_upper()
-        window.addEventListener('resize', set_vw)
-        generate_upper.type = 'desktop'
-        console.log('desk')
-    }
+    // if (document.documentElement.clientWidth < 900) {
+    //     // generate_mobile_upper()
+    //     generate_upper.type = 'mobile'
+    //     console.log('mobile')
+    // } else {
+    //     generate_desktop_upper()
+    //     window.addEventListener('resize', set_vw)
+    //     generate_upper.type = 'desktop'
+    //     console.log('desk')
+    // }
 }
 
 
@@ -190,7 +192,7 @@ function detected_phone() {
     if (detect.mobile()) {
         if (detect.phone()) {
             add_css_file('/app/static/main/phone.css')
-            generate_mobile_upper()
+            // generate_mobile_upper()
             document.documentElement.style.setProperty('--primary-font-size', `14px`)
         } else if (detect.tablet()) {
             add_css_file('/app/static/main/desktop.css')
