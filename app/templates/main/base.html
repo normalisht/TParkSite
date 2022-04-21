@@ -1,22 +1,6 @@
 <!DOCTYPE html>
 <html id="html" lang="ru">
 <head id="head">
-    <style>
-        /* scrollbar */
-        *::-webkit-scrollbar-track {
-            border-radius: 6px;
-        }
-
-        *::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        *::-webkit-scrollbar-thumb {
-            border-radius: 8px;
-            background-color: #6a7d9b;
-        }
-
-    </style>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
@@ -170,11 +154,16 @@
             <div id="upper_buttons" class="upper_buttons">
                 <div class="upper_main" data-modal-window-toggle="#services-modal-win">
                     <div class="burger_container">
-                        <div class="menu-btn">
+                        <div class="menu-btn" style="opacity: 0;">
                             <span></span>
                             <span></span>
                             <span></span>
                         </div>
+                    </div>
+                    <div class="menu-btn menu-btn-visible">
+                        <span></span>
+                        <span></span>
+                        <span></span>
                     </div>
                 </div>
                 <div class="upper_media">
@@ -187,19 +176,35 @@
 
             <div id="services-modal-win" class="modal submenu">
                 <div class="modal-window">
-                    <div>
-                        ljvjq
-                    </div>
-                    {% for category in categories %}
-                        {% if category.status %}
-                            <div class="modal-item submenu-item">
-                                <a class="modal-link"
-                                   href="{{ url_for('main.category') }}?category_id={{ category.id }}">
-                                    {{ category.name }}
+                    <div class="modal-upper">
+                        <div class="modal-upper-content">
+                            <div>
+                                <a href="{{ url_for('main.index') }}">
+                                    <img style="object-fit: cover; height: 20px; filter: invert(1)"
+                                         src="{{ url_for('static', filename='home.svg') }}" alt="">
                                 </a>
                             </div>
-                        {% endif %}
-                    {% endfor %}
+                            <div>Меню</div>
+                            <div>
+                                <a href="" onclick="history.back(); return false">
+                                    <img style="object-fit: cover; height: 20px; filter: invert(1)"
+                                         src="{{ url_for('static', filename='back.svg') }}" alt="">
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-content">
+                        {% for category in categories %}
+                            {% if category.status %}
+                                <div class="modal-item submenu-item">
+                                    <a class="modal-link"
+                                       href="{{ url_for('main.category') }}?category_id={{ category.id }}">
+                                        {{ category.name }}
+                                    </a>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
                 </div>
                 <div class="overlay"></div>
             </div>

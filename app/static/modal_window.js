@@ -62,7 +62,7 @@ function activate_modal_window() {
                     overlay.zIndex = '1'
                     overlay.opacity = '1'
                 } else {
-                    modal_window.firstElementChild.style.left = -modal_window.offsetWidth * 1.05 + 'px'
+                    modal_window.firstElementChild.style.left = -modal_window.offsetWidth + 'px'
                     overlay.opacity = '0'
                     setTimeout(() => {
                         overlay.zIndex = '-1'
@@ -109,7 +109,7 @@ function activate_modal_window() {
                 Hammer(modal_window).on('swipe', function () {
                     if (current_modal_window.status) {
                         history.back()
-                        $('.menu-btn').removeClass('active')
+                        // $('.menu-btn').removeClass('active')
                     }
                 })
             }
@@ -143,10 +143,10 @@ function activate_modal_window() {
         // если модальное окно активно изменяем url, иначе откатываем
         if (current_modal_window.status) {
             window.location.hash += current_modal_window.modal_window_name
-            $('.menu-btn').addClass('active')
+            // $('.menu-btn').addClass('active')
         } else {
             history.back()
-            $('.menu-btn').removeClass('active')
+            // $('.menu-btn').removeClass('active')
         }
     }
 
@@ -155,7 +155,7 @@ function activate_modal_window() {
 
         for (let modal_window of modal_windows) {
             modal_window.firstElementChild.style.left =
-                -document.documentElement.clientWidth * 1.05 + 'px'
+                -document.documentElement.clientWidth + 'px'
         }
     }
 }
