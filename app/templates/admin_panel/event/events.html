@@ -24,6 +24,24 @@
                 </div>
             {% endfor %}
         </div>
+        <br>
+        <div class="new_event event">
+            Прошедшие события
+        </div>
+        <div class="events">
+            {% for event in events_2 %}
+                <div class="event">
+                    <a href="{{ url_for('admin_panel.event_edit')}}?event_id={{ event.id }}">
+                        <div class="title_event">
+                            {{ event.title }}
+                        </div>
+                        <div class="date">
+                            {{ event.date.strftime('%d.%m.%Y') }}
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 
 {% endblock %}

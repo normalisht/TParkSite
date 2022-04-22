@@ -40,10 +40,47 @@
     position: absolute;
     min-height: calc(100 * var(--vh, 1vh));
     z-index: 1000;
-    width: calc(var(--vw, 1vw) * 100 + 8px); /* vw подключается из js */
+    width: calc(var(--vw, 1vw) * 100); /* vw подключается из js */
     box-shadow: 0 10px 15px rgba(0, 0, 0, .4);
     background-color: rgba(255, 255, 255, 0.99);
     transition: var(--modal_window_time, 500ms) ease; /* подключается из js */
+}
+
+.modal-upper {
+    background: url(../burger_back.png) top left repeat-x;
+    color: white;
+    font-size: calc(1.2 * var(--primary-font-size));
+    font-family: var(--primary-font-family);
+    width: 100%;
+    letter-spacing: 1px;
+    padding: 4px 13px 0;
+    max-height: 30px;
+}
+
+.modal-upper-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-upper-content > div {
+    width: calc(100% / 3);
+    height: min-content;
+}
+
+.modal-upper-content > div:first-child {
+    text-align: left;
+}
+
+.modal-upper-content > div:nth-child(2) {
+    text-align: center;
+}
+
+.modal-upper-content > div:last-child {
+    text-align: right;
+}
+
+.modal-content {
     padding: 5px;
 }
 
@@ -60,9 +97,8 @@
     text-decoration: none;
     text-align: left;
     padding: 4px 8px 4px;
-    margin-right: 16px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.35);
-    font-size: calc(1.4 * var(--primary-font-size));
+    font-size: calc(1.2 * var(--primary-font-size));
     font-family: var(--primary-font-family);
 }
 

@@ -95,10 +95,20 @@ def main():
 @bp.route('/events', methods=['GET'])
 # @login_required
 def events():
-    events = Event.query.all()
+    events = []
+    events_2 = []
+
+    for event in Event.query.order_by(Event.date).all():
+        date = datetime.date(int(event.date.strftime('%Y')), int(event.date.strftime('%m')), int(event.date.strftime('%d')))
+        dt = datetime.datetime.combine(date, datetime.time(22, 0))
+
+        if dt > datetime.datetime.now():
+            events.append(event)
+        else:
+            events_2.append(event)
 
     return render_template('admin_panel/event/events.html', title='Мероприятия',
-                           events=events)
+                           events=events, events_2=events_2)
 
 
 # создание ивента

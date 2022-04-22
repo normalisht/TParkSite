@@ -11,7 +11,7 @@
     margin: 0 auto;
     width: 100vw;
     padding: 0 17px;
-    background-color: rgba(0, 0, 0, 0.65);
+    background: url(../burger_back.png) top left repeat-x;
     color: #fff;
 }
 
