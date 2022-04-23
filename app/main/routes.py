@@ -57,7 +57,6 @@ def category():
         except:
             a = 0
             files = []
-            print('1')
         category = Category.query.filter_by(id=category_id).first()
         services = category.services.order_by(ServiceCategory.number).all()
 
@@ -98,3 +97,17 @@ def about():
     return render_template('main/about.html', employees=employees,
                            filosofi=filosofi, about=about, partners=partners,
                            categories=get_categories(), contacts_data=get_contacts_data())
+
+@bp.route('/test_main', methods=['GET'])
+def test_main():
+    main_text = Text.query.filter_by(title="main_text").first().text
+
+    temp_categories = Category.query.all()
+    temp_list = []
+    for category in temp_categories:
+        temp_list.append(category.type)
+    unique = list(set(temp_list))
+    unique.sort()
+
+    return render_template('main/new_main.html', main_text=main_text,
+                           categories=get_categories(), contacts_data=get_contacts_data(), type_list=unique)

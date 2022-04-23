@@ -1,0 +1,47 @@
+{% extends "main/base.html" %}
+
+{% block scripts %}
+<script type="text/javascript" src="{{ url_for('static', filename='slider.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const slider = new ChiefSlider('.slider', {
+            loop: true,
+            autoplay: false,
+        });
+        const slider_2 = new ChiefSlider('.slider', {
+            loop: true,
+        });
+    });
+</script>
+
+{% endblock %}
+
+{% block link %}
+<link rel="stylesheet" href="{{ url_for('static', filename='slider.css') }}">
+{% endblock %}
+
+{% block app_content %}
+
+<div class="desktop_container">
+    <div id="block_content" class="new_block_content">
+        {% for type in type_list %}
+            <section class="main_page_articles">
+                <div class="category_title">{{ type }}</div>
+                <ul class="page-list">
+                    {% for category in categories %}
+                        {% if category.type == type %}
+                            <li>
+                                {% set path = "images/category/preview/" + category.id|string + ".png" %}
+                                <a href="{{ url_for('main.category') }}?category_id={{ category.id }}" class="image-centered-wrapper">
+                                    <img src="{{ url_for("static", filename=path) }}" alt="" class="img_category">
+                                    <span class="page-text">{{ category.name }}</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                {% endfor %}
+            </section>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}
