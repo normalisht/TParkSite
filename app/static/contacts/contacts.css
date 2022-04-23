@@ -12,8 +12,8 @@
 
 .social-icons a {
     display: inline-block;
-    width: 50px;
-    height: 50px;
+    width: 38px;
+    height: 38px;
     border-radius: 40%;
     background: #efefef;
     position: relative;
@@ -37,16 +37,17 @@
 }
 
 .social-icons a img {
-    width: 32px;
-    height: 32px;
-    margin-top: 14px;
+    width: 12px;
+    height: 12px;
+    margin-top: 4px;
 }
 
 .social-icons a i,
 .social-icons a img {
     z-index:2;
     position: relative;
-    line-height: 50px;
+    line-height: 28px;
+    margin:  0 auto;
 }
 
 .social-icons a:hover {
