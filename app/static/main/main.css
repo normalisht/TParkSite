@@ -213,7 +213,7 @@ p {
 
 .image-centered-wrapper {
     display: block;
-    height: clamp(100px, 40vh, 200px);
+    height: clamp(150px, 20vh, 300px);
     width: 100%;
     align-items: center;
     margin: 0 auto;
