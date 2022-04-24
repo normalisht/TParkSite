@@ -96,13 +96,77 @@ p {
     min-height: calc(100 * var(--vh, 1vh) - 4px - min(10 * var(--vh, 1vh), 40px));
 }
 
-.mobile_upper,
-.desktop_upper {
-    display: none;
+.upper_buttons {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 30px;
+    align-items: center;
 }
 
-.desktop_upper {
-    display: none;
+.burger_container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 0 17px;
+    border-radius: 0 0 10px;
+    /*background-color: rgba(0, 0, 0, 0.65);*/
+    /*background-color: #565656;*/
+    background: url(../burger_back.png) top left repeat-x;
+    opacity: .6;
+    z-index: 2;
+}
+
+.menu-btn {
+    /*position: fixed;*/
+    /*top: 0;*/
+    /*left: 0;*/
+    width: 30px;
+    height: 30px;
+    z-index: 3;
+    overflow: hidden;
+    /*background-color: rgba(0, 0, 0, 0.65);*/
+}
+
+.menu-btn-visible {
+    position: fixed;
+    top: 0;
+    left: 17px;
+}
+
+.menu-btn span {
+    width: 25px;
+    height: 3px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #ffffff;
+    transition: all 0.5s;
+    border-radius: 2px;
+    opacity: 1;
+}
+
+.menu-btn span:nth-of-type(2) {
+    top: calc(50% - 8px);
+}
+
+.menu-btn span:nth-of-type(3) {
+    top: calc(50% + 8px);
+}
+
+.menu-btn.active span:nth-of-type(1) {
+    opacity: 0;
+}
+
+.menu-btn.active span:nth-of-type(2) {
+    top: 50%;
+    transform: translate(-50%, 0%) rotate(45deg);
+}
+
+.menu-btn.active span:nth-of-type(3) {
+    top: 50%;
+    transform: translate(-50%, 0%) rotate(-45deg);
 }
 
 .block_buttons {
