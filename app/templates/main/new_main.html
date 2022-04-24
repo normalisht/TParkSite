@@ -27,16 +27,16 @@
         {% for type in type_list %}
             <section class="main_page_articles">
                 <div class="category_title">{{ type }}</div>
-                <ul class="page-list">
+                <div class="page-list">
                     {% for category in categories %}
                         {% if category.type == type %}
-                            <li>
+                            <div>
                                 {% set path = "images/category/preview/" + category.id|string + ".png" %}
                                 <a href="{{ url_for('main.category') }}?category_id={{ category.id }}" class="image-centered-wrapper">
                                     <img src="{{ url_for("static", filename=path) }}" alt="" class="img_category">
                                     <span class="page-text">{{ category.name }}</span>
                                 </a>
-                            </li>
+                            </div>
                         {% endif %}
                 {% endfor %}
             </section>
