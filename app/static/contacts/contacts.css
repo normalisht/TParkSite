@@ -3,6 +3,7 @@
 .social-icons {
     display: flex;
     justify-content: center;
+    align-items: center;
     flex-wrap: wrap;
     list-style: none;
     padding-inline-start: 0;
@@ -12,15 +13,14 @@
 
 .social-icons a {
     display: inline-block;
-    width: 38px;
-    height: 38px;
+    width: 36px;
     border-radius: 40%;
     background: #efefef;
     position: relative;
-    margin: 5px;
+    margin: 2px 7px;
     text-align: center;
     box-shadow: 0 2px 6px #c1c1c1;
-    font-size: 32px;
+    font-size: 28px;
     transition: 0.5s;
 }
 
@@ -87,9 +87,10 @@
 }
 
 .social-icons a:hover:after {
-    width: 50px;
-    height: 50px;
-    margin-left: -25px;
+    width: 36px;
+    height: 36px;
+    margin-left: -18px;
+    margin-top: -2px;
 }
 
 .social-icons .vk:hover:after{
