@@ -144,6 +144,10 @@
 }
 
 .social-icons {
-    margin-top: 5px;
     justify-content: space-evenly;
+}
+
+.fab {
+
+
 }
