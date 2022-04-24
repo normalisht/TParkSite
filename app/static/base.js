@@ -79,57 +79,21 @@ generate_upper.type = null
 
 function generate_upper(event) {
     // функция для генерации нужной шапки в зависимости от разрешения экрана
-    // if (document.documentElement.clientWidth < 900) {
-    //     // generate_mobile_upper()
-    //     generate_upper.type = 'mobile'
-    //     console.log('mobile')
-    // } else {
-    //     generate_desktop_upper()
-    //     window.addEventListener('resize', set_vw)
-    //     generate_upper.type = 'desktop'
-    //     console.log('desk')
-    // }
+    if (document.documentElement.clientWidth < 900) {
+        generate_mobile_upper()
+        generate_upper.type = 'mobile'
+        console.log('mobile')
+    } else {
+        // generate_desktop_upper()
+        // window.addEventListener('resize', set_vw)
+        // generate_upper.type = 'desktop'
+        // console.log('desk')
+    }
 }
 
 
 function generate_mobile_upper() {
-    // шапка переделвывается в мобильную версию
-    let phone_numbers = document.getElementById('phone_numbers'),
-        block_info = document.getElementById('upper_block_info'),
-        navigation_buttons = document.getElementById('navigation_buttons'),
-        upper = document.getElementById('upper'),
-        logo = document.getElementById('block_logo')
 
-    logo.style.width = block_info.style.width = '50%'
-    // navigation_buttons.style.width = '100%'
-
-    phone_numbers.style.flexDirection = 'row'
-
-    block_info.style.flexDirection =
-        block_info.firstElementChild.style.flexDirection = 'column'
-
-    block_info.firstElementChild.style.alignItems = 'center'
-    block_info.firstElementChild.lastElementChild.innerHTML =
-        block_info.firstElementChild.lastElementChild.innerHTML.slice(0)
-
-
-    // navigation_buttons.style.paddingBottom = '12px'
-    // document.getElementById('main_block').style.marginTop = 12 + 'px'
-
-    let el
-    if (!document.getElementById('for_nav_btns')) {
-        el = document.createElement('div')
-        el.setAttribute('id', 'for_nav_btns')
-    }
-
-    upper.after(document.getElementById('for_nav_btns') ?
-        document.getElementById('for_nav_btns') : el)
-    upper.after(navigation_buttons)
-    upper.after(phone_numbers)
-    upper.style.width = 'calc(100vw - 34px)'
-    upper.style.justifyContent = 'space-between'
-
-    // phone_numbers.style.display = 'none'
 }
 
 function generate_desktop_upper() {
@@ -254,16 +218,16 @@ function back_button() {
     if (detect.mobile()) {
         let scrollPos = 0,
             bb_status = false,
-            bb = $('#back_button'),
-            bb_2 = $('#back_button_2')
+            bb = $('#back_button')
+            // bb_2 = $('#back_button_2')
 
-        bb.css('position', 'fixed')
-        bb.stop().animate({'bottom': -bb.outerHeight(true) - 10}, 200)
+        bb.css({'position': 'fixed'})
+        bb.stop().animate({'bottom': -bb.outerHeight(true) - 50}, 200)
 
         $(window).scroll(function () {
             let st = $(this).scrollTop()
 
-            if (st > scrollPos && !isScrolledIntoView($(bb_2))) {
+            if (st > scrollPos) {
                 if (bb_status) {
 
                     bb.stop().animate({'bottom': -bb.outerHeight(true)}, 200)
@@ -271,10 +235,10 @@ function back_button() {
                 }
 
             } else {
-                if (!bb_status && !isScrolledIntoView($(bb_2))) {
+                if (!bb_status) {
                     bb.addClass('back_button_active')
                     bb.css({'bottom': -bb.height()})
-                    bb.stop().animate({'bottom': '0'}, 200)
+                    bb.stop().animate({'bottom': '17px'}, 200)
                     bb_status = true
                 }
             }
@@ -282,11 +246,6 @@ function back_button() {
         });
 
         bb.click(function () {
-            history.back();
-            return false;
-        })
-
-        bb_2.click(function () {
             history.back();
             return false;
         })

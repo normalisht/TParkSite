@@ -2,10 +2,19 @@
 
 /*Desktop*/
 
+.desktop_upper {
+    display: block;
+    font-size: calc(0.85 * var(--primary-font-size));
+}
+
 .upper_container {
     display: flex;
     justify-content: center;
     flex-direction: row;
+}
+
+.upper_category {
+    margin: 5px;
 }
 
 .main_block {
