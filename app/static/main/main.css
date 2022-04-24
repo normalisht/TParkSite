@@ -82,6 +82,7 @@ p {
     margin-top: 4px;
     width: 100%;
     background-color: #1c1919;
+    /*background-color: #1c1919;*/
     color: #a8a8a8;
     font-size: calc(var(--primary-font-size) * 0.6);
 }
