@@ -8,6 +8,12 @@
     flex-direction: row;
 }
 
+.upper_buttons {
+    display: flex;
+    justify-content: flex-start;
+    margin-left: 10px;
+}
+
 .main_block {
     /*max-width: var(--primary-content-width);*/
     /*padding: 17px;*/
@@ -17,6 +23,7 @@
     max-width: 200px;
     max-height: 100px;
     object-fit: cover;
+    float: left;
 }
 
 .block_numbers {
