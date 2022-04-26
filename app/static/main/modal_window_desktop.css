@@ -70,7 +70,7 @@
 .social-icons {
     margin-top: 5px;
     justify-content: space-evenly;
-    display:none; /*Временно*/
+
 }
 
 .contacts .submenu-item:last-child:hover {

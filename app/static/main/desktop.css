@@ -6,12 +6,14 @@
     display: flex;
     justify-content: center;
     flex-direction: row;
+    width: 100%;
 }
 
 .upper_buttons {
     display: flex;
-    justify-content: flex-start;
+    justify-content: space-between;
     margin-left: 10px;
+    align-items: center;
 }
 
 .main_block {
@@ -23,7 +25,24 @@
     max-width: 200px;
     max-height: 100px;
     object-fit: cover;
-    float: left;
+}
+
+.social-icons a {
+    width: 48px;
+    height: 42px;
+    border-radius: 40%;
+    background: #efefef;
+    margin: 2px 7px;
+    box-shadow: 0 2px 6px #c1c1c1;
+    font-size: 36px;
+}
+
+
+.social-icons a:hover:after {
+    width: 48px;
+    height: 42px;
+    margin-left: -22px;
+    margin-top: -2px;
 }
 
 .block_numbers {

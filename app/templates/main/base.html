@@ -152,22 +152,114 @@
             {#            </div>#}
 
             <div id="upper_buttons" class="upper_buttons">
-{#                <div class="upper_main" data-modal-window-toggle="#services-modal-win">#}
-{#                    <div class="burger_container">#}
-{#                        <div class="menu-btn" style="opacity: 0;">#}
-{#                            <span></span>#}
-{#                            <span></span>#}
-{#                            <span></span>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                    <div class="menu-btn menu-btn-visible">#}
-{#                        <span></span>#}
-{#                        <span></span>#}
-{#                        <span></span>#}
-{#                    </div>#}
-{#                </div>#}
+                {#                <div class="upper_main" data-modal-window-toggle="#services-modal-win">#}
+                {#                    <div class="burger_container">#}
+                {#                        <div class="menu-btn" style="opacity: 0;">#}
+                {#                            <span></span>#}
+                {#                            <span></span>#}
+                {#                            <span></span>#}
+                {#                        </div>#}
+                {#                    </div>#}
+                {#                    <div class="menu-btn menu-btn-visible">#}
+                {#                        <span></span>#}
+                {#                        <span></span>#}
+                {#                        <span></span>#}
+                {#                    </div>#}
+                {#                </div>#}
                 <div class="upper_contacts">
                     <img src="app/static/logo.png" class="img_logo">
+                </div>
+
+                    <div id='navigation_buttons' class="block_buttons">
+                        <div style="display: flex;">
+                            <div class="button_main"
+                                 data-modal-window-toggle="#services-modal-win">
+
+                                <div id="services-button">
+                                    Услуги
+                                </div>
+                                <!--Модальные окно/выпадающее меню -->
+                                <div id="services-modal-win" class="modal submenu">
+                                    <div class="modal-window">
+                                        <img id="logo" class="modal_window_img"
+                                             src="{{ url_for('static', filename='logo_2.png') }}" alt="">
+                                        {% for category in categories %}
+                                            {% if category.status %}
+                                                <div class="modal-item submenu-item">
+                                                    <a class="modal-link"
+                                                       href="{{ url_for('main.category') }}?category_id={{ category.id }}">
+                                                        {{ category.name }}
+                                                    </a>
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    <div class="overlay"></div>
+                                </div>
+                            </div>
+                            <a id="about-us-button" class="button_main button_main_middle about_a"
+                               href="{{ url_for('main.about') }}">
+                                <div href="{{ url_for('main.about') }}" class="">
+                                    О нас
+                                </div>
+                            </a>
+                            <div class="button_main" data-modal-window-toggle="#contacts-modal-win">
+                                <div id="contact-button">
+                                    Контакты
+                                </div>
+                                <div id="contacts-modal-win" class="modal submenu contacts">
+                                    <div class="modal-window">
+                                        <div class="modal-item submenu-item">
+                                            <div class="geolocation" style="align-items: center">
+                                                <a href="{{ geolocation }}" target="_blank" style="color: black">Мы на
+                                                    карте
+                                                    <img id="geo" class="geo modal-link"
+                                                         src="{{ url_for('static', filename='geo.png') }}"
+                                                         alt="">
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="modal-item submenu-item">
+                                            <div class="address">Адрес: {{ address }}</div>
+                                        </div>
+                                        {% for number in phone_numbers %}
+                                            <div class="modal-item submenu-item" style="cursor: copy;">
+                                                onclick="copy_number('+7' + {{ number }}, this)">
+                                                <a class="modal-link" style='text-decoration: none' target="_blank"
+                                                   href="https://api.whatsapp.com/send?phone=7{{ number }}">+7{{ number }}</a>
+                                                <img style='object-fit: cover; width: 20px; height: 20px; margin-bottom: -2px; margin-left: -6px;'
+                                                     src="{{ url_for('static', filename='copy.png') }}" alt="">
+                                            </div>
+                                        {% endfor %}
+                                        <div class="modal-item submenu-item media">
+                                            <div class="social">
+                                                <ul class="social-icons">
+                                                    <li><a class="vk modal-link" href="{{ vk }}" target="_blank"><i
+                                                            class="fab fa-vk"></i></a>
+                                                    </li>
+                                                    <li><a class="whatsapp modal-link"
+                                                           href="https://api.whatsapp.com/send?phone=7{{ phone_numbers[0] }}"
+                                                           target="_blank">
+                                                        <i class="fab fa-whatsapp"></i></a></li>
+                                                    <li><a class="telega modal-link" href="https://t.me/+79953056461"
+                                                           target="_blank"><i
+                                                            class="fab fa-telegram-plane"></i></a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <close class="btn-close-modal-window">
+                                            <img src="{{ url_for('static', filename='cross.png') }}" alt="X">
+                                        </close>
+                                    </div>
+                                    <div class="overlay"></div>
+                                </div>
+                                <!--конец модальных окон-->
+                            </div>
+                        </div>
+
+
+
                 </div>
                 <div class="upper_media">
                     <div class="social">
