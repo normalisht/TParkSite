@@ -95,6 +95,7 @@ p {
 
 .container_base {
     min-height: calc(100 * var(--vh, 1vh) - 4px - min(10 * var(--vh, 1vh), 40px));
+
 }
 
 .upper_buttons {
