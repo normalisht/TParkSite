@@ -80,11 +80,14 @@
 }
 
 .button_main {
-    width: 120px;
+    width: 160px;
     height: 40px;
     transition: background-color 0.4s ease,
     border-color 0.4s ease,
     font-size 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .back_button {
@@ -157,7 +160,7 @@
     margin-bottom: 4px;
 }
 
-.button_main_hover {
+.button_main:hover {
     font-size: calc(var(--primary-font-size) * 1.125);
     background-color: var(--primary-color);
 }
@@ -174,4 +177,18 @@
 
 .address {
     max-width: 350px;
+}
+
+.button_main_middle_right {
+    border-right: 1px solid;
+    border-left: 1px solid;
+}
+
+.decoration {
+    text-decoration: none;
+    color: black;
+}
+
+.button_main_middle_left {
+    border-left: 1px solid;
 }
