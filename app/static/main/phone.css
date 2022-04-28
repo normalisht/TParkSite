@@ -3,8 +3,9 @@
     /*max-width: 150px;*/
     /*max-height: 100px;*/
     object-fit: cover;
-    width: 100%;
+    width: 30vw;
     height: 100%;
+    display: none;
 }
 
 .upper {
@@ -124,6 +125,7 @@
 .block_buttons {
     font-size: calc(1.2 * var(--primary-font-size));
     margin: 0 auto;
+    display:none;
 }
 
 .button_main {
