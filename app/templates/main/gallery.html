@@ -1,0 +1,31 @@
+{% extends "main/base.html" %}
+
+{% block scripts %}
+<link rel="stylesheet" href="{{ url_for('static', filename='gallery/gallery.css') }}">
+
+<script defer src="{{ url_for('static', filename='gallery/gallery.js') }}"></script>
+<script defer src="{{ url_for('static', filename='plugins/jquery.min.js') }}"></script>
+<script defer src="{{ url_for('static', filename='plugins/hammer.min.js') }}"></script>
+<script src="{{ url_for('static', filename='plugins/mobile-detect.min.js') }}"></script>
+{% endblock %}
+
+{% block app_content %}
+
+<div class="desktop_container">
+    <div class="content">
+        <div class="main">
+            <div class="list">
+                {% for image in images %}
+                    <div>
+                        {% set path = "images/gallery/" + image %}
+                        <a class="image-wrapper">
+                            <img src="{{ url_for("static", filename=path) }}" alt="" class="minimized">
+                        </a>
+                    </div>
+                {% endfor%}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -7,7 +7,7 @@ import os
 import datetime
 import time
 from os import listdir
-from app.main.functions import get_categories, get_contacts_data
+from app.main.functions import get_categories, get_contacts_data, compress
 from app.models import Text, Event, Category, ServiceCategory, Service, Employee, Partner, Price
 from sqlalchemy import create_engine
 from flask_ckeditor import CKEditor
@@ -111,3 +111,9 @@ def test_main():
 
     return render_template('main/new_main.html', main_text=main_text,
                            categories=get_categories(), contacts_data=get_contacts_data(), type_list=unique)
+
+
+@bp.route('/gallery', methods=['GET'])
+def gallery():
+    files = listdir('app/static/images/gallery')
+    return render_template('main/gallery.html',categories=get_categories(), contacts_data=get_contacts_data(), images=files)
