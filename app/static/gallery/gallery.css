@@ -67,7 +67,7 @@
 #magnify {
     display: none;
     position: fixed;
-    max-width: 600px;
+    max-width: 400px;
     width: calc(var(--vw, 1vw) * 100 - 17px);
     z-index: 9999;
     margin: auto;
