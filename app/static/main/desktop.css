@@ -42,6 +42,12 @@
     object-fit: cover;
 }
 
+.upper_burger{
+    display: none;
+
+
+}
+
 .social-icons a {
     width: 50px;
     height: 46px;
