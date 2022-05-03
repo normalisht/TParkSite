@@ -1,0 +1,16 @@
+@charset "UTF-8";
+
+.comments_container {
+    grid-column-gap: 12px;
+    grid-row-gap: 12px;
+}
+
+.com_title {
+    font-size: calc(var(--primary-font-size) * 1.3);
+}
+
+
+.comment {
+    font-size: calc(var(--primary-font-size) * 1);
+}
+

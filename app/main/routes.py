@@ -8,7 +8,7 @@ import datetime
 import time
 from os import listdir
 from app.main.functions import get_categories, get_contacts_data
-from app.models import Text, Event, Category, ServiceCategory, Service, Employee, Partner, Price
+from app.models import Text, Comment, Event, Category, ServiceCategory, Service, Employee, Partner, Price
 from sqlalchemy import create_engine
 from flask_ckeditor import CKEditor
 import shutil
@@ -98,6 +98,7 @@ def about():
                            filosofi=filosofi, about=about, partners=partners,
                            categories=get_categories(), contacts_data=get_contacts_data())
 
+
 @bp.route('/test_main', methods=['GET'])
 def test_main():
     main_text = Text.query.filter_by(title="main_text").first().text
@@ -111,3 +112,12 @@ def test_main():
 
     return render_template('main/new_main.html', main_text=main_text,
                            categories=get_categories(), contacts_data=get_contacts_data(), type_list=unique)
+
+
+@bp.route('/reviews', methods=['GET'])
+def reviews():
+
+    comments = Comment.query.all()
+
+    return render_template('main/comments.html', comments=comments,
+                           categories=get_categories(), contacts_data=get_contacts_data())
