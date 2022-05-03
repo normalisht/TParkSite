@@ -3,11 +3,7 @@
 :root {
     --background-color: rgba(169, 191, 239, 0.15); /*547dd2;*/
     --primary-color: #ffa300; /*fff600*/
-    --body-background-color: #4acfeb;
 
-
-    /*--primary-big-font: 24px;*/
-    /*--primary-small-font: 24px;*/
     --primary-font-size: 16px;
     --primary-font-family: Arial, sans-serif;
 
@@ -43,7 +39,7 @@ h1, h2, h3 {
 body {
     margin: 0;
     -webkit-text-size-adjust: none;
-    background-color: rgba(169, 191, 239, 0.15);
+    background-color: rgba(209, 207, 188, 0.15);
 }
 
 img {
@@ -207,7 +203,7 @@ p {
 .page-list > div {
     display: grid;
     position: relative;
-    margin: 8px auto;
+    margin: 0 auto 12px;
     border-radius: 12px;
     width: 100%;
 }
@@ -239,7 +235,7 @@ ul li {
     padding: 20px 30px;
     border-radius: 12px;
     color: #fff;
-    font-size: 30px;
+    font-size: calc(1.2 * var(--primary-font-size));
     text-align: center;
     left: 0;
     right: 0;

@@ -3,7 +3,7 @@
     margin: 0 auto;
     /*padding: 0 40px 46px;*/
     text-align: center;
-    max-width: min(var(--primary-content-width), 100% - 34px);
+    max-width: min(var(--primary-content-width), 100%);
 }
 
 .list {

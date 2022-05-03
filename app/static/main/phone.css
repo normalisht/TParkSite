@@ -28,10 +28,29 @@
 
 .upper_buttons {
     display: flex;
-    justify-content: space-between;
+    /*justify-content: space-between;*/
     width: 100%;
     min-height: 30px;
     align-items: center;
+}
+
+.upper_buttons > div {
+    width: calc(100% / 3);
+}
+
+.upper_buttons > div:nth-child(2) {
+    display: flex;
+    justify-content: center;
+}
+
+.upper_buttons > div:first-child {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.upper_buttons > div:last-child {
+    display: flex;
+    justify-content: flex-end;
 }
 
 .burger_container {
@@ -227,4 +246,14 @@
     width: calc(100% - 34px);
     font-size: var(--primary-font-size);
     margin: 0 auto;
+}
+
+.image-centered-wrapper .page-text {
+    padding: 20px 10px;
+    font-size: calc(1.4 * var(--primary-font-size));
+}
+
+
+.image-centered-wrapper {
+    height: clamp(100px, 15vh, 200px);
 }

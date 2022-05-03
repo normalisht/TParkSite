@@ -12,5 +12,6 @@
 
 .comment {
     font-size: calc(var(--primary-font-size) * 1);
+    padding: 20px 18px;
 }
 

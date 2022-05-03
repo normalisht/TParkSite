@@ -20,26 +20,16 @@ engine = create_engine("sqlite:///T_Park.db")
 @bp.route('/TPark', methods=['GET'])
 def index():
     main_text = Text.query.filter_by(title="main_text").first().text
-    events = Event.query.order_by(Event.date).all()
-    events_2 = []
-    slider_events = True
-    len_slider = len(os.listdir('app/static/images/staff'))
 
-    for event in events:
-        date = datetime.date(int(event.date.strftime('%Y')), int(event.date.strftime('%m')), int(event.date.strftime('%d')))
-        dt = datetime.datetime.combine(date, datetime.time(22, 0))
+    temp_categories = Category.query.all()
+    temp_list = []
+    for category in temp_categories:
+        temp_list.append(category.type)
+    unique = list(set(temp_list))
+    unique.sort()
 
-        if dt > datetime.datetime.now():
-            events_2.append(event)
-
-    if len(events_2) == 0:
-        slider_events = False
-    elif len(events_2) < 3:
-        events_2 = events_2 * 3
-
-    return render_template('main/main.html', main_text=main_text, events=events_2[1:] + events_2[:1],
-                           categories=get_categories(), contacts_data=get_contacts_data(),
-                           len_slider=len_slider, slider_events=slider_events)
+    return render_template('main/new_main.html', main_text=main_text,
+                           categories=get_categories(), contacts_data=get_contacts_data(), type_list=unique)
 
 
 @bp.route('/category', methods=['GET'])
@@ -99,19 +89,29 @@ def about():
                            categories=get_categories(), contacts_data=get_contacts_data())
 
 
-@bp.route('/test_main', methods=['GET'])
-def test_main():
+@bp.route('/events', methods=['GET'])
+def events():
     main_text = Text.query.filter_by(title="main_text").first().text
+    events = Event.query.order_by(Event.date).all()
+    events_2 = []
+    slider_events = True
+    len_slider = len(os.listdir('app/static/images/staff'))
 
-    temp_categories = Category.query.all()
-    temp_list = []
-    for category in temp_categories:
-        temp_list.append(category.type)
-    unique = list(set(temp_list))
-    unique.sort()
+    for event in events:
+        date = datetime.date(int(event.date.strftime('%Y')), int(event.date.strftime('%m')), int(event.date.strftime('%d')))
+        dt = datetime.datetime.combine(date, datetime.time(22, 0))
 
-    return render_template('main/new_main.html', main_text=main_text,
-                           categories=get_categories(), contacts_data=get_contacts_data(), type_list=unique)
+        if dt > datetime.datetime.now():
+            events_2.append(event)
+
+    if len(events_2) == 0:
+        slider_events = False
+    elif len(events_2) < 3:
+        events_2 = events_2 * 3
+
+    return render_template('main/main.html', main_text=main_text, events=events_2[1:] + events_2[:1],
+                           categories=get_categories(), contacts_data=get_contacts_data(),
+                           len_slider=len_slider, slider_events=slider_events)
 
 
 @bp.route('/reviews', methods=['GET'])

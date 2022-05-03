@@ -75,8 +75,8 @@
                             <span></span>
                         </div>
                     </div>
-                    <div>123</div>
-                    <div>123</div>
+                    <div>Иконки</div>
+                    <div>1</div>
                 </div>
 
                 <div id="services-modal-win" class="modal submenu">
@@ -99,16 +99,30 @@
                             </div>
                         </div>
                         <div class="modal-content">
-                            {% for category in categories %}
-                                {% if category.status %}
-                                    <div class="modal-item submenu-item">
-                                        <a class="modal-link"
-                                           href="{{ url_for('main.category') }}?category_id={{ category.id }}">
-                                            {{ category.name }}
-                                        </a>
-                                    </div>
-                                {% endif %}
-                            {% endfor %}
+                            <div class="modal-item submenu-item">
+                                <a class="modal-link"
+                                   href="{{ url_for('main.events') }}">
+                                    События
+                                </a>
+                            </div>
+                            <div class="modal-item submenu-item">
+                                <a class="modal-link"
+                                   href="{{ url_for('main.reviews') }}">
+                                    Отзывы
+                                </a>
+                            </div>
+                            <div class="modal-item submenu-item">
+                                <a class="modal-link"
+                                   href="{{ url_for('main.about') }}">
+                                    О нас
+                                </a>
+                            </div>
+                            <div class="modal-item submenu-item">
+                                <a class="modal-link"
+                                   href="{{ url_for('main.gallery') }}">
+                                    Галерея
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <div class="overlay"></div>
