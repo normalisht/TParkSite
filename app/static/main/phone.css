@@ -9,7 +9,7 @@
 }
 
 .upper {
-    margin: 0 auto;
+    margin: 0  auto;
     width: 100vw;
     padding: 0 17px;
     background: url(../burger_back.png) top left repeat-x;
@@ -101,6 +101,7 @@
 
 .block_logo {
     left: 0;
+    margin-left:45px;
 }
 
 .block_content {
