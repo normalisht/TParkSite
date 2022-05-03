@@ -2,6 +2,7 @@ from flask import flash
 from app.models import Category, Text
 import os
 from app import db
+from PIL import Image
 
 def get_categories():
     return Category.query.order_by(Category.number).all()
@@ -47,3 +48,9 @@ def get_contacts_data():
         'phone_numbers': get_phone_numbers(),
         'media': get_media()
     }
+
+
+def compress (width, height, path_to_file):
+    foo = Image.open(path_to_file)
+    foo = foo.resize((width,height), Image.ANTIALIAS)
+    foo.save(path_to_file, optimize=True,quality=95)
