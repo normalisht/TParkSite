@@ -58,6 +58,20 @@
 <div id="container_base" class="container_base">
     <div id="upper_container" class="upper_container">
         <div id="upper" class="upper">
+            <div class="upper_main" data-modal-window-toggle="#services-modal-win">
+                <div class="burger_container">
+                    <div class="menu-btn" style="opacity: 0;">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+                <div class="menu-btn menu-btn-visible">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
             <div id="block_logo" class="block_logo">
                 <a href="{{ url_for('main.index') }}">
                     <img id="logo" class="img_logo" src="{{ url_for('static', filename='logo.png') }}" alt="">
