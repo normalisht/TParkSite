@@ -3,12 +3,13 @@
     /*max-width: 150px;*/
     /*max-height: 100px;*/
     object-fit: cover;
-    width: 100%;
+    width: 30vw;
     height: 100%;
+    display: block;
 }
 
 .upper {
-    margin: 0 auto;
+    margin: 0  auto;
     width: 100vw;
     padding: 0 17px;
     background: url(../burger_back.png) top left repeat-x;
@@ -100,6 +101,7 @@
 
 .block_logo {
     left: 0;
+    margin-left:45px;
 }
 
 .block_content {
@@ -124,6 +126,7 @@
 .block_buttons {
     font-size: calc(1.2 * var(--primary-font-size));
     margin: 0 auto;
+    display:none;
 }
 
 .button_main {

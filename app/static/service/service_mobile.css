@@ -18,7 +18,7 @@ div {
     text-align: center;
     padding-top: 4px;
     padding-bottom: 4px;
-    text-align: center;
+
     font-size: calc(var(--primary-font-size) * 1.3);
 }
 

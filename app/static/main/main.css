@@ -72,6 +72,7 @@ p {
     background-color: white;
 }
 
+
 .footer {
     display: flex;
     justify-content: space-evenly;
@@ -95,6 +96,7 @@ p {
 
 .container_base {
     min-height: calc(100 * var(--vh, 1vh) - 4px - min(10 * var(--vh, 1vh), 40px));
+
 }
 
 .mobile_upper,
