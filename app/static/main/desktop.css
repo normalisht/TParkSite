@@ -3,14 +3,17 @@
 /*Desktop*/
 
 .desktop_upper {
-    display: block;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     font-size: calc(0.85 * var(--primary-font-size));
+    width: min(var(--vw, 1vw) * 100 - 34px, 960px);
+    margin: 5px;
+    position: sticky;
 }
 
 .upper {
-    width: min(var(--vw, 1vw) * 100 - 34px, 1024px);
-    margin: 0 5px;
-    position: sticky;
+
 }
 
 .upper_container {

@@ -26,7 +26,7 @@
     height: min-content;
     object-fit: cover;
     transition: all 0.5s;
-    z-index: 3;
+    /*z-index: 3;*/
 }
 
 .price_switch_active {
