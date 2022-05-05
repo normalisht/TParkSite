@@ -160,12 +160,12 @@ function detected_phone() {
             document.documentElement.style.setProperty('--primary-font-size', `14px`)
         } else if (detect.tablet()) {
             add_css_file('/app/static/main/desktop.css')
-            document.documentElement.style.setProperty('--primary-font-size', `16px`)
+            document.documentElement.style.setProperty('--primary-font-size', `14px`)
         }
     } else {
         add_css_file('/app/static/main/desktop.css')
         add_js_file('/app/static/base_desktop.js')
-        document.documentElement.style.setProperty('--primary-font-size', `18px`)
+        document.documentElement.style.setProperty('--primary-font-size', `16px`)
     }
 }
 
