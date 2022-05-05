@@ -92,7 +92,6 @@ p {
 
 .container_base {
     min-height: calc(100 * var(--vh, 1vh) - 4px - min(10 * var(--vh, 1vh), 40px));
-
 }
 
 .mobile_upper,
@@ -146,9 +145,11 @@ p {
     font-size: var(--primary-font-size);
 }
 
-.img_logo {
-    max-width: 200px;
-    max-height: 100px;
+.contact_img {
+    width: 22px;
+    height: 22px;
+    object-fit: cover;
+    filter: invert(1);
 }
 
 .button_menu {
@@ -176,8 +177,8 @@ p {
 }
 
 .category_title {
-    padding-top: 4px;
-    padding-bottom: 4px;
+    padding-top: 8px;
+    padding-bottom: 8px;
     text-align: center;
     font-size: calc(var(--primary-font-size) * 1.2);
     margin: 0 auto;
@@ -232,7 +233,7 @@ ul li {
 .image-centered-wrapper .page-text {
     position: absolute;
     bottom: 0;
-    padding: 20px 30px;
+    padding: 10px 20px;
     border-radius: 12px;
     color: #fff;
     font-size: calc(1.2 * var(--primary-font-size));

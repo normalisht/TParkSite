@@ -160,12 +160,12 @@ function detected_phone() {
             document.documentElement.style.setProperty('--primary-font-size', `14px`)
         } else if (detect.tablet()) {
             add_css_file('/app/static/main/desktop.css')
-            document.documentElement.style.setProperty('--primary-font-size', `20px`)
+            document.documentElement.style.setProperty('--primary-font-size', `16px`)
         }
     } else {
         add_css_file('/app/static/main/desktop.css')
         add_js_file('/app/static/base_desktop.js')
-        document.documentElement.style.setProperty('--primary-font-size', `24px`)
+        document.documentElement.style.setProperty('--primary-font-size', `18px`)
     }
 }
 
@@ -266,3 +266,20 @@ function isScrolledIntoView(elem)
 
     return (elemBottom <= docViewBottom) || (elemTop <= docViewBottom);
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    let st = false,
+        phone_numbers = $('#phone_numbers')
+    phone_numbers.stop().slideUp(0)
+
+    $('#contacts').click(function() {
+        if (st) {
+            phone_numbers.stop().slideUp(500)
+            st = !st
+        }
+        else {
+            phone_numbers.stop().slideDown(500)
+            st = !st
+        }
+    })
+})
