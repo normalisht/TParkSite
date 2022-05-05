@@ -7,7 +7,7 @@
     flex-direction: row;
     align-items: center;
     font-size: calc(0.85 * var(--primary-font-size));
-    width: min(var(--vw, 1vw) * 100 - 34px, 960px);
+    width: min(var(--vw, 1vw) * 100 - 34px, 1200px);
     margin: 5px;
     position: sticky;
 }
