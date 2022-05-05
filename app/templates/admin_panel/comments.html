@@ -1,0 +1,30 @@
+{% extends "admin_panel/base.html" %}
+
+{% block scripts %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel_phone.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='/admin_panel/comments.css') }}">
+{% endblock %}
+
+{% block app_content %}
+    {{ ckeditor.load() }}
+
+    <div class="grid_panel">
+        <div class="grid_block partners_map">
+            <div class="new_comment comment">
+                <a href="{{ url_for('admin_panel.comment_create') }}">Создать новый отзыв</a>
+            </div>
+            {% set i = namespace(a=0) %}
+            {% for comment in comments %}
+                <a class="edit_com" href="{{ url_for('admin_panel.edit_comment') }}?comment_id={{ comment.id }}">
+                    <div class="comment">
+                        <div class="comment_name">{{ comment.name }}:</div>
+                        <div class="comment_text">{{ comment.text|safe }}</div>
+                    </div>
+                </a>
+                {% set i.a = i.a + 1 %}
+            {% endfor %}
+        </div>
+    </div>
+
+{% endblock %}

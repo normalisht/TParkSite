@@ -99,7 +99,8 @@ def events():
     events_2 = []
 
     for event in Event.query.order_by(Event.date).all():
-        date = datetime.date(int(event.date.strftime('%Y')), int(event.date.strftime('%m')), int(event.date.strftime('%d')))
+        date = datetime.date(int(event.date.strftime('%Y')), int(event.date.strftime('%m')),
+                             int(event.date.strftime('%d')))
         dt = datetime.datetime.combine(date, datetime.time(22, 0))
 
         if dt > datetime.datetime.now():
@@ -378,7 +379,8 @@ def service_test():
 
             return redirect(url_for('admin_panel.all_services'))
 
-        return redirect(url_for('admin_panel.category_change') + '?category_id={}'.format(service.categories[0].category_id))
+        return redirect(
+            url_for('admin_panel.category_change') + '?category_id={}'.format(service.categories[0].category_id))
 
     for i in categories_all:
         if ServiceCategory.query.filter_by(service_id=service_id, category_id=i.id).first():
@@ -531,6 +533,76 @@ def about():
 
     return render_template('admin_panel/about.html', employees=employees,
                            filosofi=filosofi, about=about, partners=partners)
+
+
+@bp.route('/comments', methods=['GET'])
+# @login_required
+def comments():
+    comments = Comment.query.all()
+
+    return render_template('admin_panel/comments.html', title='Отзывы',
+                           comments=comments)
+
+
+@bp.route('/edit_comment', methods=['GET', 'POST'])
+# @login_required
+def edit_comment():
+    comment = Comment.query.filter_by(id=request.args.get('comment_id')).first()
+
+    if request.method == 'POST':
+        name = request.form.get('name')
+        text = request.form.get('text')
+
+        setattr(comment, 'name', name)
+        setattr(comment, 'text', text)
+
+        try:
+            if request.files.get('change'):
+                image = request.files.get('change')
+                os.chdir('app/static/images/comments')
+                image.save(os.path.join(os.getcwd(), '{}.png'.format(comment.id)))
+                os.chdir('../../../../')
+        except:
+            pass
+
+        db.session.commit()
+
+        if request.form.get('delete'):
+            db.session.delete(comment)
+            db.session.commit()
+
+            return redirect(url_for('admin_panel.comments'))
+
+    return render_template('admin_panel/edit_comment.html', title='Отзывы',
+                           comment=comment)
+
+
+# создание отзыва
+@bp.route('/comment_create', methods=['GET', 'POST'])
+# @login_required
+def comment_create():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        text = request.form.get('text')
+
+        comment = Comment(name=name, text=text)
+
+        db.session.add(comment)
+        db.session.commit()
+
+        photo = request.files['photo']
+        os.chdir('app/static/images/comments')
+        try:
+            photo.save(os.path.join(os.getcwd(), '{}.png'.format(
+                Comment.query.filter_by(name=name, text=text).first().id
+            )))
+            os.chdir('../../../../')
+        except:
+            os.chdir('../../../../')
+
+        return redirect(url_for('admin_panel.comments'))
+
+    return render_template('admin_panel/comment_create.html', title='Создание отзыва')
 
 #
 # '''json запросы'''

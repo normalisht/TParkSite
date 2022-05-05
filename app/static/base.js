@@ -205,7 +205,7 @@ window.addEventListener('load', function () {
     let slider_items = $('#event_items'),
         slider_item_active = slider_items.find('.slider__item_active')
 
-    slider_items.css({'height': slider_item_active.outerHeight() + 'px'})
+    slider_items.css({'height': slider_item_active.outerHeight() + 'px'}, 1000)
 
     slider_items.find('.slider__item').each(function () {
         let name_event = $(this).find('.event_name')

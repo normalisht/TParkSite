@@ -240,7 +240,7 @@
     height: min-content;
     text-align: left;
     left: 17px;
-    /*top: calc(clamp(200px, (var(--vh, 1vh) * 45), 800px) - 53px);*/
+    top: calc(clamp(200px, (var(--vh, 1vh) * 45), 800px) - 53px);
 }
 
 .event_text {

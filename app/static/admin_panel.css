@@ -53,6 +53,7 @@
     grid-template-columns: 100%;
     min-height: 100px;
     justify-items: center;
+    align-items: center;
 }
 
 .grid_block_photo {

@@ -1,0 +1,26 @@
+{% extends "admin_panel/base.html" %}
+
+{% block scripts %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel/event_create.css') }}">
+{% endblock %}
+
+{% block app_content %}
+{{ ckeditor.load() }}
+    <form class="form" method="post" action="{{ url_for('admin_panel.comment_create') }}" enctype="multipart/form-data">
+        <div class="form_container">
+
+            <input type="file" name="photo" id="photo">
+
+            <label for="name"></label>
+            <input type="text" name="name" id="name" placeholder="Имя">
+
+            <label for="text"></label>
+            <textarea name="text" id="text" autocomplete="off"
+                      placeholder="Текст" cols="50" rows="20"></textarea>
+
+            <input type="submit" value="Создать">
+        </div>
+
+    </form>
+{{ ckeditor.config(name='text') }}
+{% endblock %}

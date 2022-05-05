@@ -96,9 +96,11 @@ def events():
     events_2 = []
     slider_events = True
     len_slider = len(os.listdir('app/static/images/staff'))
+    # len_slider = len(os.listdir('/home/Losharik17/TParkSite/app/static/images/staff'))
 
     for event in events:
-        date = datetime.date(int(event.date.strftime('%Y')), int(event.date.strftime('%m')), int(event.date.strftime('%d')))
+        date = datetime.date(int(event.date.strftime('%Y')), int(event.date.strftime('%m')),
+                             int(event.date.strftime('%d')))
         dt = datetime.datetime.combine(date, datetime.time(22, 0))
 
         if dt > datetime.datetime.now():
@@ -116,7 +118,6 @@ def events():
 
 @bp.route('/reviews', methods=['GET'])
 def reviews():
-
     comments = Comment.query.all()
 
     return render_template('main/comments.html', comments=comments,
@@ -126,4 +127,5 @@ def reviews():
 @bp.route('/gallery', methods=['GET'])
 def gallery():
     files = listdir('app/static/images/gallery')
-    return render_template('main/gallery.html',categories=get_categories(), contacts_data=get_contacts_data(), images=files)
+    return render_template('main/gallery.html', categories=get_categories(), contacts_data=get_contacts_data(),
+                           images=files)
