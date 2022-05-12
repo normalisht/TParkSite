@@ -16,6 +16,10 @@
 
 }
 
+.block_logo {
+    display: none;
+}
+
 .upper_container {
     display: flex;
     justify-content: center;
