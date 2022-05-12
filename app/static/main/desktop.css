@@ -16,7 +16,7 @@
 
 }
 
-.block_logo {
+.block_logo_phone {
     display: none;
 }
 
@@ -233,4 +233,8 @@
 
 .button_main_middle_left {
     border-left: 1px solid;
+}
+
+.category_title:first-child {
+    padding-top: 0;
 }
