@@ -482,26 +482,26 @@ def about():
                     os.chdir('../../../../')
                     return redirect(url_for('admin_panel.about'))
                 partner.link = request.form.get('partner_' + str(partner.id) + '_link')
-        for employee in employees:
-            if request.form.get('employee_' + str(employee.id) + '_delete'):
-                try:
-                    os.remove('app/static/images/employee/' + str(employee.id) + ".png")
-                except:
-                    pass
-                Employee.query.filter_by(id=employee.id).delete()
-                db.session.commit()
-                return redirect(url_for('admin_panel.about'))
-            if request.form.get('employee_' + str(employee.id) + '_save'):
-                if request.files.get('employee_' + str(employee.id) + '_photo'):
-                    image = request.files.get('employee_' + str(employee.id) + '_photo')
-                    os.chdir('app/static/images/employee')
-                    image.save(os.path.join(os.getcwd(), '{}.png'.format(employee.id)))
-                    os.chdir('../../../../')
-                    return redirect(url_for('admin_panel.about'))
-                if request.form.get('employee_' + str(employee.id) + '_name'):
-                    employee.name = request.form.get('employee_' + str(employee.id) + '_name')
-                if request.form.get('employee_' + str(employee.id) + '_position'):
-                    employee.position = request.form.get('employee_' + str(employee.id) + '_position')
+        # for employee in employees:
+        #     if request.form.get('employee_' + str(employee.id) + '_delete'):
+        #         try:
+        #             os.remove('app/static/images/employee/' + str(employee.id) + ".png")
+        #         except:
+        #             pass
+        #         Employee.query.filter_by(id=employee.id).delete()
+        #         db.session.commit()
+        #         return redirect(url_for('admin_panel.about'))
+        #     if request.form.get('employee_' + str(employee.id) + '_save'):
+        #         if request.files.get('employee_' + str(employee.id) + '_photo'):
+        #             image = request.files.get('employee_' + str(employee.id) + '_photo')
+        #             os.chdir('app/static/images/employee')
+        #             image.save(os.path.join(os.getcwd(), '{}.png'.format(employee.id)))
+        #             os.chdir('../../../../')
+        #             return redirect(url_for('admin_panel.about'))
+        #         if request.form.get('employee_' + str(employee.id) + '_name'):
+        #             employee.name = request.form.get('employee_' + str(employee.id) + '_name')
+        #         if request.form.get('employee_' + str(employee.id) + '_position'):
+        #             employee.position = request.form.get('employee_' + str(employee.id) + '_position')
         if request.form.get('partner_add'):
             temp = Partner.query.filter_by(name='temp').first()
             image = request.files.get('partner_add_photo')
@@ -513,17 +513,17 @@ def about():
             db.session.add(temp)
             db.session.commit()
             return redirect(url_for('admin_panel.about'))
-        if request.form.get('employee_add'):
-            temp = Employee.query.filter_by(name='temp').first()
-            image = request.files.get('employee_add_photo')
-            os.chdir('app/static/images/employee')
-            image.save(os.path.join(os.getcwd(), '{}.png'.format(temp.id)))
-            os.chdir('../../../../')
-            temp.name = request.form.get('employee_' + str(temp.id) + '_name')
-            temp.position = request.form.get('employee_' + str(temp.id) + '_position')
-            db.session.add(temp)
-            db.session.commit()
-            return redirect(url_for('admin_panel.about'))
+        # if request.form.get('employee_add'):
+        #     temp = Employee.query.filter_by(name='temp').first()
+        #     image = request.files.get('employee_add_photo')
+        #     os.chdir('app/static/images/employee')
+        #     image.save(os.path.join(os.getcwd(), '{}.png'.format(temp.id)))
+        #     os.chdir('../../../../')
+        #     temp.name = request.form.get('employee_' + str(temp.id) + '_name')
+        #     temp.position = request.form.get('employee_' + str(temp.id) + '_position')
+        #     db.session.add(temp)
+        #     db.session.commit()
+        #     return redirect(url_for('admin_panel.about'))
         if request.form.get('about_text'):
             about.text = request.form.get('about_text')
         if request.form.get('filosofi_text'):
