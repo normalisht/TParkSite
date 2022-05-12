@@ -665,7 +665,6 @@ def edit_category_type():
 @bp.route('/category_type_create', methods=['GET', 'POST'])
 # @login_required
 def category_type_create():
-
     if request.method == 'POST':
         name = request.form.get('name')
         number = request.form.get('number')
