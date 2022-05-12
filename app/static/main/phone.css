@@ -120,7 +120,7 @@
 .block_logo {
     /*left: 0;*/
     /*margin-left:45px;*/
-    margin: 5px 17px;
+    margin: 10px 17px;
     width: calc(var(--vw, 1vw) * 100 - 34px);
 }
 
@@ -197,17 +197,19 @@
 .block_numbers {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(50%, 1fr));
-    font-size: calc(1.3 * var(--primary-font-size));
+    font-size: calc(1.5 * var(--primary-font-size));
     justify-content: center;
     /*height: 0;*/
     overflow: hidden;
+    margin: 10px auto;
 }
 
 .block_numbers > a {
     width: max-content;
     margin: 5px auto;
     text-decoration: none;
-    color: #f88c00;
+    /*color: #ffaa1a;*/
+    color: #2a4758;
     font-weight: 700;
     box-sizing: border-box;
     padding: 3px 4px 0;
