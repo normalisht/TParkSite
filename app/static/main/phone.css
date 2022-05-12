@@ -54,6 +54,47 @@
     justify-content: flex-end;
 }
 
+
+.social-icons a {
+    display: inline-block;
+    width: 28px;
+    height: 24px;
+    border-radius: 40%;
+    background:  url(../burger_back.png) top left repeat-x;;
+    position: relative;
+    margin: 5px;
+    text-align: center;
+    box-shadow: 0 2px 2px #636b7c;
+    font-size: 28px;
+    transition: 0.5s;
+}
+
+.social-icons .vk {
+    color: #337AB7;
+}
+
+.social-icons .whatsapp {
+    color:#25d366;
+}
+
+.social-icons .telega{
+    color: #0088cc;
+}
+
+.social-icons a img {
+    width: 16px;
+    height: 16px;
+    margin-top: -2px;
+}
+
+.social-icons a i,
+.social-icons a img {
+    z-index:2;
+    position: relative;
+    line-height: 16px;
+}
+
+
 .burger_container {
     position: fixed;
     top: 0;
