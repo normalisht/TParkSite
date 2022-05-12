@@ -41,15 +41,14 @@
                 </div>
 
                 <label for="select">Категории</label>
-
                 <div class="grid_category">
+                    {% set i = namespace(a=1) %}
                     {% for category in categories %}
-
                         <label for="category" class="label_1">{{ category.name }}</label>
                         <input type="checkbox" id="category" class="checkbox"
                                name={{ category.id }}  value={{ category.id }}
-                                {{ "checked" if category.id == categories_checked[category.id] else "" }}>
-
+                                {{ "checked" if category.id == categories_checked[i.a] else "" }}>
+                        {% set i.a = i.a + 1 %}
                     {% endfor %}
                 </div>
 

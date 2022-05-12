@@ -240,7 +240,7 @@ ul li {
     left: 0;
     right: 0;
     display: block;
-    background: linear-gradient(0deg, rgba(0, 0, 0, .3) 0%, rgba(0, 0, 0, 0) 100%);
+    background: linear-gradient(0deg, rgba(0, 0, 0, .35) 0%, rgba(0, 0, 0, 0) 100%);
 }
 
 .new_block_content {

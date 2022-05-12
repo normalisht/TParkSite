@@ -5,14 +5,17 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="stylesheet" href="{{ url_for('static', filename='main/main.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='main/desktop.css') }}">
+{#    <link rel="stylesheet" href="{{ url_for('static', filename='main/desktop.css') }}">#}
     <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel.css') }}">
     <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename="favicon.ico") }}"/>
     {% block link %}{% endblock %}
 
     <script defer src="{{ url_for('static', filename='plugins/jquery.min.js') }}"></script>
-    <script defer src="{{ url_for('static', filename='plugins/hammer.min.js') }}"></script>
+    {#    <script defer src="{{ url_for('static', filename='plugins/hammer.min.js') }}"></script>#}
+    <script defer src="https://ajax.googleapis.com/ajax/libs/hammerjs/2.0.8/hammer.min.js"></script>
     <script src="{{ url_for('static', filename='plugins/mobile-detect.min.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='base.js') }}"></script>
+    <script defer type="text/javascript" src="{{ url_for('static', filename='modal_window.js') }}"></script>
 
     {% block scripts %}{% endblock %}
 
@@ -41,51 +44,163 @@
 
 
 <div id="main_block" class="main_block">
-
-    <div id='navigation_buttons' class="block_buttons">
-        <div style="display: flex;">
-            <div class="button_main"
-                 data-modal-window-toggle="#services-modal-win">
-                <a id="about-us-button" class="button_main  about_a"
-                   href="{{ url_for('admin_panel.category') }}">
-                    <div href="{{ url_for('admin_panel.category') }}" class="">
-                        Категории
+    <div id="upper_container" class="upper_container">
+        <div id="upper" class="upper">
+            <div id="mobile_upper" class="mobile_upper">
+                <div id="upper_buttons" class="upper_buttons">
+                    <div class="upper_main" data-modal-window-toggle="#services-modal-win">
+                        <div class="burger_container">
+                            <div class="menu-btn" style="opacity: 0;">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+                        <div class="menu-btn menu-btn-visible">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
                     </div>
 
-                </a>
-                <!--Модальные окно/выпадающее меню -->
+                    <div>
+                        <div class="upper_media">
+                            {% block page_name %}{% endblock %}
+                        </div>
+                    </div>
+
+                    <div></div>
+                </div>
+
                 <div id="services-modal-win" class="modal submenu">
                     <div class="modal-window">
-                        {% for category in categories %}
+                        <div class="modal-upper">
+                            <div class="modal-upper-content">
+                                <div>
+                                    <a href="{{ url_for('main.index') }}">
+                                        <img style="object-fit: cover; height: 20px; filter: invert(1)"
+                                             src="{{ url_for('static', filename='home.svg') }}" alt="">
+                                    </a>
+                                </div>
+                                <div>Меню</div>
+                                <div>
+                                    <a href="" onclick="history.back(); return false">
+                                        <img style="object-fit: cover; height: 20px; filter: invert(1)"
+                                             src="{{ url_for('static', filename='back.svg') }}" alt="">
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-content">
                             <div class="modal-item submenu-item">
-                                <a href="{{ url_for('admin_panel.category_change') }}?category_id={{ category.id }}">
-                                    {{ category.name }}
+                                <a class="modal-link"
+                                   href="{{ url_for('admin_panel.category') }}">
+                                    Категории
                                 </a>
                             </div>
-                        {% endfor %}
+                            <div class="modal-item submenu-item">
+                                <a class="modal-link"
+                                   href="{{ url_for('admin_panel.events') }}">
+                                    События
+                                </a>
+                            </div>
+                            <div class="modal-item submenu-item">
+                                <a class="modal-link"
+                                   href="{{ url_for('admin_panel.main') }}">
+                                    Страница событий
+                                </a>
+                            </div>
+                            <div class="modal-item submenu-item">
+                                <a class="modal-link"
+                                   href="{{ url_for('admin_panel.about') }}">
+                                    О нас
+                                </a>
+                            </div>
+                            <div class="modal-item submenu-item">
+                                <a class="modal-link"
+                                   href="{{ url_for('admin_panel.all_services') }}">
+                                    Услуги
+                                </a>
+                            </div>
+                            <div class="modal-item submenu-item">
+                                <a class="modal-link"
+                                   href="{{ url_for('admin_panel.category_types') }}">
+                                    Группы событий
+                                </a>
+                            </div>
+                            <div class="modal-item submenu-item">
+                                <a class="modal-link"
+                                   href="{{ url_for('admin_panel.comments') }}">
+                                    Отзывы
+                                </a>
+                            </div>
+                        </div>
                     </div>
                     <div class="overlay"></div>
                 </div>
             </div>
-            <a class="button_main about_a" href="{{ url_for('admin_panel.events') }}">
-                <div class="" href="{{ url_for('admin_panel.events') }}">
-                    События
-                </div>
-            </a>
-            <a id="about-us-button" class="button_main button_main_middle about_a"
-               href="{{ url_for('admin_panel.about') }}">
-                <div href="{{ url_for('admin_panel.about') }}" class="">
-                    О нас
-                </div>
-            </a>
-            <a id="about-us-button" class="button_main button_main_middle about_a"
-               href="{{ url_for('admin_panel.main') }}">
-                <div href="{{ url_for('admin_panel.main') }}" class="">
-                    Главная
-                </div>
-            </a>
 
+            <div class="desktop_upper">
+                <div id='navigation_buttons' class="block_buttons">
+                    <div style="display: flex;">
+                        <a id="about-us-button" class="button_main decoration"
+                           href="{{ url_for('main.about') }}">
+                            <div href="{{ url_for('main.about') }}" class="">
+                                События
+                            </div>
+                        </a>
+                        <a id="about-us-button" class="button_main button_main_middle_left decoration"
+                           href="{{ url_for('main.about') }}">
+                            <div href="{{ url_for('main.about') }}" class="">
+                                О нас
+                            </div>
+                        </a>
+
+                        <a id="about-us-button" class="button_main button_main_middle_right decoration"
+                           href="{{ url_for('main.about') }}">
+                            <div href="{{ url_for('main.about') }}" class="">
+                                Отзывы
+                            </div>
+                        </a>
+                        <a id="about-us-button" class="button_main decoration"
+                           href="{{ url_for('main.about') }}">
+                            <div href="{{ url_for('main.about') }}" class="">
+                                Фотоальбом
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
+
+        {#            <div id="upper_block_info" class="block_info">#}
+        {#                <div id="block_info_name" class='name'>#}
+        {#                <div class="info_name">#}
+        {#                    <div>Тренинг-парк</div>#}
+        {#                    <div>#}
+        {#                        <div id="dmitry">Дмитрия</div>#}
+        {#                        <div>Сергеева</div>#}
+        {#                    </div>#}
+        {#                </div>#}
+        {#                </div>#}
+        {#            <div style="visibility: hidden">#}
+        {#                <div class="info_name">#}
+        {#                <div>Тренинг-парк</div>#}
+        {#                <div>Дмитрия Сергеева</div>#}
+        {#                </div>#}
+        {#            </div>#}
+        {#                <div id="phone_numbers" class="block_numbers">#}
+        {#                    <div style="cursor: copy;" href="tel:+7{{ phone_numbers[0] }}">#}
+        {#                     onclick="copy_number('+7{{ phone_numbers[0] }}', this)"#}
+        {#                     title="Нажмите чтобы скопировать">#}
+        {#                        +7{{ phone_numbers[0] }}</div>#}
+        {#                    <div style="cursor: copy;" href="tel:+7{{ phone_numbers[1] }}">#}
+        {#                     onclick="copy_number('+7{{ phone_numbers[1] }}', this)"#}
+        {#                     title="Нажмите чтобы скопировать">#}
+        {#                        +7{{ phone_numbers[1] }}</div>#}
+        {##}
+        {#                </div>#}
+        {#            </div>#}
     </div>
 
     {% block app_content %}{% endblock %}

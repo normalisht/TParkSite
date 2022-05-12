@@ -24,21 +24,20 @@
 
     <div class="desktop_container">
         <div id="block_content" class="new_block_content">
-            {% for type in type_list %}
+            {% for type in types %}
                 <section class="main_page_articles">
-                    <div class="category_title">{{ type }}</div>
+                    <div class="category_title">{{ type.name }}</div>
                     <div class="page-list">
-                        {% for category in categories %}
-                            {% if category.type == type %}
-                                <div>
-                                    {% set path = "images/category/preview/" + category.id|string + ".png" %}
-                                    <a href="{{ url_for('main.category') }}?category_id={{ category.id }}"
-                                       class="image-centered-wrapper">
-                                        <img src="{{ url_for("static", filename=path) }}" alt="" class="img_category">
-                                        <span class="page-text">{{ category.name }}</span>
-                                    </a>
-                                </div>
-                            {% endif %}
+                        {% for category in type.categories.all() %}
+                            {% set category=category.category %}
+                            <div>
+                                {% set path = "images/category/preview/" + category.id|string + ".png" %}
+                                <a href="{{ url_for('main.category') }}?category_id={{ category.id }}"
+                                   class="image-centered-wrapper">
+                                    <img src="{{ url_for("static", filename=path) }}" alt="" class="img_category">
+                                    <span class="page-text">{{ category.name }}</span>
+                                </a>
+                            </div>
                         {% endfor %}
                     </div>
                 </section>

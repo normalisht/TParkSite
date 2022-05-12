@@ -7,7 +7,7 @@ import os
 import datetime
 import time
 from os import listdir
-from app.models import Text, Comment, Event, Category, ServiceCategory, Service, Employee, Partner, Price
+from app.models import Text, Comment, Event, Category, ServiceCategory, Service, Employee, Partner, Price, Type
 from app.main.functions import get_categories, get_contacts_data, compress
 from sqlalchemy import create_engine
 from flask_ckeditor import CKEditor
@@ -20,16 +20,10 @@ engine = create_engine("sqlite:///T_Park.db")
 @bp.route('/TPark', methods=['GET'])
 def index():
     main_text = Text.query.filter_by(title="main_text").first().text
-
-    temp_categories = Category.query.all()
-    temp_list = []
-    for category in temp_categories:
-        temp_list.append(category.type)
-    unique = list(set(temp_list))
-    unique.sort()
+    types = Type.query.order_by(Type.number).all()
 
     return render_template('main/new_main.html', main_text=main_text,
-                           categories=get_categories(), contacts_data=get_contacts_data(), type_list=unique)
+                           contacts_data=get_contacts_data(), types=types)
 
 
 @bp.route('/category', methods=['GET'])

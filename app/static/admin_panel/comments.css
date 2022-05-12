@@ -4,11 +4,12 @@
     display: flex;
     justify-content: flex-start;
     width: min(100%, 400px);
-    margin:  10px auto;
+    margin: 10px auto;
 }
 
 .new_comment > a {
     color: black;
+    font-size: calc(var(--primary-font-size) * 1.2)
 }
 
 .comment {

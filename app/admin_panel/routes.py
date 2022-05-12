@@ -9,7 +9,8 @@ from app import db
 from flask_login import login_user, logout_user, current_user, login_required
 
 from app.main.functions import get_categories
-from app.models import Admin, Category, Service, Employee, Text, Comment, ServiceCategory, Event, Partner
+from app.models import CategoryType, Admin, Category, Service, Employee, Text, Comment, ServiceCategory, Event, Partner, \
+    Type
 import json
 import shutil
 
@@ -27,7 +28,7 @@ def login():
             flash('Неверный пароль или email', 'warning')
             return redirect(url_for('admin_panel.login'))
 
-        return redirect(url_for('admin_panel.main'))
+        return redirect(url_for('admin_panel.category'))
 
     return render_template('admin_panel/login.html', title='Авторизация')
 
@@ -280,7 +281,8 @@ def category_change():
 
         category.number = request.form.get('weight')
         category.description = request.form.get('ckeditor')
-        category.name = request.form.get('title')
+        category.name = request.form.get('title').strip().capitalize()
+        category.type = request.form.get('type').strip().capitalize()
         db.session.commit()
         return redirect(url_for('admin_panel.category_change', category_id=category_id))
 
@@ -323,7 +325,7 @@ def service_test():
     service = Service.query.filter_by(id=service_id).first()
     categories_all = Category.query.all()
 
-    b = [0]
+    categories_cheked = [0]
 
     if request.method == 'POST':
         if request.form.get('checkbox') == '1':
@@ -384,12 +386,12 @@ def service_test():
 
     for i in categories_all:
         if ServiceCategory.query.filter_by(service_id=service_id, category_id=i.id).first():
-            b.insert(i.id, i.id)
+            categories_cheked.insert(i.id, i.id)
         else:
-            b.insert(i.id, 0)
+            categories_cheked.insert(i.id, 0)
 
     return render_template('admin_panel/service.html', title='{}'.format(service.name),
-                           categories=get_categories(), service=service, categories_checked=b,
+                           categories=get_categories(), service=service, categories_checked=categories_cheked,
                            files=os.path.isfile('app/static/images/service/{}.png'.format(service_id)))
 
 
@@ -603,6 +605,96 @@ def comment_create():
         return redirect(url_for('admin_panel.comments'))
 
     return render_template('admin_panel/comment_create.html', title='Создание отзыва')
+
+
+@bp.route('/category_types', methods=['GET'])
+# @login_required
+def category_types():
+    category_types = Type.query.order_by(Type.number).all()
+
+    return render_template('admin_panel/category_types.html', title='Группы категорий',
+                           category_types=category_types)
+
+
+@bp.route('/edit_category_type', methods=['GET', 'POST'])
+# @login_required
+def edit_category_type():
+    type = Type.query.filter_by(id=request.args.get('type_id')).first()
+    categories = Category.query.all()
+
+    if request.method == 'POST':
+        name = request.form.get('name')
+        number = request.form.get('number')
+
+        setattr(type, 'name', name)
+        setattr(type, 'number', number)
+
+        db.session.commit()
+
+        for category in categories:
+            temp = CategoryType(type_id=type.id, category_id=category.id)
+
+            if request.form.get(str(category.id)) == str(category.id):
+                if not CategoryType.query.filter_by(type_id=type.id, category_id=category.id).first():
+                    db.session.add(temp)
+                    db.session.commit()
+            else:
+                temp = CategoryType.query.filter_by(type_id=type.id, category_id=category.id).first()
+                if temp:
+                    db.session.delete(temp)
+                    db.session.commit()
+
+        if request.form.get('delete'):
+            db.session.delete(type)
+            db.session.commit()
+
+        return redirect(url_for('admin_panel.category_types'))
+
+    categories_checked = [0]
+    for category in categories:
+        if CategoryType.query.filter_by(type_id=type.id, category_id=category.id).first():
+            categories_checked.insert(category.id, category.id)
+        else:
+            categories_checked.insert(category.id, 0)
+
+    return render_template('admin_panel/edit_type_category.html', title='Группа категорий',
+                           type=type, categories=categories, categories_checked=categories_checked)
+
+
+# создание отзыва
+@bp.route('/category_type_create', methods=['GET', 'POST'])
+# @login_required
+def category_type_create():
+
+    if request.method == 'POST':
+        name = request.form.get('name')
+        number = request.form.get('number')
+
+        type = Type(name=name, number=number)
+
+        db.session.add(type)
+        db.session.commit()
+
+        type = Type.query.all()[-1]
+
+        for category in Category.query.all():
+            temp = CategoryType(type_id=type.id, category_id=category.id)
+
+            if request.form.get(str(category.id)) == str(category.id):
+                if not CategoryType.query.filter_by(type_id=type.id, category_id=category.id).first():
+                    db.session.add(temp)
+                    db.session.commit()
+            else:
+                temp = CategoryType.query.filter_by(type_id=type.id, category_id=category.id).first()
+                if temp:
+                    db.session.delete(temp)
+                    db.session.commit()
+
+        return redirect(url_for('admin_panel.category_types'))
+
+    return render_template('admin_panel/category_type_create.html', title='Создание отзыва',
+                           categories=Category.query.all())
+
 
 #
 # '''json запросы'''
