@@ -57,29 +57,29 @@
 
 .social-icons a {
     display: inline-block;
-    width: 28px;
-    height: 24px;
-    border-radius: 40%;
-    background:  url(../burger_back.png) top left repeat-x;;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #505050;
     position: relative;
     margin: 5px;
     text-align: center;
-    box-shadow: 0 2px 2px #636b7c;
     font-size: 28px;
     transition: 0.5s;
 }
 
 .social-icons .vk {
-    color: #337AB7;
+    color: #ffffff;
 }
 
 .social-icons .whatsapp {
-    color:#25d366;
+    color:#ffffff;
 }
 
 .social-icons .telega{
-    color: #0088cc;
+    color: #ffffff;
 }
+
 
 .social-icons a img {
     width: 16px;
@@ -87,11 +87,18 @@
     margin-top: -2px;
 }
 
+
+
+.fa-telegram-plane:before {
+
+
+}
+
 .social-icons a i,
 .social-icons a img {
     z-index:2;
     position: relative;
-    line-height: 16px;
+    line-height: 28px;
 }
 
 
