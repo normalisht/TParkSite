@@ -709,11 +709,21 @@ def gallery():
             for img in files:
                 os.rename(img, str(base_number)+'.jpg')
                 base_number += 1
+
             base_number -= 1
             for img in images:
                 img.save(os.path.join(os.getcwd(), '{}.png'.format(base_number + 1)))
                 base_number += 1
             os.chdir('../../../../')
+        for photo in files:
+            print(request.form.get)
+            if request.form.get('delete_' + str(photo)):
+                try:
+                    print('a')
+                    os.remove('app/static/images/gallery/' + str(photo))
+                    return redirect(url_for('admin_panel.gallery'))
+                except:
+                    pass
 
         return redirect(url_for('admin_panel.gallery'))
 

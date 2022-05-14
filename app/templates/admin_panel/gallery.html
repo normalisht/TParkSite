@@ -16,11 +16,12 @@
                     {% for image in images %}
                     <div>
                         {% set path = "images/gallery/" + image %}
-                        <a class="image-wrapper" href="{{ url_for("static", filename=path) }}">
+                        <a class="image-wrapper">
                         <img src="{{ url_for("static", filename=path) }}" alt="" class="minimized">
-                        <label for="delete_{{ photo }}" class="input__file_button">
-                            <button class="input__file_button_text_2">Удалить</button>
-                        </label>
+                            <input type="submit" id="delete_category" class="input__file" name="delete_{{image}}">
+                            <label for="delete_category" class="input__file_button">
+                                <span class="input__file_button_text_2">Удалить</span>
+                            </label>
                         </a>
                     </div>
                     {% endfor %}
