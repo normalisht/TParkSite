@@ -157,35 +157,7 @@
                         <img id="logo" class="img_logo" src="{{ url_for('static', filename='logo.png') }}" alt="">
                     </a>
                 </div>
-                <div id='navigation_buttons' class="block_buttons">
-                    <div style="display: flex;">
-                        <a id="about-us-button" class="button_main decoration"
-                           href="{{ url_for('main.about') }}">
-                            <div href="{{ url_for('main.about') }}" class="">
-                                События
-                            </div>
-                        </a>
-                        <a id="about-us-button" class="button_main button_main_middle_left decoration"
-                           href="{{ url_for('main.about') }}">
-                            <div href="{{ url_for('main.about') }}" class="">
-                                О нас
-                            </div>
-                        </a>
 
-                        <a id="about-us-button" class="button_main button_main_middle_right decoration"
-                           href="{{ url_for('main.about') }}">
-                            <div href="{{ url_for('main.about') }}" class="">
-                                Отзывы
-                            </div>
-                        </a>
-                        <a id="about-us-button" class="button_main decoration"
-                           href="{{ url_for('main.about') }}">
-                            <div href="{{ url_for('main.about') }}" class="">
-                                Фотоальбом
-                            </div>
-                        </a>
-                    </div>
-                </div>
                 <div class="upper_media">
                     <div class="social">
                         <ul class="social-icons">
@@ -204,40 +176,75 @@
                     </div>
                 </div>
 
-
+                <div id="phone_numbers" class="block_numbers">
+                    <div>+7{{ phone_numbers[0] }}</div>
+                    <div>+7{{ phone_numbers[1] }}</div>
+                </div>
             </div>
         </div>
 
-        {#            <div id="upper_block_info" class="block_info">#}
-        {#                <div id="block_info_name" class='name'>#}
-        {#                <div class="info_name">#}
-        {#                    <div>Тренинг-парк</div>#}
-        {#                    <div>#}
-        {#                        <div id="dmitry">Дмитрия</div>#}
-        {#                        <div>Сергеева</div>#}
-        {#                    </div>#}
-        {#                </div>#}
-        {#                </div>#}
-        {#            <div style="visibility: hidden">#}
-        {#                <div class="info_name">#}
-        {#                <div>Тренинг-парк</div>#}
-        {#                <div>Дмитрия Сергеева</div>#}
-        {#                </div>#}
-        {#            </div>#}
-        {#                <div id="phone_numbers" class="block_numbers">#}
-        {#                    <div style="cursor: copy;" href="tel:+7{{ phone_numbers[0] }}">#}
-        {#                     onclick="copy_number('+7{{ phone_numbers[0] }}', this)"#}
-        {#                     title="Нажмите чтобы скопировать">#}
-        {#                        +7{{ phone_numbers[0] }}</div>#}
-        {#                    <div style="cursor: copy;" href="tel:+7{{ phone_numbers[1] }}">#}
-        {#                     onclick="copy_number('+7{{ phone_numbers[1] }}', this)"#}
-        {#                     title="Нажмите чтобы скопировать">#}
-        {#                        +7{{ phone_numbers[1] }}</div>#}
-        {##}
-        {#                </div>#}
+
+        {#       #}{#            <div id="upper_block_info" class="block_info">#}{#
+        #}{#                <div id="block_info_name" class='name'>#}{#
+        #}{#                <div class="info_name">#}{#
+        #}{#                    <div>Тренинг-парк</div>#}{#
+        #}{#                    <div>#}{#
+        #}{#                        <div id="dmitry">Дмитрия</div>#}{#
+        #}{#                        <div>Сергеева</div>#}{#
+        #}{#                    </div>#}{#
+        #}{#                </div>#}{#
+        #}{#                </div>#}{#
+        #}{#            <div style="visibility: hidden">#}{#
+        #}{#                <div class="info_name">#}{#
+        #}{#                <div>Тренинг-парк</div>#}{#
+        #}{#                <div>Дмитрия Сергеева</div>#}{#
+        #}{#                </div>#}
+        {#                    </div>
+                        <div id="phone_numbers" class="block_numbers">
+                            <div style="cursor: copy;" href="tel:+7{{ phone_numbers[0] }}">
+                             onclick="copy_number('+7{{ phone_numbers[0] }}', this)"
+                             title="Нажмите чтобы скопировать">
+                                +7{{ phone_numbers[0] }}</div>
+                            <div style="cursor: copy;" href="tel:+7{{ phone_numbers[1] }}">
+                             onclick="copy_number('+7{{ phone_numbers[1] }}', this)"
+                             title="Нажмите чтобы скопировать">
+                                +7{{ phone_numbers[1] }}</div>
+
+                        </div>#}
         {#            </div>#}
     </div>
 
+    <div id='upper_navigation_buttons' class="upper_navigation_buttons">
+        <div id='navigation_buttons' class="block_buttons">
+            <div style="display: flex;">
+                <a id="about-us-button" class="button_main decoration"
+                   href="{{ url_for('main.events') }}">
+                    <div href="{{ url_for('main.events') }}" class="">
+                        События
+                    </div>
+                </a>
+                <a id="about-us-button" class="button_main button_main_middle_left decoration"
+                   href="{{ url_for('main.about') }}">
+                    <div href="{{ url_for('main.about') }}" class="">
+                        О нас
+                    </div>
+                </a>
+
+                <a id="about-us-button" class="button_main button_main_middle_right decoration"
+                   href="{{ url_for('main.reviews') }}">
+                    <div href="{{ url_for('main.reviews') }}" class="">
+                        Отзывы
+                    </div>
+                </a>
+                <a id="about-us-button" class="button_main decoration"
+                   href="{{ url_for('main.gallery') }}">
+                    <div href="{{ url_for('main.gallery') }}" class="">
+                        Фотоальбом
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
 
     <div id="main_block" class="main_block">
         {% block app_content %}{% endblock %}
