@@ -1,0 +1,80 @@
+.main {
+    /*width: 1200px;*/
+    margin: 0 auto;
+    /*padding: 0 40px 46px;*/
+    text-align: center;
+    max-width: min(var(--primary-content-width), 100%);
+}
+
+.list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(400px, 100%), 1fr));
+    grid-column-gap: 16px;
+    justify-content: center;
+}
+
+.list > div {
+    display: grid;
+    position: relative;
+    margin: 8px auto;
+    width: 100%;
+}
+
+.image-wrapper {
+    display: block;
+    height: clamp(250px, 30vh, 400px);
+    width: 100%;
+    align-items: center;
+    margin: 0 auto;
+    position: relative;
+}
+
+.image-centered-wrapper .page-text {
+    position: absolute;
+    bottom: 0;
+    padding: 20px 30px;
+    color: #fff;
+    font-size: 30px;
+    text-align: center;
+    left: 0;
+    right: 0;
+    display: block;
+    background: linear-gradient(0deg, rgba(0, 0, 0, .3) 0%, rgba(0, 0, 0, 0) 100%);
+}
+
+.content {
+    justify-content: center;
+    margin: 5px auto 7px;
+    text-align: left;
+    word-wrap: break-word;
+    font-size: var(--primary-font-size);
+}
+
+
+.desktop_container {
+    margin: 0 17px;
+}
+
+/* картинка на странице */
+.minimized {
+    display: block;
+    object-fit: cover;
+    width: 100%;
+    margin: 0 auto;
+    cursor: pointer;
+    height: clamp(250px, 30vh, 400px);
+}
+
+.input__file_button {
+    opacity: 0;
+    position: absolute;
+    top: 100px;
+    transition: opacity .3s;
+}
+
+.image-wrapper:hover .input__file_button {
+    opacity: 1;
+    transition: opacity .3s;
+}
+
+

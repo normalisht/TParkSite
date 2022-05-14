@@ -536,7 +536,6 @@ def about():
     return render_template('admin_panel/about.html', employees=employees,
                            filosofi=filosofi, about=about, partners=partners)
 
-
 @bp.route('/comments', methods=['GET'])
 # @login_required
 def comments():
@@ -694,6 +693,10 @@ def category_type_create():
     return render_template('admin_panel/category_type_create.html', title='Создание отзыва',
                            categories=Category.query.all())
 
+@bp.route('/gallery', methods=['GET'])
+def gallery():
+    files = listdir('app/static/images/gallery')
+    return render_template('admin_panel/gallery.html',categories=get_categories(), images=files)
 
 #
 # '''json запросы'''
