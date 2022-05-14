@@ -65,14 +65,15 @@
     height: clamp(250px, 30vh, 400px);
 }
 
-button {
+.display_button {
     opacity: 0;
     position: absolute;
-    top: 100px;
+    top: clamp(125px, 15vh, 200px);
+    left: min(200px, 50%);
     transition: opacity .3s;
 }
 
-.image-wrapper:hover button {
+.image-wrapper:hover .display_button {
     opacity: 1;
     transition: opacity .3s;
 }
