@@ -26,7 +26,8 @@
     font-size: 28px;
 }
 
-.fa-telegram-plane {
+.fa-paper-plane {
+    transform: scale(0.9);
     left: -1px;
 }
 
