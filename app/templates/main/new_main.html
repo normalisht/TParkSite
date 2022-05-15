@@ -1,18 +1,6 @@
 {% extends "main/base.html" %}
 
 {% block scripts %}
-    <script type="text/javascript" src="{{ url_for('static', filename='slider.js') }}"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const slider = new ChiefSlider('.slider', {
-                loop: true,
-                autoplay: false,
-            });
-            const slider_2 = new ChiefSlider('.slider', {
-                loop: true,
-            });
-        });
-    </script>
 
 {% endblock %}
 
