@@ -1,0 +1,46 @@
+@charset "UTF-8";
+
+.new_comment {
+    display: flex;
+    justify-content: flex-start;
+    width: min(100%, 400px);
+    margin: 10px auto;
+}
+
+.new_comment > a {
+    color: black;
+    font-size: calc(var(--primary-font-size) * 1.2)
+}
+
+.comment {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    overflow: hidden;
+    height: calc(var(--primary-font-size));
+    font-size: var(--primary-font-size);
+    text-align: left;
+}
+
+.comment_name {
+    display: block;
+    min-width: max-content;
+    text-align: left;
+    margin-right: 10px;
+}
+
+.comment_text {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+}
+
+.edit_com {
+    margin: 10px auto;
+    color: black;
+    text-decoration: none;
+    width: min(100%, 400px);
+    /*align-items: center;*/
+    height: min-content;
+    /*border-bottom: 1px solid;*/
+}

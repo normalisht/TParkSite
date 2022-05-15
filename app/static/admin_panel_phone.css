@@ -1,11 +1,13 @@
+
+
 .grid_category {
     display: grid;
     min-width: 90vw;
     grid-template-columns: 75% 1fr;
     text-align: left;
     justify-content: left;
-    margin-bottom: 20px;
-    margin-left: 10px;
+    /*margin-bottom: 20px;*/
+    /*margin-left: 10px;*/
 }
 
 .grid_block_price {

@@ -7,7 +7,7 @@ import os
 import datetime
 import time
 from os import listdir
-from app.models import Text, Comment, Event, Category, ServiceCategory, Service, Employee, Partner, Price
+from app.models import Text, Comment, Event, Category, ServiceCategory, Service, Employee, Partner, Price, Type
 from app.main.functions import get_categories, get_contacts_data, compress
 from sqlalchemy import create_engine
 from flask_ckeditor import CKEditor
@@ -20,16 +20,10 @@ engine = create_engine("sqlite:///T_Park.db")
 @bp.route('/TPark', methods=['GET'])
 def index():
     main_text = Text.query.filter_by(title="main_text").first().text
-
-    temp_categories = Category.query.all()
-    temp_list = []
-    for category in temp_categories:
-        temp_list.append(category.type)
-    unique = list(set(temp_list))
-    unique.sort()
+    types = Type.query.order_by(Type.number).all()
 
     return render_template('main/new_main.html', main_text=main_text,
-                           categories=get_categories(), contacts_data=get_contacts_data(), type_list=unique)
+                           contacts_data=get_contacts_data(), types=types)
 
 
 @bp.route('/category', methods=['GET'])
@@ -96,9 +90,11 @@ def events():
     events_2 = []
     slider_events = True
     len_slider = len(os.listdir('app/static/images/staff'))
+    # len_slider = len(os.listdir('/home/Losharik17/TParkSite/app/static/images/staff'))
 
     for event in events:
-        date = datetime.date(int(event.date.strftime('%Y')), int(event.date.strftime('%m')), int(event.date.strftime('%d')))
+        date = datetime.date(int(event.date.strftime('%Y')), int(event.date.strftime('%m')),
+                             int(event.date.strftime('%d')))
         dt = datetime.datetime.combine(date, datetime.time(22, 0))
 
         if dt > datetime.datetime.now():
@@ -116,7 +112,6 @@ def events():
 
 @bp.route('/reviews', methods=['GET'])
 def reviews():
-
     comments = Comment.query.all()
 
     return render_template('main/comments.html', comments=comments,
@@ -126,4 +121,5 @@ def reviews():
 @bp.route('/gallery', methods=['GET'])
 def gallery():
     files = listdir('app/static/images/gallery')
-    return render_template('main/gallery.html',categories=get_categories(), contacts_data=get_contacts_data(), images=files)
+    return render_template('main/gallery.html', categories=get_categories(), contacts_data=get_contacts_data(),
+                           images=files)

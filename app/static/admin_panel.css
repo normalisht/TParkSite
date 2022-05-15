@@ -1,5 +1,9 @@
 @charset "UTF-8";
 
+* {
+    font-size: var(--primary-font-size);
+}
+
 .block_buttons {
     margin-bottom: 10px;
 }
@@ -53,6 +57,7 @@
     grid-template-columns: 100%;
     min-height: 100px;
     justify-items: center;
+    align-items: center;
 }
 
 .grid_block_photo {
@@ -270,8 +275,11 @@
     grid-template-columns: 75% 1fr;
     text-align: left;
     justify-content: left;
-    margin-bottom: 20px;
-    margin-left: 10px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    /*margin-left: 10px;*/
+    grid-row-gap: 5px;
+    align-items: center;
 }
 
 .grid_block_price {
@@ -286,8 +294,12 @@
 
 
 .label_1 {
-    font-size: 18px;
+    font-size: var(--primary-font-size);
+    border-bottom: 1px solid;
+}
 
+.label_1:last-child {
+    border: 0;
 }
 
 .service_name {

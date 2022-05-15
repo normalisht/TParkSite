@@ -102,7 +102,8 @@
                         </div>
                     </div>
 
-                    <div>Контакты</div>
+                    <div><img id="contacts" class="contact_img" src="{{ url_for("static", filename='contacts.png') }}"
+                              alt=""></div>
                 </div>
 
                 <div id="services-modal-win" class="modal submenu">
@@ -125,6 +126,12 @@
                             </div>
                         </div>
                         <div class="modal-content">
+                            <div class="modal-item submenu-item">
+                                <a class="modal-link"
+                                   href="{{ url_for('main.category') }}">
+                                    Услуги
+                                </a>
+                            </div>
                             <div class="modal-item submenu-item">
                                 <a class="modal-link"
                                    href="{{ url_for('main.events') }}">
@@ -242,8 +249,24 @@
         {#            </div>#}
     </div>
 
-
     <div id="main_block" class="main_block">
+        <div id="phone_numbers" class="block_numbers">
+            <a style="cursor: pointer;" href="tel:+7{{ phone_numbers[0] }}">
+                +7{{ phone_numbers[0] }}
+            </a>
+            <a style="cursor: pointer;" href="tel:+7{{ phone_numbers[1] }}">
+                +7{{ phone_numbers[1] }}
+            </a>
+        </div>
+
+        <div id="block_logo" class="block_logo block_logo_phone">
+            <div>
+                <a href="{{ url_for('main.index') }}">
+                    <img id="logo" class="img_logo" src="{{ url_for('static', filename='logo_2.png') }}" alt="">
+                </a>
+            </div>
+        </div>
+
         {% block app_content %}{% endblock %}
     </div>
 
