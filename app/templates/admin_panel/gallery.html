@@ -1,0 +1,48 @@
+{% extends "admin_panel/base.html" %}
+
+{% block scripts %}
+<link rel="stylesheet" href="{{ url_for('static', filename='admin_panel/gallery.css') }}">
+
+{% endblock %}
+
+{% block app_content %}
+
+<div class="desktop_container">
+    <div class="content">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="main">
+                <div class="category_title">Фотоальбом</div>
+                <div class="list">
+                    {% for image in images %}
+                    <div>
+                        {% set path = "images/gallery/" + image %}
+                        <a class="image-wrapper">
+                        <img src="{{ url_for("static", filename=path) }}" alt="" class="minimized">
+                            <div class="display_button">
+                            <input type="submit" id="delete_category" class="input__file" name="delete_{{image}}">
+                            <label for="delete_category" class="input__file_button">
+                                <span class="input__file_button_text_2">Удалить</span>
+                            </label>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="input__wrapper">
+                    <input type="file" id="blank_file" multiple name="add_photo" class="input__file">
+                    <label for="blank_file" class="input__file_button">
+                        <span class="input__file_button_text_2">Добавить</span>
+                    </label>
+                </div>
+                <div class="input__wrapper">
+                    <input type="submit" id="Submit" value="Подтвердить" class="input__file">
+                    <label for="Submit" class="input__file_button">
+                        <span class="input__file_button_text_2">Сохранить изменения</span>
+                    </label>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

@@ -13,7 +13,7 @@ from app.models import CategoryType, Admin, Category, Service, Employee, Text, C
     Type
 import json
 import shutil
-
+import uuid
 
 # авторизация админа
 @bp.route('/', methods=['GET', 'POST'])
@@ -196,6 +196,7 @@ def category():
 @bp.route('/category_change', methods=['GET', 'POST'])
 # @login_required
 def category_change():
+    base_number = 1
     category_id = request.args.get('category_id')
     category = Category.query.filter_by(id=category_id).first()
     services = category.services.order_by(ServiceCategory.number).all()
@@ -263,18 +264,13 @@ def category_change():
         if request.files.get('add_photo'):
 
             images = request.files.getlist('add_photo')
-            count = len(files)
-
-            try:
-                os.chdir('app/static/images/category/{}'.format(category_id))
-            except:
-                os.makedirs('app/static/images/category/{}'.format(category_id))
-                os.chdir('app/static/images/category/{}'.format(category_id))
-
+            for img in files:
+                os.rename(img, str(base_number)+'.jpg')
+                base_number += 1
+            base_number -= 1
             for img in images:
-                print(os.getcwd())
-                img.save(os.path.join(os.getcwd(), '{}.png'.format(count + 1)))
-                count += 1
+                img.save(os.path.join(os.getcwd(), '{}.png'.format(base_number + 1)))
+                base_number += 1
                 os.chdir('../../../../../')
 
             return redirect(url_for('admin_panel.category_change', category_id=category_id))
@@ -536,7 +532,6 @@ def about():
     return render_template('admin_panel/about.html', employees=employees,
                            filosofi=filosofi, about=about, partners=partners)
 
-
 @bp.route('/comments', methods=['GET'])
 # @login_required
 def comments():
@@ -694,6 +689,45 @@ def category_type_create():
     return render_template('admin_panel/category_type_create.html', title='Создание отзыва',
                            categories=Category.query.all())
 
+
+@bp.route('/gallery', methods=['GET', 'POST'])
+def gallery():
+    base_number = 1
+    print(os.getcwd())
+    try:
+        os.chdir('app/static/images/gallery')
+        temp = os.getcwd()
+        files = listdir(temp)
+        files.sort(key=len)
+        os.chdir('../../../../')
+    except:
+        files = []
+    if request.method == 'POST':
+        if request.files.get('add_photo'):
+            os.chdir('app/static/images/gallery')
+            images = request.files.getlist('add_photo')
+            for img in files:
+                os.rename(img, str(base_number)+'.jpg')
+                base_number += 1
+
+            base_number -= 1
+            for img in images:
+                img.save(os.path.join(os.getcwd(), '{}.png'.format(base_number + 1)))
+                base_number += 1
+            os.chdir('../../../../')
+        for photo in files:
+            print(request.form.get)
+            if request.form.get('delete_' + str(photo)):
+                try:
+                    print('a')
+                    os.remove('app/static/images/gallery/' + str(photo))
+                    return redirect(url_for('admin_panel.gallery'))
+                except:
+                    pass
+
+        return redirect(url_for('admin_panel.gallery'))
+
+    return render_template('admin_panel/gallery.html',categories=get_categories(), images=files)
 
 #
 # '''json запросы'''
