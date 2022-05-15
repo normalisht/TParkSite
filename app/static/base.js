@@ -160,12 +160,12 @@ function detected_phone() {
             document.documentElement.style.setProperty('--primary-font-size', `14px`)
         } else if (detect.tablet()) {
             add_css_file('/app/static/main/desktop.css')
-            document.documentElement.style.setProperty('--primary-font-size', `14px`)
+            document.documentElement.style.setProperty('--primary-font-size', `20px`)
         }
     } else {
         add_css_file('/app/static/main/desktop.css')
         add_js_file('/app/static/base_desktop.js')
-        document.documentElement.style.setProperty('--primary-font-size', `16px`)
+        document.documentElement.style.setProperty('--primary-font-size', `24px`)
     }
 }
 
@@ -205,7 +205,7 @@ window.addEventListener('load', function () {
     let slider_items = $('#event_items'),
         slider_item_active = slider_items.find('.slider__item_active')
 
-    slider_items.css({'height': slider_item_active.outerHeight() + 'px'}, 1000)
+    slider_items.css({'height': slider_item_active.outerHeight() + 'px'})
 
     slider_items.find('.slider__item').each(function () {
         let name_event = $(this).find('.event_name')
@@ -266,20 +266,3 @@ function isScrolledIntoView(elem)
 
     return (elemBottom <= docViewBottom) || (elemTop <= docViewBottom);
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-    let st = false,
-        phone_numbers = $('#phone_numbers')
-    phone_numbers.stop().slideUp(0)
-
-    $('#contacts').click(function() {
-        if (st) {
-            phone_numbers.stop().slideUp(500)
-            st = !st
-        }
-        else {
-            phone_numbers.stop().slideDown(500)
-            st = !st
-        }
-    })
-})

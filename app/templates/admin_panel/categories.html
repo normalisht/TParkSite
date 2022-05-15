@@ -7,8 +7,13 @@
 {% block app_content %}
 
     <div class="block_event">
-        <div class="new_event event">
-            <a href="{{ url_for('admin_panel.category_types') }}">Группы категорий</a>
+        <div class="event">
+            <a id="about-us-button" class=""
+               href="{{ url_for('admin_panel.all_services') }}">
+                <div href="{{ url_for('admin_panel.all_services') }}" class="">
+                    Все услуги
+                </div>
+            </a>
         </div>
         <div class="new_event event">
             <a href="{{ url_for('admin_panel.category_create') }}">Создать новую категорию</a>

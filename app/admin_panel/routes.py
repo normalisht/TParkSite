@@ -9,8 +9,7 @@ from app import db
 from flask_login import login_user, logout_user, current_user, login_required
 
 from app.main.functions import get_categories
-from app.models import CategoryType, Admin, Category, Service, Employee, Text, Comment, ServiceCategory, Event, Partner, \
-    Type
+from app.models import Admin, Category, Service, Employee, Text, Comment, ServiceCategory, Event, Partner
 import json
 import shutil
 
@@ -28,7 +27,7 @@ def login():
             flash('Неверный пароль или email', 'warning')
             return redirect(url_for('admin_panel.login'))
 
-        return redirect(url_for('admin_panel.category'))
+        return redirect(url_for('admin_panel.main'))
 
     return render_template('admin_panel/login.html', title='Авторизация')
 
@@ -100,8 +99,7 @@ def events():
     events_2 = []
 
     for event in Event.query.order_by(Event.date).all():
-        date = datetime.date(int(event.date.strftime('%Y')), int(event.date.strftime('%m')),
-                             int(event.date.strftime('%d')))
+        date = datetime.date(int(event.date.strftime('%Y')), int(event.date.strftime('%m')), int(event.date.strftime('%d')))
         dt = datetime.datetime.combine(date, datetime.time(22, 0))
 
         if dt > datetime.datetime.now():
@@ -281,8 +279,7 @@ def category_change():
 
         category.number = request.form.get('weight')
         category.description = request.form.get('ckeditor')
-        category.name = request.form.get('title').strip().capitalize()
-        category.type = request.form.get('type').strip().capitalize()
+        category.name = request.form.get('title')
         db.session.commit()
         return redirect(url_for('admin_panel.category_change', category_id=category_id))
 
@@ -325,7 +322,7 @@ def service_test():
     service = Service.query.filter_by(id=service_id).first()
     categories_all = Category.query.all()
 
-    categories_cheked = [0]
+    b = [0]
 
     if request.method == 'POST':
         if request.form.get('checkbox') == '1':
@@ -381,17 +378,16 @@ def service_test():
 
             return redirect(url_for('admin_panel.all_services'))
 
-        return redirect(
-            url_for('admin_panel.category_change') + '?category_id={}'.format(service.categories[0].category_id))
+        return redirect(url_for('admin_panel.category_change') + '?category_id={}'.format(service.categories[0].category_id))
 
     for i in categories_all:
         if ServiceCategory.query.filter_by(service_id=service_id, category_id=i.id).first():
-            categories_cheked.insert(i.id, i.id)
+            b.insert(i.id, i.id)
         else:
-            categories_cheked.insert(i.id, 0)
+            b.insert(i.id, 0)
 
     return render_template('admin_panel/service.html', title='{}'.format(service.name),
-                           categories=get_categories(), service=service, categories_checked=categories_cheked,
+                           categories=get_categories(), service=service, categories_checked=b,
                            files=os.path.isfile('app/static/images/service/{}.png'.format(service_id)))
 
 
@@ -484,26 +480,26 @@ def about():
                     os.chdir('../../../../')
                     return redirect(url_for('admin_panel.about'))
                 partner.link = request.form.get('partner_' + str(partner.id) + '_link')
-        # for employee in employees:
-        #     if request.form.get('employee_' + str(employee.id) + '_delete'):
-        #         try:
-        #             os.remove('app/static/images/employee/' + str(employee.id) + ".png")
-        #         except:
-        #             pass
-        #         Employee.query.filter_by(id=employee.id).delete()
-        #         db.session.commit()
-        #         return redirect(url_for('admin_panel.about'))
-        #     if request.form.get('employee_' + str(employee.id) + '_save'):
-        #         if request.files.get('employee_' + str(employee.id) + '_photo'):
-        #             image = request.files.get('employee_' + str(employee.id) + '_photo')
-        #             os.chdir('app/static/images/employee')
-        #             image.save(os.path.join(os.getcwd(), '{}.png'.format(employee.id)))
-        #             os.chdir('../../../../')
-        #             return redirect(url_for('admin_panel.about'))
-        #         if request.form.get('employee_' + str(employee.id) + '_name'):
-        #             employee.name = request.form.get('employee_' + str(employee.id) + '_name')
-        #         if request.form.get('employee_' + str(employee.id) + '_position'):
-        #             employee.position = request.form.get('employee_' + str(employee.id) + '_position')
+        for employee in employees:
+            if request.form.get('employee_' + str(employee.id) + '_delete'):
+                try:
+                    os.remove('app/static/images/employee/' + str(employee.id) + ".png")
+                except:
+                    pass
+                Employee.query.filter_by(id=employee.id).delete()
+                db.session.commit()
+                return redirect(url_for('admin_panel.about'))
+            if request.form.get('employee_' + str(employee.id) + '_save'):
+                if request.files.get('employee_' + str(employee.id) + '_photo'):
+                    image = request.files.get('employee_' + str(employee.id) + '_photo')
+                    os.chdir('app/static/images/employee')
+                    image.save(os.path.join(os.getcwd(), '{}.png'.format(employee.id)))
+                    os.chdir('../../../../')
+                    return redirect(url_for('admin_panel.about'))
+                if request.form.get('employee_' + str(employee.id) + '_name'):
+                    employee.name = request.form.get('employee_' + str(employee.id) + '_name')
+                if request.form.get('employee_' + str(employee.id) + '_position'):
+                    employee.position = request.form.get('employee_' + str(employee.id) + '_position')
         if request.form.get('partner_add'):
             temp = Partner.query.filter_by(name='temp').first()
             image = request.files.get('partner_add_photo')
@@ -515,17 +511,17 @@ def about():
             db.session.add(temp)
             db.session.commit()
             return redirect(url_for('admin_panel.about'))
-        # if request.form.get('employee_add'):
-        #     temp = Employee.query.filter_by(name='temp').first()
-        #     image = request.files.get('employee_add_photo')
-        #     os.chdir('app/static/images/employee')
-        #     image.save(os.path.join(os.getcwd(), '{}.png'.format(temp.id)))
-        #     os.chdir('../../../../')
-        #     temp.name = request.form.get('employee_' + str(temp.id) + '_name')
-        #     temp.position = request.form.get('employee_' + str(temp.id) + '_position')
-        #     db.session.add(temp)
-        #     db.session.commit()
-        #     return redirect(url_for('admin_panel.about'))
+        if request.form.get('employee_add'):
+            temp = Employee.query.filter_by(name='temp').first()
+            image = request.files.get('employee_add_photo')
+            os.chdir('app/static/images/employee')
+            image.save(os.path.join(os.getcwd(), '{}.png'.format(temp.id)))
+            os.chdir('../../../../')
+            temp.name = request.form.get('employee_' + str(temp.id) + '_name')
+            temp.position = request.form.get('employee_' + str(temp.id) + '_position')
+            db.session.add(temp)
+            db.session.commit()
+            return redirect(url_for('admin_panel.about'))
         if request.form.get('about_text'):
             about.text = request.form.get('about_text')
         if request.form.get('filosofi_text'):
@@ -535,165 +531,6 @@ def about():
 
     return render_template('admin_panel/about.html', employees=employees,
                            filosofi=filosofi, about=about, partners=partners)
-
-
-@bp.route('/comments', methods=['GET'])
-# @login_required
-def comments():
-    comments = Comment.query.all()
-
-    return render_template('admin_panel/comments.html', title='Отзывы',
-                           comments=comments)
-
-
-@bp.route('/edit_comment', methods=['GET', 'POST'])
-# @login_required
-def edit_comment():
-    comment = Comment.query.filter_by(id=request.args.get('comment_id')).first()
-
-    if request.method == 'POST':
-        name = request.form.get('name')
-        text = request.form.get('text')
-
-        setattr(comment, 'name', name)
-        setattr(comment, 'text', text)
-
-        try:
-            if request.files.get('change'):
-                image = request.files.get('change')
-                os.chdir('app/static/images/comments')
-                image.save(os.path.join(os.getcwd(), '{}.png'.format(comment.id)))
-                os.chdir('../../../../')
-        except:
-            pass
-
-        db.session.commit()
-
-        if request.form.get('delete'):
-            db.session.delete(comment)
-            db.session.commit()
-
-            return redirect(url_for('admin_panel.comments'))
-
-    return render_template('admin_panel/edit_comment.html', title='Отзывы',
-                           comment=comment)
-
-
-# создание отзыва
-@bp.route('/comment_create', methods=['GET', 'POST'])
-# @login_required
-def comment_create():
-    if request.method == 'POST':
-        name = request.form.get('name')
-        text = request.form.get('text')
-
-        comment = Comment(name=name, text=text)
-
-        db.session.add(comment)
-        db.session.commit()
-
-        photo = request.files['photo']
-        os.chdir('app/static/images/comments')
-        try:
-            photo.save(os.path.join(os.getcwd(), '{}.png'.format(
-                Comment.query.filter_by(name=name, text=text).first().id
-            )))
-            os.chdir('../../../../')
-        except:
-            os.chdir('../../../../')
-
-        return redirect(url_for('admin_panel.comments'))
-
-    return render_template('admin_panel/comment_create.html', title='Создание отзыва')
-
-
-@bp.route('/category_types', methods=['GET'])
-# @login_required
-def category_types():
-    category_types = Type.query.order_by(Type.number).all()
-
-    return render_template('admin_panel/category_types.html', title='Группы категорий',
-                           category_types=category_types)
-
-
-@bp.route('/edit_category_type', methods=['GET', 'POST'])
-# @login_required
-def edit_category_type():
-    type = Type.query.filter_by(id=request.args.get('type_id')).first()
-    categories = Category.query.all()
-
-    if request.method == 'POST':
-        name = request.form.get('name')
-        number = request.form.get('number')
-
-        setattr(type, 'name', name)
-        setattr(type, 'number', number)
-
-        db.session.commit()
-
-        for category in categories:
-            temp = CategoryType(type_id=type.id, category_id=category.id)
-
-            if request.form.get(str(category.id)) == str(category.id):
-                if not CategoryType.query.filter_by(type_id=type.id, category_id=category.id).first():
-                    db.session.add(temp)
-                    db.session.commit()
-            else:
-                temp = CategoryType.query.filter_by(type_id=type.id, category_id=category.id).first()
-                if temp:
-                    db.session.delete(temp)
-                    db.session.commit()
-
-        if request.form.get('delete'):
-            db.session.delete(type)
-            db.session.commit()
-
-        return redirect(url_for('admin_panel.category_types'))
-
-    categories_checked = [0]
-    for category in categories:
-        if CategoryType.query.filter_by(type_id=type.id, category_id=category.id).first():
-            categories_checked.insert(category.id, category.id)
-        else:
-            categories_checked.insert(category.id, 0)
-
-    return render_template('admin_panel/edit_type_category.html', title='Группа категорий',
-                           type=type, categories=categories, categories_checked=categories_checked)
-
-
-# создание отзыва
-@bp.route('/category_type_create', methods=['GET', 'POST'])
-# @login_required
-def category_type_create():
-    if request.method == 'POST':
-        name = request.form.get('name')
-        number = request.form.get('number')
-
-        type = Type(name=name, number=number)
-
-        db.session.add(type)
-        db.session.commit()
-
-        type = Type.query.all()[-1]
-
-        for category in Category.query.all():
-            temp = CategoryType(type_id=type.id, category_id=category.id)
-
-            if request.form.get(str(category.id)) == str(category.id):
-                if not CategoryType.query.filter_by(type_id=type.id, category_id=category.id).first():
-                    db.session.add(temp)
-                    db.session.commit()
-            else:
-                temp = CategoryType.query.filter_by(type_id=type.id, category_id=category.id).first()
-                if temp:
-                    db.session.delete(temp)
-                    db.session.commit()
-
-        return redirect(url_for('admin_panel.category_types'))
-
-    return render_template('admin_panel/category_type_create.html', title='Создание отзыва',
-                           categories=Category.query.all())
-
 
 #
 # '''json запросы'''

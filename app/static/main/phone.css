@@ -1,9 +1,11 @@
 /*Phone*/
 .img_logo {
-    width: calc(var(--vw, 1vw) * 70 - 34px);
+    /*max-width: 150px;*/
+    /*max-height: 100px;*/
     object-fit: cover;
+    width: 30vw;
+    height: 100%;
     display: block;
-    /*transform: translate(-50%, 0);*/
 }
 
 .upper {
@@ -118,15 +120,8 @@
 }
 
 .block_logo {
-    /*left: 0;*/
-    /*margin-left:45px;*/
-    margin: 10px 17px;
-    width: calc(var(--vw, 1vw) * 100 - 34px);
-}
-
-.block_logo > div {
-    display: flex;
-    justify-content: center;
+    left: 0;
+    margin-left:45px;
 }
 
 .block_content {
@@ -195,35 +190,23 @@
 }
 
 .block_numbers {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(50%, 1fr));
-    font-size: calc(1.5 * var(--primary-font-size));
-    justify-content: center;
-    /*height: 0;*/
-    overflow: hidden;
-    margin: 10px auto;
+    font-size: calc(1 * var(--primary-font-size));
+    margin-bottom: 2px;
 }
 
-.block_numbers > a {
-    width: max-content;
-    margin: 5px auto;
-    text-decoration: none;
-    /*color: #ffaa1a;*/
-    color: #2a4758;
-    font-weight: 700;
-    box-sizing: border-box;
-    padding: 3px 4px 0;
+.block_numbers > div {
+    width: 50%;
 }
 
-/*.block_numbers > div:first-child {*/
-/*    text-align: left;*/
-/*    margin-left: 17px;*/
-/*}*/
+.block_numbers > div:first-child {
+    text-align: left;
+    margin-left: 17px;
+}
 
-/*.block_numbers > div:last-child {*/
-/*    text-align: right;*/
-/*    margin-right: 17px;*/
-/*}*/
+.block_numbers > div:last-child {
+    text-align: right;
+    margin-right: 17px;
+}
 
 .event_info {
     text-align: center;
@@ -257,7 +240,7 @@
     height: min-content;
     text-align: left;
     left: 17px;
-    top: calc(clamp(200px, (var(--vh, 1vh) * 45), 800px) - 53px);
+    /*top: calc(clamp(200px, (var(--vh, 1vh) * 45), 800px) - 53px);*/
 }
 
 .event_text {
@@ -267,17 +250,11 @@
 }
 
 .image-centered-wrapper .page-text {
-    padding: 5px 10px;
+    padding: 20px 10px;
     font-size: calc(1.4 * var(--primary-font-size));
 }
 
 
 .image-centered-wrapper {
     height: clamp(100px, 15vh, 200px);
-}
-
-.category_title {
-    padding-top: 0;
-    padding-bottom: 4px;
-    font-size: calc(var(--primary-font-size) * 1.3);
 }

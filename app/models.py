@@ -41,24 +41,11 @@ class Price(db.Model):
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True, index=True, unique=True)
     name = db.Column(db.String(128))
+    type = db.Column(db.String(128))
     description = db.Column(db.Text)
     status = db.Column(db.BOOLEAN())  # отображение клиентам
     services = db.relationship('ServiceCategory', backref='category', lazy='dynamic')
     number = db.Column(db.Integer, index=True, default=30)
-    types = db.relationship('CategoryType', backref='category', lazy='dynamic')
-
-
-class CategoryType(db.Model):
-    id = db.Column(db.Integer, primary_key=True, index=True, unique=True)
-    type_id = db.Column(db.Integer, db.ForeignKey('type.id'))
-    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
-
-
-class Type(db.Model):
-    id = db.Column(db.Integer, primary_key=True, index=True, unique=True)
-    name = db.Column(db.String(128))
-    number = db.Column(db.Integer, default=500)  # порядковый номер
-    categories = db.relationship('CategoryType', backref='type', lazy='dynamic')
 
 
 class ServiceCategory(db.Model):
