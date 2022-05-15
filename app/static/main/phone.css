@@ -56,7 +56,7 @@
     position: fixed;
     top: 0;
     left: 0;
-    padding: 0 17px;
+    padding: 0 17px 6px;
     border-radius: 0 0 10px;
     /*background-color: rgba(0, 0, 0, 0.65);*/
     /*background-color: #565656;*/
@@ -69,10 +69,13 @@
     /*position: fixed;*/
     /*top: 0;*/
     /*left: 0;*/
+    padding-top: 2px;
     width: 30px;
-    height: 30px;
+    height: 32px;
     z-index: 3;
     overflow: hidden;
+    /*background: url(../burger_back.png) top left repeat-x;*/
+    /*top: 30px;*/
     /*background-color: rgba(0, 0, 0, 0.65);*/
 }
 
@@ -82,40 +85,40 @@
     left: 17px;
 }
 
-.menu-btn span {
-    width: 25px;
-    height: 4px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #ffffff;
-    transition: all 0.5s;
-    border-radius: 2px;
-    opacity: 1;
-}
+/*.menu-btn span {*/
+/*    width: 25px;*/
+/*    height: 4px;*/
+/*    position: absolute;*/
+/*    top: 50%;*/
+/*    left: 50%;*/
+/*    transform: translate(-50%, -50%);*/
+/*    background-color: #ffffff;*/
+/*    transition: all 0.5s;*/
+/*    border-radius: 2px;*/
+/*    opacity: 1;*/
+/*}*/
 
-.menu-btn span:nth-of-type(2) {
-    top: calc(50% - 8px);
-}
+/*.menu-btn span:nth-of-type(2) {*/
+/*    top: calc(50% - 8px);*/
+/*}*/
 
-.menu-btn span:nth-of-type(3) {
-    top: calc(50% + 8px);
-}
+/*.menu-btn span:nth-of-type(3) {*/
+/*    top: calc(50% + 8px);*/
+/*}*/
 
-.menu-btn.active span:nth-of-type(1) {
-    opacity: 0;
-}
+/*.menu-btn.active span:nth-of-type(1) {*/
+/*    opacity: 0;*/
+/*}*/
 
-.menu-btn.active span:nth-of-type(2) {
-    top: 50%;
-    transform: translate(-50%, 0%) rotate(45deg);
-}
+/*.menu-btn.active span:nth-of-type(2) {*/
+/*    top: 50%;*/
+/*    transform: translate(-50%, 0%) rotate(45deg);*/
+/*}*/
 
-.menu-btn.active span:nth-of-type(3) {
-    top: 50%;
-    transform: translate(-50%, 0%) rotate(-45deg);
-}
+/*.menu-btn.active span:nth-of-type(3) {*/
+/*    top: 50%;*/
+/*    transform: translate(-50%, 0%) rotate(-45deg);*/
+/*}*/
 
 .block_logo {
     /*left: 0;*/
