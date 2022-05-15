@@ -54,56 +54,6 @@
     justify-content: flex-end;
 }
 
-
-.social-icons a {
-    display: inline-block;
-    width: 36px;
-    height: 32px;
-    border-radius: 50%;
-    background: #505050;
-    position: relative;
-    margin: 5px;
-    text-align: center;
-    font-size: 28px;
-    transition: 0.5s;
-    align-items: center;
-    box-shadow: 0 0;
-}
-
-.social-icons .vk {
-    color: #ffffff;
-}
-
-.social-icons .whatsapp {
-    color:#ffffff;
-}
-
-.social-icons .telega{
-    color: #ffffff;
-}
-
-
-.social-icons a img {
-    width: 16px;
-    height: 16px;
-    margin-top: -2px;
-}
-
-
-
-.fa-telegram-plane:before {
-scale(0.5);
-
-}
-
-.social-icons a i,
-.social-icons a img {
-    z-index:2;
-    position: relative;
-    line-height: 28px;
-}
-
-
 .burger_container {
     position: fixed;
     top: 0;
