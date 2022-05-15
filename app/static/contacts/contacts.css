@@ -1,5 +1,35 @@
 @import url(https://use.fontawesome.com/releases/v5.0.13/css/all.css);
 
+.social-icons-phone {
+    display: flex;
+    padding-inline-start: 0;
+    margin-block-start: 0;
+    margin-block-end: 0;
+    justify-content: center;
+    margin: 3px;
+}
+
+.social-icons-phone > li {
+    margin: 0 5px;
+}
+
+.social-icons-phone > li > a {
+    color: #767574;
+    -moz-transition: opacity .3s;
+    -o-transition: opacity .3s;
+    -webkit-transition: opacity .3s;
+    transition: opacity .3s;
+}
+
+.fa-stack-2x {
+    top: 2px;
+    font-size: 28px;
+}
+
+.fa-telegram-plane {
+    left: -1px;
+}
+
 .social-icons {
     display: flex;
     justify-content: center;
@@ -29,10 +59,10 @@
 }
 
 .social-icons .whatsapp {
-    color:#25d366;
+    color: #25d366;
 }
 
-.social-icons .telega{
+.social-icons .telega {
     color: #0088cc;
 }
 
@@ -44,7 +74,7 @@
 
 .social-icons a i,
 .social-icons a img {
-    z-index:2;
+    z-index: 2;
     position: relative;
     line-height: 30px;
 }
@@ -65,11 +95,11 @@
     left: 50%;
 }
 
-.social-icons .vk:after{
+.social-icons .vk:after {
     background: #BFE2FF;
 }
 
-.social-icons .insta:after{
+.social-icons .insta:after {
     background: radial-gradient(circle farthest-corner at 35% 90%, #fec564, transparent 50%),
     radial-gradient(circle farthest-corner at 0 140%, #fec564, transparent 50%),
     radial-gradient(ellipse farthest-corner at 0 -25%, #5258cf, transparent 50%),
@@ -80,9 +110,9 @@
     linear-gradient(#6559ca, #bc318f 30%, #e33f5f 50%, #f77638 70%, #fec66d 100%);
 }
 
-.social-icons .whatsapp:after{
-    background: linear-gradient(#25d366,#25d366) 14% 84%/16% 16% no-repeat,
-    radial-gradient(#25d366 100%,transparent 0);
+.social-icons .whatsapp:after {
+    background: linear-gradient(#25d366, #25d366) 14% 84%/16% 16% no-repeat,
+    radial-gradient(#25d366 100%, transparent 0);
 }
 
 .social-icons a:hover:after {
@@ -91,16 +121,16 @@
     margin-left: -18px;
 }
 
-.social-icons .vk:hover:after{
+.social-icons .vk:hover:after {
     background: #337AB7;
 }
 
 .social-icons .telega:hover:after {
-    background:#0088cc;
-    radial-gradient(white 100%,transparent 0);
+    background: #0088cc;
+radial-gradient(white 100 %, transparent 0);
 }
 
-.geolocation a{
+.geolocation a {
     text-decoration: none;
 }
 
