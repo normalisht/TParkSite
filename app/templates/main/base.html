@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='preloader.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='main/main.css') }}">
     <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename="favicon.ico") }}"/>
@@ -65,15 +64,11 @@
                     <div class="upper_main" data-modal-window-toggle="#services-modal-win">
                         <div class="burger_container">
                             <div class="menu-btn" style="opacity: 0;">
-                                <span></span>
-                                <span></span>
-                                <span></span>
+                                <i class="fa fa-bars fa-inverse fa-2x"></i>
                             </div>
                         </div>
                         <div class="menu-btn menu-btn-visible">
-                            <span></span>
-                            <span></span>
-                            <span></span>
+                            <i class="fa fa-bars fa-inverse fa-2x"></i>
                         </div>
                     </div>
 
@@ -104,7 +99,7 @@
                                            target="_blank">
                                             <span class="fa-stack">
                                                 <i class="fa fa-circle fa-inverse fa-stack-2x"></i>
-                                                <i class="fa fa-paper-plane fa-stack-1x"></i>
+                                                <i class="fab fa-telegram-plane fa-stack-1x"></i>
                                             </span>
                                         </a>
                                     </li>
@@ -260,6 +255,24 @@
         {#            </div>#}
     </div>
 
+    <div id="main_block" class="main_block">
+        <div id="phone_numbers" class="block_numbers">
+            <a style="cursor: pointer;" href="tel:+7{{ phone_numbers[0] }}">
+                8-{{ phone_numbers[0][0]|string + phone_numbers[0][1]|string + phone_numbers[0][2]|string }}-{{ phone_numbers[0][3]|string + phone_numbers[0][4]|string + phone_numbers[0][5]|string }}-{{ phone_numbers[0][6]|string + phone_numbers[0][7]|string }}-{{ phone_numbers[0][8]|string + phone_numbers[0][9]|string }}
+
+            </a>
+            <a style="cursor: pointer;" href="tel:+7{{ phone_numbers[1] }}">
+                8-{{ phone_numbers[1][0]|string + phone_numbers[1][1]|string + phone_numbers[1][2]|string }}-{{ phone_numbers[1][3]|string + phone_numbers[1][4]|string + phone_numbers[1][5]|string }}-{{ phone_numbers[1][6]|string + phone_numbers[1][7]|string }}-{{ phone_numbers[1][8]|string + phone_numbers[1][9]|string }}
+            </a>
+        </div>
+
+        <div id="block_logo" class="block_logo block_logo_phone">
+            <div>
+                <a href="{{ url_for('main.index') }}">
+                    <img id="logo" class="img_logo" src="{{ url_for('static', filename='logo_2.png') }}" alt="">
+                </a>
+            </div>
+        </div>
 
         {% block app_content %}{% endblock %}
     </div>
