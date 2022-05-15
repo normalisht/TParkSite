@@ -12,12 +12,19 @@
     position: sticky;
 }
 
-.upper {
-
+.upper_media {
+    width: calc(100%/3);
 }
 
-.block_logo_phone {
-    display: none;
+.block_logo {
+    width: calc(100%/3);
+}
+
+.upper_navigation_buttons{
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    width: 100%;
 }
 
 .upper_container {
@@ -90,10 +97,11 @@
     display: flex;
     flex-direction: column;
     /*align-items: flex-end;*/
-    text-align: center;
+    text-align: right;
     padding: 2px;
     margin: 5px 0 0 0;
     font-size: calc(var(--primary-font-size) * 0.8);
+    width: calc(100%/3);
 }
 
 .block_info {
@@ -233,8 +241,4 @@
 
 .button_main_middle_left {
     border-left: 1px solid;
-}
-
-.category_title:first-child {
-    padding-top: 0;
 }
