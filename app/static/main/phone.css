@@ -57,8 +57,8 @@
 
 .social-icons a {
     display: inline-block;
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 32px;
     border-radius: 50%;
     background: #505050;
     position: relative;
@@ -66,6 +66,8 @@
     text-align: center;
     font-size: 28px;
     transition: 0.5s;
+    align-items: center;
+    box-shadow: 0 0;
 }
 
 .social-icons .vk {
