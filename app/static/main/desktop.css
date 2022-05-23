@@ -62,6 +62,10 @@
 
 }
 
+.block_logo_phone {
+    display: none;
+}
+
 .social-icons a {
     width: 50px;
     height: 46px;
@@ -93,7 +97,7 @@
     line-height: 40px;
 }
 
-.block_numbers {
+.block_numbers_2 {
     display: flex !important;
     flex-direction: column;
     /*align-items: flex-end;*/
@@ -104,6 +108,10 @@
     width: calc(100%/3);
 }
 
+.block_numbers {
+    display: none;
+
+}
 .block_info {
     display: flex;
     justify-content: flex-end;
