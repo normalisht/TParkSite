@@ -94,13 +94,13 @@
 }
 
 .block_numbers {
-    display: flex;
+    display: flex !important;
     flex-direction: column;
     /*align-items: flex-end;*/
     text-align: right;
     padding: 2px;
     margin: 5px 0 0 0;
-    font-size: calc(var(--primary-font-size) * 0.8);
+    font-size: calc(var(--primary-font-size) * 1.2);
     width: calc(100%/3);
 }
 
