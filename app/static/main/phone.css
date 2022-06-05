@@ -271,16 +271,6 @@ scale(0.5);
     font-weight: bold;
 }
 
-/*.block_numbers > div:first-child {*/
-/*    text-align: left;*/
-/*    margin-left: 17px;*/
-/*}*/
-
-/*.block_numbers > div:last-child {*/
-/*    text-align: right;*/
-/*    margin-right: 17px;*/
-/*}*/
-
 .event_info {
     text-align: center;
     font-size: 40px;
