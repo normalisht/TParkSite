@@ -10,10 +10,13 @@
     width: min(var(--vw, 1vw) * 100 - 34px, 1200px);
     margin: 5px;
     position: sticky;
+    justify-content: flex-start;
 }
 
 .upper_media {
     width: calc(100%/3);
+    display: flex;
+    flex-direction:column;
 }
 
 .block_logo {
@@ -99,13 +102,19 @@
 
 .block_numbers_2 {
     display: flex !important;
-    flex-direction: column;
     /*align-items: flex-end;*/
-    text-align: right;
     padding: 2px;
     margin: 5px 0 0 0;
     font-size: calc(var(--primary-font-size) * 1.2);
-    width: calc(100%/3);
+    /*width: calc(100%/3);*/
+    justify-content: space-around
+}
+
+.block_name {
+    font-size: calc(var(--primary-font-size) * 1.4);
+    display: flex;
+    flex-direction: column;
+    margin-left:  calc(35%/3);
 }
 
 .block_numbers {
