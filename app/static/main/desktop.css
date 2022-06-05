@@ -107,7 +107,21 @@
     margin: 5px 0 0 0;
     font-size: calc(var(--primary-font-size) * 1.2);
     /*width: calc(100%/3);*/
-    justify-content: space-around
+    justify-content: space-around;
+
+}
+
+.block_numbers_2 > div >a{
+    display: flex !important;
+    /*align-items: flex-end;*/
+    padding: 2px;
+    margin: 5px 0 0 0;
+    font-size: calc(var(--primary-font-size) * 1.2);
+    /*width: calc(100%/3);*/
+    justify-content: space-around;
+    overflow: hidden;
+    color: #2a4758;
+    text-decoration: none;
 }
 
 .block_name {
