@@ -1,35 +1,42 @@
 {% extends "main/base.html" %}
 
+{% block scripts %}
+    <script type="text/javascript" src="{{ url_for('static', filename='service/service.js') }}"></script>
+{% endblock %}
+
 
 {% block app_content %}<!--Шаблон страницы конкретной услуги-->
 
+    <div>
+        <div class="category_title">{{ service.name }}</div>
 
-    <div class="category_title">{{ service.name }}</div>
+
+        {% set path = "images/service/" + service.id|string + ".png" %}
+        <div class="block_service">
+
+            {% if files %}
+                <div class="block_img"><img src="{{ url_for("static", filename=path) }}" alt="" class="img_service">
+                </div>
+                <!--Фото услуги-->
+            {% endif %}
+            <div class="block_price">
+                <div id="price" class="price"></div>
+                <script>
+                    x = document.getElementById('price');
+                    x.innerHTML = `{{ service }}`
+                    x.innerHTML = x.textContent
+                </script>
+            </div>
 
 
-    {% set path = "images/service/" + service.id|string + ".png" %}
-    <div class="block_service">
-
-        {% if files %}
-            <div class="block_img"><img src="{{ url_for("static", filename=path) }}" alt="" class="img_service"></div>
-            <!--Фото услуги-->
-        {% endif %}
-        <div class="block_price">
-            <div id="price" class="price"></div>
-            <script>
-                x = document.getElementById('price');
-                x.innerHTML = `{{ service }}`
-                x.innerHTML = x.textContent
-            </script>
+            <div class="">
+                <div class="block_text">
+                    <div class="text_inside">{{ service.description|safe }}</div>
+                </div><!--Описание услуги-->
+            </div>
         </div>
 
-
-        <div class="">
-            <div class="block_text"><div class="text_inside">{{ service.description|safe }}</div></div><!--Описание услуги-->
-        </div>
     </div>
-
-
 
     <script>
         let detect = new MobileDetect(window.navigator.userAgent)

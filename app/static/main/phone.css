@@ -265,9 +265,10 @@ scale(0.5);
     text-decoration: none;
     /*color: #ffaa1a;*/
     color: #2a4758;
-    font-weight: 700;
     box-sizing: border-box;
     padding: 3px 4px 0;
+    font-family: "OpenSans", sans-serif;
+    font-weight: bold;
 }
 
 /*.block_numbers > div:first-child {*/

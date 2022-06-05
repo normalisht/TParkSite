@@ -3,6 +3,22 @@ div {
     margin-top: 0px !important
 }
 
+.container_base {
+    min-height: calc(100vh - min(10 * var(--vh, 1vh), 40px));
+}
+
+.img_logo {
+    margin-top: 10px;
+}
+
+.block_numbers {
+    margin: 10px auto 0;
+}
+
+.block_numbers > a {
+    margin: 10px auto -10px;
+}
+
 .block_service {
     /*background-color:var(--body-background-color);*/
     /*box-shadow: 2px 4px 16px #ccc;*/
