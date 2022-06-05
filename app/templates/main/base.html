@@ -192,12 +192,19 @@
                             </li>
                         </ul>
                     </div>
+                    <div id="phone_numbers2" class="block_numbers_2">
+                        <div>+7{{ phone_numbers[0] }}</div>
+
+                        <div>+7{{ phone_numbers[1] }}</div>
+                    </div>
                 </div>
 
-                <div id="phone_numbers2" class="block_numbers_2">
-                    <div>+7{{ phone_numbers[0] }}</div>
-                    <div>+7{{ phone_numbers[1] }}</div>
+                <div class = "block_name">
+                    <div>Т-Парк</div>
+                    <div>Дмитрия Сергеева</div>
                 </div>
+
+
             </div>
         </div>
     </div>
@@ -216,6 +223,12 @@
                    href="{{ url_for('main.about') }}">
                     <div href="{{ url_for('main.about') }}" class="">
                         О нас
+                    </div>
+                </a>
+                <a id="about-us-button" class="button_main button_main_middle_right decoration"
+                   href="{{ url_for('main.index') }}">
+                    <div href="{{ url_for('main.index') }}" class="">
+                        Услуги
                     </div>
                 </a>
 
