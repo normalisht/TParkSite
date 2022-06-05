@@ -271,6 +271,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let st = false,
         phone_numbers = $('#phone_numbers')
     phone_numbers.stop().slideUp(0)
+    console.log(phone_numbers)
 
     $('#contacts').click(function() {
         if (st) {
