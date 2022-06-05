@@ -129,12 +129,11 @@ function activate_modal_window() {
 
         current_modal_window.change_status(modal_window_target)
 
-
         if ((event.target.tagName.toLowerCase() === 'div' && (event.target.classList.contains('modal-item') ||
                 event.target.classList.contains('geolocation') || event.target.classList.contains('address') ||
                 event.target.classList.contains('social'))) || event.target.tagName.toLowerCase() === 'ul' ||
-            event.target.tagName.toLowerCase() === 'li' || event.target.tagName.toLowerCase() === 'i') {
-            event.target.closest('a').click()
+            event.target.tagName.toLowerCase() === 'li') {
+            $(event.target.closest('a')).click()
             return;
         }
 

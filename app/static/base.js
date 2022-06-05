@@ -217,12 +217,13 @@ function back_button() {
     let detect = new MobileDetect(window.navigator.userAgent)
     if (detect.mobile()) {
         let scrollPos = 0,
-            bb_status = false,
+            bb_status = true,
             bb = $('#back_button')
             // bb_2 = $('#back_button_2')
 
         bb.css({'position': 'fixed'})
-        bb.stop().animate({'bottom': -bb.outerHeight(true) - 50}, 200)
+        bb.addClass('back_button_active')
+        bb.stop().animate({'bottom': '17px'})
 
         $(window).scroll(function () {
             let st = $(this).scrollTop()
@@ -236,7 +237,6 @@ function back_button() {
 
             } else {
                 if (!bb_status) {
-                    bb.addClass('back_button_active')
                     bb.css({'bottom': -bb.height()})
                     bb.stop().animate({'bottom': '17px'}, 200)
                     bb_status = true

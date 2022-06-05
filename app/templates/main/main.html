@@ -71,29 +71,29 @@
                 {{ main_text|safe }}
         </div>
         <!--Слайдер-->
-        <div class="main_slider">
-            <div class="block_slider">
-                <div class="slider">
-                    <div class="slider__container">
-                        <div class="slider__wrapper">
-                            <div class="slider__items">
-                                {% for i in range(len_slider) %}
-                                    <div class="slider__item">
-                                        <img class="slider__img" alt=""
-                                             src="{{ url_for('static',
-                                     filename='/images/staff/' + i|string + '.png' ) }}">
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Стрелки для перехода к предыдущему и следующему слайду -->
-                    <a class="slider__control slider__control_prev" href="#" role="button" data-slide="prev"></a>
-                    <a class="slider__control slider__control_next" href="#" role="button" data-slide="next"></a>
-                </div>
-            </div>
-        </div>
+{#        <div class="main_slider">#}
+{#            <div class="block_slider">#}
+{#                <div class="slider">#}
+{#                    <div class="slider__container">#}
+{#                        <div class="slider__wrapper">#}
+{#                            <div class="slider__items">#}
+{#                                {% for i in range(len_slider) %}#}
+{#                                    <div class="slider__item">#}
+{#                                        <img class="slider__img" alt=""#}
+{#                                             src="{{ url_for('static',#}
+{#                                     filename='/images/staff/' + i|string + '.png' ) }}">#}
+{#                                    </div>#}
+{#                                {% endfor %}#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{##}
+{#                    <!-- Стрелки для перехода к предыдущему и следующему слайду -->#}
+{#                    <a class="slider__control slider__control_prev" href="#" role="button" data-slide="prev"></a>#}
+{#                    <a class="slider__control slider__control_next" href="#" role="button" data-slide="next"></a>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
     </div>
 
 {% endblock %}
