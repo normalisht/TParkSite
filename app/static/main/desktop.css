@@ -200,6 +200,7 @@
     border: 2px solid black;
     transition: 0.5s;
     cursor: pointer;
+    margin: 10px 0 10px 0;
 }
 
 .back_button_btn_2:hover {
