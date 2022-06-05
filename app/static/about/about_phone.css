@@ -11,3 +11,8 @@
 .container_about {
     margin: 8px auto;
 }
+
+.text {
+    position: relative;
+    top: -4px;
+}

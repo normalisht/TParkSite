@@ -12,7 +12,7 @@ app/static/images/staff/загружено.jfif
 .xml
 *.zip
 tpark1/
-/node_modules/
-package-lock.json
-package.json
+/node_modules
 testFile.txt
+package.json
+package-lock.json

@@ -146,8 +146,8 @@ p {
 }
 
 .contact_img {
-    width: 22px;
-    height: 22px;
+    width: 26px;
+    height: 26px;
     object-fit: cover;
     filter: invert(1);
 }
