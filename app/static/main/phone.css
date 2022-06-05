@@ -231,6 +231,10 @@ scale(0.5);
     height: 25px
 }
 
+.back_button_3 {
+    display: none;
+}
+
 .back_button_active {
     display: block;
     transform: translateX(-17px);

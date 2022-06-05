@@ -200,7 +200,7 @@
                 </div>
 
                 <div class = "block_name">
-                    <div>Т-Парк</div>
+                    <div>Тренинг-Парк</div>
                     <div>Дмитрия Сергеева</div>
                 </div>
 
@@ -213,22 +213,22 @@
     <div id='upper_navigation_buttons' class="upper_navigation_buttons">
         <div id='navigation_buttons' class="block_buttons">
             <div style="display: flex;">
-                <a id="about-us-button" class="button_main decoration"
+                <a id="about-us-button" class="button_main  decoration"
+                   href="{{ url_for('main.index') }}">
+                    <div href="{{ url_for('main.index') }}" class="">
+                        Услуги
+                    </div>
+                </a>
+                <a id="about-us-button" class="button_main button_main_middle_left decoration"
                    href="{{ url_for('main.events') }}">
                     <div href="{{ url_for('main.events') }}" class="">
                         События
                     </div>
                 </a>
-                <a id="about-us-button" class="button_main button_main_middle_left decoration"
+                <a id="about-us-button" class="button_main button_main_middle decoration"
                    href="{{ url_for('main.about') }}">
                     <div href="{{ url_for('main.about') }}" class="">
                         О нас
-                    </div>
-                </a>
-                <a id="about-us-button" class="button_main button_main_middle_right decoration"
-                   href="{{ url_for('main.index') }}">
-                    <div href="{{ url_for('main.index') }}" class="">
-                        Услуги
                     </div>
                 </a>
 
@@ -277,6 +277,16 @@
             <div class="back_button_btn">
                 <a style="" onclick="history.back(); return false;">
                     <img src="{{ url_for('static', filename='back.svg' ) }}" class="back_button_img" alt="">
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin:  auto 17px;">
+        <div id="back_button_2" class="back_button_3">
+            <div class="back_button_btn_2">
+                <a style="" onclick="history.back(); return false;">
+                    Назад
                 </a>
             </div>
         </div>
