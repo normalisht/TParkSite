@@ -40,7 +40,7 @@ def logout():
     return redirect(url_for('main.index'))
 
 
-@bp.route('/main', methods=['GET'])
+@bp.route('/main', methods=['GET', 'POST'])
 # @login_required
 def main():
     categories = Category.query.order_by(Category.number).all()
