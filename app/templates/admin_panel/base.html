@@ -51,15 +51,11 @@
                     <div class="upper_main" data-modal-window-toggle="#services-modal-win">
                         <div class="burger_container">
                             <div class="menu-btn" style="opacity: 0;">
-                                <span></span>
-                                <span></span>
-                                <span></span>
+                                <i class="fa fa-bars fa-inverse fa-2x"></i>
                             </div>
                         </div>
                         <div class="menu-btn menu-btn-visible">
-                            <span></span>
-                            <span></span>
-                            <span></span>
+                            <i class="fa fa-bars fa-inverse fa-2x"></i>
                         </div>
                     </div>
 
@@ -106,7 +102,7 @@
                             </div>
                             <div class="modal-item submenu-item">
                                 <a class="modal-link"
-                                   href="{{ url_for('admin_panel.main') }}">
+                                   href="{{ url_for('admin_panel.events_content') }}">
                                     Страница событий
                                 </a>
                             </div>
@@ -124,8 +120,14 @@
                             </div>
                             <div class="modal-item submenu-item">
                                 <a class="modal-link"
+                                   href="{{ url_for('admin_panel.gallery') }}">
+                                    Фотоальбом
+                                </a>
+                            </div>
+                            <div class="modal-item submenu-item">
+                                <a class="modal-link"
                                    href="{{ url_for('admin_panel.category_types') }}">
-                                    Группы событий
+                                    Группы категорий
                                 </a>
                             </div>
                             <div class="modal-item submenu-item">
@@ -144,27 +146,38 @@
                 <div id='navigation_buttons' class="block_buttons">
                     <div style="display: flex;">
                         <a id="about-us-button" class="button_main decoration"
-                           href="{{ url_for('main.about') }}">
-                            <div href="{{ url_for('main.about') }}" class="">
+                           href="{{ url_for('admin_panel.category') }}">
+                            <div class="">
+                                Категории
+                            </div>
+                        </a>
+                        <a id="about-us-button" class="button_main button_main_middle_left decoration"
+                           href="{{ url_for('admin_panel.events') }}">
+                            <div class="">
                                 События
                             </div>
                         </a>
                         <a id="about-us-button" class="button_main button_main_middle_left decoration"
-                           href="{{ url_for('main.about') }}">
-                            <div href="{{ url_for('main.about') }}" class="">
+                           href="{{ url_for('admin_panel.about') }}">
+                            <div class="">
                                 О нас
                             </div>
                         </a>
-
+                        <a id="about-us-button" class="button_main decoration"
+                           href="{{ url_for('admin_panel.all_services') }}">
+                            <div class="">
+                                Услуги
+                            </div>
+                        </a>
                         <a id="about-us-button" class="button_main button_main_middle_right decoration"
-                           href="{{ url_for('main.about') }}">
-                            <div href="{{ url_for('main.about') }}" class="">
+                           href="{{ url_for('admin_panel.comments') }}">
+                            <div class="">
                                 Отзывы
                             </div>
                         </a>
                         <a id="about-us-button" class="button_main decoration"
-                           href="{{ url_for('main.about') }}">
-                            <div href="{{ url_for('main.about') }}" class="">
+                           href="{{ url_for('admin_panel.gallery') }}">
+                            <div class="">
                                 Фотоальбом
                             </div>
                         </a>

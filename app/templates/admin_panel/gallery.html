@@ -19,8 +19,8 @@
                         <a class="image-wrapper">
                         <img src="{{ url_for("static", filename=path) }}" alt="" class="minimized">
                             <div class="display_button">
-                            <input type="submit" id="delete_category" class="input__file" name="delete_{{image}}">
-                            <label for="delete_category" class="input__file_button">
+                            <input type="submit" id="delete_category{{ image }}" class="input__file" name="delete_{{image}}" value="{{ image }}" />
+                            <label for="delete_category{{ image }}" class="input__file_button">
                                 <span class="input__file_button_text_2">Удалить</span>
                             </label>
                             </div>

@@ -40,9 +40,18 @@ def logout():
     return redirect(url_for('main.index'))
 
 
-@bp.route('/main', methods=['GET', 'POST'])
+@bp.route('/main', methods=['GET'])
 # @login_required
 def main():
+    categories = Category.query.order_by(Category.number).all()
+
+    return render_template('admin_panel/categories.html', title='Категории',
+                           categories=categories)
+
+
+@bp.route('/events_content', methods=['GET', 'POST'])
+# @login_required
+def events_content():
     main_text = Text.query.filter_by(title="main_text").first()
 
     try:
@@ -86,9 +95,9 @@ def main():
             images.save(os.path.join(os.getcwd(), '{}.png'.format(name)))
             os.chdir('../../../../')
 
-            return redirect(url_for('admin_panel.main'))
+            return redirect(url_for('admin_panel.events_content'))
 
-    return render_template('admin_panel/main.html', title='Главная страница', main_text=main_text,
+    return render_template('admin_panel/main.html', title='Страница событий', main_text=main_text,
                            categories=get_categories(), files=files)
 
 
@@ -692,8 +701,6 @@ def category_type_create():
 
 @bp.route('/gallery', methods=['GET', 'POST'])
 def gallery():
-    base_number = 1
-    print(os.getcwd())
     try:
         os.chdir('app/static/images/gallery')
         temp = os.getcwd()
@@ -706,6 +713,7 @@ def gallery():
         if request.files.get('add_photo'):
             os.chdir('app/static/images/gallery')
             images = request.files.getlist('add_photo')
+            base_number = 1
             for img in files:
                 os.rename(img, str(base_number)+'.jpg')
                 base_number += 1
@@ -715,15 +723,15 @@ def gallery():
                 img.save(os.path.join(os.getcwd(), '{}.png'.format(base_number + 1)))
                 base_number += 1
             os.chdir('../../../../')
+
         for photo in files:
-            print(request.form.get)
-            if request.form.get('delete_' + str(photo)):
+            if request.form.get('delete_' + str(photo)) is not None:
                 try:
-                    print('a')
                     os.remove('app/static/images/gallery/' + str(photo))
                     return redirect(url_for('admin_panel.gallery'))
                 except:
                     pass
+
 
         return redirect(url_for('admin_panel.gallery'))
 
