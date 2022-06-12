@@ -212,7 +212,7 @@
     padding: 4px;
     border-radius: 12px;
     border: 2px solid black;
-    transition: 0.5s;
+    transition: all 0.5s, border 0.35s, color 0.35s;
     cursor: pointer;
     margin: 10px 0 10px 0;
 }
