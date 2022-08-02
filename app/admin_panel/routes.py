@@ -1,19 +1,15 @@
 import datetime
 import os
 from os import listdir
-
 from flask import render_template, flash, redirect, url_for, request, jsonify, current_app
-
+from werkzeug.urls import url_parse
 from app.admin_panel import bp
 from app import db
 from flask_login import login_user, logout_user, current_user, login_required
-
 from app.main.functions import get_categories
 from app.models import CategoryType, Admin, Category, Service, Employee, Text, Comment, ServiceCategory, Event, Partner, \
     Type
-import json
 import shutil
-import uuid
 
 # авторизация админа
 @bp.route('/', methods=['GET', 'POST'])
@@ -28,7 +24,11 @@ def login():
             flash('Неверный пароль или email', 'warning')
             return redirect(url_for('admin_panel.login'))
 
-        return redirect(url_for('admin_panel.category'))
+        login_user(admin, remember=True)
+        next_page = request.args.get('next')
+        if not next_page or url_parse(next_page).netloc != '':
+            next_page = url_for('admin_panel.main')
+        return redirect(next_page)
 
     return render_template('admin_panel/login.html', title='Авторизация')
 
