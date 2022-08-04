@@ -1,7 +1,7 @@
 import datetime
 import os
 from os import listdir
-from flask import render_template, flash, redirect, url_for, request, jsonify, current_app
+from flask import render_template, flash, redirect, url_for, request
 from werkzeug.urls import url_parse
 from app.admin_panel import bp
 from app import db

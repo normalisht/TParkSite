@@ -1,17 +1,13 @@
-from flask import render_template, flash, redirect, url_for, request, jsonify, current_app
-from typing import List
-
+from flask import render_template, redirect, url_for, request
 from app.main import bp
 from app import db
 import os
 import datetime
-import time
 from os import listdir
-from app.models import Text, Comment, Event, Category, ServiceCategory, Service, Employee, Partner, Price, Type
-from app.main.functions import get_categories, get_contacts_data, compress
+from app.models import Text, Comment, Event, Category, ServiceCategory, Service, Employee, Partner, Type
+from app.main.functions import get_categories, get_contacts_data
 from sqlalchemy import create_engine
-from flask_ckeditor import CKEditor
-import shutil
+
 
 engine = create_engine("sqlite:///T_Park.db")
 
@@ -104,6 +100,8 @@ def events():
         slider_events = False
     elif len(events_2) < 3:
         events_2 = events_2 * 3
+
+    print(events_2)
 
     return render_template('main/main.html', main_text=main_text, events=events_2[1:] + events_2[:1],
                            categories=get_categories(), contacts_data=get_contacts_data(),
