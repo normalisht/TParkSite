@@ -1,4 +1,3 @@
-/*Phone*/
 div {
     margin-top: 0px !important
 }
@@ -63,7 +62,7 @@ div {
 
 .block_text {
     min-width: clamp(150px, 10vw, 20vw);
-    margin: 0 17px;
+    margin: 0 17px 7px;
     font-size: var(--primary-font-size);
 }
 

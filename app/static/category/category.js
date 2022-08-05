@@ -40,7 +40,7 @@ document.addEventListener('click', function (event) {
 
 document.addEventListener('DOMContentLoaded', function () {
     let services = $('.button'),
-        time_animation = 1000
+        time_animation = 600
 
     services.each(function () {
         $(this).click(function () {

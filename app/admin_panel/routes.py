@@ -380,7 +380,7 @@ def service_test():
             except:
                 pass
 
-            ServiceCategory.query.filter_by(service_id=service_id).all().delete()
+            ServiceCategory.query.filter_by(service_id=service_id).delete()
             Service.query.filter_by(id=service_id).delete()
             db.session.commit()
 
