@@ -38,7 +38,7 @@
 
                 <label for="select">Категории</label>
                 <div class="grid_category">
-                    {% set i = namespace(a=1) %}
+                    {% set i = namespace(a=0) %}
                     {% for category in categories %}
                         <label for="category" class="label_1">{{ category.name }}</label>
                         <input type="checkbox" id="category" class="checkbox"

@@ -26,24 +26,20 @@ def index():
 def category():
     try:
         category_id = request.args.get('category_id')
+        photo = False
         try:
-            os.chdir('app/static/images/category/{}'.format(category_id))
-            temp = os.getcwd()
-            files = listdir(temp)
-            path = os.path.join(os.getcwd(), files[0])
-            open(path)
-            a = 1
-            os.chdir('../../../../../')
+            if os.path.exists('app/static/images/category/{}.png'.format(category_id)):
+                photo = True
         except:
-            a = 0
-            files = []
+            pass
+
         category = Category.query.filter_by(id=category_id).first()
         services = category.services.order_by(ServiceCategory.number).all()
 
         if category.status == 1:
             return render_template('main/category.html', category=category, category_id=category_id,
                                    services=services, categories=get_categories(),
-                                   contacts_data=get_contacts_data(), a=a, files=files)
+                                   contacts_data=get_contacts_data(), photo=photo)
         else:
             return redirect(url_for('main.index'))
     except:

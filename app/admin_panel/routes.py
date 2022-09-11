@@ -211,16 +211,15 @@ def category_change():
     services = category.services.order_by(ServiceCategory.number).all()
     numbers = []  # хранит порядковые номера услуг
 
+    photo = False
+    try:
+        if os.path.exists('app/static/images/category/{}.png'.format(category_id)):
+            photo = True
+    except:
+        pass
+
     for element in services:
         numbers.append(element.number)
-
-    try:
-        os.chdir('app/static/images/category/{}'.format(category_id))
-        temp = os.getcwd()
-        files = listdir(temp)
-        os.chdir('../../../../../')
-    except:
-        files = []
 
     if request.method == 'POST':
         if request.form.get('mycheckbox') == '1':
@@ -248,41 +247,18 @@ def category_change():
             db.session.commit()
             return redirect(url_for('admin_panel.category'))
 
-        for photo in files:
-
-            if request.form.get('delete_' + str(photo)):
-                try:
-                    os.remove('app/static/images/category/{}/'.format(category_id) + str(photo))
-                    return redirect(url_for('admin_panel.category_change', category_id=category_id))
-                except:
-                    pass
-
-            if request.files['add_' + str(photo)]:
-
-                images = request.files.getlist('add_' + str(photo))
-                count = len(files)
-
-                for img in images:
-                    os.chdir('app/static/images/category/{}'.format(category_id))
-                    img.save(os.path.join(os.getcwd(), '{}.png'.format(count + 1)))
-                    count += 1
-                    os.chdir('../../../../../')
-
+        if request.form.get('delete_photo'):
+            try:
+                os.remove('app/static/images/category/{}.png'.format(category_id))
                 return redirect(url_for('admin_panel.category_change', category_id=category_id))
+            except:
+                pass
 
         if request.files.get('add_photo'):
-
-            images = request.files.getlist('add_photo')
-            for img in files:
-                os.rename(img, str(base_number)+'.jpg')
-                base_number += 1
-            base_number -= 1
-            for img in images:
-                img.save(os.path.join(os.getcwd(), '{}.png'.format(base_number + 1)))
-                base_number += 1
-                os.chdir('../../../../../')
-
-            return redirect(url_for('admin_panel.category_change', category_id=category_id))
+            image = request.files.get('add_photo')
+            os.chdir('app/static/images/category')
+            image.save(os.path.join(os.getcwd(), '{}.png'.format(category_id)))
+            os.chdir('../../../../../')
 
         category.number = request.form.get('weight')
         category.description = request.form.get('ckeditor')
@@ -292,8 +268,7 @@ def category_change():
         return redirect(url_for('admin_panel.category_change', category_id=category_id))
 
     return render_template('admin_panel/category.html', title='{}'.format(category.name),
-                           category=category, services=services, files=files,
-                           numbers=numbers)
+                           category=category, services=services, numbers=numbers, photo=photo)
 
 
 @bp.route('/category_create', methods=['GET', 'POST'])
@@ -330,7 +305,12 @@ def service_test():
     service = Service.query.filter_by(id=service_id).first()
     categories_all = Category.query.all()
 
-    categories_cheked = [0]
+    categories_cheked = []
+    for category in categories_all:
+        if ServiceCategory.query.filter_by(service_id=service_id, category_id=category.id).first():
+            categories_cheked.insert(category.id, category.id)
+        else:
+            categories_cheked.insert(category.id, 0)
 
     if request.method == 'POST':
         if request.form.get('checkbox') == '1':
@@ -388,12 +368,6 @@ def service_test():
 
         return redirect(
             url_for('admin_panel.category_change') + '?category_id={}'.format(service.categories[0].category_id))
-
-    for i in categories_all:
-        if ServiceCategory.query.filter_by(service_id=service_id, category_id=i.id).first():
-            categories_cheked.insert(i.id, i.id)
-        else:
-            categories_cheked.insert(i.id, 0)
 
     return render_template('admin_panel/service.html', title='{}'.format(service.name),
                            categories=get_categories(), service=service, categories_checked=categories_cheked,

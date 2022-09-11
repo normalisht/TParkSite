@@ -9,22 +9,19 @@
 {% block app_content %}
 
     <div class="category_title">{{ category.name |safe }}</div>
+
     <div class="container">
-        <div class="data">
-            {% if a == 1 %}
+        {% if photo %}
+            <div class="data">
                 <div class="block_slider">
                     <div class="slider">
                         <div class="slider__container">
                             <div class="slider__wrapper">
                                 <div class="slider__items">
-                                    {% for i in range(3) %}
-                                        {% for photo in files %}
-                                            <div class="slider__item">
-                                                <img class="slider__img" alt=""
-                                                     src="{{ url_for('static',filename='/images/category/' + category.id|string  + '/' + photo) }}">
-                                            </div>
-                                        {% endfor %}
-                                    {% endfor %}
+                                    <div class="slider__item">
+                                        <img class="slider__img" alt="" style="margin: 0 auto 8px;"
+                                             src="{{ url_for('static',filename='/images/category/' + category.id|string + '.png') }}">
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -32,8 +29,8 @@
                         <a class="slider__control slider__control_next" href="#" role="button" data-slide="next"></a>
                     </div>
                 </div>
-            {% endif %}
-        </div>
+            </div>
+        {% endif %}
 
         <div class="category_description">
             <div class="text">
@@ -74,7 +71,7 @@
 
                                             <div>
                                                 <a class='detailed'
-                                                    href="{{ url_for('main.service') }}?service_id={{ service.id }}">
+                                                   href="{{ url_for('main.service') }}?service_id={{ service.id }}">
                                                     Подробнее...
                                                 </a>
                                             </div>
