@@ -14,11 +14,7 @@
     <div class="grid_panel">
 
         <div class="grid_block partners_map">
-
-
             <form method="POST" enctype="multipart/form-data" class="grid_block">
-
-
                 <label for="title">Название услуги</label>
                 <input type="text" name="title" id="title" class="little_input"
                        style="width: 150px; justify-content: left;"
@@ -53,11 +49,9 @@
                 </div>
 
                 <div class="grid_checkbox">
-
                     <label for="checkbox_1">С Подробнее</label>
                     <input type="checkbox" id="checkbox_1" class="checkbox" name="checkbox" value="1" {{ "checked" if
                         service.next == 1 else "" }}/>
-
                 </div>
 
                 <label for="input_desc">Описание</label>
@@ -94,21 +88,18 @@
                             <span class="input__file_button_text_2">Удалить</span>
                         </label>
                     </div>
-
                 </div>
+
                 <div class="input__wrapper">
                     <input type="submit" id="Submit" value="Подтвердить" class="input__file">
                     <label for="Submit" class="input__file_button">
                         <span class="input__file_button_text_2">Сохранить</span>
                     </label>
                 </div>
-
             </form>
-
         </div>
         {{ ckeditor.config(name='input_short_desc') }}
         {{ ckeditor.config(name='input_desc') }}
-
     </div>
 
 {% endblock %}
