@@ -204,15 +204,15 @@
 .back_button_btn_2 {
     display: flex;
     justify-content: center;
-    font-size: 20px;
+    font-size: 14px;
     align-items: center;
     text-align: center;
-    width: 120px ;
-    height: 40px ;
+    width: 60px ;
+    height: 30px ;
     padding: 4px;
     border-radius: 12px;
-    border: 2px solid black;
-    transition: all 0.5s, border 0.35s, color 0.35s;
+    border: 1px solid black;
+    transition: all 0.2s, border 0.1s, color 0.1s;
     cursor: pointer;
     margin: 10px 0 10px 0;
 }
@@ -221,7 +221,7 @@
     background-color: #FFA300FF;
     transform: scale(1.1);
     color: white;
-    border: 2px solid #FFA300FF;
+    border: 1px solid #FFA300FF;
 }
 
 

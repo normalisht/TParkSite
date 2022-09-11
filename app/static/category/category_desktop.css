@@ -10,6 +10,11 @@
     /*grid-column-gap: 50px;*/
 }
 
+.category_title {
+    padding-top: 12px;
+    padding-bottom: 0;
+}
+
 .description > p:last-child {
     margin: 0;
     margin-block-start: 0;
@@ -76,6 +81,10 @@
     transition: all 0.25s;
 }
 
+.button:hover {
+    background-color: rgba(209, 207, 188, 0.45);
+}
+
 .description {
     margin-left: 0;
     text-align: left;
@@ -84,10 +93,6 @@
     /*color: black;*/
     transition: color 0.25s;
     font-size: calc(0.9 * var(--primary-font-size));
-}
-
-.button:first-child {
-    padding-top: 15px;
 }
 
 .detailed {

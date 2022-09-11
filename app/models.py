@@ -21,8 +21,10 @@ class Service(db.Model):
     def __repr__(self):
         if self.time:
             return self.price + ' руб / ' + self.time
-        else:
+        elif self.price:
             return self.price + ' руб'
+        else:
+            return ''
 
 
 class Price(db.Model):
@@ -34,8 +36,10 @@ class Price(db.Model):
     def __repr__(self):
         if self.time:
             return self.price + ' руб / ' + self.time
-        else:
+        elif self.price + ' руб' != ' руб':
             return self.price + ' руб'
+        else:
+            return ''
 
 
 class Category(db.Model):

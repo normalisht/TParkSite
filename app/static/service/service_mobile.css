@@ -57,7 +57,7 @@ div {
     /*width: 100vw;*/
     left: 0;
     height: clamp(100px, 40vh, 400px);
-    margin: 0 auto;
+    margin: 0 auto 5px;
 }
 
 

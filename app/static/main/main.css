@@ -208,6 +208,11 @@ p {
     margin: 0 auto 12px;
     border-radius: 12px;
     width: 100%;
+    transition: all 0.3s;
+}
+
+.page-list > div:hover {
+    transform: scale(1.02);
 }
 
 .image-centered-wrapper {
