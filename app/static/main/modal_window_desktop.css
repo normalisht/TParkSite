@@ -68,9 +68,8 @@
 }
 
 .social-icons {
-    margin-top: 5px;
+    margin: 5px 0 -8px;
     justify-content: space-evenly;
-
 }
 
 .contacts .submenu-item:last-child:hover {

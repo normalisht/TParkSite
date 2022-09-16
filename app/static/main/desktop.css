@@ -70,21 +70,21 @@
 }
 
 .social-icons a {
-    width: 50px;
-    height: 46px;
-    border-radius: 40%;
-    background: #efefef;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    /*background: #efefef;*/
     margin: 2px 7px;
-    box-shadow: 0 2px 6px #c1c1c1;
+    /*box-shadow: 0 2px 6px #c1c1c1;*/
     font-size: 38px;
 }
 
 
 .social-icons a:hover:after {
-    width: 50px;
-    height: 46px;
-    margin-left: -24px;
-    margin-top: -0px;
+    width: 56px;
+    height: 56px;
+    margin-left: -28px;
+    margin-top: -32px;
 }
 
 .social-icons a img {
@@ -104,7 +104,6 @@
     display: flex !important;
     /*align-items: flex-end;*/
     padding: 2px;
-    margin: 5px 0 0 0;
     font-size: calc(var(--primary-font-size) * 1.2);
     /*width: calc(100%/3);*/
     justify-content: space-around;
@@ -198,7 +197,7 @@
 }
 
 .back_button_btn > a {
-    border-bottom: 0px solid black;
+    border-bottom: 0 solid black;
 }
 
 .back_button_btn_2 {
