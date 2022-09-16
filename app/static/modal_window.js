@@ -1,3 +1,5 @@
+let only_once = true
+
 mobile_or_desktop_css()
 
 function mobile_or_desktop_css() {
@@ -142,6 +144,35 @@ function activate_modal_window() {
         // если модальное окно активно изменяем url, иначе откатываем
         if (current_modal_window.status) {
             window.location.hash += current_modal_window.modal_window_name
+
+            if (only_once) {
+                // $('.modal-item').each(function (index, element) {
+                //         console.log($(element).parent().outerHeight(true))
+                //         $(element).append(`<div style="position: absolute; top: ${$(element).position().top + 'px'};
+                //         left: 0; width: 100vw;
+                //         height: ${$(element).outerHeight(true) + 'px'};"></div>`)
+                //     }
+                // )
+                console.log(555)
+                only_once = false
+                let el = $('.modal-item')
+                let i = -1;
+                el.each(function (index, element) {
+                    i++
+                })
+                $('.modal-content > div').css({position: 'absolute',
+                    top:`${$(el[0]).position().top + 'px'}`,
+                    width: `${$(el[0]).outerWidth(true) + 'px'}`})
+
+                $('.modal-content').prepend(`<div>
+                <div style="position: relative; top: ${$(el[0]).position().top + 'px'};
+                left: 0; width: 100vw;
+                height: ${$(el[i]).position().top + $(el[i]).outerHeight(true) - $(el[0]).position().top + 'px'};
+                backdrop-filter: blur(4px);"></div></div>
+                `)
+
+                // $('.menu-btn').addClass('active')
+            }
         } else {
             history.back()
             // $('.menu-btn').removeClass('active')
