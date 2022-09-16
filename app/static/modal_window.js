@@ -142,7 +142,6 @@ function activate_modal_window() {
         // если модальное окно активно изменяем url, иначе откатываем
         if (current_modal_window.status) {
             window.location.hash += current_modal_window.modal_window_name
-            // $('.menu-btn').addClass('active')
         } else {
             history.back()
             // $('.menu-btn').removeClass('active')

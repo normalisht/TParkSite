@@ -8,13 +8,13 @@
 {{ ckeditor.load() }}
     <form class="form" method="post" action="{{ url_for('admin_panel.comment_create') }}" enctype="multipart/form-data">
         <div class="form_container">
-
+            <label for="file">Фото</label>
             <input type="file" name="photo" id="photo">
 
-            <label for="name"></label>
+            <label for="name">Имя</label>
             <input type="text" name="name" id="name" placeholder="Имя">
 
-            <label for="text"></label>
+            <label for="text">Отзыв</label>
             <textarea name="text" id="text" autocomplete="off"
                       placeholder="Текст" cols="50" rows="20"></textarea>
 

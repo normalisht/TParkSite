@@ -19,3 +19,8 @@ input {
     margin: 5px;
     padding: 2px;
 }
+
+.grid_checkbox {
+    margin: 10px;
+    grid-template-columns: 110px 25px;
+}

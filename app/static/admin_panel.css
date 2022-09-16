@@ -28,7 +28,7 @@
 }
 
 .title {
-    text-align: center;
+    /*text-align: center;*/
     font-size: calc(var(--primary-font-size) * 1.2);
 }
 
@@ -98,6 +98,10 @@
     grid-row-gap: 10px;
     margin-bottom: 10px;
     text-align: center;
+}
+
+.grid_service > label {
+    text-align: left;
 }
 
 .category_name {
@@ -187,6 +191,7 @@
     border: 2px solid;
     border-radius: 2px;
     margin-bottom: 10px;
+    text-align: center;
 }
 
 .input__file_button:hover {

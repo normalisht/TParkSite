@@ -9,15 +9,16 @@
     <form class="form" method="post" action="{{ url_for('admin_panel.event_create') }}" enctype="multipart/form-data">
         <div class="form_container">
 
+            <label for="file">Фото</label>
             <input type="file" name="photo" id="photo">
 
-            <label for="title"></label>
+            <label for="title">Название</label>
             <input type="text" name="title" id="title" placeholder="Название">
 
-            <label for="date"></label>
+            <label for="date">Дата</label>
             <input type="date" name="date" id="date">
 
-            <label for="link"></label>
+            <label for="link">Ссылка</label>
             <input type="text" name="link" id="link" placeholder="Ссылка">
 
             <label for="color" style="display: flex; align-items: center;">
@@ -25,7 +26,7 @@
                 <input type="color" name="color" id="color">
             </label>
 
-            <label for="description"></label>
+            <label for="description">Описание</label>
             <textarea name="description" id="description" autocomplete="off"
                       placeholder="Описание" cols="50" rows="20"></textarea>
 

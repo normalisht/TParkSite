@@ -263,7 +263,6 @@ def category_change():
         category.number = request.form.get('weight')
         category.description = request.form.get('ckeditor')
         category.name = request.form.get('title').strip().capitalize()
-        category.type = request.form.get('type').strip().capitalize()
         db.session.commit()
         return redirect(url_for('admin_panel.category_change', category_id=category_id))
 
@@ -425,7 +424,7 @@ def service_create():
 @bp.route('/all_services', methods=['GET'])
 @login_required
 def all_services():
-    services = Service.query.all()
+    services = Service.query.order_by(Service.name).all()
 
     return render_template('admin_panel/all_services.html', services=services)
 

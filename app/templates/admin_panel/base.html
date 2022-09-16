@@ -5,13 +5,11 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="stylesheet" href="{{ url_for('static', filename='main/main.css') }}">
-{#    <link rel="stylesheet" href="{{ url_for('static', filename='main/desktop.css') }}">#}
     <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel.css') }}">
     <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename="favicon.ico") }}"/>
     {% block link %}{% endblock %}
 
     <script defer src="{{ url_for('static', filename='plugins/jquery.min.js') }}"></script>
-    {#    <script defer src="{{ url_for('static', filename='plugins/hammer.min.js') }}"></script>#}
     <script defer src="https://ajax.googleapis.com/ajax/libs/hammerjs/2.0.8/hammer.min.js"></script>
     <script src="{{ url_for('static', filename='plugins/mobile-detect.min.js') }}"></script>
     <script defer src="{{ url_for('static', filename='base.js') }}"></script>
@@ -45,7 +43,7 @@
 
 <div id="main_block" class="main_block">
     <div id="upper_container" class="upper_container">
-        <div id="upper" class="upper">
+        <div id="upper" class="upper" style="width: min(var(--vw, 1vw) * 100 - 34px, 1200px); margin: 0 auto;">
             <div id="mobile_upper" class="mobile_upper">
                 <div id="upper_buttons" class="upper_buttons">
                     <div class="upper_main" data-modal-window-toggle="#services-modal-win">
@@ -102,12 +100,6 @@
                             </div>
                             <div class="modal-item submenu-item">
                                 <a class="modal-link"
-                                   href="{{ url_for('admin_panel.events_content') }}">
-                                    Страница событий
-                                </a>
-                            </div>
-                            <div class="modal-item submenu-item">
-                                <a class="modal-link"
                                    href="{{ url_for('admin_panel.about') }}">
                                     О нас
                                 </a>
@@ -152,7 +144,7 @@
                             </div>
                         </a>
                         <a id="about-us-button" class="button_main button_main_middle_left decoration"
-                           href="{{ url_for('admin_panel.events') }}">
+                           href="{{ url_for('admin_panel.events') }}" style="border-right: 0;">
                             <div class="">
                                 События
                             </div>
@@ -181,39 +173,16 @@
                                 Фотоальбом
                             </div>
                         </a>
+                        <a id="about-us-button" class="button_main decoration"
+                           href="{{ url_for('admin_panel.events_content') }}">
+                            <div class="">
+                                Страница событий
+                            </div>
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
-
-        {#            <div id="upper_block_info" class="block_info">#}
-        {#                <div id="block_info_name" class='name'>#}
-        {#                <div class="info_name">#}
-        {#                    <div>Тренинг-парк</div>#}
-        {#                    <div>#}
-        {#                        <div id="dmitry">Дмитрия</div>#}
-        {#                        <div>Сергеева</div>#}
-        {#                    </div>#}
-        {#                </div>#}
-        {#                </div>#}
-        {#            <div style="visibility: hidden">#}
-        {#                <div class="info_name">#}
-        {#                <div>Тренинг-парк</div>#}
-        {#                <div>Дмитрия Сергеева</div>#}
-        {#                </div>#}
-        {#            </div>#}
-        {#                <div id="phone_numbers" class="block_numbers">#}
-        {#                    <div style="cursor: copy;" href="tel:+7{{ phone_numbers[0] }}">#}
-        {#                     onclick="copy_number('+7{{ phone_numbers[0] }}', this)"#}
-        {#                     title="Нажмите чтобы скопировать">#}
-        {#                        +7{{ phone_numbers[0] }}</div>#}
-        {#                    <div style="cursor: copy;" href="tel:+7{{ phone_numbers[1] }}">#}
-        {#                     onclick="copy_number('+7{{ phone_numbers[1] }}', this)"#}
-        {#                     title="Нажмите чтобы скопировать">#}
-        {#                        +7{{ phone_numbers[1] }}</div>#}
-        {##}
-        {#                </div>#}
-        {#            </div>#}
     </div>
 
     {% block app_content %}{% endblock %}

@@ -10,12 +10,13 @@
     <form class="form" method="post" action="{{ url_for('admin_panel.service_create') }}">
         <div class="form_container">
 
+            <label for="file">Фото</label>
             <input type="file" name="photo" id="photo">
 
-            <label for="title"></label>
+            <label for="title">Название</label>
             <input type="text" name="title" id="title" placeholder="Название">
 
-            <label for="short_description"></label>
+            <label for="short_description">Краткое описание</label>
             <textarea name="short_description" id="short_description" autocomplete="off"
                       placeholder="Краткое описание" cols="50" rows="20"></textarea>
 
@@ -25,7 +26,7 @@
 
             </div>
 
-            <label for="description"></label>
+            <label for="description">Описание</label>
             <textarea name="description" id="description" autocomplete="off"
                       placeholder="Описание" cols="50" rows="20"></textarea>
 
