@@ -39,7 +39,6 @@
     grid-column-gap: 25px;
     grid-row-gap: 17px;
     max-width: var(--primary-content-width);
-    /*grid-auto-flow: column;*/
 }
 
 .img_block {

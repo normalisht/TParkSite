@@ -16,8 +16,25 @@
 .list > div {
     display: grid;
     position: relative;
-    margin: 8px auto;
+    margin: 0 auto 12px;
     width: 100%;
+    transition: all 0.3s;
+}
+
+.list > div > a {
+    display: block;
+    height: clamp(250px, 30vh, 400px);
+    width: 100%;
+    align-items: center;
+    margin: 0 auto;
+}
+
+.list > div > a > img {
+    display: block;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
 }
 
 .image-wrapper {
