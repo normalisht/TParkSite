@@ -19,7 +19,6 @@
 {% block link %}
     <link rel="stylesheet" href="{{ url_for('static', filename='slider.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='event/event.css') }}">
-{#    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css"/>#}
 {% endblock %}
 
 {% block app_content %}
@@ -61,10 +60,10 @@
                                 </div>
                             </div>
                         </div>
-                    
-                        <button class="slider__control slider__control_prev carousel__button is-prev" tabindex="0">
+
+                        <button class="slider__control slider__control_prev carousel__button_2 is-prev" tabindex="0">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" tabindex="-1"><path d="M15 3l-9 9 9 9"></path></svg></button>
-                        <button class="slider__control slider__control_next carousel__button is-next" tabindex="0">
+                        <button class="slider__control slider__control_next carousel__button_2 is-next" tabindex="0">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" tabindex="-1"><path d="M9 3l9 9-9 9"></path></svg></button>
                     </div>
                 </div>
@@ -74,30 +73,6 @@
         <div id="block_content" class="block_content">
                 {{ main_text|safe }}
         </div>
-        <!--Слайдер-->
-{#        <div class="main_slider">#}
-{#            <div class="block_slider">#}
-{#                <div class="slider">#}
-{#                    <div class="slider__container">#}
-{#                        <div class="slider__wrapper">#}
-{#                            <div class="slider__items">#}
-{#                                {% for i in range(len_slider) %}#}
-{#                                    <div class="slider__item">#}
-{#                                        <img class="slider__img" alt=""#}
-{#                                             src="{{ url_for('static',#}
-{#                                     filename='/images/staff/' + i|string + '.png' ) }}">#}
-{#                                    </div>#}
-{#                                {% endfor %}#}
-{#                            </div>#}
-{#                        </div>#}
-{#                    </div>#}
-{##}
-{#                    <!-- Стрелки для перехода к предыдущему и следующему слайду -->#}
-{#                    <a class="slider__control slider__control_prev" href="#" role="button" data-slide="prev"></a>#}
-{#                    <a class="slider__control slider__control_next" href="#" role="button" data-slide="next"></a>#}
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}
     </div>
 
 {% endblock %}

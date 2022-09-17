@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='main/main.css') }}">
     <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename="favicon.ico") }}"/>
     <link rel="stylesheet" href="{{ url_for('static', filename='slider.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='event/event.css') }}"> {# стили для кнопки назад #}
     <link rel="stylesheet" href="{{ url_for('static', filename='contacts/contacts.css') }}">
     {% block link %}{% endblock %}
 
@@ -293,18 +294,21 @@
         {% block app_content %}{% endblock %}
     </div>
 
-
+    {# Для телефона #}
     <div style="margin: auto 17px;">
-        <div id="back_button" class="back_button">
+        <div id="back_button" class="back_button" style="background: none;">
             <div class="back_button_btn">
-                <a style="" onclick="history.back(); return false;">
-                    <img src="{{ url_for('static', filename='back.svg' ) }}" class="back_button_img" alt="">
-                </a>
+                <button class="slider__control slider__control_prev carousel__button_2 is-prev"
+                        style="top: 26px; width: 50px; right: 2px; left: 0; background: rgba(0, 0, 0, 1)" tabindex="0">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" tabindex="-1">
+                        <path d="M15 3l-9 9 9 9"></path>
+                    </svg>
+                </button>
             </div>
         </div>
     </div>
 
-
+    {# Для компа  #}
     <div style="margin:  auto 17px;">
         <div id="back_button_2" class="back_button_3">
             <div class="back_button_btn_2">
@@ -314,10 +318,7 @@
             </div>
         </div>
     </div>
-
-
 </div>
-
 
 <div id="footer" class="footer">© 2021</div>
 

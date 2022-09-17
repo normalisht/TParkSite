@@ -1,6 +1,6 @@
 @charset "UTF-8";
 
-.carousel__button {
+.carousel__button_2 {
     width: var(--carousel-button-width, 48px);
     height: var(--carousel-button-height, 48px);
     padding: 0;
@@ -17,20 +17,20 @@
     transition: opacity .15s ease
 }
 
-.carousel__button.is-prev {
+.carousel__button_2.is-prev {
     left: 10px
 }
 
-.carousel__button.is-next {
+.carousel__button_2.is-next {
     right: 10px
 }
 
-.carousel__button[disabled] {
+.carousel__button_2[disabled] {
     cursor: default;
     opacity: .3
 }
 
-.carousel__button svg {
+.carousel__button_2 svg {
     width: var(--carousel-button-svg-width, 50%);
     height: var(--carousel-button-svg-height, 50%);
     fill: none;
