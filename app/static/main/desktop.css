@@ -10,7 +10,7 @@
     width: min(var(--vw, 1vw) * 100 - 34px, 1200px);
     margin: 5px;
     position: sticky;
-    justify-content: flex-start;
+    justify-content: space-between;
 }
 
 .upper_media {

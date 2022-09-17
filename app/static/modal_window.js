@@ -146,14 +146,7 @@ function activate_modal_window() {
             window.location.hash += current_modal_window.modal_window_name
 
             if (only_once) {
-                // $('.modal-item').each(function (index, element) {
-                //         console.log($(element).parent().outerHeight(true))
-                //         $(element).append(`<div style="position: absolute; top: ${$(element).position().top + 'px'};
-                //         left: 0; width: 100vw;
-                //         height: ${$(element).outerHeight(true) + 'px'};"></div>`)
-                //     }
-                // )
-                console.log(555)
+                // размытие за кнопками
                 only_once = false
                 let el = $('.modal-item')
                 let i = -1;

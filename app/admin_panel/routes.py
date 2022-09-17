@@ -434,18 +434,12 @@ def all_services():
 def about():
     about = Text.query.filter_by(title='about').first()
     filosofi = Text.query.filter_by(title='filosofi').first()
-    if Partner.query.filter_by(name='temp').first():
-        pass
-    else:
+    if not Partner.query.filter_by(name='temp').first():
         db.session.add(Partner(name='temp'))
         db.session.commit()
-    if Employee.query.filter_by(name='temp').first():
-        pass
-    else:
-        db.session.add(Employee(name='temp'))
-        db.session.commit()
-    employees = Employee.query.all()
+
     partners = Partner.query.all()
+
     if request.method == 'POST':
         for partner in partners:
             if request.form.get('partner_' + str(partner.id) + '_delete'):
@@ -455,66 +449,38 @@ def about():
                     pass
                 Partner.query.filter_by(id=partner.id).delete()
                 db.session.commit()
-                return redirect(url_for('admin_panel.about'))
-            if request.form.get('partner_' + str(partner.id) + '_save'):
+                continue
+
+            if request.form.get('partner_' + str(partner.id) + '_save') and partner.name != 'temp':
                 if request.files.get('partner_' + str(partner.id) + '_photo'):
                     image = request.files.get('partner_' + str(partner.id) + '_photo')
                     os.chdir('app/static/images/partner')
                     image.save(os.path.join(os.getcwd(), '{}.png'.format(partner.id)))
                     os.chdir('../../../../')
-                    return redirect(url_for('admin_panel.about'))
                 partner.link = request.form.get('partner_' + str(partner.id) + '_link')
-        # for employee in employees:
-        #     if request.form.get('employee_' + str(employee.id) + '_delete'):
-        #         try:
-        #             os.remove('app/static/images/employee/' + str(employee.id) + ".png")
-        #         except:
-        #             pass
-        #         Employee.query.filter_by(id=employee.id).delete()
-        #         db.session.commit()
-        #         return redirect(url_for('admin_panel.about'))
-        #     if request.form.get('employee_' + str(employee.id) + '_save'):
-        #         if request.files.get('employee_' + str(employee.id) + '_photo'):
-        #             image = request.files.get('employee_' + str(employee.id) + '_photo')
-        #             os.chdir('app/static/images/employee')
-        #             image.save(os.path.join(os.getcwd(), '{}.png'.format(employee.id)))
-        #             os.chdir('../../../../')
-        #             return redirect(url_for('admin_panel.about'))
-        #         if request.form.get('employee_' + str(employee.id) + '_name'):
-        #             employee.name = request.form.get('employee_' + str(employee.id) + '_name')
-        #         if request.form.get('employee_' + str(employee.id) + '_position'):
-        #             employee.position = request.form.get('employee_' + str(employee.id) + '_position')
-        if request.form.get('partner_add'):
-            temp = Partner.query.filter_by(name='temp').first()
-            image = request.files.get('partner_add_photo')
-            os.chdir('app/static/images/partner')
-            image.save(os.path.join(os.getcwd(), '{}.png'.format(temp.id)))
-            os.chdir('../../../../')
-            temp.name = ""
-            temp.link = request.form.get('partner_' + str(temp.id) + '_link')
-            db.session.add(temp)
-            db.session.commit()
-            return redirect(url_for('admin_panel.about'))
-        # if request.form.get('employee_add'):
-        #     temp = Employee.query.filter_by(name='temp').first()
-        #     image = request.files.get('employee_add_photo')
-        #     os.chdir('app/static/images/employee')
-        #     image.save(os.path.join(os.getcwd(), '{}.png'.format(temp.id)))
-        #     os.chdir('../../../../')
-        #     temp.name = request.form.get('employee_' + str(temp.id) + '_name')
-        #     temp.position = request.form.get('employee_' + str(temp.id) + '_position')
-        #     db.session.add(temp)
-        #     db.session.commit()
-        #     return redirect(url_for('admin_panel.about'))
+
+
         if request.form.get('about_text'):
             about.text = request.form.get('about_text')
         if request.form.get('filosofi_text'):
             filosofi.text = request.form.get('filosofi_text')
-
         db.session.commit()
 
-    return render_template('admin_panel/about.html', employees=employees,
-                           filosofi=filosofi, about=about, partners=partners)
+        temp = Partner.query.filter_by(name='temp').first()
+        if request.files.get(f'partner_{temp.id}_photo'):
+            image = request.files.get(f'partner_{temp.id}_photo')
+            os.chdir('app/static/images/partner')
+            image.save(os.path.join(os.getcwd(), '{}.png'.format(temp.id)))
+            os.chdir('../../../../')
+            setattr(temp, 'name', f'{temp.id}')
+            temp.link = request.form.get('partner_' + str(temp.id) + '_link')
+            db.session.commit()
+            return redirect(url_for('admin_panel.about'))
+
+    partners = Partner.query.all()
+
+    return render_template('admin_panel/about.html', filosofi=filosofi, about=about, partners=partners)
+
 
 @bp.route('/comments', methods=['GET'])
 @login_required

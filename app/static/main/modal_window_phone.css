@@ -54,13 +54,16 @@
     width: 100%;
     letter-spacing: 1px;
     padding: 4px 13px 0;
-    height: 30px;
+    height: 38px;
+    align-items: center;
+    display: flex;
 }
 
 .modal-upper-content {
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 100%;
 }
 
 .modal-upper-content > div {
@@ -74,6 +77,7 @@
 
 .modal-upper-content > div:nth-child(2) {
     text-align: center;
+    font-size: 20px;
 }
 
 .modal-upper-content > div:last-child {
