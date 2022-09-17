@@ -8,7 +8,7 @@
 {% block app_content %}<!--Шаблон страницы конкретной услуги-->
 
     <div>
-        <div class="category_title" {% if not files %}style="padding-bottom: 0;" {% endif %}>{{ service.name }}</div>
+        <div class="category_title" {% if not files %}style="padding-bottom: 0; margin-bottom: -4px;" {% endif %}>{{ service.name }}</div>
 
 
         {% set path = "images/service/" + service.id|string + ".png" %}
