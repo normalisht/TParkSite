@@ -23,7 +23,8 @@
 .title {
     font-size: calc(var(--primary-font-size) * 1.2);
     text-align: center;
-    margin-bottom: 4px;
+    margin-bottom: 8px;
+    margin-top: 2px;
 }
 
 .text {
