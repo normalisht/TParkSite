@@ -211,12 +211,14 @@ def category_change():
     services = category.services.order_by(ServiceCategory.number).all()
     numbers = []  # хранит порядковые номера услуг
 
-    photo = False
+
     try:
-        if os.path.exists('app/static/images/category/{}.png'.format(category_id)):
-            photo = True
+        os.chdir('app/static/images/category/{}'.format(category_id))
+        temp = os.getcwd()
+        files = listdir(temp)
+        os.chdir('../../../../../')
     except:
-        pass
+        files = []
 
     for element in services:
         numbers.append(element.number)
@@ -247,18 +249,33 @@ def category_change():
             db.session.commit()
             return redirect(url_for('admin_panel.category'))
 
-        if request.form.get('delete_photo'):
-            try:
-                os.remove('app/static/images/category/{}.png'.format(category_id))
-                return redirect(url_for('admin_panel.category_change', category_id=category_id))
-            except:
-                pass
+        for photo in files:
+            if request.form.get('delete_' + str(photo)):
+                try:
+                    os.remove('app/static/images/category/{}/'.format(category_id) + str(photo))
+                except:
+                    pass
+
+            if request.files['add_' + str(photo)]:
+                images = request.files.getlist('add_' + str(photo))
+                count = len(files)
+
+                for img in images:
+                    os.chdir('app/static/images/category/{}'.format(category_id))
+                    img.save(os.path.join(os.getcwd(), '{}.png'.format(count + 1)))
+                    count += 1
+                    os.chdir('../../../../../')
 
         if request.files.get('add_photo'):
-            image = request.files.get('add_photo')
-            os.chdir('app/static/images/category')
-            image.save(os.path.join(os.getcwd(), '{}.png'.format(category_id)))
-            os.chdir('../../../../../')
+            images = request.files.getlist('add_photo')
+            for img in files:
+                os.rename(img, str(base_number)+'.jpg')
+                base_number += 1
+            base_number -= 1
+            for img in images:
+                img.save(os.path.join(os.getcwd(), '{}.png'.format(base_number + 1)))
+                base_number += 1
+                os.chdir('../../../../../')
 
         category.number = request.form.get('weight')
         category.description = request.form.get('ckeditor')
@@ -267,7 +284,7 @@ def category_change():
         return redirect(url_for('admin_panel.category_change', category_id=category_id))
 
     return render_template('admin_panel/category.html', title='{}'.format(category.name),
-                           category=category, services=services, numbers=numbers, photo=photo)
+                           category=category, services=services, numbers=numbers)
 
 
 @bp.route('/category_create', methods=['GET', 'POST'])
@@ -284,7 +301,7 @@ def category_create():
         os.makedirs('app/static/images/category/{}'.format(category_id))
         try:
             photo = request.files.getlist('photo')
-            count = 0
+            count = 1
             os.chdir('app/static/images/category/{}'.format(category_id))
             if photo[0]:
                 for file in photo:
