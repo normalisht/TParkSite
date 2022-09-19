@@ -1,9 +1,13 @@
 {% extends "main/base.html" %}
 
 {% block scripts %}
+    <script type="text/javascript" src="{{ url_for('static', filename='slider.js') }}"></script>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='category/category.css') }}">
 
     <script type="text/javascript" src="{{ url_for('static', filename='category/category.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='slider.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='event/event.css') }}">
 {% endblock %}
 
 {% block app_content %}
@@ -13,11 +17,11 @@
     <div class="container">
         {% if photo %}
             <div class="data">
-                <div class="block_slider">
+            <div class="block_slider">
                     <div class="slider">
                         <div class="slider__container">
                             <div class="slider__wrapper">
-                                <div class="slider__items">
+                                <div class="slider__items" id="event_items">
                                     {% for i in range(3) %}
                                         {% for photo in files %}
                                             <div class="slider__item">
@@ -29,8 +33,11 @@
                                 </div>
                             </div>
                         </div>
-                        <a class="slider__control slider__control_prev" href="#" role="button" data-slide="prev"></a>
-                        <a class="slider__control slider__control_next" href="#" role="button" data-slide="next"></a>
+
+                        <button class="slider__control slider__control_prev carousel__button_2 is-prev" href="#" role="button" data-slide="prev" tabindex="0">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" tabindex="-1"><path d="M15 3l-9 9 9 9"></path></svg></button>
+                        <button class="slider__control slider__control_next carousel__button_2 is-next" href="#" role="button" data-slide="next" tabindex="0">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" tabindex="-1"><path d="M9 3l9 9-9 9"></path></svg></button>
                     </div>
                 </div>
             </div>
