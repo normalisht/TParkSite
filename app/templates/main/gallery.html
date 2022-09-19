@@ -15,10 +15,10 @@
                 <div class="list">
                     {% for image in images %}
                         <div>
-                        {% set path = "images/gallery/" + image %}
-                        <a data-fancybox="gallery" href="{{ url_for("static", filename=path) }}">
-                            <img class="rounded" src="{{ url_for("static", filename=path) }}"/>
-                        </a>
+                            {% set path = "images/gallery/" + image %}
+                            <a data-fancybox="gallery" href="{{ url_for("static", filename=path) }}">
+                                <img class="rounded" src="{{ url_for("static", filename=path) }}"/>
+                            </a>
                         </div>
                     {% endfor %}
                 </div>

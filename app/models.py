@@ -94,7 +94,7 @@ class Comment(db.Model):
     text = db.Column(db.Text)  # содержание
 
     def __repr__(self):
-        return self.text
+        return f'{self.id}'
 
 
 class Admin(UserMixin, db.Model):

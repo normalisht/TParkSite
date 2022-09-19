@@ -18,11 +18,20 @@
     justify-content: center;
 }
 
-.comments_container {
+.comments_container_2 {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
     justify-content: center;
+    align-items: flex-start;
     grid-column-gap: 16px;
+    grid-row-gap: 16px;
+}
+
+.comments_container {
+        display: grid;
+    grid-template-columns: repeat(1, minmax(min(320px, 100%), 1fr));
+    justify-content: center;
+    /*grid-column-gap: 16px;*/
     grid-row-gap: 16px;
 }
 
@@ -33,6 +42,7 @@
     padding: 30px 20px;
     background-color: white;
     border-radius: 10px;
+    height: min-content;
 }
 
 .img_and_name {

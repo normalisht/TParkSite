@@ -11,6 +11,7 @@ from app.models import CategoryType, Admin, Category, Service, Employee, Text, C
     Type
 import shutil
 
+
 # авторизация админа
 @bp.route('/', methods=['GET', 'POST'])
 @bp.route('/login', methods=['GET', 'POST'])
@@ -211,7 +212,6 @@ def category_change():
     services = category.services.order_by(ServiceCategory.number).all()
     numbers = []  # хранит порядковые номера услуг
 
-
     try:
         os.chdir('app/static/images/category/{}'.format(category_id))
         temp = os.getcwd()
@@ -230,10 +230,11 @@ def category_change():
             category.status = 0
 
         for element in services:
-            if request.form.get('service_checkbox_' + str(element.service.id)) == '1':
-                element.service.status = 1
-            else:
-                element.service.status = 0
+            if request.form.get('service_checkbox_' + str(element.service.id)) != '1':
+                el = ServiceCategory.query.filter_by(service_id=element.service.id,
+                                                     category_id=category_id).first()
+                db.session.delete(el)
+                db.session.commit()
 
             number = request.form.get('service_number_' + str(element.service.id))
             if number:
@@ -282,12 +283,13 @@ def category_change():
             img.save(os.path.join(os.getcwd(), '{}.png'.format(category_id)))
             os.chdir('../../../../../')
 
-
         category.number = request.form.get('weight')
         category.description = request.form.get('ckeditor')
         category.name = request.form.get('title').strip().capitalize()
         db.session.commit()
         return redirect(url_for('admin_panel.category_change', category_id=category_id))
+
+    services = category.services.order_by(ServiceCategory.number).all()
 
     return render_template('admin_panel/category.html', title='{}'.format(category.name),
                            category=category, services=services, numbers=numbers, files=files)
@@ -325,7 +327,7 @@ def category_create():
 def service_test():
     service_id = request.args.get('service_id')
     service = Service.query.filter_by(id=service_id).first()
-    categories_all = Category.query.all()
+    categories_all = Category.query.order_by(Category.number).all()
 
     categories_cheked = []
     for category in categories_all:
@@ -388,8 +390,16 @@ def service_test():
 
             return redirect(url_for('admin_panel.all_services'))
 
-        return redirect(
-            url_for('admin_panel.category_change') + '?category_id={}'.format(service.categories[0].category_id))
+        if len(service.categories.all()) > 0:
+            return redirect(
+                url_for('admin_panel.category_change') + '?category_id={}'.format(service.categories.all()[0].category_id))
+
+    categories_cheked = []
+    for category in categories_all:
+        if ServiceCategory.query.filter_by(service_id=service_id, category_id=category.id).first():
+            categories_cheked.insert(category.id, category.id)
+        else:
+            categories_cheked.insert(category.id, 0)
 
     return render_template('admin_panel/service.html', title='{}'.format(service.name),
                            categories=get_categories(), service=service, categories_checked=categories_cheked,
@@ -482,7 +492,6 @@ def about():
                     os.chdir('../../../../')
                 partner.link = request.form.get('partner_' + str(partner.id) + '_link')
 
-
         if request.form.get('about_text'):
             about.text = request.form.get('about_text')
         if request.form.get('filosofi_text'):
@@ -560,15 +569,16 @@ def comment_create():
         db.session.add(comment)
         db.session.commit()
 
-        photo = request.files['photo']
-        os.chdir('app/static/images/comments')
-        try:
-            photo.save(os.path.join(os.getcwd(), '{}.png'.format(
-                Comment.query.filter_by(name=name, text=text).first().id
-            )))
-            os.chdir('../../../../')
-        except:
-            os.chdir('../../../../')
+        if request.files['photo']:
+            photo = request.files['photo']
+            os.chdir('app/static/images/comments')
+            try:
+                photo.save(os.path.join(os.getcwd(), '{}.png'.format(
+                    Comment.query.filter_by(name=name, text=text).first().id
+                )))
+                os.chdir('../../../../')
+            except:
+                os.chdir('../../../../')
 
         return redirect(url_for('admin_panel.comments'))
 
@@ -670,34 +680,41 @@ def gallery():
         os.chdir('app/static/images/gallery')
         temp = os.getcwd()
         files = listdir(temp)
-        files.sort(key=len)
+        files.sort(key=lambda x: int(x[0:-4]))
         os.chdir('../../../../')
     except:
         files = []
     if request.method == 'POST':
-        if request.files.get('add_photo'):
-            os.chdir('app/static/images/gallery')
-            images = request.files.getlist('add_photo')
-            base_number = 1
-            for img in files:
-                os.rename(img, str(base_number)+'.jpg')
-                base_number += 1
-
-            base_number -= 1
-            for img in images:
-                img.save(os.path.join(os.getcwd(), '{}.png'.format(base_number + 1)))
-                base_number += 1
-            os.chdir('../../../../')
-
         for photo in files:
-            if request.form.get('delete_' + str(photo)) is not None:
+            if request.form.get('delete_' + str(photo)):
                 try:
                     os.remove('app/static/images/gallery/' + str(photo))
                     return redirect(url_for('admin_panel.gallery'))
                 except:
                     pass
 
+        if request.files.get('add_photo'):
+            images = request.files.getlist('add_photo')
+            count = int(os.path.splitext(files[-1])[0])
+            for img in images:
+                os.chdir('app/static/images/gallery')
+                img.save(os.path.join(os.getcwd(), '{}.png'.format(count + 1)))
+                count += 1
+                os.chdir('../../../../')
 
         return redirect(url_for('admin_panel.gallery'))
 
-    return render_template('admin_panel/gallery.html',categories=get_categories(), images=files)
+    return render_template('admin_panel/gallery.html', categories=get_categories(), images=files)
+
+
+@bp.after_request
+def add_header(r):
+    """
+    Add headers to both force latest IE rendering engine or Chrome Frame,
+    and also to cache the rendered page for 10 minutes.
+    """
+    r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    r.headers["Pragma"] = "no-cache"
+    r.headers["Expires"] = "0"
+    r.headers['Cache-Control'] = 'public, max-age=0'
+    return r

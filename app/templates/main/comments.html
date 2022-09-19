@@ -13,22 +13,56 @@
     <div class="desktop_container">
         <div>
             <div class="com_title">Прочтите, что говорят наши посетители</div>
-            <div class="comments_container">
-                {% for comment in comments %}
-                    <div class="comment">
-                        <div>{{ comment.text|safe }}</div>
-                        {% set x = '../../..' + url_for('static', filename='images/comments/' + comment.id|string + '.png') %}
-                        <div class="img_and_name">
-                            <div style="width: 50px; height: 50px; background-size: 50px; object-fit: cover; border-radius: 50%; background-position: 50% 50%;
-                            background-image: url({{ x }});
-                            background-repeat: no-repeat"></div>
-                            <div>{{ comment.name }}</div>
-                        </div>
-                    </div>
-                {% endfor %}
+            <div class="comments_container_2">
+                <div class="comments_container">
+                    {% set i = namespace(a=0) %}
+                    {% for comment in comments %}
+                        {% if i.a < comments|length|round(0, 'ceil') / 2 %}
+                            <div class="comment">
+                                <div>{{ comment.text|safe }}</div>
+                                {% set x = '../../..' + url_for('static', filename='images/comments/' + comment.id|string + '.png') %}
+                                {% if names[i.a] or photos[i.a] %}
+                                    <div class="img_and_name">
+                                        {% if photos[i.a] %}
+                                            <div style="width: 50px; height: 50px; background-size: 50px; object-fit: cover; border-radius: 50%; background-position: 50% 50%;
+                                                    background-image: url({{ x }});
+                                                    background-repeat: no-repeat"></div>
+                                        {% endif %}
+                                        {% if names[i.a] %}
+                                            <div>{{ comment.name }}</div>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                        {% set i.a = i.a + 1 %}
+                    {% endfor %}
+                </div>
+                <div class="comments_container">
+                    {% set i = namespace(a=0) %}
+                    {% for comment in comments %}
+                        {% if i.a >= comments|length|round(0, 'ceil') / 2 %}
+                            <div class="comment">
+                                <div>{{ comment.text|safe }}</div>
+                                {% set x = '../../..' + url_for('static', filename='images/comments/' + comment.id|string + '.png') %}
+                                {% if names[i.a] or photos[i.a] %}
+                                    <div class="img_and_name">
+                                        {% if photos[i.a] %}
+                                            <div style="width: 50px; height: 50px; background-size: 50px; object-fit: cover; border-radius: 50%; background-position: 50% 50%;
+                                                    background-image: url({{ x }});
+                                                    background-repeat: no-repeat"></div>
+                                        {% endif %}
+                                        {% if names[i.a] %}
+                                            <div>{{ comment.name }}</div>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                        {% set i.a = i.a + 1 %}
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>
-
-
 {% endblock %}

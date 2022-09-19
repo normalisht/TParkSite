@@ -3,6 +3,7 @@ from app.main import bp
 from app import db
 import os
 import datetime
+from random import shuffle
 from os import listdir
 from app.models import Text, Comment, Event, Category, ServiceCategory, Service, Employee, Partner, Type
 from app.main.functions import get_categories, get_contacts_data
@@ -118,7 +119,37 @@ def events():
 def reviews():
     comments = Comment.query.all()
 
-    return render_template('main/comments.html', comments=comments,
+    comments.sort(key=lambda x: len(x.text))
+    photos = []
+    names = []
+    comments1 = []
+    comments2 = []
+
+    for index, comment in enumerate(comments):
+        if index == 0:
+            print(1)
+            comments1.append(comment)
+            count = 2
+            continue
+        if count < 2:
+            count += 1
+            print(1)
+            comments1.append(comment)
+        elif count < 4:
+            print(2)
+            count += 1
+            comments2.append(comment)
+        if count == 4:
+            count = 0
+    shuffle(comments1)
+    shuffle(comments2)
+    comments = comments1 + comments2
+
+    for comment in comments:
+        photos.append(os.path.exists(f'app/static/images/comments/{comment.id}.png'))
+        names.append(comment.name)
+
+    return render_template('main/comments.html', comments=comments, names=names, photos=photos,
                            categories=get_categories(), contacts_data=get_contacts_data())
 
 
