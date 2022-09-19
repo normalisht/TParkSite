@@ -57,9 +57,14 @@ def service():
 
     service = Service.query.filter_by(id=service_id).first()
 
+    photo = False
+    if os.path.exists('app/static/images/service/{}.png'.format(service_id)):
+        photo = True
+
+    print(photo)
+
     return render_template('main/service.html', service=service, categories=get_categories(),
-                           files=os.path.isfile('app/static/images/service/{}.png'.format(service_id)),
-                           contacts_data=get_contacts_data())
+                           photo=photo, contacts_data=get_contacts_data())
 
 
 @bp.route('/about_2', methods=['GET'])
