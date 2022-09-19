@@ -67,8 +67,22 @@
                     {% set i.a = i.a + 1 %}
                 {% endfor %}
                 <div>
-                    <div class="title">Фото</div>
+                    <div class="title">Фото в меню</div>
+                    <div class="grid_block_photo">
+                            <div><img
+                                    src="{{ url_for('static',filename='/images/category/preview/' + category.id|string  + '.png') }}"
+                                    alt="" class="image"></div>
 
+                            <div class="input__wrapper">
+                                <input type="file" class="input__file" id="add_preview" multiple
+                                       name="add_preview">
+                                <label for="add_preview" class="input__file_button">
+                                    <span class="input__file_button_text_2">Добавить/Изменить</span>
+                                </label>
+                            </div>
+                    </div>
+
+                    <div class="title">Фото внутри</div>
                     <div class="grid_block_photo">
                         {% for photo in files %}
                             <div><img

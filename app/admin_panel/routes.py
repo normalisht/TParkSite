@@ -276,6 +276,13 @@ def category_change():
                 count += 1
                 os.chdir('../../../../../')
 
+        if request.files.get('add_preview'):
+            img = request.files.get('add_preview')
+            os.chdir('app/static/images/category/preview')
+            img.save(os.path.join(os.getcwd(), '{}.png'.format(category_id)))
+            os.chdir('../../../../../')
+
+
         category.number = request.form.get('weight')
         category.description = request.form.get('ckeditor')
         category.name = request.form.get('title').strip().capitalize()
@@ -293,7 +300,7 @@ def category_create():
         title = request.form.get('title')
         description = request.form.get('description')
 
-        category = Category(name=title, description=description, status=1)
+        category = Category(name=title, description=description, status=0)
         db.session.add(category)
         db.session.commit()
         category_id = category.id

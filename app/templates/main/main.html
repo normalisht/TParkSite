@@ -60,18 +60,27 @@
                                 </div>
                             </div>
                         </div>
-
-                        <button class="slider__control slider__control_prev carousel__button_2 is-prev" href="#" role="button" data-slide="prev" tabindex="0">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" tabindex="-1"><path d="M15 3l-9 9 9 9"></path></svg></button>
-                        <button class="slider__control slider__control_next carousel__button_2 is-next" href="#" role="button" data-slide="next" abindex="0">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" tabindex="-1"><path d="M9 3l9 9-9 9"></path></svg></button>
+                        {% if events|length > 1 %}
+                            <button class="slider__control slider__control_prev carousel__button_2 is-prev" href="#"
+                                    role="button" data-slide="prev" tabindex="0">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" tabindex="-1">
+                                    <path d="M15 3l-9 9 9 9"></path>
+                                </svg>
+                            </button>
+                            <button class="slider__control slider__control_next carousel__button_2 is-next" href="#"
+                                    role="button" data-slide="next" tabindex="0">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" tabindex="-1">
+                                    <path d="M9 3l9 9-9 9"></path>
+                                </svg>
+                            </button>
+                        {% endif %}
                     </div>
                 </div>
             </div>
         {% endif %}
 
         <div id="block_content" class="block_content">
-                {{ main_text|safe }}
+            {{ main_text|safe }}
         </div>
     </div>
 
