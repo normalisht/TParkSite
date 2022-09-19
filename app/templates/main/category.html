@@ -18,10 +18,14 @@
                         <div class="slider__container">
                             <div class="slider__wrapper">
                                 <div class="slider__items">
-                                    <div class="slider__item">
-                                        <img class="slider__img" alt="" style="margin: 0 auto 8px;"
-                                             src="{{ url_for('static',filename='/images/category/' + category.id|string + '.png') }}">
-                                    </div>
+                                    {% for i in range(3) %}
+                                        {% for photo in files %}
+                                            <div class="slider__item">
+                                                <img class="slider__img" alt=""
+                                                     src="{{ url_for('static',filename='/images/category/' + category.id|string  + '/' + photo) }}">
+                                            </div>
+                                        {% endfor %}
+                                    {% endfor %}
                                 </div>
                             </div>
                         </div>

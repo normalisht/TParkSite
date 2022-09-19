@@ -70,28 +70,38 @@
                     <div class="title">Фото</div>
 
                     <div class="grid_block_photo">
-                        {% if photo %}
-                        <div><img
-                                src="{{ url_for('static',filename='/images/category/' + category.id|string + '.png') }}"
-                                alt="" class="image">
-                        </div>
+                        {% for photo in files %}
+                            <div><img
+                                    src="{{ url_for('static',filename='/images/category/' + category.id|string  + '/' + photo) }}"
+                                    alt="" class="image"></div>
+
+                            <div class="input__wrapper">
+                                <input type="file" class="input__file" id="add_{{ photo }}" multiple
+                                       name="add_{{ photo }}">
+                                <label for="add_{{ photo }}" class="input__file_button">
+                                    <span class="input__file_button_text_2">Добавить</span>
+                                </label>
+                            </div>
+
+                            <div class="input__wrapper">
+                                <input type="submit" id="delete_{{ photo }}" class="input__file"
+                                       name="delete_{{ photo }}"
+                                       value="Удалить">
+                                <label for="delete_{{ photo }}" class="input__file_button">
+                                    <span class="input__file_button_text_2">Удалить</span>
+                                </label>
+                            </div>
+                        {% endfor %}
+
+                        {% if not files[0] %}
+                            <div class="input__wrapper">
+                                <input type="file" id="blank_file" multiple name="add_photo" class="input__file">
+                                <label for="blank_file" class="input__file_button">
+                                    <span class="input__file_button_text_2">Добавить</span>
+                                </label>
+                            </div>
                         {% endif %}
 
-                        <div class="input__wrapper">
-                            <input type="file" class="input__file" id="add_photo" name="add_photo">
-                            <label for="add_photo" class="input__file_button">
-                                <span class="input__file_button_text_2">Добавить</span>
-                            </label>
-                        </div>
-
-                        <div class="input__wrapper">
-                            <input type="submit" id="delete_photo" class="input__file"
-                                   name="delete_photo"
-                                   value="Удалить">
-                            <label for="delete_photo" class="input__file_button">
-                                <span class="input__file_button_text_2">Удалить</span>
-                            </label>
-                        </div>
                     </div>
 
                 </div>
