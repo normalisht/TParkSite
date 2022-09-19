@@ -27,6 +27,8 @@ def category():
     try:
         category_id = request.args.get('category_id')
         photo = False
+        print('app/static/images/category/{}.png'.format(category_id),
+              os.path.exists('app/static/images/category/{}.png'.format(category_id)))
         try:
             if os.path.exists('app/static/images/category/{}.png'.format(category_id)):
                 photo = True
