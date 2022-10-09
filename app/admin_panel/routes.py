@@ -56,12 +56,9 @@ def events_content():
     main_text = Text.query.filter_by(title="main_text").first()
 
     try:
-        os.chdir('app/static/images/staff/')
-        temp = os.getcwd()
-        files = listdir(temp)
-        path = os.path.join(os.getcwd(), files[0])
+        files = listdir('app/static/images/staff/')
+        path = os.path.join('app/static/images/staff/', files[0])
         open(path)
-        os.chdir('../../../../')
     except:
         files = []
 
@@ -80,9 +77,7 @@ def events_content():
                     pass
             if request.files.get('change_' + str(photo)):
                 image = request.files.get('change_' + str(photo))
-                os.chdir('app/static/images/staff')
-                image.save(os.path.join(os.getcwd(), '{}.png'.format(os.path.splitext(photo)[0])))
-                os.chdir('../../../../')
+                image.save(os.path.join('app/static/images/staff', '{}.png'.format(os.path.splitext(photo)[0])))
                 return redirect(url_for('admin_panel.main'))
         if files[0] != '0.png':
             name = 0
@@ -92,9 +87,7 @@ def events_content():
             name = 2
         if request.files.get('add_photo'):
             images = request.files.get('add_photo')
-            os.chdir('app/static/images/staff/')
-            images.save(os.path.join(os.getcwd(), '{}.png'.format(name)))
-            os.chdir('../../../../')
+            images.save(os.path.join('app/static/images/staff/', '{}.png'.format(name)))
 
             return redirect(url_for('admin_panel.events_content'))
 
@@ -176,9 +169,7 @@ def event_edit():
         try:
             if request.files.get('change'):
                 image = request.files.get('change')
-                os.chdir('app/static/images/events')
-                image.save(os.path.join(os.getcwd(), '{}.png'.format(event.id)))
-                os.chdir('../../../../')
+                image.save(os.path.join('app/static/images/events', '{}.png'.format(event.id)))
         except:
             pass
 
@@ -213,10 +204,7 @@ def category_change():
     numbers = []  # хранит порядковые номера услуг
 
     try:
-        os.chdir('app/static/images/category/{}'.format(category_id))
-        temp = os.getcwd()
-        files = listdir(temp)
-        os.chdir('../../../../../')
+        files = listdir('app/static/images/category/{}'.format(category_id))
     except:
         files = []
 
@@ -262,26 +250,20 @@ def category_change():
                 count = len(files)
 
                 for img in images:
-                    os.chdir('app/static/images/category/{}'.format(category_id))
-                    img.save(os.path.join(os.getcwd(), '{}.png'.format(count + 1)))
+                    img.save(os.path.join('app/static/images/category/{}'.format(category_id), '{}.png'.format(count + 1)))
                     count += 1
-                    os.chdir('../../../../../')
 
         if request.files.get('add_photo'):
             print(5)
             images = request.files.getlist('add_photo')
             count = len(files) + 1
             for img in images:
-                os.chdir('app/static/images/category/{}'.format(category_id))
-                img.save(os.path.join(os.getcwd(), '{}.png'.format(count)))
+                img.save(os.path.join('app/static/images/category/{}'.format(category_id), '{}.png'.format(count)))
                 count += 1
-                os.chdir('../../../../../')
 
         if request.files.get('add_preview'):
             img = request.files.get('add_preview')
-            os.chdir('app/static/images/category/preview')
-            img.save(os.path.join(os.getcwd(), '{}.png'.format(category_id)))
-            os.chdir('../../../../../')
+            img.save(os.path.join('app/static/images/category/preview', '{}.png'.format(category_id)))
 
         category.number = request.form.get('weight')
         category.description = request.form.get('ckeditor')
@@ -310,12 +292,10 @@ def category_create():
         try:
             photo = request.files.getlist('photo')
             count = 1
-            os.chdir('app/static/images/category/{}'.format(category_id))
             if photo[0]:
                 for file in photo:
-                    file.save(os.path.join(os.getcwd(), '{}.png'.format(count)))
+                    file.save(os.path.join('app/static/images/category/{}'.format(category_id), '{}.png'.format(count)))
                     count += 1
-            os.chdir('../../../../../')
         except:
             pass
 
@@ -366,9 +346,7 @@ def service_test():
                 pass
         if request.files.get('change'):
             image = request.files.get('change')
-            os.chdir('app/static/images/service')
-            image.save(os.path.join(os.getcwd(), '{}.png'.format(service_id)))
-            os.chdir('../../../../')
+            image.save(os.path.join('app/static/images/service', '{}.png'.format(service_id)))
 
         service.short_description = request.form.get('input_short_desc')
         service.description = request.form.get('input_desc')
@@ -487,9 +465,7 @@ def about():
             if request.form.get('partner_' + str(partner.id) + '_save') and partner.name != 'temp':
                 if request.files.get('partner_' + str(partner.id) + '_photo'):
                     image = request.files.get('partner_' + str(partner.id) + '_photo')
-                    os.chdir('app/static/images/partner')
-                    image.save(os.path.join(os.getcwd(), '{}.png'.format(partner.id)))
-                    os.chdir('../../../../')
+                    image.save(os.path.join('app/static/images/partner', '{}.png'.format(partner.id)))
                 partner.link = request.form.get('partner_' + str(partner.id) + '_link')
 
         if request.form.get('about_text'):
@@ -501,9 +477,7 @@ def about():
         temp = Partner.query.filter_by(name='temp').first()
         if request.files.get(f'partner_{temp.id}_photo'):
             image = request.files.get(f'partner_{temp.id}_photo')
-            os.chdir('app/static/images/partner')
-            image.save(os.path.join(os.getcwd(), '{}.png'.format(temp.id)))
-            os.chdir('../../../../')
+            image.save(os.path.join('app/static/images/partner', '{}.png'.format(temp.id)))
             setattr(temp, 'name', f'{temp.id}')
             temp.link = request.form.get('partner_' + str(temp.id) + '_link')
             db.session.commit()
@@ -538,9 +512,7 @@ def edit_comment():
         try:
             if request.files.get('change'):
                 image = request.files.get('change')
-                os.chdir('app/static/images/comments')
-                image.save(os.path.join(os.getcwd(), '{}.png'.format(comment.id)))
-                os.chdir('../../../../')
+                image.save(os.path.join('app/static/images/comments', '{}.png'.format(comment.id)))
         except:
             pass
 
@@ -571,14 +543,12 @@ def comment_create():
 
         if request.files['photo']:
             photo = request.files['photo']
-            os.chdir('app/static/images/comments')
             try:
-                photo.save(os.path.join(os.getcwd(), '{}.png'.format(
+                photo.save(os.path.join('app/static/images/comments', '{}.png'.format(
                     Comment.query.filter_by(name=name, text=text).first().id
                 )))
-                os.chdir('../../../../')
             except:
-                os.chdir('../../../../')
+                pass
 
         return redirect(url_for('admin_panel.comments'))
 
@@ -677,11 +647,8 @@ def category_type_create():
 @login_required
 def gallery():
     try:
-        os.chdir('app/static/images/gallery')
-        temp = os.getcwd()
-        files = listdir(temp)
+        files = listdir('app/static/images/gallery')
         files.sort(key=lambda x: int(x[0:-4]))
-        os.chdir('../../../../')
     except:
         files = []
     if request.method == 'POST':
@@ -697,10 +664,8 @@ def gallery():
             images = request.files.getlist('add_photo')
             count = int(os.path.splitext(files[-1])[0])
             for img in images:
-                os.chdir('app/static/images/gallery')
-                img.save(os.path.join(os.getcwd(), '{}.png'.format(count + 1)))
+                img.save(os.path.join('app/static/images/gallery', '{}.png'.format(count + 1)))
                 count += 1
-                os.chdir('../../../../')
 
         return redirect(url_for('admin_panel.gallery'))
 

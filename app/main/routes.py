@@ -28,13 +28,10 @@ def category():
     try:
         category_id = request.args.get('category_id')
         try:
-            os.chdir('app/static/images/category/{}'.format(category_id))
-            temp = os.getcwd()
-            files = listdir(temp)
-            path = os.path.join(os.getcwd(), files[0])
+            files = listdir('app/static/images/category/{}'.format(category_id))
+            path = os.path.join('app/static/images/category/{}'.format(category_id), files[0])
             open(path)
             photo = True
-            os.chdir('../../../../../')
         except:
             photo = False
             files = []

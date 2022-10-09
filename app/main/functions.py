@@ -30,10 +30,8 @@ def saving_changes(request, project, project_number):
     result = request.form
 
     if request.files['logo']:
-        os.chdir('app/static/images/{}'.format(project_number))
         photo = request.files['photo']
-        photo.save(os.path.join(os.getcwd(), 'photo.png'))
-        os.chdir('../../../../')
+        photo.save(os.path.join('app/static/images/{}'.format(project_number), 'photo.png'))
         changes = True
 
     db.session.commit()
