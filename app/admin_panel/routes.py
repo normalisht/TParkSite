@@ -134,7 +134,7 @@ def event_create():
         db.session.commit()
 
         photo = request.files['photo']
-        photo.save(os.path.join(os.getcwd(), '{}.png'.format(
+        photo.save(os.path.join('app/static/images/staff/', '{}.png'.format(
             Event.query.filter_by(title=title, link=link).first().id
         )))
 
