@@ -10,6 +10,62 @@ from app.main.functions import get_categories
 from app.models import CategoryType, Admin, Category, Service, Employee, Text, Comment, ServiceCategory, Event, Partner, \
     Type
 import shutil
+from PIL import Image
+from math import floor
+
+def get_size_format(b, factor=1024, suffix="B"):
+    for unit in ["", "K", "M", "G", "T", "P", "E", "Z"]:
+        if b < factor:
+            return f"{b:.2f}{unit}{suffix}"
+        b /= factor
+    return f"{b:.2f}Y{suffix}"
+
+
+def compress_img(image_name, new_size_ratio=1, quality=50, width=None, height=None, to_jpg=True):
+    # load the image to memory
+    img = Image.open(image_name)
+    # print the original image shape
+    # print("[*] Image shape:", img.size)
+    # get the original image size in bytes
+    image_size = os.path.getsize(image_name)
+    # print the size before compression/resizing
+    print("[*] Size before compression:", get_size_format(image_size))
+    if new_size_ratio < 1.0:
+        # if resizing ratio is below 1.0, then multiply width & height with this ratio to reduce image size
+        img = img.resize((int(img.size[0] * new_size_ratio), int(img.size[1] * new_size_ratio)), Image.ANTIALIAS)
+        # print new image shape
+        # print("[+] New Image shape:", img.size)
+    elif width and height:
+        # if width and height are set, resize with them instead
+        img.thumbnail((width, height), Image.ANTIALIAS)
+        # print new image shape
+        # print("[+] New Image shape:", img.size)
+    # split the filename and extension
+    filename, ext = os.path.splitext(image_name)
+    # make new filename appending _compressed to the original file name
+    if to_jpg:
+        # change the extension to JPEG
+        new_filename = f"{filename}.jpg"
+    else:
+        # retain the same extension of the original image
+        new_filename = f"{filename}{ext}"
+    try:
+        # save the image with the corresponding quality and optimize set to True
+        img.save(new_filename, quality=quality, optimize=True)
+    except OSError:
+        # convert the image to RGB mode first
+        img = img.convert("RGB")
+        # save the image with the corresponding quality and optimize set to True
+        img.save(new_filename, quality=quality, optimize=True)
+    # print("[+] New file saved:", new_filename)
+    # get the new image size in bytes
+    new_image_size = os.path.getsize(new_filename)
+    # print the new size in a good format
+    # print("[+] Size after compression:", get_size_format(new_image_size))
+    # calculate the saving bytes
+    saving_diff = new_image_size - image_size
+    # print the saving percentage
+    print(f"[+] Image size change: {saving_diff/image_size*100:.2f}% of the original image size.")
 
 
 # авторизация админа
@@ -56,8 +112,8 @@ def events_content():
     main_text = Text.query.filter_by(title="main_text").first()
 
     try:
-        files = listdir('app/static/images/staff/')
-        path = os.path.join('app/static/images/staff/', files[0])
+        files = listdir('app/static/images/events/')
+        path = os.path.join('app/static/images/events/', files[0])
         open(path)
     except:
         files = []
@@ -71,23 +127,27 @@ def events_content():
         for photo in files:
             if request.form.get('delete_' + str(photo)):
                 try:
-                    os.remove('app/static/images/staff/' + str(photo))
+                    os.remove('app/static/images/events/' + str(photo))
                     return redirect(url_for('admin_panel.main'))
                 except:
                     pass
             if request.files.get('change_' + str(photo)):
                 image = request.files.get('change_' + str(photo))
-                image.save(os.path.join('app/static/images/staff', '{}.png'.format(os.path.splitext(photo)[0])))
+                path = os.path.join('app/static/images/events', '{}.jpg'.format(os.path.splitext(photo)[0]))
+                image.save(path)
+                compress_img(path, width=1920, height=1080)
                 return redirect(url_for('admin_panel.main'))
-        if files[0] != '0.png':
+        if files[0] != '0.jpg':
             name = 0
-        elif files[1] != '1.png':
+        elif files[1] != '1.jpg':
             name = 1
         else:
             name = 2
         if request.files.get('add_photo'):
             images = request.files.get('add_photo')
-            images.save(os.path.join('app/static/images/staff/', '{}.png'.format(name)))
+            path = os.path.join('app/static/images/events/', '{}.jpg'.format(name))
+            images.save(path)
+            compress_img(path, width=1920, height=1080)
 
             return redirect(url_for('admin_panel.events_content'))
 
@@ -134,9 +194,10 @@ def event_create():
         db.session.commit()
 
         photo = request.files['photo']
-        photo.save(os.path.join('app/static/images/staff/', '{}.png'.format(
-            Event.query.filter_by(title=title, link=link).first().id
-        )))
+        path = os.path.join('app/static/images/events/', '{}.jpg'.format(
+            Event.query.filter_by(title=title, link=link).first().id))
+        photo.save(path)
+        compress_img(path, width=1920, height=1080)
 
         return redirect(url_for('admin_panel.events'))
 
@@ -169,7 +230,9 @@ def event_edit():
         try:
             if request.files.get('change'):
                 image = request.files.get('change')
-                image.save(os.path.join('app/static/images/events', '{}.png'.format(event.id)))
+                path = os.path.join('app/static/images/events', '{}.jpg'.format(event.id))
+                image.save(path)
+                compress_img(path, width=1920, height=1080)
         except:
             pass
 
@@ -250,20 +313,25 @@ def category_change():
                 count = len(files)
 
                 for img in images:
-                    img.save(os.path.join('app/static/images/category/{}'.format(category_id), '{}.png'.format(count + 1)))
+                    path = os.path.join('app/static/images/category/{}'.format(category_id), '{}.jpg'.format(count + 1))
+                    img.save(path)
+                    compress_img(path, width=1920, height=1080)
                     count += 1
 
         if request.files.get('add_photo'):
-            print(5)
             images = request.files.getlist('add_photo')
             count = len(files) + 1
             for img in images:
-                img.save(os.path.join('app/static/images/category/{}'.format(category_id), '{}.png'.format(count)))
+                path = os.path.join('app/static/images/category/{}'.format(category_id), '{}.jpg'.format(count))
+                img.save(path)
+                compress_img(path, width=1920, height=1080)
                 count += 1
 
         if request.files.get('add_preview'):
             img = request.files.get('add_preview')
-            img.save(os.path.join('app/static/images/category/preview', '{}.png'.format(category_id)))
+            path = os.path.join('app/static/images/category/preview', '{}.jpg'.format(category_id))
+            img.save(path)
+            compress_img(path, width=1080, height=720)
 
         category.number = request.form.get('weight')
         category.description = request.form.get('ckeditor')
@@ -294,7 +362,9 @@ def category_create():
             count = 1
             if photo[0]:
                 for file in photo:
-                    file.save(os.path.join('app/static/images/category/{}'.format(category_id), '{}.png'.format(count)))
+                    path = os.path.join('app/static/images/category/{}'.format(category_id), '{}.jpg'.format(count))
+                    file.save(path)
+                    compress_img(path, width=1920, height=1080)
                     count += 1
         except:
             pass
@@ -341,12 +411,14 @@ def service_test():
 
         if request.form.get('delete'):
             try:
-                os.remove('app/static/images/service/' + str(service.id) + ".png")
+                os.remove('app/static/images/service/' + str(service.id) + ".jpg")
             except:
                 pass
         if request.files.get('change'):
             image = request.files.get('change')
-            image.save(os.path.join('app/static/images/service', '{}.png'.format(service_id)))
+            path = os.path.join('app/static/images/service', '{}.jpg'.format(service_id))
+            image.save(path)
+            compress_img(path, width=1920, height=1080)
 
         service.short_description = request.form.get('input_short_desc')
         service.description = request.form.get('input_desc')
@@ -381,7 +453,7 @@ def service_test():
 
     return render_template('admin_panel/service.html', title='{}'.format(service.name),
                            categories=get_categories(), service=service, categories_checked=categories_cheked,
-                           files=os.path.isfile('app/static/images/service/{}.png'.format(service_id)))
+                           files=os.path.isfile('app/static/images/service/{}.jpg'.format(service_id)))
 
 
 @bp.route('/service_create', methods=['GET', 'POST'])
@@ -422,7 +494,7 @@ def service_create():
 
         # photo = request.files['photo']
         # if photo:
-        #     photo.save(os.path.join(os.getcwd(), '{}.png'.format(
+        #     photo.save(os.path.join(os.getcwd(), '{}.jpg'.format(
         #         Service.query.filter_by(name=title).first().id
         #     )))
 
@@ -455,7 +527,7 @@ def about():
         for partner in partners:
             if request.form.get('partner_' + str(partner.id) + '_delete'):
                 try:
-                    os.remove('app/static/images/partner/' + str(partner.id) + ".png")
+                    os.remove('app/static/images/partner/' + str(partner.id) + ".jpg")
                 except:
                     pass
                 Partner.query.filter_by(id=partner.id).delete()
@@ -465,7 +537,9 @@ def about():
             if request.form.get('partner_' + str(partner.id) + '_save') and partner.name != 'temp':
                 if request.files.get('partner_' + str(partner.id) + '_photo'):
                     image = request.files.get('partner_' + str(partner.id) + '_photo')
-                    image.save(os.path.join('app/static/images/partner', '{}.png'.format(partner.id)))
+                    path = os.path.join('app/static/images/partner', '{}.jpg'.format(partner.id))
+                    image.save(path)
+                    compress_img(path, width=1920, height=1080)
                 partner.link = request.form.get('partner_' + str(partner.id) + '_link')
 
         if request.form.get('about_text'):
@@ -477,7 +551,9 @@ def about():
         temp = Partner.query.filter_by(name='temp').first()
         if request.files.get(f'partner_{temp.id}_photo'):
             image = request.files.get(f'partner_{temp.id}_photo')
-            image.save(os.path.join('app/static/images/partner', '{}.png'.format(temp.id)))
+            path = os.path.join('app/static/images/partner', '{}.jpg'.format(temp.id))
+            image.save(path)
+            compress_img(path, width=1920, height=1080)
             setattr(temp, 'name', f'{temp.id}')
             temp.link = request.form.get('partner_' + str(temp.id) + '_link')
             db.session.commit()
@@ -512,7 +588,9 @@ def edit_comment():
         try:
             if request.files.get('change'):
                 image = request.files.get('change')
-                image.save(os.path.join('app/static/images/comments', '{}.png'.format(comment.id)))
+                path = os.path.join('app/static/images/comments', '{}.jpg'.format(comment.id))
+                image.save(path)
+                compress_img(path, width=1920, height=1080)
         except:
             pass
 
@@ -544,9 +622,10 @@ def comment_create():
         if request.files['photo']:
             photo = request.files['photo']
             try:
-                photo.save(os.path.join('app/static/images/comments', '{}.png'.format(
-                    Comment.query.filter_by(name=name, text=text).first().id
-                )))
+                path = os.path.join('app/static/images/comments', '{}.jpg'.format(
+                    Comment.query.filter_by(name=name, text=text).first().id))
+                photo.save(path)
+                compress_img(path, width=1920, height=1080)
             except:
                 pass
 
@@ -664,7 +743,9 @@ def gallery():
             images = request.files.getlist('add_photo')
             count = int(os.path.splitext(files[-1])[0])
             for img in images:
-                img.save(os.path.join('app/static/images/gallery', '{}.png'.format(count + 1)))
+                path = os.path.join('app/static/images/gallery', '{}.jpg'.format(count + 1))
+                img.save(path)
+                compress_img(path, width=1920, height=1080)
                 count += 1
 
         return redirect(url_for('admin_panel.gallery'))

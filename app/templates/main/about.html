@@ -20,7 +20,7 @@
                 {% for partner in partners %}
                     <div class="img_block">
                         <a href="{{ partner.link }}">
-                            <img src="{{ url_for('static', filename='/images/partner/' + partner.id|string + '.png') }}"
+                            <img src="{{ url_for('static', filename='/images/partner/' + partner.id|string + '.jpg') }}"
                                  alt="{{ partner.name }}" class="partner img">
                         </a>
                     </div>
@@ -42,7 +42,7 @@
                 {% for employee in employees %}
                     <div class="img_block">
                         <div>
-                            <img src="{{ url_for('static', filename='/images/employee/' + employee.id|string + '.png') }}"
+                            <img src="{{ url_for('static', filename='/images/employee/' + employee.id|string + '.jpg') }}"
                                  alt="" class="employees img">
                         </div>
                         <div>

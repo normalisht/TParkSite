@@ -49,7 +49,7 @@
                         <div class="partners_map_1">
                             <div class="grid_block_photo">
                                 {% if partner.name != 'temp' %}
-                                    {% set path = "images/partner/" + partner.id|string + ".png" %}
+                                    {% set path = "images/partner/" + partner.id|string + ".jpg" %}
                                     <figure class="img__employ">
                                         <center><img src="{{ url_for("static", filename=path) }}"
                                                      alt="{{ partner.name }}"
@@ -127,7 +127,7 @@
             {#                {% for employee in employees %}#}
             {#                    <div class="partners_map_1">#}
             {#                        <div class="grid_block_photo">#}
-            {#                            {% set path = "images/employee/" + employee.id|string + ".png" %}#}
+            {#                            {% set path = "images/employee/" + employee.id|string + ".jpg" %}#}
             {#                            <figure class="img__employ">#}
             {#                                <center><img src="{{ url_for("static", filename=path) }}" alt="" class="emplimg">#}
             {#                                </center>#}

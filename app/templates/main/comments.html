@@ -20,7 +20,7 @@
                         {% if i.a < comments|length|round(0, 'ceil') / 2 %}
                             <div class="comment">
                                 <div>{{ comment.text|safe }}</div>
-                                {% set x = '../../..' + url_for('static', filename='images/comments/' + comment.id|string + '.png') %}
+                                {% set x = '../../..' + url_for('static', filename='images/comments/' + comment.id|string + '.jpg') %}
                                 {% if names[i.a] or photos[i.a] %}
                                     <div class="img_and_name">
                                         {% if photos[i.a] %}
@@ -44,7 +44,7 @@
                         {% if i.a >= comments|length|round(0, 'ceil') / 2 %}
                             <div class="comment">
                                 <div>{{ comment.text|safe }}</div>
-                                {% set x = '../../..' + url_for('static', filename='images/comments/' + comment.id|string + '.png') %}
+                                {% set x = '../../..' + url_for('static', filename='images/comments/' + comment.id|string + '.jpg') %}
                                 {% if names[i.a] or photos[i.a] %}
                                     <div class="img_and_name">
                                         {% if photos[i.a] %}

@@ -13,7 +13,7 @@
             <input type="text" name="name" id="name" placeholder="Имя"
                    value="{{ comment.name }}">
 
-            {% set x = '../../..' + url_for('static', filename='images/comments/' + comment.id|string + '.png') %}
+            {% set x = '../../..' + url_for('static', filename='images/comments/' + comment.id|string + '.jpg') %}
             <div style="width: 50px; height: 50px; background-size: 50px; object-fit: cover;
                     border-radius: 50%; background-position: 50% 50%; margin: 10px;
                     background-image: url({{ x }}); background-repeat: no-repeat">

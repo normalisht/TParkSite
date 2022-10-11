@@ -34,7 +34,7 @@
                                 <div class="slider__items" id="event_items">
                                     {% set i = namespace(a=0) %}
                                     {% for event in events %}
-                                        {% set path = "static/images/events/" + event.id|string + ".png" %}
+                                        {% set path = "static/images/events/" + event.id|string + ".jpg" %}
                                         <div class="slider__item" style="z-index: {{ i.a }};">
                                             <div style="width: 100%;">
                                                 <!-- Контент 1 слайда -->
@@ -48,7 +48,7 @@
                                         <div></div></span>
                                                 <a href="{{ event.link }}">
                                                     <img class="slider__img" alt=""
-                                                         src="{{ url_for('static',filename='/images/events/' + event.id|string + '.png') }}">
+                                                         src="{{ url_for('static',filename='/images/events/' + event.id|string + '.jpg') }}">
                                                 </a>
                                                 <div class="event_text">
                                                     {{ event.description|safe }}

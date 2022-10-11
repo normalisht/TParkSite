@@ -56,7 +56,7 @@ def service():
     service = Service.query.filter_by(id=service_id).first()
 
     photo = False
-    if os.path.exists('app/static/images/service/{}.png'.format(service_id)):
+    if os.path.exists('app/static/images/service/{}.jpg'.format(service_id)):
         photo = True
 
     print(photo)
@@ -89,7 +89,7 @@ def events():
     events = Event.query.order_by(Event.date).all()
     events_2 = []
     slider_events = True
-    len_slider = len(os.listdir('app/static/images/staff'))
+    len_slider = len(os.listdir('app/static/images/events'))
     # len_slider = len(os.listdir('/home/Losharik17/TParkSite/app/static/images/staff'))
 
     for event in events:
@@ -143,7 +143,7 @@ def reviews():
     comments = comments1 + comments2
 
     for comment in comments:
-        photos.append(os.path.exists(f'app/static/images/comments/{comment.id}.png'))
+        photos.append(os.path.exists(f'app/static/images/comments/{comment.id}.jpg'))
         names.append(comment.name)
 
     return render_template('main/comments.html', comments=comments, names=names, photos=photos,

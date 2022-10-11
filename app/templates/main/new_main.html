@@ -24,7 +24,7 @@
                         {% for category in type.categories.all() %}
                             {% set category=category.category %}
                             <div>
-                                {% set path = "images/category/preview/" + category.id|string + ".png" %}
+                                {% set path = "images/category/preview/" + category.id|string + ".jpg" %}
                                 <a href="{{ url_for('main.category') }}?category_id={{ category.id }}"
                                    class="image-centered-wrapper">
                                     <img src="{{ url_for("static", filename=path) }}" alt="" class="img_category">
