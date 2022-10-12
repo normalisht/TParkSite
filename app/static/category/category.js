@@ -42,6 +42,10 @@ document.addEventListener('DOMContentLoaded', function () {
     let services = $('.button'),
         time_animation = 600
 
+    let detect = new MobileDetect(window.navigator.userAgent)
+    if (!detect.mobile() && !detect.phone() && !detect.tablet())
+            $('.next_switch').css("display", "none")
+
     services.each(function () {
         $(this).click(function () {
             let description = $(this).find('.description').stop()

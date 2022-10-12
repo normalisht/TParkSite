@@ -8,6 +8,12 @@
     <script type="text/javascript" src="{{ url_for('static', filename='category/category.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='slider.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='event/event.css') }}">
+
+    <style>
+        a:-webkit-any-link {
+            cursor: inherit;
+        }
+    </style>
 {% endblock %}
 
 {% block app_content %}
@@ -63,16 +69,23 @@
                 {% set service = element.service %}
                 {% if service.status == true %}
                     <div id="{{ service.id }}" class="button" status="0"
-                         style="cursor: {% if service.short_description != None %}pointer{% else %}default{% endif %}">
+                         style="cursor: {%- if service.short_description or service.next -%}pointer{% else %}default{% endif %}">
+                        {%- if not service.short_description and service.next -%}
+                            <a href="{{ url_for('main.service') }}?service_id={{ service.id }}"
+                               style="color: black; text-decoration: none;">
+                        {% endif %}
                         <div class="content">
                             <div class="price">
                                 <div>{{ service.name }}</div>
                                 <div class="cost" style="display: flex;">
                                     <div id="prices{{ service.id }}"></div>
-                                    {% if service.short_description or service.next %}
+                                    {%- if service.short_description -%}
                                         <img class="price_switch" src="{{ url_for('static', filename='down.svg') }}"
                                              alt="">
-                                    {% endif %}
+                                        {%- elif not service.short_description and service.next -%}
+                                        <img class="price_switch next_switch" style="transform: rotate(-90deg)" src="{{ url_for('static', filename='down.svg') }}"
+                                             alt="">
+                                    {%- endif -%}
                                     <script>
                                         x = document.getElementById('prices{{ service.id }}')
                                         x.innerHTML = `{{ service }}`
@@ -81,10 +94,9 @@
                                     </script>
                                 </div>
                             </div>
-                            {% if service.short_description or service.next %}
-                                <div class="description">
-
-                                    {% if service.next %}
+                            {%- if service.short_description -%}
+                                {% if service.next %}
+                                    <div class="description">
                                         <div class="more">
                                             <div>
                                                 <a class='detailed'
@@ -95,16 +107,19 @@
                                                 </a>
                                             </div>
                                         </div>
-                                    {% else %}
+                                    </div>
+                                {% else %}
+                                    <div class="description">
                                         {% if service.short_description != None and service.short_description %}
                                             {{ service.short_description|safe }}
                                         {% endif %}
-                                    {% endif %}
-
-
-                                </div>
+                                    </div>
+                                {%- endif -%}
                             {% endif %}
                         </div>
+                        {%- if not service.short_description and service.next -%}
+                            </a>
+                        {%- endif -%}
                     </div>
                 {% endif %}
             {% endfor %}
