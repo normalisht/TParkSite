@@ -8,6 +8,10 @@
     margin: 0 auto 8px;
 }
 
+.block {
+    margin: 2px auto;
+}
+
 .container_about {
     margin: 8px auto;
 }
@@ -15,4 +19,5 @@
 .text {
     position: relative;
     top: -4px;
+    width: 100%
 }

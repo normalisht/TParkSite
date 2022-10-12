@@ -13,6 +13,7 @@ import shutil
 from PIL import Image
 from math import floor
 
+
 def get_size_format(b, factor=1024, suffix="B"):
     for unit in ["", "K", "M", "G", "T", "P", "E", "Z"]:
         if b < factor:
@@ -217,7 +218,7 @@ def event_edit():
         date = request.form.get('date').split('-')
         description = request.form.get('description')
         link = request.form.get('link')
-        color = request.form.get('color')
+        text_color = request.form.get('color')
 
         date = datetime.datetime(int(date[0]), int(date[1]), int(date[2]), 22)
 
@@ -225,7 +226,7 @@ def event_edit():
         setattr(event, 'description', description)
         setattr(event, 'date', date)
         setattr(event, 'link', link)
-        setattr(event, 'color', color)
+        setattr(event, 'text_color', text_color)
 
         try:
             if request.files.get('change'):
@@ -315,7 +316,7 @@ def category_change():
                 for img in images:
                     path = os.path.join('app/static/images/category/{}'.format(category_id), '{}.jpg'.format(count + 1))
                     img.save(path)
-                    compress_img(path, width=1920, height=1080)
+                    compress_img(path, width=1920, height=1080, quality=75)
                     count += 1
 
         if request.files.get('add_photo'):
@@ -517,6 +518,8 @@ def all_services():
 def about():
     about = Text.query.filter_by(title='about').first()
     filosofi = Text.query.filter_by(title='filosofi').first()
+    structure = Text.query.filter_by(title='structure').first()
+
     if not Partner.query.filter_by(name='temp').first():
         db.session.add(Partner(name='temp'))
         db.session.commit()
@@ -546,6 +549,8 @@ def about():
             about.text = request.form.get('about_text')
         if request.form.get('filosofi_text'):
             filosofi.text = request.form.get('filosofi_text')
+        if request.form.get('structure_text'):
+            structure.text = request.form.get('structure_text')
         db.session.commit()
 
         temp = Partner.query.filter_by(name='temp').first()
@@ -561,7 +566,8 @@ def about():
 
     partners = Partner.query.all()
 
-    return render_template('admin_panel/about.html', filosofi=filosofi, about=about, partners=partners)
+    return render_template('admin_panel/about.html', filosofi=filosofi, about=about, structure=structure,
+                           partners=partners)
 
 
 @bp.route('/comments', methods=['GET'])
@@ -745,7 +751,7 @@ def gallery():
             for img in images:
                 path = os.path.join('app/static/images/gallery', '{}.jpg'.format(count + 1))
                 img.save(path)
-                compress_img(path, width=1920, height=1080)
+                compress_img(path, width=1920, height=1080, quality=70)
                 count += 1
 
         return redirect(url_for('admin_panel.gallery'))

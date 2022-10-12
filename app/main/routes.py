@@ -59,8 +59,6 @@ def service():
     if os.path.exists('app/static/images/service/{}.jpg'.format(service_id)):
         photo = True
 
-    print(photo)
-
     return render_template('main/service.html', service=service, categories=get_categories(),
                            photo=photo, contacts_data=get_contacts_data())
 
@@ -76,9 +74,10 @@ def about():
     employees = Employee.query.all()
     about = Text.query.filter_by(title='about').first()
     filosofi = Text.query.filter_by(title='filosofi').first()
+    structure = Text.query.filter_by(title='structure').first()
     partners = Partner.query.all()
 
-    return render_template('main/about.html', employees=employees,
+    return render_template('main/about.html', employees=employees, structure=structure,
                            filosofi=filosofi, about=about, partners=partners,
                            categories=get_categories(), contacts_data=get_contacts_data())
 

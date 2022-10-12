@@ -13,7 +13,20 @@
             <div>
                 <div class="grid_block">
                     <div>
-                        <div class="title">Текст</div>
+                        <form method="POST">
+                            <label for="about_text">
+                                <center>Философия</center>
+                                <br>
+                            </label>
+                            <textarea name="about_text" id="about_text" class=""
+                            >{{ about.text|safe if about.text }}</textarea>
+                            <input type="submit" value="Сохранить" class="confirm_text">
+                        </form>
+                    </div>
+                </div>
+                <br>
+                <div class="grid_block">
+                    <div>
                         <form method="POST">
                             <label for="title">
                                 <center>О нас</center>
@@ -29,12 +42,12 @@
                 <div class="grid_block">
                     <div>
                         <form method="POST">
-                            <label for="about_text">
-                                <center>Философия</center>
+                            <label for="structure_text">
+                                <center>Инфраструктура</center>
                                 <br>
                             </label>
-                            <textarea name="about_text" id="about_text" class=""
-                            >{{ about.text|safe if about.text }}</textarea>
+                            <textarea name="structure_text" id="structure_text" class=""
+                            >{{ structure.text|safe if structure.text }}</textarea>
                             <input type="submit" value="Сохранить" class="confirm_text">
                         </form>
                     </div>
@@ -179,5 +192,6 @@
 
     {{ ckeditor.config(name='filosofi_text') }}
     {{ ckeditor.config(name='about_text') }}
+    {{ ckeditor.config(name='structure_text') }}
 
 {% endblock %}

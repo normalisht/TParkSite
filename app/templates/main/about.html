@@ -8,9 +8,18 @@
 
     <div class="container_max">
         <div class="block">
+            <div class="title">Философия</div>
+            <div class="text">{{ about.text|safe }}</div>
+        </div>
+
+        <div class="block">
             <div class="title">О нас</div>
-            <!--Философия-->
             <div class="text">{{ filosofi.text|safe }}</div>
+        </div>
+
+        <div class="block">
+            <div class="title">Инфраструктура</div>
+            <div class="text">{{ structure.text|safe }}</div>
         </div>
 
         <!--Партнёры-->
@@ -20,18 +29,12 @@
                 {% for partner in partners %}
                     <div class="img_block">
                         <a href="{{ partner.link }}">
-                            <img src="{{ url_for('static', filename='/images/partner/' + partner.id|string + '.jpg') }}"
+                            <img src="{{ url_for('static', filename='images/partner/' + partner.id|string + '.jpg') }}"
                                  alt="{{ partner.name }}" class="partner img">
                         </a>
                     </div>
                 {% endfor %}
             </div>
-        </div>
-
-        <!--Что есть-->
-        <div class="block">
-            <div class="title">Философия</div>
-            <div class="text">{{ about.text|safe }}</div>
         </div>
 
         {#<div class="container_about">
