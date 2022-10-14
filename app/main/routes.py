@@ -81,6 +81,24 @@ def about():
                            filosofi=filosofi, about=about, partners=partners,
                            categories=get_categories(), contacts_data=get_contacts_data())
 
+@bp.route('/contacts', methods=['GET'])
+def contacts():
+    try:
+        Partner.query.filter_by(name='temp').delete()
+        Employee.query.filter_by(name='temp').delete()
+        db.session.commit()
+    except:
+        pass
+    employees = Employee.query.all()
+    about = Text.query.filter_by(title='about').first()
+    filosofi = Text.query.filter_by(title='filosofi').first()
+    structure = Text.query.filter_by(title='structure').first()
+    partners = Partner.query.all()
+
+    return render_template('main/about.html', employees=employees, structure=structure,
+                           filosofi=filosofi, about=about, partners=partners,
+                           categories=get_categories(), contacts_data=get_contacts_data())
+
 
 @bp.route('/events', methods=['GET'])
 def events():

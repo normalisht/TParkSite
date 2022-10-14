@@ -59,3 +59,10 @@
 .employees {
     aspect-ratio: 3 / 4;
 }
+
+.block_2 {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    margin: 6px auto;
+}

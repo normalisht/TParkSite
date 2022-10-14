@@ -9,17 +9,16 @@
     <div class="container_max">
         <div class="block">
             <div class="title">Контакты</div>
-            <div class="text">{{ contacts.map|safe }}</div>
+            <div class="img_block">{{ contacts.map|safe }}</div>
         </div>
 
         <div class="block">
-            <div class="title">О нас</div>
             <div class="text">{{ filosofi.text|safe }}</div>
         </div>
 
         <div class="block">
-            <div class="title">Инфраструктура</div>
-            <div class="text">{{ structure.text|safe }}</div>
+            <div class="block">Инфраструктура</div>
+            <div class="block">{{ structure.text|safe }}</div>
         </div>
 
         <!--Партнёры-->
