@@ -1,0 +1,63 @@
+{% extends "main/base.html" %}
+
+{% block app_content %}
+
+    <link id="style" rel="stylesheet" href="{{ url_for('static', filename='about/about.css') }}">
+    <script src="{{ url_for('static', filename='about/about.js') }}"></script>
+
+
+    <div class="container_max">
+        <div class="block">
+            <div class="title">Контакты</div>
+            <div class="text">{{ contacts.map|safe }}</div>
+        </div>
+
+        <div class="block">
+            <div class="title">О нас</div>
+            <div class="text">{{ filosofi.text|safe }}</div>
+        </div>
+
+        <div class="block">
+            <div class="title">Инфраструктура</div>
+            <div class="text">{{ structure.text|safe }}</div>
+        </div>
+
+        <!--Партнёры-->
+        <div class="container_about">
+            <div class="title">Партнёры</div>
+            <div class="grid_block">
+                {% for partner in partners %}
+                    <div class="img_block">
+                        <a href="{{ partner.link }}">
+                            <img src="{{ url_for('static', filename='images/partner/' + partner.id|string + '.jpg') }}"
+                                 alt="{{ partner.name }}" class="partner img">
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        {#<div class="container_about">
+            <!--Сотрудники-->
+            <div class="title">Сотрудники</div>
+            <div class="grid_block employees">
+
+                {% for employee in employees %}
+                    <div class="img_block">
+                        <div>
+                            <img src="{{ url_for('static', filename='/images/employee/' + employee.id|string + '.jpg') }}"
+                                 alt="" class="employees img">
+                        </div>
+                        <div>
+                            <div class="name_employees">{{ employee.name }}</div>
+                        </div>
+                        <div>
+                            <div class="position_employees">{{ employee.position }}</div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>#}
+    </div>
+
+{% endblock %}
