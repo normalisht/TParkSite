@@ -15,11 +15,6 @@
     margin: 12px auto;
 }
 
-.title_2 {
-    font-size: calc(var(--primary-font-size) * 1.2);
-    text-align: center;
-}
-
 .title {
     font-size: calc(var(--primary-font-size) * 1.2);
     text-align: center;
@@ -60,9 +55,3 @@
     aspect-ratio: 3 / 4;
 }
 
-.block_2 {
-    display: flex;
-    justify-content: center;
-    flex-direction: row;
-    margin: 6px auto;
-}

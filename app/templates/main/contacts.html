@@ -2,12 +2,13 @@
 
 {% block app_content %}
 
+    <link id="style" rel="stylesheet" href="{{ url_for('static', filename='contacts/contacts.css') }}">
     <link id="style" rel="stylesheet" href="{{ url_for('static', filename='about/about.css') }}">
     <script src="{{ url_for('static', filename='about/about.js') }}"></script>
 
 
     <div class="container_max">
-        <div class="block">
+        <div class="block_2">
             <div class="title">Контакты</div>
             <div class="img_block">{{ contacts.map|safe }}</div>
         </div>
@@ -17,46 +18,18 @@
         </div>
 
         <div class="block">
-            <div class="block">Инфраструктура</div>
-            <div class="block">{{ structure.text|safe }}</div>
+            <div class="block_info">
+                <div class="title_2">Адрес</div>
+                <div class="block_inside">
+                    Село санатория Восход, Калужская обл., Россия, 249250
+                </div>
+                <div class="block_inside" href="https://goo.gl/maps/NwkTB7jW9j1fGsf27"><img src=""></div>
+            </div>
+
+
         </div>
 
-        <!--Партнёры-->
-        <div class="container_about">
-            <div class="title">Партнёры</div>
-            <div class="grid_block">
-                {% for partner in partners %}
-                    <div class="img_block">
-                        <a href="{{ partner.link }}">
-                            <img src="{{ url_for('static', filename='images/partner/' + partner.id|string + '.jpg') }}"
-                                 alt="{{ partner.name }}" class="partner img">
-                        </a>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
 
-        {#<div class="container_about">
-            <!--Сотрудники-->
-            <div class="title">Сотрудники</div>
-            <div class="grid_block employees">
-
-                {% for employee in employees %}
-                    <div class="img_block">
-                        <div>
-                            <img src="{{ url_for('static', filename='/images/employee/' + employee.id|string + '.jpg') }}"
-                                 alt="" class="employees img">
-                        </div>
-                        <div>
-                            <div class="name_employees">{{ employee.name }}</div>
-                        </div>
-                        <div>
-                            <div class="position_employees">{{ employee.position }}</div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>#}
     </div>
 
 {% endblock %}
