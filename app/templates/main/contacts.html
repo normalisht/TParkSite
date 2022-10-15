@@ -8,9 +8,10 @@
 
 
     <div class="container_max">
+        {% set path = "images/staff/" + "map" %}
         <div class="block_2">
             <div class="title">Контакты</div>
-            <div class="img_block">{{ contacts.map|safe }}</div>
+            <div class="img_block"><img src="{{ url_for("static", filename=path) }}"></div>
         </div>
 
         <div class="block">
@@ -19,13 +20,15 @@
 
         <div class="block">
             <div class="block_info">
+                {% set path = "images/staff/" + "geo" %}
                 <div class="title_2">Адрес</div>
                 <div class="block_inside">
                     Село санатория Восход, Калужская обл., Россия, 249250
                 </div>
-                <div class="block_inside" href="https://goo.gl/maps/NwkTB7jW9j1fGsf27"><img src=""></div>
+                <div class="block_inside" href="https://goo.gl/maps/NwkTB7jW9j1fGsf27"><img
+                        alt="" src="{{ url_for("static", filename=path) }}">
+                </div>
             </div>
-
 
         </div>
 
