@@ -144,15 +144,17 @@ radial-gradient(white 100 %, transparent 0);
 
 .block_2 {
     display: flex;
-    justify-content: center;
-    flex-direction: row;
+    justify-content: space-between;
     margin: 6px auto;
+    max-width: var(--primary-content-width);
 }
 
-.block_info {
+.block_inf {
     display: flex;
+    flex-direction: column;
     background-color: white;
-
+    justify-content: center;
+    max-width: calc(var(--primary-content-width) * 0.48);
 
 }
 
@@ -160,3 +162,18 @@ radial-gradient(white 100 %, transparent 0);
 
 
 }
+
+.img_bloc {
+    display:flex;
+    height:clamp(100px,40vh, 600px );
+    width:clamp(200px,40vw, 800px );
+    align-items: center;
+    margin: 0  auto 2px;
+
+}
+
+.title_2 {
+    display:flex;
+    justify-content: center;
+}
+

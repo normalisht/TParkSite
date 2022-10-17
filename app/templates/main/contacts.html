@@ -3,33 +3,38 @@
 {% block app_content %}
 
     <link id="style" rel="stylesheet" href="{{ url_for('static', filename='contacts/contacts.css') }}">
-    <link id="style" rel="stylesheet" href="{{ url_for('static', filename='service/service.css') }}">
+    <link id="style" rel="stylesheet" href="{{ url_for('static', filename='service/service_desktop.css') }}">
     <link id="style" rel="stylesheet" href="{{ url_for('static', filename='about/about.css') }}">
     <script src="{{ url_for('static', filename='about/about.js') }}"></script>
     {% set geolocation = contacts_data.geolocation %}
     {% set address = contacts_data.address %}
     {% set phone_numbers = contacts_data.phone_numbers %}
 
-    <div class="block_service">
+    <div class="">
         {% set path = "images/staff/" + "map" + ".jpg" %}
-        <div class="block_2">
-            <div class="title">Контакты</div>
-            <div class="block_img"><img alt="" src="{{ url_for("static", filename=path) }}"></div>
-        </div>
+
+        <div class="category_title">Контакты</div>
+        <div class="img_bloc"><img alt="" src="{{ url_for("static", filename=path) }}" class="img_service"></div>
+
 
         <div class="block">
             <div class="text">{{ filosofi.text|safe }}</div>
         </div>
 
-        <div class="block">
-            <div class="block_info">
-                {% set path = "images/staff/" + "geo" + "png" %}
+        <div class="block_2">
+            <div class="block_inf">
+                {% set path = "images/staff/" + "geo" + ".png" %}
                 <div class="title_2">Адрес</div>
                 <div class="block_inside">
                     Село санатория Восход, Калужская обл., Россия, 249250
+                    <div class="block_inside" href="{{ geolocation }}">
+                        <img alt="" src="{{ url_for("static", filename=path) }}" class="geo">
+                    </div>
                 </div>
-                <div class="block_inside" href="{ geolocation }">
-                    <img alt="" src="{{ url_for("static", filename=path) }}">
+
+            </div>
+            <div class="block_inf">
+
                 </div>
             </div>
 
