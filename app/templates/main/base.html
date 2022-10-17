@@ -9,7 +9,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='main/main.css') }}">
     <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename="favicon.ico") }}"/>
     <link rel="stylesheet" href="{{ url_for('static', filename='slider.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='event/event.css') }}"> {# стили для кнопки назад #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='event/event.css') }}">
+    {# стили для кнопки назад #}
     <link rel="stylesheet" href="{{ url_for('static', filename='contacts/contacts.css') }}">
     {% block link %}{% endblock %}
 
@@ -320,7 +321,14 @@
     </div>
 </div>
 
-<div id="footer" class="footer">© 2021</div>
+<div id="footer" class="footer">
+    <div class="footer_date">© 2021</div>
+    <div class="contacts">
+        <a class="modal-link" href="{{ url_for('main.contacts') }}">
+            Контакты
+        </a>
+    </div>
+</div>
 
 </body>
 </html>
