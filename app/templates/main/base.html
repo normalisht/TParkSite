@@ -166,6 +166,12 @@
                                         Фотоальбом
                                     </a>
                                 </div>
+                                <div class="modal-item submenu-item">
+                                    <a class="modal-link"
+                                       href="{{ url_for('main.contacts') }}">
+                                        Контакты
+                                    </a>
+                                </div>
                                 <div class="modal_logo">
                                     <img id="modal_logo" class="img_logo img_logo_modal"
                                          src="{{ url_for('static', filename='modal_logo4.png') }}" alt="">
@@ -243,20 +249,20 @@
                         Услуги и цены
                     </div>
                 </a>
-                <a id="event-button" class="button_main button_main_middle_left decoration"
+                <a id="event-button" class="button_main decoration"
                    href="{{ url_for('main.events') }}">
                     <div href="{{ url_for('main.events') }}" class="">
                         События
                     </div>
                 </a>
-                <a id="about-us-button" class="button_main button_main_middle decoration"
+                <a id="about-us-button" class="button_main decoration"
                    href="{{ url_for('main.about') }}">
                     <div href="{{ url_for('main.about') }}" class="">
                         О нас
                     </div>
                 </a>
 
-                <a id="comments-button" class="button_main button_main_middle_right decoration"
+                <a id="comments-button" class="button_main decoration"
                    href="{{ url_for('main.reviews') }}">
                     <div href="{{ url_for('main.reviews') }}" class="">
                         Отзывы
@@ -266,6 +272,12 @@
                    href="{{ url_for('main.gallery') }}">
                     <div href="{{ url_for('main.gallery') }}" class="">
                         Фотоальбом
+                    </div>
+                </a>
+                <a id="contacts-button" class="button_main button_main_last decoration"
+                   href="{{ url_for('main.contacts') }}">
+                    <div href="{{ url_for('main.contacts') }}" class="">
+                        Контакты
                     </div>
                 </a>
             </div>
@@ -323,11 +335,11 @@
 
 <div id="footer" class="footer">
     <div class="footer_date">© 2021</div>
-    <div class="contacts">
-        <a class="modal-link" href="{{ url_for('main.contacts') }}">
-            Контакты
-        </a>
-    </div>
+    {#    <div class="contacts">#}
+    {#        <a class="modal-link" href="{{ url_for('main.contacts') }}">#}
+    {#            Контакты#}
+    {#        </a>#}
+    {#    </div>#}
 </div>
 
 </body>

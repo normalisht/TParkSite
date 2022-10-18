@@ -168,6 +168,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    border-right: 1px solid;
 }
 
 .back_button {
@@ -297,20 +298,11 @@
     max-width: 350px;
 }
 
-.button_main_middle {
-    border-right: 1px solid;
-    border-left: 1px solid;
-}
-
 .decoration {
     text-decoration: none;
     color: black;
 }
 
-.button_main_middle_left {
-    border-left: 1px solid;
-}
-
-.button_main_middle_right {
-    border-right: 1px solid;
+.button_main_last {
+    border-right: 0;
 }
