@@ -19,7 +19,18 @@ def index():
     main_text = Text.query.filter_by(title="main_text").first().text
     types = Type.query.order_by(Type.number).all()
 
-    return render_template('main/new_main.html', main_text=main_text,
+    categories = []
+    for index, type in enumerate(types):
+        categories.append([])
+        for category in type.categories:
+            categories[index].append(category.category)
+
+    for group in categories:
+        group.sort(key=lambda Category: Category.number)
+
+    print("\n\n\n\n")
+
+    return render_template('main/new_main.html', main_text=main_text, categories=categories,
                            contacts_data=get_contacts_data(), types=types)
 
 

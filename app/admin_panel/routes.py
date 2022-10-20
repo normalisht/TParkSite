@@ -298,6 +298,7 @@ def category_change():
             except:
                 pass
 
+            CategoryType.query.filter_by(category_id=category.id).delete()
             Category.query.filter_by(id=category_id).delete()
             db.session.commit()
             return redirect(url_for('admin_panel.category'))

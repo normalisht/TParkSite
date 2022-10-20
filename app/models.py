@@ -56,6 +56,7 @@ class CategoryType(db.Model):
     id = db.Column(db.Integer, primary_key=True, index=True, unique=True)
     type_id = db.Column(db.Integer, db.ForeignKey('type.id'))
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+    # number = db.Column(db.Integer, index=True, default=30)
 
 
 class Type(db.Model):
