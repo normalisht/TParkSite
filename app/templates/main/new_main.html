@@ -17,12 +17,12 @@
 
     <div class="desktop_container">
         <div id="block_content" class="new_block_content">
+        {% set i = namespace(a=0)%}
             {% for type in types %}
                 <section class="main_page_articles">
                     <div class="category_title">{{ type.name }}</div>
                     <div class="page-list">
-                        {% for category in type.categories.all() %}
-                            {% set category=category.category %}
+                        {% for category in categories[i.a] %}
                             <div>
                                 {% set path = "images/category/preview/" + category.id|string + ".jpg" %}
                                 <a href="{{ url_for('main.category') }}?category_id={{ category.id }}"
@@ -34,6 +34,7 @@
                         {% endfor %}
                     </div>
                 </section>
+                {% set i.a = i.a + 1 %}
             {% endfor %}
         </div>
     </div>
