@@ -26,11 +26,14 @@
                 {% set path = "images/staff/" + "geo" + ".png" %}
                 <div class="title_2">Адрес</div>
                 <div class="block_inside">
-                    Село санатория Восход, Калужская обл., Россия, 249250
-                    <div class="block_inside" href="{{ geolocation }}">
-                        <img alt="" src="{{ url_for("static", filename=path) }}" class="geo">
+                    <div class="block_adress">Россия, Калужская область, Жуковский район, сельское поселение Село Восход, село санатория Восход, 249250</div>
+                    <div class="block_geo">
+                        <a href="{{ geolocation }}" class="geo">
+                            <img alt="" src="{{ url_for("static", filename=path) }}" class="geo">
+                        </a>
                     </div>
                 </div>
+
 
             </div>
             <div class="block_inf">

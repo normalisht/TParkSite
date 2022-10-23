@@ -137,8 +137,8 @@ radial-gradient(white 100 %, transparent 0);
 }
 
 .geo {
-    max-width: 27px;
-    max-height: 30px;
+    width: 50px;
+    height: 60px;
     object-fit: cover;
 }
 
@@ -155,12 +155,26 @@ radial-gradient(white 100 %, transparent 0);
     background-color: white;
     justify-content: center;
     max-width: calc(var(--primary-content-width) * 0.48);
-
+    min-height: var(--primary-content-height);
 }
 
 .block_inside {
+    display: flex;
 
 
+}
+
+.block_adress {
+    display: flex;
+    align-items: center;
+    min-height: calc(var(--primary-content-height) * 0.5);
+    margin:  0 0 10px 20px;
+}
+
+.block_geo {
+    display: flex;
+    align-items: center;
+    margin: 0 0 14px 0; !important;
 }
 
 .img_bloc {
@@ -173,7 +187,9 @@ radial-gradient(white 100 %, transparent 0);
 }
 
 .title_2 {
-    display:flex;
-    justify-content: center;
+    display: flex;
+    justify-content: flex-start;
+    margin: 0 24px;
+    font-size: 20px;
 }
 
