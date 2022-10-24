@@ -137,8 +137,8 @@ radial-gradient(white 100 %, transparent 0);
 }
 
 .geo {
-    width: 50px;
-    height: 60px;
+    width: 60px;
+    height: 80px;
     object-fit: cover;
 }
 
@@ -155,6 +155,7 @@ radial-gradient(white 100 %, transparent 0);
     background-color: white;
     justify-content: center;
     max-width: calc(var(--primary-content-width) * 0.48);
+    min-width: calc(var(--primary-content-width) * 0.48);
     min-height: var(--primary-content-height);
 }
 
@@ -189,7 +190,28 @@ radial-gradient(white 100 %, transparent 0);
 .title_2 {
     display: flex;
     justify-content: flex-start;
-    margin: 0 24px;
-    font-size: 20px;
+    margin: 10px 0 0 20px;
+    font-size: 24px;
 }
 
+.block_numbers {
+    display: block; !important;
+    /*align-items: flex-end;*/
+    padding: 2px;
+    font-size: calc(var(--primary-font-size) * 1.2);
+    /*width: calc(100%/3);*/
+    min-height: calc(var(--primary-content-height) * 0.5);
+    margin:  0 0 10px 20px;
+
+}
+
+.block_numbers > div >a{
+    /*align-items: flex-end;*/
+    padding: 2px;
+    margin: 5px;
+    font-size: calc(var(--primary-font-size) * 1.2);
+    /*width: calc(100%/3);*/
+    overflow: hidden;
+    color: #2a4758;
+    text-decoration: none;
+}
