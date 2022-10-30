@@ -2,10 +2,10 @@
 
 {% block app_content %}
 
-    <link id="style" rel="stylesheet" href="{{ url_for('static', filename='contacts/contacts.css') }}">
+    <link id="style" rel="stylesheet" href="{{ url_for('static', filename='contacts/contacts_desctop.css') }}">
     <link id="style" rel="stylesheet" href="{{ url_for('static', filename='service/service_desktop.css') }}">
     <link id="style" rel="stylesheet" href="{{ url_for('static', filename='about/about.css') }}">
-    <script src="{{ url_for('static', filename='about/about.js') }}"></script>
+    <script src="{{ url_for('static', filename='contacts/contacts.js') }}"></script>
     {% set geolocation = contacts_data.geolocation %}
     {% set address = contacts_data.address %}
     {% set phone_numbers = contacts_data.phone_numbers %}
