@@ -2,23 +2,21 @@
 
 {% block app_content %}
 
-    <link id="style" rel="stylesheet" href="{{ url_for('static', filename='contacts/contacts_desctop.css') }}">
     <link id="style" rel="stylesheet" href="{{ url_for('static', filename='service/service_desktop.css') }}">
-    <link id="style" rel="stylesheet" href="{{ url_for('static', filename='about/about.css') }}">
     <script src="{{ url_for('static', filename='contacts/contacts.js') }}"></script>
     {% set geolocation = contacts_data.geolocation %}
     {% set address = contacts_data.address %}
     {% set phone_numbers = contacts_data.phone_numbers %}
 
     <div class="desktop_container">
-        <div class="category_title">Контакты</div>
+        <div class="title">Контакты</div>
         <div class="map_img_container">
             <img class="map_img" src="{{ url_for("static", filename='images/staff/map.jpg') }}" alt="Карта">
         </div>
-        <div class="block">
+        <div class="comments_container">
             <div class="text">{{ contacts_info.text|safe }}</div>
         </div>
-        <div class="block_2">
+        <div class="comments_container_2">
             <div class="block_inf">
                 {% set path = "images/staff/" + "geo" + ".png" %}
                 <div class="title_2">Адрес</div>

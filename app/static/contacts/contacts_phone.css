@@ -25,6 +25,10 @@ body {
     top: -4px;
     width: 100%
 }
+.desktop_container {
+    margin: 0 17px;
+}
+
 
 .img_bloc {
     display:flex;
@@ -70,8 +74,6 @@ body {
     flex-direction: column;
     background-color: white;
     /*justify-content: center;*/
-    max-width: 100vw;
-    min-width: calc(var(--primary-content-width) * 0.48);
     min-height: var(--primary-content-height);
     margin-bottom: 20px;
 }

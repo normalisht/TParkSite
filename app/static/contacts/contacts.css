@@ -149,6 +149,16 @@ radial-gradient(white 100 %, transparent 0);
     max-width: var(--primary-content-width);
 }
 
+.comments_container_2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(min(320px, 100%), 1fr));
+    justify-content: center;
+    align-items: flex-start;
+    grid-column-gap: 16px;
+    grid-row-gap: 16px;
+
+}
+
 .block_inf {
     display: flex;
     flex-direction: column;
