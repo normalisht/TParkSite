@@ -200,7 +200,7 @@ radial-gradient(white 100 %, transparent 0);
 .title_2 {
     display: flex;
     justify-content: flex-start;
-    margin: 10px 0 10px 20px;
+    margin: 10px 0 -8px 20px;
     font-size: 24px;
 }
 
