@@ -6,7 +6,7 @@ from werkzeug.urls import url_parse
 from app.admin_panel import bp
 from app import db
 from flask_login import login_user, logout_user, current_user, login_required
-from app.main.functions import get_categories
+from app.main.functions import get_categories, get_contacts_data
 from app.models import CategoryType, Admin, Category, Service, Employee, Text, Comment, ServiceCategory, Event, Partner, \
     Type
 import shutil
@@ -758,6 +758,28 @@ def gallery():
         return redirect(url_for('admin_panel.gallery'))
 
     return render_template('admin_panel/gallery.html', categories=get_categories(), images=files)
+
+
+@bp.route('/contacts', methods=['GET', 'POST'])
+@login_required
+def contacts():
+    contacts_info = Text.query.filter_by(title='contacts_info').first()
+
+    if request.method == 'POST':
+        if request.form.get('contacts_info'):
+            contacts_info.text = request.form.get('contacts_info')
+            db.session.commit()
+
+        if request.files['map']:
+            photo = request.files['map']
+            try:
+                path = os.path.join('app/static/images/staff/map.jpg')
+                photo.save(path)
+                compress_img(path, width=1920, height=1080, quality=95)
+            except:
+                pass
+
+    return render_template('admin_panel/contacts.html', contacts_info=contacts_info, contacts_data=get_contacts_data())
 
 
 @bp.after_request

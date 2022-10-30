@@ -10,17 +10,14 @@
     {% set address = contacts_data.address %}
     {% set phone_numbers = contacts_data.phone_numbers %}
 
-    <div class="">
-        {% set path = "images/staff/" + "map" + ".jpg" %}
-
+    <div class="desktop_container">
         <div class="category_title">Контакты</div>
-        <div class="img_bloc"><img alt="" src="{{ url_for("static", filename=path) }}" class="img_service"></div>
-
-
-        <div class="block">
-            <div class="text">{{ filosofi.text|safe }}</div>
+        <div class="map_img_container">
+            <img class="map_img" src="{{ url_for("static", filename='images/staff/map.jpg') }}" alt="Карта">
         </div>
-
+        <div class="block">
+            <div class="text">{{ contacts_info.text|safe }}</div>
+        </div>
         <div class="block_2">
             <div class="block_inf">
                 {% set path = "images/staff/" + "geo" + ".png" %}
@@ -35,9 +32,8 @@
                         </a>
                     </div>
                 </div>
-
-
             </div>
+
             <div class="block_inf">
                 {% set path = "images/staff/" + "geo" + ".png" %}
                 <div class="title_2">Номера и мессенджеры</div>
@@ -58,17 +54,10 @@
                                 8-{{ phone_numbers[2][0]|string + phone_numbers[2][1]|string + phone_numbers[2][2]|string }}-{{ phone_numbers[2][3]|string + phone_numbers[2][4]|string + phone_numbers[2][5]|string }}-{{ phone_numbers[2][6]|string + phone_numbers[2][7]|string }}-{{ phone_numbers[2][8]|string + phone_numbers[2][9]|string }}
                             </a>
                         </div>
-
                     </div>
-
                 </div>
-
             </div>
         </div>
-
-    </div>
-
-
     </div>
 
 {% endblock %}
