@@ -92,13 +92,12 @@ def about():
                            filosofi=filosofi, about=about, partners=partners,
                            categories=get_categories(), contacts_data=get_contacts_data())
 
+
 @bp.route('/contacts', methods=['GET'])
 def contacts():
-
-    filosofi = Text.query.filter_by(title='filosofi').first()
-    return render_template('main/contacts.html',
-                           filosofi=filosofi,
-                           categories=get_categories(), contacts_data=get_contacts_data())
+    contacts_info = Text.query.filter_by(title='contacts_info').first()
+    return render_template('main/contacts.html', contacts_info=contacts_info, categories=get_categories(),
+                           contacts_data=get_contacts_data())
 
 
 @bp.route('/events', methods=['GET'])

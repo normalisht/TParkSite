@@ -2,50 +2,47 @@
 
 {% block scripts %}
     <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel.css') }}">
+    <link id="style" rel="stylesheet" href="{{ url_for('static', filename='contacts/contacts.css') }}">
+    <link id="style" rel="stylesheet" href="{{ url_for('static', filename='about/about.css') }}">
 {% endblock %}
 
 {% block app_content %}
-
-{#    <div class="title">Шаблон-пример для админ панели</div>#}
-
+    {{ ckeditor.load() }}
     <div class="grid_panel">
-        <div>
-            <div class="title">Текст</div>
-            <div class="grid_block">
-                <div>{{ title }}</div>
+        <form method="POST" enctype="multipart/form-data">
+            <div>
+                <div class="title">Текст</div>
                 <div class="grid_block">
-                    <div>{{ texts.contacts }}</div>
-                    <div>
-                        {{ text(class="comment") }}
+                    <div class="grid_block">
+                    <textarea name="contacts_info_text" id="contacts_info_text" class="category_name"
+                    >{{ contacts_info.text|safe }}</textarea>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div>
-            <div class="title">Фото</div>
-            {% for photo in photos %}
+            <div>
+                <div class="title">Карта</div>
                 <div class="grid_block">
-                    <div>{{ photo.map }}</div>
-
-                    <div class="input__wrapper">
-                        <input type="file" name="block_photo" id="photo" class="input input__file" multiple>
-                        <label for="block_photo" class="button">
-                            <span class="input__file_button">Изменить</span>
-                        </label>
+                    <div class="map_img_container">
+                        <img class="map_img" src="{{ url_for("static", filename='images/staff/map.jpg') }}" alt="Карта">
                     </div>
-                    <div class="button_delete" id="delete_photo">
-                        <label for="block_photo" class="button">
-                            <span class="input__file_button">Удалить</span>
-                        </label>
-                    </div>
-
-                    <div class="checkbox"></div>
                 </div>
-            {% endfor %}
-        </div>
+                <div class="input__wrapper">
+                    <input type="file" class="input__file" id="map" name="map">
+                    <label for="map" class="input__file_button">
+                        <span class="input__file_button_text_2">Изменить</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="input__wrapper">
+                <input type="submit" id="Submit" value="Подтвердить" class="input__file">
+                <label for="Submit" class="input__file_button">
+                    <span class="input__file_button_text_2">Сохранить изменения</span>
+                </label>
+            </div>
+        </form>
     </div>
 
-
-
+    {{ ckeditor.config(name='contacts_info_text') }}
 {% endblock %}

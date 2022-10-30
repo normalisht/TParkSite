@@ -215,3 +215,19 @@ radial-gradient(white 100 %, transparent 0);
     color: #2a4758;
     text-decoration: none;
 }
+
+.map_img_container {
+    display:flex;
+    align-items:center;
+    justify-content: center;
+    overflow: hidden;
+    margin: auto;
+    height: min(35vh, 500px);
+    width: min(100vw, var(--primary-content-width));
+}
+
+.map_img {
+    position: relative;
+    object-fit: cover;
+    max-width: 100%;
+}
