@@ -49,9 +49,6 @@ body {
     /*width: calc(100%/3);*/
     min-height: calc(var(--primary-content-height) * 0.5);
     margin:  10px 0  10px 20px;
-
-
-
 }
 
 .block_numbers > div >a{
