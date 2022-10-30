@@ -3,6 +3,8 @@
 {% block app_content %}
 
     <link id="style" rel="stylesheet" href="{{ url_for('static', filename='service/service_desktop.css') }}">
+
+
     <script src="{{ url_for('static', filename='contacts/contacts.js') }}"></script>
     {% set geolocation = contacts_data.geolocation %}
     {% set address = contacts_data.address %}
@@ -36,7 +38,7 @@
                 {% set path = "images/staff/" + "geo" + ".png" %}
                 <div class="title_2">Номера и мессенджеры</div>
                 <div class="block_inside">
-                    <div id="" class="block_numbers">
+                    <div id="" class="block_numbers_contacts">
                         <div>
                             <a style="cursor: pointer;" href="tel:+7{{ phone_numbers[0] }}">
                                 8-{{ phone_numbers[0][0]|string + phone_numbers[0][1]|string + phone_numbers[0][2]|string }}-{{ phone_numbers[0][3]|string + phone_numbers[0][4]|string + phone_numbers[0][5]|string }}-{{ phone_numbers[0][6]|string + phone_numbers[0][7]|string }}-{{ phone_numbers[0][8]|string + phone_numbers[0][9]|string }}
