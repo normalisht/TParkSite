@@ -140,6 +140,7 @@ radial-gradient(white 100 %, transparent 0);
     width: 60px;
     height: 80px;
     object-fit: cover;
+    margin-right: 17px;
 }
 
 .block_2 {
@@ -170,8 +171,6 @@ radial-gradient(white 100 %, transparent 0);
 
 .block_inside {
     display: flex;
-
-
 }
 
 .block_adress {
@@ -208,28 +207,6 @@ radial-gradient(white 100 %, transparent 0);
     font-size: 24px;
 }
 
-/*.block_numbers_2 {*/
-/*    display: block; !important;*/
-/*    !*align-items: flex-end;*!*/
-/*    padding: 2px;*/
-/*    font-size: calc(var(--primary-font-size) * 1.2);*/
-/*    !*width: calc(100%/3);*!*/
-/*    min-height: calc(var(--primary-content-height) * 0.5);*/
-/*    margin:  10px 0  10px 20px;*/
-
-/*}*/
-
-/*.block_numbers_2 > div >a{*/
-/*    !*align-items: flex-end;*!*/
-/*    padding: 2px;*/
-/*    margin: 5px;*/
-/*    font-size: calc(var(--primary-font-size) * 1.2);*/
-/*    !*width: calc(100%/3);*!*/
-/*    overflow: hidden;*/
-/*    color: #2a4758;*/
-/*    text-decoration: none;*/
-/*}*/
-
 .block_numbers_contacts {
     display: block; !important;
     /*align-items: flex-end;*/
@@ -237,14 +214,15 @@ radial-gradient(white 100 %, transparent 0);
     font-size: calc(var(--primary-font-size) * 1.2);
     /*width: calc(100%/3);*/
     min-height: calc(var(--primary-content-height) * 0.5);
-    margin:  10px 0  10px 20px;
+    margin:  10px 0  10px 18px;
 
 }
 
 .block_numbers_contacts > div >a{
     /*align-items: flex-end;*/
-    padding: 2px;
-    margin: 5px;
+    /*padding: 2px;*/
+    /*margin: 5px;*/
+    /*margin: 5px;*/
     font-size: calc(var(--primary-font-size) * 1.2);
     /*width: calc(100%/3);*/
     overflow: hidden;
@@ -266,4 +244,8 @@ radial-gradient(white 100 %, transparent 0);
     position: relative;
     object-fit: cover;
     max-width: 100%;
+}
+
+.text {
+    margin: 8px auto;
 }

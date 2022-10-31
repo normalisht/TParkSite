@@ -11,7 +11,7 @@
     {% set phone_numbers = contacts_data.phone_numbers %}
 
     <div class="desktop_container">
-        <div class="title">Контакты</div>
+        <div class="title" style="margin: 4px auto;">Контакты</div>
         <div class="map_img_container">
             <img class="map_img" src="{{ url_for("static", filename='images/staff/map.jpg') }}" alt="Карта">
         </div>
@@ -36,22 +36,19 @@
 
             <div class="block_inf">
                 {% set path = "images/staff/" + "geo" + ".png" %}
-                <div class="title_2">Номера и мессенджеры</div>
+                <div class="title_2">Номера телефонов</div>
                 <div class="block_inside">
                     <div id="" class="block_numbers_contacts">
                         <div>
-                            <a style="cursor: pointer;" href="tel:+7{{ phone_numbers[0] }}">
-                                8-{{ phone_numbers[0][0]|string + phone_numbers[0][1]|string + phone_numbers[0][2]|string }}-{{ phone_numbers[0][3]|string + phone_numbers[0][4]|string + phone_numbers[0][5]|string }}-{{ phone_numbers[0][6]|string + phone_numbers[0][7]|string }}-{{ phone_numbers[0][8]|string + phone_numbers[0][9]|string }}
+                            <a style="color: black; cursor: pointer;" href="tel:+7{{ phone_numbers[0] }}">8-{{ phone_numbers[0][0]|string + phone_numbers[0][1]|string + phone_numbers[0][2]|string }}-{{ phone_numbers[0][3]|string + phone_numbers[0][4]|string + phone_numbers[0][5]|string }}-{{ phone_numbers[0][6]|string + phone_numbers[0][7]|string }}-{{ phone_numbers[0][8]|string + phone_numbers[0][9]|string }}
                             </a>
                         </div>
                         <div>
-                            <a style="cursor: pointer;" href="tel:+7{{ phone_numbers[1] }}">
-                                8-{{ phone_numbers[1][0]|string + phone_numbers[1][1]|string + phone_numbers[1][2]|string }}-{{ phone_numbers[1][3]|string + phone_numbers[1][4]|string + phone_numbers[1][5]|string }}-{{ phone_numbers[1][6]|string + phone_numbers[1][7]|string }}-{{ phone_numbers[1][8]|string + phone_numbers[1][9]|string }}
+                            <a style="color: black; cursor: pointer;" href="tel:+7{{ phone_numbers[1] }}">8-{{ phone_numbers[1][0]|string + phone_numbers[1][1]|string + phone_numbers[1][2]|string }}-{{ phone_numbers[1][3]|string + phone_numbers[1][4]|string + phone_numbers[1][5]|string }}-{{ phone_numbers[1][6]|string + phone_numbers[1][7]|string }}-{{ phone_numbers[1][8]|string + phone_numbers[1][9]|string }}
                             </a>
                         </div>
                         <div>
-                            <a style="cursor: pointer;" href="tel:+7{{ phone_numbers[1] }}">
-                                8-{{ phone_numbers[2][0]|string + phone_numbers[2][1]|string + phone_numbers[2][2]|string }}-{{ phone_numbers[2][3]|string + phone_numbers[2][4]|string + phone_numbers[2][5]|string }}-{{ phone_numbers[2][6]|string + phone_numbers[2][7]|string }}-{{ phone_numbers[2][8]|string + phone_numbers[2][9]|string }}
+                            <a style="color: black; cursor: pointer;" href="tel:+7{{ phone_numbers[1] }}">8-{{ phone_numbers[2][0]|string + phone_numbers[2][1]|string + phone_numbers[2][2]|string }}-{{ phone_numbers[2][3]|string + phone_numbers[2][4]|string + phone_numbers[2][5]|string }}-{{ phone_numbers[2][6]|string + phone_numbers[2][7]|string }}-{{ phone_numbers[2][8]|string + phone_numbers[2][9]|string }}
                             </a>
                         </div>
                     </div>

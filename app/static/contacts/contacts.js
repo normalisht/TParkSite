@@ -1,4 +1,5 @@
 style_css()
+style_css_dop()
 
 function style_css() {
     let detect = new MobileDetect(window.navigator.userAgent)
@@ -15,7 +16,6 @@ function style_css() {
     document.getElementById('style').append(link)
 }
 
-style_css_dop()
 
 function style_css_dop() {
     let detect = new MobileDetect(window.navigator.userAgent)
