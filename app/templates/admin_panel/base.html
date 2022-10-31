@@ -87,48 +87,54 @@
                         </div>
                         <div class="modal-content">
                             <div>
-                            <div class="modal-item submenu-item">
-                                <a class="modal-link"
-                                   href="{{ url_for('admin_panel.category') }}">
-                                    Категории
-                                </a>
-                            </div>
-                            <div class="modal-item submenu-item">
-                                <a class="modal-link"
-                                   href="{{ url_for('admin_panel.events') }}">
-                                    События
-                                </a>
-                            </div>
-                            <div class="modal-item submenu-item">
-                                <a class="modal-link"
-                                   href="{{ url_for('admin_panel.about') }}">
-                                    О нас
-                                </a>
-                            </div>
-                            <div class="modal-item submenu-item">
-                                <a class="modal-link"
-                                   href="{{ url_for('admin_panel.all_services') }}">
-                                    Услуги
-                                </a>
-                            </div>
-                            <div class="modal-item submenu-item">
-                                <a class="modal-link"
-                                   href="{{ url_for('admin_panel.gallery') }}">
-                                    Фотоальбом
-                                </a>
-                            </div>
-                            <div class="modal-item submenu-item">
-                                <a class="modal-link"
-                                   href="{{ url_for('admin_panel.category_types') }}">
-                                    Группы категорий
-                                </a>
-                            </div>
-                            <div class="modal-item submenu-item">
-                                <a class="modal-link"
-                                   href="{{ url_for('admin_panel.comments') }}">
-                                    Отзывы
-                                </a>
-                            </div>
+                                <div class="modal-item submenu-item">
+                                    <a class="modal-link"
+                                       href="{{ url_for('admin_panel.category') }}">
+                                        Категории
+                                    </a>
+                                </div>
+                                <div class="modal-item submenu-item">
+                                    <a class="modal-link"
+                                       href="{{ url_for('admin_panel.events') }}">
+                                        События
+                                    </a>
+                                </div>
+                                <div class="modal-item submenu-item">
+                                    <a class="modal-link"
+                                       href="{{ url_for('admin_panel.about') }}">
+                                        О нас
+                                    </a>
+                                </div>
+                                <div class="modal-item submenu-item">
+                                    <a class="modal-link"
+                                       href="{{ url_for('admin_panel.all_services') }}">
+                                        Услуги
+                                    </a>
+                                </div>
+                                <div class="modal-item submenu-item">
+                                    <a class="modal-link"
+                                       href="{{ url_for('admin_panel.gallery') }}">
+                                        Фотоальбом
+                                    </a>
+                                </div>
+                                <div class="modal-item submenu-item">
+                                    <a class="modal-link"
+                                       href="{{ url_for('admin_panel.category_types') }}">
+                                        Группы категорий
+                                    </a>
+                                </div>
+                                <div class="modal-item submenu-item">
+                                    <a class="modal-link"
+                                       href="{{ url_for('admin_panel.comments') }}">
+                                        Отзывы
+                                    </a>
+                                </div>
+                                <div class="modal-item submenu-item">
+                                    <a class="modal-link"
+                                       href="{{ url_for('admin_panel.contacts') }}">
+                                        Контакты
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -179,6 +185,12 @@
                            href="{{ url_for('admin_panel.events_content') }}">
                             <div class="">
                                 Страница событий
+                            </div>
+                        </a>
+                        <a id="about-us-button" class="button_main decoration"
+                           href="{{ url_for('admin_panel.contacts') }}">
+                            <div class="">
+                                Контакты
                             </div>
                         </a>
                     </div>

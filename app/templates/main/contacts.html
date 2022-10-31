@@ -12,7 +12,7 @@
 
     <div class="desktop_container">
         <div class="title" style="margin: 4px auto;">Контакты</div>
-        <div class="map_img_container">
+        <div class="map_img_container" style="cursor: pointer" onclick="window.location='https://yandex.ru/maps/org/t_park_treningovy_park/17031236197/'">
             <img class="map_img" src="{{ url_for("static", filename='images/staff/map.jpg') }}" alt="Карта">
         </div>
         <div class="comments_container">
@@ -22,7 +22,7 @@
             <div class="block_inf">
                 {% set path = "images/staff/" + "geo" + ".png" %}
                 <div class="title_2">Адрес</div>
-                <div class="block_inside">
+                <div class="block_inside" style="cursor: pointer" onclick="window.location='https://yandex.ru/maps/org/t_park_treningovy_park/17031236197/'">
                     <div class="block_adress">Россия, Калужская область, Жуковский район, сельское поселение Село
                         Восход, село санатория Восход, 249250
                     </div>

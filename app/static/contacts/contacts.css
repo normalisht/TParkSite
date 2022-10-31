@@ -166,7 +166,7 @@ radial-gradient(white 100 %, transparent 0);
     background-color: white;
     /*justify-content: center;*/
     max-width: 100vw;
-    min-height: var(--primary-content-height);
+    min-height: 124px;
 }
 
 .block_inside {
