@@ -282,6 +282,7 @@
 .button_main:hover {
     font-size: calc(var(--primary-font-size) * 1.125);
     background-color: var(--primary-color);
+    cursor: pointer;
 }
 
 .block_info {
