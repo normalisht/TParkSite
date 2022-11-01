@@ -766,8 +766,9 @@ def contacts():
     contacts_info = Text.query.filter_by(title='contacts_info').first()
 
     if request.method == 'POST':
-        if request.form.get('contacts_info'):
-            contacts_info.text = request.form.get('contacts_info')
+        if request.form.get('contacts_info_text'):
+            print(contacts_info)
+            contacts_info.text = request.form.get('contacts_info_text')
             db.session.commit()
 
         if request.files['map']:

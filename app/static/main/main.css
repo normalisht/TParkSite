@@ -109,7 +109,7 @@ p {
 }
 
 .container_base {
-    min-height: calc(100vh - 4px - min(10 * var(--vh, 1vh), 40px));
+    min-height: calc(100vh - 14px - min(10 * var(--vh, 1vh), 40px));
 }
 
 .mobile_upper,
