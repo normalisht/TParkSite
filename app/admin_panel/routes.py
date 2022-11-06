@@ -317,7 +317,7 @@ def category_change():
                 for img in images:
                     path = os.path.join('app/static/images/category/{}'.format(category_id), '{}.jpg'.format(count + 1))
                     img.save(path)
-                    compress_img(path, width=1920, height=1080, quality=75)
+                    compress_img(path, width=1920, height=1080, quality=85)
                     count += 1
 
         if request.files.get('add_photo'):
@@ -326,7 +326,7 @@ def category_change():
             for img in images:
                 path = os.path.join('app/static/images/category/{}'.format(category_id), '{}.jpg'.format(count))
                 img.save(path)
-                compress_img(path, width=1920, height=1080)
+                compress_img(path, width=1920, height=1080, quality=85)
                 count += 1
 
         if request.files.get('add_preview'):
@@ -366,7 +366,7 @@ def category_create():
                 for file in photo:
                     path = os.path.join('app/static/images/category/{}'.format(category_id), '{}.jpg'.format(count))
                     file.save(path)
-                    compress_img(path, width=1920, height=1080)
+                    compress_img(path, width=1920, height=1080, quality=85)
                     count += 1
         except:
             pass
@@ -420,7 +420,7 @@ def service_test():
             image = request.files.get('change')
             path = os.path.join('app/static/images/service', '{}.jpg'.format(service_id))
             image.save(path)
-            compress_img(path, width=1920, height=1080)
+            compress_img(path, width=1920, height=1080, quality=85)
 
         service.short_description = request.form.get('input_short_desc')
         service.description = request.form.get('input_desc')
@@ -767,7 +767,6 @@ def contacts():
 
     if request.method == 'POST':
         if request.form.get('contacts_info_text'):
-            print(contacts_info)
             contacts_info.text = request.form.get('contacts_info_text')
             db.session.commit()
 
