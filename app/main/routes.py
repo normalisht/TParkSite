@@ -64,14 +64,19 @@ def category():
 def service():
     service_id = request.args.get('service_id')
 
+    try:
+        files = listdir('app/static/images/service/{}'.format(service_id))
+        path = os.path.join('app/static/images/service/{}'.format(service_id), files[0])
+        open(path)
+        photo = True
+    except:
+        photo = False
+        files = []
+
     service = Service.query.filter_by(id=service_id).first()
 
-    photo = False
-    if os.path.exists('app/static/images/service/{}.jpg'.format(service_id)):
-        photo = True
-
     return render_template('main/service.html', service=service, categories=get_categories(),
-                           photo=photo, contacts_data=get_contacts_data())
+                           photo=photo, files=files, contacts_data=get_contacts_data())
 
 
 @bp.route('/about_2', methods=['GET'])

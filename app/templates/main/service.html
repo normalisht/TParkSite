@@ -2,20 +2,69 @@
 
 {% block scripts %}
     <script type="text/javascript" src="{{ url_for('static', filename='service/service.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='slider.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='event/event.css') }}">
+    <script type="text/javascript" src="{{ url_for('static', filename='slider.js') }}"></script>
 {% endblock %}
 
 
 {% block app_content %}<!--Шаблон страницы конкретной услуги-->
 
     <div>
-        <div class="category_title" {% if not photo %}style="padding-bottom: 0; margin-bottom: -4px;" {% endif %}>{{ service.name }}</div>
+        <div class="category_title"
+             {% if not photo %}style="padding-bottom: 0; margin-bottom: -4px;" {% endif %}>{{ service.name }}
+        </div>
 
-
-        {% set path = "images/service/" + service.id|string + ".jpg" %}
         <div class="block_service">
-
             {% if photo %}
-                <div class="block_img"><img src="{{ url_for("static", filename=path) }}" alt="" class="img_service">
+                <div class="container">
+                    {% if photo %}
+                        <div class="data">
+                            <div class="block_slider">
+                                <div class="slider">
+                                    <div class="slider__container">
+                                        <div class="slider__wrapper">
+                                            <div class="slider__items" id="event_items">
+                                                {% if files|length < 3 %}
+                                                    {% for i in range(3) %}
+                                                        {% for photo in files %}
+                                                            <div class="slider__item">
+                                                                <img class="slider__img" alt=""
+                                                                     src="{{ url_for('static',filename='/images/service/' + service.id|string  + '/' + photo) }}">
+                                                            </div>
+                                                        {% endfor %}
+                                                    {% endfor %}
+                                                {% else %}
+                                                    {% for photo in files %}
+                                                        <div class="slider__item">
+                                                            <img class="slider__img" alt=""
+                                                                 src="{{ url_for('static',filename='/images/service/' + service.id|string  + '/' + photo) }}">
+                                                        </div>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% if files|length > 1 %}
+                                        <button class="slider__control slider__control_prev carousel__button_2 is-prev"
+                                                href="#"
+                                                role="button" data-slide="prev" tabindex="0">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" tabindex="-1">
+                                                <path d="M15 3l-9 9 9 9"></path>
+                                            </svg>
+                                        </button>
+                                        <button class="slider__control slider__control_next carousel__button_2 is-next"
+                                                href="#"
+                                                role="button" data-slide="next" tabindex="0">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" tabindex="-1">
+                                                <path d="M9 3l9 9-9 9"></path>
+                                            </svg>
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
                 <!--Фото услуги-->
             {% endif %}

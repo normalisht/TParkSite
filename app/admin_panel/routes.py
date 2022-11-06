@@ -136,7 +136,7 @@ def events_content():
                 image = request.files.get('change_' + str(photo))
                 path = os.path.join('app/static/images/events', '{}.jpg'.format(os.path.splitext(photo)[0]))
                 image.save(path)
-                compress_img(path, width=1920, height=1080)
+                compress_img(path, width=1920, height=1080, quality=95)
                 return redirect(url_for('admin_panel.main'))
         if files[0] != '0.jpg':
             name = 0
@@ -148,7 +148,7 @@ def events_content():
             images = request.files.get('add_photo')
             path = os.path.join('app/static/images/events/', '{}.jpg'.format(name))
             images.save(path)
-            compress_img(path, width=1920, height=1080)
+            compress_img(path, width=1920, height=1080, quality=95)
 
             return redirect(url_for('admin_panel.events_content'))
 
@@ -198,7 +198,7 @@ def event_create():
         path = os.path.join('app/static/images/events/', '{}.jpg'.format(
             Event.query.filter_by(title=title, link=link).first().id))
         photo.save(path)
-        compress_img(path, width=1920, height=1080)
+        compress_img(path, width=1920, height=1080, quality=95)
 
         return redirect(url_for('admin_panel.events'))
 
@@ -233,7 +233,7 @@ def event_edit():
                 image = request.files.get('change')
                 path = os.path.join('app/static/images/events', '{}.jpg'.format(event.id))
                 image.save(path)
-                compress_img(path, width=1920, height=1080)
+                compress_img(path, width=1920, height=1080, quality=95)
         except:
             pass
 
@@ -317,23 +317,23 @@ def category_change():
                 for img in images:
                     path = os.path.join('app/static/images/category/{}'.format(category_id), '{}.jpg'.format(count + 1))
                     img.save(path)
-                    compress_img(path, width=1920, height=1080, quality=85)
+                    compress_img(path, width=1920, height=1080, quality=95)
                     count += 1
 
         if request.files.get('add_photo'):
             images = request.files.getlist('add_photo')
             count = len(files) + 1
             for img in images:
-                path = os.path.join('app/static/images/category/{}'.format(category_id), '{}.jpg'.format(count))
+                path = os.path.join('app/static/images/category/{}'.format(category_id), '{}.jpg'.format(count + 2))
                 img.save(path)
-                compress_img(path, width=1920, height=1080, quality=85)
+                compress_img(path, width=1920, height=1080, quality=95)
                 count += 1
 
         if request.files.get('add_preview'):
             img = request.files.get('add_preview')
             path = os.path.join('app/static/images/category/preview', '{}.jpg'.format(category_id))
             img.save(path)
-            compress_img(path, width=1080, height=720)
+            compress_img(path, width=1080, height=720, quality=80)
 
         category.number = request.form.get('weight')
         category.description = request.form.get('ckeditor')
@@ -366,7 +366,7 @@ def category_create():
                 for file in photo:
                     path = os.path.join('app/static/images/category/{}'.format(category_id), '{}.jpg'.format(count))
                     file.save(path)
-                    compress_img(path, width=1920, height=1080, quality=85)
+                    compress_img(path, width=1920, height=1080, quality=95)
                     count += 1
         except:
             pass
@@ -380,6 +380,11 @@ def service_test():
     service_id = request.args.get('service_id')
     service = Service.query.filter_by(id=service_id).first()
     categories_all = Category.query.order_by(Category.number).all()
+
+    try:
+        files = listdir('app/static/images/service/{}'.format(service_id))
+    except:
+        files = []
 
     categories_cheked = []
     for category in categories_all:
@@ -416,11 +421,33 @@ def service_test():
                 os.remove('app/static/images/service/' + str(service.id) + ".jpg")
             except:
                 pass
-        if request.files.get('change'):
-            image = request.files.get('change')
-            path = os.path.join('app/static/images/service', '{}.jpg'.format(service_id))
-            image.save(path)
-            compress_img(path, width=1920, height=1080, quality=85)
+
+        for photo in files:
+            if request.form.get('delete_' + str(photo)):
+                print(str(photo))
+                try:
+                    os.remove('app/static/images/service/{}/'.format(service_id) + str(photo))
+                except:
+                    pass
+
+            if request.files['add_' + str(photo)]:
+                images = request.files.getlist('add_' + str(photo))
+                count = len(files)
+
+                for img in images:
+                    path = os.path.join('app/static/images/service/{}'.format(service_id), '{}.jpg'.format(count + 1))
+                    img.save(path)
+                    compress_img(path, width=1920, height=1080, quality=95)
+                    count += 1
+
+        if request.files.get('add_photo'):
+            images = request.files.getlist('add_photo')
+            count = len(files) + 1
+            for img in images:
+                path = os.path.join('app/static/images/service/{}'.format(service_id), '{}.jpg'.format(count + 2))
+                img.save(path)
+                compress_img(path, width=1920, height=1080, quality=95)
+                count += 1
 
         service.short_description = request.form.get('input_short_desc')
         service.description = request.form.get('input_desc')
@@ -453,9 +480,8 @@ def service_test():
         else:
             categories_cheked.insert(category.id, 0)
 
-    return render_template('admin_panel/service.html', title='{}'.format(service.name),
-                           categories=get_categories(), service=service, categories_checked=categories_cheked,
-                           files=os.path.isfile('app/static/images/service/{}.jpg'.format(service_id)))
+    return render_template('admin_panel/service.html', title='{}'.format(service.name), files=files,
+                           categories=get_categories(), service=service, categories_checked=categories_cheked)
 
 
 @bp.route('/service_create', methods=['GET', 'POST'])

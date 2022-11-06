@@ -28,14 +28,23 @@
                         <div class="slider__container">
                             <div class="slider__wrapper">
                                 <div class="slider__items" id="event_items">
-                                    {% for i in range(3) %}
-                                        {% for photo in files %}
-                                            <div class="slider__item">
-                                                <img class="slider__img" alt=""
-                                                     src="{{ url_for('static',filename='/images/category/' + category.id|string  + '/' + photo) }}">
-                                            </div>
+                                    {% if files|length < 3 %}
+                                        {% for i in range(3) %}
+                                            {% for photo in files %}
+                                                <div class="slider__item">
+                                                    <img class="slider__img" alt=""
+                                                         src="{{ url_for('static',filename='/images/category/' + category.id|string  + '/' + photo) }}">
+                                                </div>
+                                            {% endfor %}
                                         {% endfor %}
-                                    {% endfor %}
+                                    {% else %}
+                                        {% for photo in files %}
+                                                <div class="slider__item">
+                                                    <img class="slider__img" alt=""
+                                                         src="{{ url_for('static',filename='/images/category/' + category.id|string  + '/' + photo) }}">
+                                                </div>
+                                            {% endfor %}
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -82,8 +91,9 @@
                                     {%- if service.short_description -%}
                                         <img class="price_switch" src="{{ url_for('static', filename='down.svg') }}"
                                              alt="">
-                                        {%- elif not service.short_description and service.next -%}
-                                        <img class="price_switch next_switch" style="transform: rotate(-90deg)" src="{{ url_for('static', filename='down.svg') }}"
+                                    {%- elif not service.short_description and service.next -%}
+                                        <img class="price_switch next_switch" style="transform: rotate(-90deg)"
+                                             src="{{ url_for('static', filename='down.svg') }}"
                                              alt="">
                                     {%- endif -%}
                                     <script>

@@ -1,5 +1,6 @@
 from PIL import Image
 import os
+import shutil
 
 
 def get_size_format(b, factor=1024, suffix="B"):
@@ -57,10 +58,20 @@ def compress_img(image_name, new_size_ratio=1, quality=50, width=None, height=No
     print(f"[+] Image size change: {saving_diff/image_size*100:.2f}% of the original image size.")
 
 
-directory = "app/static/images/category/1"
+# directory = "app/static/images/category/1"
+#
+# for root, dirs, files in os.walk(directory):
+#     for file in files:
+#         if file.endswith('.jpg'):
+#             compress_img(os.path.join(root, file), width=1920, height=1080)
+#             # os.remove(os.path.join(root, file))
+
+directory = "app/static/images/service"
 
 for root, dirs, files in os.walk(directory):
     for file in files:
         if file.endswith('.jpg'):
-            compress_img(os.path.join(root, file), width=1920, height=1080)
-            # os.remove(os.path.join(root, file))
+            file_name = file.split('.')[0]
+            new_dir = os.getcwd() + '/' + directory + '/' + file_name
+            os.makedirs(new_dir)
+            shutil.move(directory + '/' + file, new_dir)
