@@ -2,6 +2,8 @@
 
 {% block app_content %}
     <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel/category.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='slider.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='event/event.css') }}">
 
     {{ ckeditor.load() }}
     {% set title = ckeditor %}
@@ -69,25 +71,36 @@
                 <div>
                     <div class="title">Фото в меню</div>
                     <div class="grid_block_photo">
-                            <div><img
-                                    src="{{ url_for('static',filename='/images/category/preview/' + category.id|string  + '.jpg') }}"
-                                    alt="" class="image"></div>
+                        <div><img
+                                src="{{ url_for('static',filename='/images/category/preview/' + category.id|string  + '.jpg') }}"
+                                alt="" class="image"></div>
 
-                            <div class="input__wrapper">
-                                <input type="file" class="input__file" id="add_preview" multiple
-                                       name="add_preview">
-                                <label for="add_preview" class="input__file_button">
-                                    <span class="input__file_button_text_2">Добавить/Изменить</span>
-                                </label>
-                            </div>
+                        <div class="input__wrapper">
+                            <input type="file" class="input__file" id="add_preview" multiple
+                                   name="add_preview">
+                            <label for="add_preview" class="input__file_button">
+                                <span class="input__file_button_text_2">Добавить/Изменить</span>
+                            </label>
+                        </div>
                     </div>
 
                     <div class="title">Фото внутри</div>
                     <div class="grid_block_photo">
                         {% for photo in files %}
-                            <div><img
-                                    src="{{ url_for('static',filename='/images/category/' + category.id|string  + '/' + photo) }}"
-                                    alt="" class="image"></div>
+                            <div class="block_slider">
+                                <div class="slider">
+                                    <div class="slider__container">
+                                        <div class="slider__wrapper">
+                                            <div class="slider__items" id="event_items">
+                                                <div class="slider__item">
+                                                    <img class="slider__img" alt=""
+                                                         src="{{ url_for('static',filename='/images/category/' + category.id|string  + '/' + photo) }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                             <div class="input__wrapper">
                                 <input type="file" class="input__file" id="add_{{ photo }}" multiple
@@ -106,12 +119,12 @@
                                 </label>
                             </div>
                         {% endfor %}
-                            <div class="input__wrapper">
-                                <input type="file" id="blank_file" multiple name="add_photo" class="input__file">
-                                <label for="blank_file" class="input__file_button">
-                                    <span class="input__file_button_text_2">Добавить новое</span>
-                                </label>
-                            </div>
+                        <div class="input__wrapper">
+                            <input type="file" id="blank_file" multiple name="add_photo" class="input__file">
+                            <label for="blank_file" class="input__file_button">
+                                <span class="input__file_button_text_2">Добавить новое</span>
+                            </label>
+                        </div>
                     </div>
                 </div>
 

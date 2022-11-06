@@ -2,6 +2,8 @@
 
 {% block scripts %}
     <script type="text/javascript" src="{{ url_for('static', filename='service/service.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='slider.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='event/event.css') }}">
 {% endblock %}
 
 {% block app_content %}
@@ -65,9 +67,19 @@
                 <div class="title">Фото</div>
                 <div class="grid_block_photo">
                     {% for photo in files %}
-                        <div><img
-                                src="{{ url_for('static',filename='/images/service/' + service.id|string  + '/' + photo) }}"
-                                alt="" class="image">
+                        <div class="block_slider">
+                            <div class="slider">
+                                <div class="slider__container">
+                                    <div class="slider__wrapper">
+                                        <div class="slider__items" id="event_items">
+                                            <div class="slider__item">
+                                                <img class="slider__img" alt=""
+                                                     src="{{ url_for('static',filename='/images/service/' + service.id|string  + '/' + photo) }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="input__wrapper">
