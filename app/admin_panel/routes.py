@@ -315,7 +315,7 @@ def category_change():
                 count = len(files)
 
                 for img in images:
-                    path = os.path.join('app/static/images/category/{}'.format(category_id), '{}.jpg'.format(count + 1))
+                    path = os.path.join('app/static/images/category/{}'.format(category_id), '{}.jpg'.format(coun))
                     img.save(path)
                     compress_img(path, width=1920, height=1080, quality=95)
                     count += 1
@@ -435,7 +435,7 @@ def service_test():
                 count = len(files)
 
                 for img in images:
-                    path = os.path.join('app/static/images/service/{}'.format(service_id), '{}.jpg'.format(count + 1))
+                    path = os.path.join('app/static/images/service/{}'.format(service_id), '{}.jpg'.format(count))
                     img.save(path)
                     compress_img(path, width=1920, height=1080, quality=95)
                     count += 1
