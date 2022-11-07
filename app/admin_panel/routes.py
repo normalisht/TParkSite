@@ -315,7 +315,7 @@ def category_change():
                 count = len(files)
 
                 for img in images:
-                    path = os.path.join('app/static/images/category/{}'.format(category_id), '{}.jpg'.format(coun))
+                    path = os.path.join('app/static/images/category/{}'.format(category_id), '{}.jpg'.format(count))
                     img.save(path)
                     compress_img(path, width=1920, height=1080, quality=95)
                     count += 1
@@ -581,6 +581,15 @@ def about():
             structure.text = request.form.get('structure_text')
         db.session.commit()
 
+        if request.files['map']:
+            photo = request.files['map']
+            try:
+                path = os.path.join('app/static/images/staff/map_about.jpg')
+                photo.save(path)
+                compress_img(path, width=1920, height=1080, quality=95)
+            except:
+                pass
+
         temp = Partner.query.filter_by(name='temp').first()
         if request.files.get(f'partner_{temp.id}_photo'):
             image = request.files.get(f'partner_{temp.id}_photo')
@@ -792,9 +801,8 @@ def gallery():
 def contacts():
     contacts_info = Text.query.filter_by(title='contacts_info').first()
     if request.method == 'POST':
-        if request.form.get('contacts_info_text'):
-            contacts_info.text = request.form.get('contacts_info_text')
-            db.session.commit()
+        contacts_info.text = request.form.get('contacts_info_text')
+        db.session.commit()
 
         if request.files['map']:
             photo = request.files['map']

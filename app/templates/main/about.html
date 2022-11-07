@@ -1,12 +1,16 @@
 {% extends "main/base.html" %}
 
-{% block app_content %}
-
+{% block scripts %}
     <link id="style" rel="stylesheet" href="{{ url_for('static', filename='about/about.css') }}">
     <script src="{{ url_for('static', filename='about/about.js') }}"></script>
 
+    <link rel="stylesheet" href="{{ url_for('static', filename='gallery/gallery.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@4.0/dist/fancybox.umd.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css"/>
+{% endblock %}
 
-    <div class="container_max">
+{% block app_content %}
+    <div class="container_max desktop_container">
         <div class="block">
             <div class="title">Философия</div>
             <div class="text">{{ about.text|safe }}</div>
@@ -20,6 +24,12 @@
         <div class="block">
             <div class="title">Инфраструктура</div>
             <div class="text">{{ structure.text|safe }}</div>
+            <div class="map_img_container">
+                <a data-fancybox="gallery" href="{{ url_for("static", filename='images/staff/map_about.jpg') }}">
+                    <img class="rounded" style="width: 900px" src="{{ url_for("static", filename='images/staff/map_about.jpg') }}"
+                         alt="Карта"/>
+                </a>
+            </div>
         </div>
 
         <!--Партнёры-->
@@ -36,28 +46,6 @@
                 {% endfor %}
             </div>
         </div>
-
-        {#<div class="container_about">
-            <!--Сотрудники-->
-            <div class="title">Сотрудники</div>
-            <div class="grid_block employees">
-
-                {% for employee in employees %}
-                    <div class="img_block">
-                        <div>
-                            <img src="{{ url_for('static', filename='/images/employee/' + employee.id|string + '.jpg') }}"
-                                 alt="" class="employees img">
-                        </div>
-                        <div>
-                            <div class="name_employees">{{ employee.name }}</div>
-                        </div>
-                        <div>
-                            <div class="position_employees">{{ employee.position }}</div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>#}
     </div>
 
 {% endblock %}

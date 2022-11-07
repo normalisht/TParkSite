@@ -54,3 +54,19 @@
 .employees {
     aspect-ratio: 3 / 4;
 }
+
+.map_img_container {
+    max-width: 960px;
+    display:flex;
+    align-items:center;
+    justify-content: center;
+    overflow: hidden;
+    margin: 0 auto;
+    max-height: min(40vh, 500px);
+}
+
+.map_img {
+    position: relative;
+    object-fit: cover;
+    max-width: 100%;
+}

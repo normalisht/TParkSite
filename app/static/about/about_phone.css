@@ -21,3 +21,13 @@
     top: -4px;
     width: 100%
 }
+
+.map_img_container {
+    margin-left: -17px;
+    width: calc(100% + 34px);
+    max-width: calc(100% + 34px);
+}
+
+.map_img {
+    max-width: 750px;
+}

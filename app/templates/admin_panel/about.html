@@ -2,18 +2,18 @@
 
 {% block scripts %}
     <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel/about.css') }}">
-
+    <link id="style" rel="stylesheet" href="{{ url_for('static', filename='contacts/contacts.css') }}">
 {% endblock %}
 
 {% block app_content %}
     {{ ckeditor.load() }}
     <div class="title">Страница О НАС</div>
     <div class="div_grid_panel">
-        <div class="grid_panel">
-            <div>
-                <div class="grid_block">
-                    <div>
-                        <form method="POST">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="grid_panel">
+                <div>
+                    <div class="grid_block">
+                        <div>
                             <label for="about_text">
                                 <center>Философия</center>
                                 <br>
@@ -21,13 +21,11 @@
                             <textarea name="about_text" id="about_text" class=""
                             >{{ about.text|safe if about.text }}</textarea>
                             <input type="submit" value="Сохранить" class="confirm_text">
-                        </form>
+                        </div>
                     </div>
-                </div>
-                <br>
-                <div class="grid_block">
-                    <div>
-                        <form method="POST">
+                    <br>
+                    <div class="grid_block">
+                        <div>
                             <label for="title">
                                 <center>О нас</center>
                                 <br>
@@ -35,13 +33,11 @@
                             <textarea name="filosofi_text" id="filosofi_text" class=""
                             >{{ filosofi.text|safe if filosofi.text }}</textarea>
                             <input type="submit" value="Сохранить" class="confirm_text">
-                        </form>
+                        </div>
                     </div>
-                </div>
-                <br>
-                <div class="grid_block">
-                    <div>
-                        <form method="POST">
+                    <br>
+                    <div class="grid_block">
+                        <div>
                             <label for="structure_text">
                                 <center>Инфраструктура</center>
                                 <br>
@@ -49,15 +45,35 @@
                             <textarea name="structure_text" id="structure_text" class=""
                             >{{ structure.text|safe if structure.text }}</textarea>
                             <input type="submit" value="Сохранить" class="confirm_text">
-                        </form>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="title">Карта</div>
+                        <div class="grid_block">
+                            <div class="map_img_container">
+                                <img class="map_img"
+                                     src="{{ url_for("static", filename='images/staff/map_about.jpg') }}"
+                                     alt="Карта">
+                            </div>
+                        </div>
+                        <div class="input__wrapper">
+                            <input type="file" class="input__file" id="map" name="map">
+                            <label for="map" class="input__file_button">
+                                <span class="input__file_button_text_2">Изменить</span>
+                            </label>
+                        </div>
+                        <div class="input__wrapper">
+                            <input type="submit" id="map_submit" value="Подтвердить" class="input__file">
+                            <label for="map_submit" class="input__file_button">
+                                <span class="input__file_button_text_2">Сохранить изменения</span>
+                            </label>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="">
-                <div class="title">Партнёры</div>
-                <br>
-                <form method="POST" enctype="multipart/form-data">
+                <div class="">
+                    <div class="title">Партнёры</div>
+                    <br>
                     {% for partner in partners %}
                         <div class="partners_map_1">
                             <div class="grid_block_photo">
@@ -65,7 +81,6 @@
                                     {% set path = "images/partner/" + partner.id|string + ".jpg" %}
                                     <figure class="img__employ">
                                         <center><img src="{{ url_for("static", filename=path) }}"
-                                                     alt="{{ partner.name }}"
                                                      class="partimg"></center>
                                         <figcaption>
                                             <div class="ss">
@@ -116,7 +131,8 @@
                                         {% else %}Добавить{% endif %}</span>
                                     </label>
                                     {% if partner.name != 'temp' %}
-                                        <input type="submit" class="input__file" id="partner_{{ partner.id }}_delete"
+                                        <input type="submit" class="input__file"
+                                               id="partner_{{ partner.id }}_delete"
                                                name="partner_{{ partner.id }}_delete">
                                         <label for="partner_{{ partner.id }}_delete" class="input__file_button">
                                             <span class="input__file_button_text_2">Удалить</span>
@@ -126,9 +142,9 @@
                             </div>
                         </div>
                     {% endfor %}
-                </form>
+                </div>
             </div>
-        </div>
+        </form>
     </div>
 
     {{ ckeditor.config(name='filosofi_text') }}
