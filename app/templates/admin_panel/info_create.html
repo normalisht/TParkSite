@@ -1,0 +1,38 @@
+{% extends "admin_panel/base.html" %}
+
+{% block scripts %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel.css') }}">
+    <link id="style" rel="stylesheet" href="{{ url_for('static', filename='contacts/contacts.css') }}">
+    <link id="style" rel="stylesheet" href="{{ url_for('static', filename='about/about.css') }}">
+{% endblock %}
+
+{% block app_content %}
+    {{ ckeditor.load() }}
+    <div class="grid_panel">
+        <form method="POST" enctype="multipart/form-data">
+            <div>
+                <div class="title">Текст</div>
+                <div class="grid_block">
+                    <div class="grid_block">
+                    <textarea name="info_text" id="info_text" class="category_name"
+                    ></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid_checkbox" style="max-width: 200px;">
+                <label for="status">Показывать/скрыть</label>
+                <input type="checkbox" id="status" class="checkbox" name="status" value="0"/>
+            </div>
+
+            <div class="input__wrapper">
+                <input type="submit" id="Submit" value="Подтвердить" class="input__file">
+                <label for="Submit" class="input__file_button">
+                    <span class="input__file_button_text_2">Создать</span>
+                </label>
+            </div>
+        </form>
+    </div>
+
+    {{ ckeditor.config(name='info_text') }}
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "main/base.html" %}
+
+{% block scripts %}
+<style type="text/css">
+.text {
+    margin: 8px auto 0;
+    width: min(calc(100% - 34px), 960px);
+}
+</style>
+{% endblock %}
+
+{% block app_content %}
+    <div class="text">
+        {{ text|safe }}
+    </div>
+{% endblock %}

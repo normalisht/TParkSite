@@ -177,3 +177,15 @@ def gallery():
     files = listdir('app/static/images/gallery')
     return render_template('main/gallery.html', categories=get_categories(), contacts_data=get_contacts_data(),
                            images=files)
+
+
+@bp.route('/info', methods=['GET'])
+def info():
+    info_id = request.args.get('info_id')
+
+    text = Text.query.filter_by(id=info_id).first()
+
+    if text is None or not text.status:
+        text = 'Доступ к странице закрыт'
+
+    return render_template('main/info.html', text=text, contacts_data=get_contacts_data())

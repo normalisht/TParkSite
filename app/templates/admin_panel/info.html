@@ -1,0 +1,63 @@
+{% extends "admin_panel/base.html" %}
+
+{% block scripts %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel.css') }}">
+    <link id="style" rel="stylesheet" href="{{ url_for('static', filename='contacts/contacts.css') }}">
+    <link id="style" rel="stylesheet" href="{{ url_for('static', filename='about/about.css') }}">
+    <script>
+        function copyLink(e) {
+            e.preventDefault()
+            let link = e.target.getAttribute('href');
+            let tmp = document.createElement('INPUT');
+            tmp.value = link;
+            document.body.appendChild(tmp);
+            tmp.select();
+            document.execCommand('copy');
+            document.body.removeChild(tmp);
+        }
+    </script>
+{% endblock %}
+
+{% block app_content %}
+    {{ ckeditor.load() }}
+    <div class="grid_panel">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="grid_block">
+                <a href="{{ base_url }}{{ url_for('main.info', info_id=text.id) }}" onclick="copyLink(event)">Ссылка на
+                    страницу(копировать)</a>
+            </div>
+            <div>
+                <div class="title">Текст</div>
+                <div class="grid_block">
+                    <div class="grid_block">
+                    <textarea name="info_text" id="info_text" class="category_name"
+                    >{{ text.text|safe }}</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid_checkbox" style="max-width: 200px;">
+                <label for="status">Показывать/скрыть</label>
+                <input type="checkbox" id="status" class="checkbox" name="status" value="1" {{ "checked" if
+                        text.status else "" }}/>
+            </div>
+
+            <div class="input__wrapper">
+                <input type="submit" id="delete_info" class="input__file" name="delete_info"
+                       value="Удалить страницу">
+                <label for="delete_info" class="input__file_button">
+                    <span class="input__file_button_text_2">Удалить страницу</span>
+                </label>
+            </div>
+
+            <div class="input__wrapper">
+                <input type="submit" id="Submit" value="Подтвердить" class="input__file">
+                <label for="Submit" class="input__file_button">
+                    <span class="input__file_button_text_2">Сохранить изменения</span>
+                </label>
+            </div>
+        </form>
+    </div>
+
+    {{ ckeditor.config(name='info_text') }}
+{% endblock %}

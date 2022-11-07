@@ -8,12 +8,15 @@
 
     <div class="block_event">
         <div class="new_event event">
+            <a href="{{ url_for('admin_panel.events_content') }}">Страница событий</a>
+        </div>
+        <div class="new_event event">
             <a href="{{ url_for('admin_panel.event_create') }}">Создать новое событие</a>
         </div>
         <div class="events">
             {% for event in events %}
                 <div class="event">
-                    <a href="{{ url_for('admin_panel.event_edit')}}?event_id={{ event.id }}">
+                    <a href="{{ url_for('admin_panel.event_edit') }}?event_id={{ event.id }}">
                         <div class="title_event">
                             {{ event.title }}
                         </div>
@@ -31,7 +34,7 @@
         <div class="events">
             {% for event in events_2 %}
                 <div class="event">
-                    <a href="{{ url_for('admin_panel.event_edit')}}?event_id={{ event.id }}">
+                    <a href="{{ url_for('admin_panel.event_edit') }}?event_id={{ event.id }}">
                         <div class="title_event">
                             {{ event.title }}
                         </div>

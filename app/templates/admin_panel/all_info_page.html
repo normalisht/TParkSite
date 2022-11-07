@@ -1,0 +1,26 @@
+{% extends "admin_panel/base.html" %}
+
+{% block scripts %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_panel/events.css') }}">
+{% endblock %}
+
+{% block app_content %}
+
+    <div class="block_event">
+        <div class="new_event event">
+            <a href="{{ url_for('admin_panel.info_create') }}">Создать новую страницу</a>
+        </div>
+        <div class="events">
+            {% for text in texts %}
+                <div class="event">
+                    <a href="{{ url_for('admin_panel.info', info_id=text.id ) }}">
+                        <div class="title">
+                            {{ text.text|safe }}
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+{% endblock %}

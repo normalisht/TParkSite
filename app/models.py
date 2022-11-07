@@ -84,6 +84,7 @@ class Text(db.Model):
     id = db.Column(db.Integer, primary_key=True, index=True, unique=True)
     title = db.Column(db.String(64))  # название текста
     text = db.Column(db.Text)  # содержание
+    status = db.Column(db.BOOLEAN, default=True)
 
     def __repr__(self):
         return self.text

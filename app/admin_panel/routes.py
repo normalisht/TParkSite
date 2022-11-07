@@ -66,7 +66,7 @@ def compress_img(image_name, new_size_ratio=1, quality=50, width=None, height=No
     # calculate the saving bytes
     saving_diff = new_image_size - image_size
     # print the saving percentage
-    print(f"[+] Image size change: {saving_diff/image_size*100:.2f}% of the original image size.")
+    print(f"[+] Image size change: {saving_diff / image_size * 100:.2f}% of the original image size.")
 
 
 # авторизация админа
@@ -471,7 +471,8 @@ def service_test():
 
         if len(service.categories.all()) > 0:
             return redirect(
-                url_for('admin_panel.category_change') + '?category_id={}'.format(service.categories.all()[0].category_id))
+                url_for('admin_panel.category_change') + '?category_id={}'.format(
+                    service.categories.all()[0].category_id))
 
     categories_cheked = []
     for category in categories_all:
@@ -790,7 +791,6 @@ def gallery():
 @login_required
 def contacts():
     contacts_info = Text.query.filter_by(title='contacts_info').first()
-
     if request.method == 'POST':
         if request.form.get('contacts_info_text'):
             contacts_info.text = request.form.get('contacts_info_text')
@@ -808,6 +808,47 @@ def contacts():
     return render_template('admin_panel/contacts.html', contacts_info=contacts_info, contacts_data=get_contacts_data())
 
 
+@bp.route('/info_create', methods=['GET', 'POST'])
+@login_required
+def info_create():
+    if request.method == 'POST':
+        text = Text(text=request.form.get('info_text'), status=bool(request.form.get('status')))
+        db.session.add(text)
+        db.session.commit()
+        return redirect(url_for('admin_panel.info', info_id=text.id))
+    return render_template('admin_panel/info_create.html', contacts_data=get_contacts_data())
+
+
+@bp.route('/all_info_page', methods=['GET'])
+@login_required
+def all_info_page():
+    texts = Text.query.filter(Text.id > 10).all()
+    return render_template('admin_panel/all_info_page.html', texts=texts, contacts_data=get_contacts_data())
+
+
+@bp.route('/info', methods=['GET', 'POST'])
+@login_required
+def info():
+    info_id = request.args.get('info_id')
+    try:
+        text = Text.query.filter_by(id=info_id).first()
+
+        if request.method == 'POST':
+            if request.form.get('delete_info'):
+                db.session.delete(text)
+                db.session.commit()
+                return render_template('admin_panel/all_info_page.html', contacts_data=get_contacts_data())
+
+            text.text = request.form.get('info_text')
+            text.status = bool(request.form.get('status'))
+            db.session.commit()
+        return render_template('admin_panel/info.html', text=text,
+                               base_url=request.base_url.replace('/admin_panel/info', ''),
+                               contacts_data=get_contacts_data())
+    except:
+        return redirect(url_for('admin_panel.all_info_page'))
+
+
 @bp.after_request
 def add_header(r):
     """
@@ -816,6 +857,6 @@ def add_header(r):
     """
     r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     r.headers["Pragma"] = "no-cache"
-    r.headers["Expires"] = "0"
+    r.headers["Expires"] = "1"
     r.headers['Cache-Control'] = 'public, max-age=0'
     return r
