@@ -237,7 +237,6 @@ radial-gradient(white 100 %, transparent 0);
     overflow: hidden;
     margin: 10px 0;
     max-height: min(35vh, 500px);
-
 }
 
 .map_img {
