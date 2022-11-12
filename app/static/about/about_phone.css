@@ -26,8 +26,21 @@
     margin-left: -17px;
     width: calc(100% + 34px);
     max-width: calc(100% + 34px);
+    margin-top: 0;
+    margin-bottom: 4px;
 }
 
 .map_img {
     max-width: 750px;
+}
+
+.gallery {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.rounded {
+    /*width: 900px*/
+    transform: scale(2.3);
 }

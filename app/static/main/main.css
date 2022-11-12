@@ -71,6 +71,10 @@ p {
     background-color: white;
 }
 
+.upper ul li {
+    list-style: none;
+}
+
 
 .footer {
     display: flex;
@@ -246,10 +250,6 @@ p {
     height: 100%;
     margin: 0 auto;
     border-radius: 12px;
-}
-
-ul li {
-    list-style: none;
 }
 
 .image-centered-wrapper .page-text {

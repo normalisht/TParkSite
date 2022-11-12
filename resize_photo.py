@@ -65,13 +65,43 @@ def compress_img(image_name, new_size_ratio=1, quality=50, width=None, height=No
 #         if file.endswith('.jpg'):
 #             compress_img(os.path.join(root, file), width=1920, height=1080)
 #             # os.remove(os.path.join(root, file))
+#
+# directory = "app/static/images/service"
+#
+# for root, dirs, files in os.walk(directory):
+#     for file in files:
+#         if file.endswith('.jpg'):
+#             file_name = file.split('.')[0]
+#             new_dir = os.getcwd() + '/' + directory + '/' + file_name
+#             os.makedirs(new_dir)
+#             shutil.move(directory + '/' + file, new_dir)
+weight = 75 # Вес
+height = 175 # Рост
+steps = 8462 # Количество пройденных за день шагов
+hours = 2 # Время движения в часах
+len_step_m = 0.65 # Длина одного шага в метрах
+transfer_coeff = 1000 # Коэффициент перевода значения расстояния из метров в километры
 
-directory = "app/static/images/service"
+dist = (steps * len_step_m) / transfer_coeff # Напишите формулу расчёта
 
-for root, dirs, files in os.walk(directory):
-    for file in files:
-        if file.endswith('.jpg'):
-            file_name = file.split('.')[0]
-            new_dir = os.getcwd() + '/' + directory + '/' + file_name
-            os.makedirs(new_dir)
-            shutil.move(directory + '/' + file, new_dir)
+mean_speed = dist / hours
+minutes = hours * 60
+
+spent_calories = (0.035*weight + (mean_speed**2 / height) * 0.029*weight) * minutes
+
+congratulations = ()
+
+if dist >= 7:
+    congratulations = ('Отличный результат! Цель достигнута')
+elif dist >= 3.9:
+    congratulations = ('Неплохо! День был продуктивным')
+elif dist >= 2:
+    congratulations = ('Маловато, но завтра наверстаем')
+else:
+    congratulations = ('Лежать тоже полезно. Главное - участие, а не победа!')
+
+output = (f'Сегодня вы прошли {dist:.2f} '
+       f'км и затратили {spent_calories:.2f} '
+       f'килокалорий. {congratulations}')  # Здесь подготовьте строку для вывода
+# print(type(dist))
+print (output)

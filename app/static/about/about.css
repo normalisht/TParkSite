@@ -61,7 +61,7 @@
     align-items:center;
     justify-content: center;
     overflow: hidden;
-    margin: 0 auto;
+    margin: 12px auto 0;
     max-height: min(40vh, 500px);
 }
 
@@ -69,4 +69,12 @@
     position: relative;
     object-fit: cover;
     max-width: 100%;
+}
+
+.gallery {
+    width: 100%;
+}
+
+.rounded {
+    width: 100%;
 }
