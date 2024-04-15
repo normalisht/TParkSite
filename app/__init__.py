@@ -20,7 +20,7 @@ moment = Moment()
 json = FlaskJSON()
 ckeditor = CKEditor()
 login = LoginManager()
-login.login_view = 'auth.login'
+login.login_view = 'admin_panel.login'
 login.login_message = 'Пожалуйста, авторизируйтесь для доступа к данной странице.'
 login.login_message_category = 'warning'
 
@@ -30,7 +30,6 @@ def create_app(config_class=Config):
                 template_folder='templates',
                 static_folder='static')
     app.config.from_object(config_class)
-
     db.init_app(app)
     migrate.init_app(app, db, render_as_batch=True)
     mail.init_app(app)

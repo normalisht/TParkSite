@@ -7,7 +7,7 @@
 {% block app_content %}
     {{ ckeditor.load() }}
     <form class="form" method="POST" enctype="multipart/form-data"
-          action="{{ url_for('admin_panel.event_edit')}}?event_id={{ event.id }}">
+          action="{{ url_for('admin_panel.event_edit') }}?event_id={{ event.id }}">
         <div class="form_container">
 
             <label for="title">Название</label>
@@ -20,6 +20,12 @@
             <label for="link">Ссылка</label>
             <input type="text" name="link" id="link" placeholder="Ссылка"
                    value="{{ event.link }}">
+
+            <div style="display: flex;">
+                <label for="after_date">Показывать после окончания</label>
+                <input type="checkbox" name="after_date" id="after_date" placeholder="Показывать после окончания"
+                       {{ "checked" if event.after_date else "" }} style="border: 1px; appearance: auto;">
+            </div>
 
             <label for="color" style="display: flex; align-items: center;">
                 <div>Цвет текста на фото</div>

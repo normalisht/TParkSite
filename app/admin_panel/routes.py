@@ -29,6 +29,7 @@ def compress_img(image_name, new_size_ratio=1, quality=50, width=None, height=No
     # print("[*] Image shape:", img.size)
     # get the original image size in bytes
     image_size = os.path.getsize(image_name)
+    print(image_name)
     # print the size before compression/resizing
     print("[*] Size before compression:", get_size_format(image_size))
     if new_size_ratio < 1.0:
@@ -52,15 +53,15 @@ def compress_img(image_name, new_size_ratio=1, quality=50, width=None, height=No
         new_filename = f"{filename}{ext}"
     try:
         # save the image with the corresponding quality and optimize set to True
-        img.save(new_filename, quality=quality, optimize=True)
+        img.save(image_name, quality=quality, optimize=True)
     except OSError:
         # convert the image to RGB mode first
         img = img.convert("RGB")
         # save the image with the corresponding quality and optimize set to True
-        img.save(new_filename, quality=quality, optimize=True)
+        img.save(image_name, quality=quality, optimize=True)
     # print("[+] New file saved:", new_filename)
     # get the new image size in bytes
-    new_image_size = os.path.getsize(new_filename)
+    new_image_size = os.path.getsize(image_name)
     # print the new size in a good format
     # print("[+] Size after compression:", get_size_format(new_image_size))
     # calculate the saving bytes
@@ -95,7 +96,7 @@ def login():
 @bp.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('main.index'))
+    return redirect(url_for('admin_panel.login'))
 
 
 @bp.route('/main', methods=['GET', 'POST'])
@@ -173,8 +174,9 @@ def events():
         else:
             events_2.append(event)
 
-    return render_template('admin_panel/event/events.html', title='Мероприятия',
-                           events=events, events_2=events_2)
+    return render_template('admin_panel/event/events.html',
+                           title='Мероприятия', events=events,
+                           events_2=reversed(events_2))
 
 
 # создание ивента
@@ -210,7 +212,6 @@ def event_create():
 @login_required
 def event_edit():
     id = request.args.get('event_id')
-
     event = Event.query.filter_by(id=id).first()
 
     if request.method == 'POST':
@@ -219,6 +220,8 @@ def event_edit():
         description = request.form.get('description')
         link = request.form.get('link')
         text_color = request.form.get('color')
+        after_date = bool(request.form.get('after_date')) or False
+        print(after_date, request.form.get('after_date'), '\n\n\n\n')
 
         date = datetime.datetime(int(date[0]), int(date[1]), int(date[2]), 22)
 
@@ -227,6 +230,7 @@ def event_edit():
         setattr(event, 'date', date)
         setattr(event, 'link', link)
         setattr(event, 'text_color', text_color)
+        setattr(event, 'after_date', after_date)
 
         try:
             if request.files.get('change'):
@@ -242,7 +246,6 @@ def event_edit():
         if request.form.get('delete'):
             db.session.delete(event)
             db.session.commit()
-
             return redirect(url_for('admin_panel.events'))
 
     return render_template('admin_panel/event/event_edit.html', event=event,
@@ -283,8 +286,9 @@ def category_change():
 
         for element in services:
             if request.form.get('service_checkbox_' + str(element.service.id)) != '1':
-                el = ServiceCategory.query.filter_by(service_id=element.service.id,
-                                                     category_id=category_id).first()
+                el = ServiceCategory.query.filter_by(
+                    service_id=element.service.id, category_id=category_id
+                ).first()
                 db.session.delete(el)
                 db.session.commit()
 
@@ -324,7 +328,7 @@ def category_change():
             images = request.files.getlist('add_photo')
             count = len(files) + 1
             for img in images:
-                path = os.path.join('app/static/images/category/{}'.format(category_id), '{}.jpg'.format(count + 2))
+                path = os.path.join(f'app/static/images/category/{category_id}/{count + 2}.jpg')
                 img.save(path)
                 compress_img(path, width=1920, height=1080, quality=95)
                 count += 1
@@ -433,6 +437,9 @@ def service_test():
             if request.files['add_' + str(photo)]:
                 images = request.files.getlist('add_' + str(photo))
                 count = len(files)
+                if not os.path.exists(
+                        f"app/static/images/service/{service_id}"):
+                    os.makedirs(f"app/static/images/service/{service_id}")
 
                 for img in images:
                     path = os.path.join('app/static/images/service/{}'.format(service_id), '{}.jpg'.format(count))
@@ -443,8 +450,12 @@ def service_test():
         if request.files.get('add_photo'):
             images = request.files.getlist('add_photo')
             count = len(files) + 1
+            if not os.path.exists(f"app/static/images/service/{service_id}"):
+                os.makedirs(f"app/static/images/service/{service_id}")
+
             for img in images:
-                path = os.path.join('app/static/images/service/{}'.format(service_id), '{}.jpg'.format(count + 2))
+                path = os.path.join('app/static/images/service/{}'.format(
+                    service_id), '{}.jpg'.format(count + 2))
                 img.save(path)
                 compress_img(path, width=1920, height=1080, quality=95)
                 count += 1
@@ -477,9 +488,9 @@ def service_test():
     categories_cheked = []
     for category in categories_all:
         if ServiceCategory.query.filter_by(service_id=service_id, category_id=category.id).first():
-            categories_cheked.insert(category.id, category.id)
+            categories_cheked.append(category.id)
         else:
-            categories_cheked.insert(category.id, 0)
+            categories_cheked.append(0)
 
     return render_template('admin_panel/service.html', title='{}'.format(service.name), files=files,
                            categories=get_categories(), service=service, categories_checked=categories_cheked)

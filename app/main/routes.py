@@ -23,12 +23,11 @@ def index():
     for index, type in enumerate(types):
         categories.append([])
         for category in type.categories:
-            categories[index].append(category.category)
+            if category.category.status == 1:
+                categories[index].append(category.category)
 
     for group in categories:
         group.sort(key=lambda Category: Category.number)
-
-    print("\n\n\n\n")
 
     return render_template('main/new_main.html', main_text=main_text, categories=categories,
                            contacts_data=get_contacts_data(), types=types)
@@ -110,6 +109,7 @@ def events():
     main_text = Text.query.filter_by(title="main_text").first().text
     events = Event.query.order_by(Event.date).all()
     events_2 = []
+    old_events = []
     slider_events = True
     len_slider = len(os.listdir('app/static/images/events'))
     # len_slider = len(os.listdir('/home/Losharik17/TParkSite/app/static/images/staff'))
@@ -121,16 +121,20 @@ def events():
 
         if dt > datetime.datetime.now():
             events_2.append(event)
+        elif event.after_date:
+            old_events.append(event)
+
+    events_2 += old_events
 
     if len(events_2) == 0:
         slider_events = False
     elif len(events_2) < 3:
         events_2 = events_2 * 3
 
-    print(events_2)
-
-    return render_template('main/main.html', main_text=main_text, events=events_2[1:] + events_2[:1],
-                           categories=get_categories(), contacts_data=get_contacts_data(),
+    return render_template('main/main.html', main_text=main_text,
+                           events=events_2[1:] + events_2[:1],
+                           categories=get_categories(),
+                           contacts_data=get_contacts_data(),
                            len_slider=len_slider, slider_events=slider_events)
 
 

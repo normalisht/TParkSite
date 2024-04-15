@@ -116,14 +116,16 @@ class Event(db.Model):
     text_color = db.Column(db.String(16))
     link = db.Column(db.String(1024))  # ссылка на мероприятие(соц сеть или левый сайт)
     description = db.Column(db.Text)
+    after_date = db.Column(db.BOOLEAN, default=False)  # отображение после
+    # окончания
 
-    def check_date(self):
-        """Если дата мероприятия прошла, оно удаляется"""
-        if self.date < datetime.now():
-            db.session.delete(self)
-            db.session.commit()
-            return True
-        return False
+    # def check_date(self):
+    #     """Если дата мероприятия прошла, оно удаляется"""
+    #     if self.date < datetime.now():
+    #         db.session.delete(self)
+    #         db.session.commit()
+    #         return True
+    #     return False
 
 
 class Partner(db.Model):
