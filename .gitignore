@@ -16,4 +16,4 @@ tpark1/
 testFile.txt
 package.json
 package-lock.json
-/app/static/images/*.jpg
+/app/static/images/**.jpg
