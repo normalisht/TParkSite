@@ -200,6 +200,8 @@
     </div>
 
     {% block app_content %}{% endblock %}
+
+    {{ ckeditor.config(custom_config='versionCheck: false') }}
 </div>
 
 </body>

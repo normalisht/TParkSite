@@ -15,7 +15,7 @@
                 <div class="event">
                     <a href="{{ url_for('admin_panel.info', info_id=text.id ) }}">
                         <div class="title">
-                            {{ text.text|safe }}
+                            {{ text.text.split('\n')[0][:200]|safe }}
                         </div>
                     </a>
                 </div>
