@@ -66,11 +66,23 @@
     object-fit: cover;
     transition: all 0.5s;
     filter: invert(0); /* убрать при другом варианте */
-    /*z-index: 5;*/
 }
 
 .price_switch_active {
     transform: rotate(-180deg);
+}
+
+.plus_switch {
+    margin-left: 3px;
+    top: 8px;
+    right: -1px;
+    width: 20px;
+    object-fit: cover;
+    transition: all 0.5s;
+}
+
+.plus_switch_active {
+    transform: rotate(135deg);
 }
 
 .button {

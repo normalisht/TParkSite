@@ -1,5 +1,5 @@
 div {
-    margin-top: 0px !important
+    /*margin-top: 0px !important*/
 }
 
 .container_base {
@@ -25,6 +25,7 @@ div {
 }
 
 .price {
+    margin-top: 8px;
     font-size: var(--primary-font-size);
 }
 

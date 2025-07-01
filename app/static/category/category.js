@@ -24,10 +24,11 @@ function close_all() {
 
         description.animate({
             'height': '0'
-        }, 1000)
+        }, 400)
         $(this).attr('status', '0')
 
         $(this).find('.price_switch').removeClass('price_switch_active')
+        $(this).find('.plus_switch').removeClass('plus_switch_active')
     })
 }
 
@@ -40,11 +41,7 @@ document.addEventListener('click', function (event) {
 
 document.addEventListener('DOMContentLoaded', function () {
     let services = $('.button'),
-        time_animation = 600
-
-    let detect = new MobileDetect(window.navigator.userAgent)
-    if (!detect.mobile() && !detect.phone() && !detect.tablet())
-            $('.next_switch').css("display", "none")
+        time_animation = 400
 
     services.each(function () {
         $(this).click(function () {
@@ -59,6 +56,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 $(this).attr('status', '1')
 
                 $(this).find('.price_switch').toggleClass('price_switch_active')
+                $(this).find('.plus_switch').toggleClass('plus_switch_active')
 
             } else {
                 description.stop().animate({
@@ -67,6 +65,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 $(this).attr('status', '0')
 
                 $(this).find('.price_switch').toggleClass('price_switch_active')
+                $(this).find('.plus_switch').toggleClass('plus_switch_active')
             }
         })
     })
