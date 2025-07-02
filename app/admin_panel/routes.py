@@ -29,7 +29,6 @@ def compress_img(image_name, new_size_ratio=1, quality=50, width=None, height=No
     # print("[*] Image shape:", img.size)
     # get the original image size in bytes
     image_size = os.path.getsize(image_name)
-    print(image_name)
     # print the size before compression/resizing
     print("[*] Size before compression:", get_size_format(image_size))
     if new_size_ratio < 1.0:
@@ -53,15 +52,15 @@ def compress_img(image_name, new_size_ratio=1, quality=50, width=None, height=No
         new_filename = f"{filename}{ext}"
     try:
         # save the image with the corresponding quality and optimize set to True
-        img.save(image_name, quality=quality, optimize=True)
+        img.save(new_filename, quality=quality, optimize=True)
     except OSError:
         # convert the image to RGB mode first
         img = img.convert("RGB")
         # save the image with the corresponding quality and optimize set to True
-        img.save(image_name, quality=quality, optimize=True)
+        img.save(new_filename, quality=quality, optimize=True)
     # print("[+] New file saved:", new_filename)
     # get the new image size in bytes
-    new_image_size = os.path.getsize(image_name)
+    new_image_size = os.path.getsize(new_filename)
     # print the new size in a good format
     # print("[+] Size after compression:", get_size_format(new_image_size))
     # calculate the saving bytes
@@ -174,9 +173,8 @@ def events():
         else:
             events_2.append(event)
 
-    return render_template('admin_panel/event/events.html',
-                           title='Мероприятия', events=events,
-                           events_2=reversed(events_2))
+    return render_template('admin_panel/event/events.html', title='Мероприятия',
+                           events=events, events_2=reversed(events_2))
 
 
 # создание ивента
@@ -221,7 +219,6 @@ def event_edit():
         link = request.form.get('link')
         text_color = request.form.get('color')
         after_date = bool(request.form.get('after_date')) or False
-        print(after_date, request.form.get('after_date'), '\n\n\n\n')
 
         date = datetime.datetime(int(date[0]), int(date[1]), int(date[2]), 22)
 
@@ -286,9 +283,8 @@ def category_change():
 
         for element in services:
             if request.form.get('service_checkbox_' + str(element.service.id)) != '1':
-                el = ServiceCategory.query.filter_by(
-                    service_id=element.service.id, category_id=category_id
-                ).first()
+                el = ServiceCategory.query.filter_by(service_id=element.service.id,
+                                                     category_id=category_id).first()
                 db.session.delete(el)
                 db.session.commit()
 
@@ -328,7 +324,7 @@ def category_change():
             images = request.files.getlist('add_photo')
             count = len(files) + 1
             for img in images:
-                path = os.path.join(f'app/static/images/category/{category_id}/{count + 2}.jpg')
+                path = os.path.join('app/static/images/category/{}'.format(category_id), '{}.jpg'.format(count + 2))
                 img.save(path)
                 compress_img(path, width=1920, height=1080, quality=95)
                 count += 1
@@ -426,11 +422,12 @@ def service_test():
             except:
                 pass
 
+        was_delete = False
         for photo in files:
             if request.form.get('delete_' + str(photo)):
-                print(str(photo))
                 try:
                     os.remove('app/static/images/service/{}/'.format(service_id) + str(photo))
+                    was_delete = True
                 except:
                     pass
 
@@ -454,11 +451,35 @@ def service_test():
                 os.makedirs(f"app/static/images/service/{service_id}")
 
             for img in images:
-                path = os.path.join('app/static/images/service/{}'.format(
-                    service_id), '{}.jpg'.format(count + 2))
+                path = os.path.join('app/static/images/service/{}'.format(service_id), '{}.jpg'.format(count + 2))
                 img.save(path)
                 compress_img(path, width=1920, height=1080, quality=95)
                 count += 1
+
+        if was_delete:
+            # Сначала добавляем префикс, чтобы не перетереть файлы, потом переименовываем
+            counter = 3
+            folder_path = 'app/static/images/service/{}'.format(service_id)
+            for filename in os.listdir('app/static/images/service/{}'.format(service_id)):
+                old_file_path = os.path.join(folder_path, filename)
+                if not os.path.isfile(old_file_path):
+                    continue
+                file_extension = os.path.splitext(filename)[1]
+                new_filename = f"file_{counter}{file_extension}"
+                new_file_path = os.path.join(folder_path, new_filename)
+                os.rename(old_file_path, new_file_path)
+                counter += 1
+
+            counter = 3
+            for filename in os.listdir('app/static/images/service/{}'.format(service_id)):
+                old_file_path = os.path.join(folder_path, filename)
+                if not os.path.isfile(old_file_path):
+                    continue
+                file_extension = os.path.splitext(filename)[1]
+                new_filename = f"{counter}{file_extension}"
+                new_file_path = os.path.join(folder_path, new_filename)
+                os.rename(old_file_path, new_file_path)
+                counter += 1
 
         service.short_description = request.form.get('input_short_desc')
         service.description = request.form.get('input_desc')
