@@ -92,10 +92,6 @@
                                     <img class="price_switch next_switch" style="transform: rotate(-90deg)"
                                          src="{{ url_for('static', filename='down.svg') }}"
                                          alt="">
-                                {% elif service.short_description %}
-                                    <img class="plus_switch"
-                                         src="{{ url_for('static', filename='plus.svg') }}"
-                                         alt="">
                                 {% endif %}
                                 <script>
                                     x = document.getElementById('prices{{ service.id }}')
@@ -104,13 +100,6 @@
                                 </script>
                             </div>
                         </div>
-                        {% if service.short_description and not service.next %}
-                            <div class="description">
-                                {% if service.short_description != None and service.short_description %}
-                                    {{ service.short_description|safe }}
-                                {% endif %}
-                            </div>
-                        {% endif %}
                     </div>
                 </div>
                 {% if service.next %}
