@@ -1,8 +1,3 @@
-from datetime import datetime
-from enum import unique
-from time import time
-from flask import current_app
-from sqlalchemy import event, DDL
 from app import db, login
 from flask_login import UserMixin
 
@@ -13,33 +8,33 @@ class Service(db.Model):
     short_description = db.Column(db.String(512))  # краткое описание
     description = db.Column(db.Text)  # полное описание
     status = db.Column(db.BOOLEAN())  # отображение клиентам
-    next = db.Column(db.BOOLEAN())   # есть ли переход на дальнейшую страницу
-    categories = db.relationship('ServiceCategory', backref='service', lazy='dynamic')
+    next = db.Column(db.BOOLEAN())  # есть ли переход на дальнейшую страницу
+    categories = db.relationship("ServiceCategory", backref="service", lazy="dynamic")
     price = db.Column(db.String(8))
     time = db.Column(db.String(128))
 
     def __repr__(self):
         if self.time:
-            return self.price + ' руб / ' + self.time
+            return self.price + " руб / " + self.time
         elif self.price:
-            return self.price + ' руб'
+            return self.price + " руб"
         else:
-            return ''
+            return ""
 
 
 class Price(db.Model):
     id = db.Column(db.Integer, primary_key=True, index=True, unique=True)
-    service_id = db.Column(db.ForeignKey('service.id'))
+    service_id = db.Column(db.ForeignKey("service.id"))
     price = db.Column(db.String(8))
     time = db.Column(db.String(128))
 
     def __repr__(self):
         if self.time:
-            return self.price + ' руб / ' + self.time
-        elif self.price + ' руб' != ' руб':
-            return self.price + ' руб'
+            return self.price + " руб / " + self.time
+        elif self.price + " руб" != " руб":
+            return self.price + " руб"
         else:
-            return ''
+            return ""
 
 
 class Category(db.Model):
@@ -47,15 +42,15 @@ class Category(db.Model):
     name = db.Column(db.String(128))
     description = db.Column(db.Text)
     status = db.Column(db.BOOLEAN())  # отображение клиентам
-    services = db.relationship('ServiceCategory', backref='category', lazy='dynamic')
+    services = db.relationship("ServiceCategory", backref="category", lazy="dynamic")
     number = db.Column(db.Integer, index=True, default=30)
-    types = db.relationship('CategoryType', backref='category', lazy='dynamic')
+    types = db.relationship("CategoryType", backref="category", lazy="dynamic")
 
 
 class CategoryType(db.Model):
     id = db.Column(db.Integer, primary_key=True, index=True, unique=True)
-    type_id = db.Column(db.Integer, db.ForeignKey('type.id'))
-    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+    type_id = db.Column(db.Integer, db.ForeignKey("type.id"))
+    category_id = db.Column(db.Integer, db.ForeignKey("category.id"))
     # number = db.Column(db.Integer, index=True, default=30)
 
 
@@ -63,13 +58,13 @@ class Type(db.Model):
     id = db.Column(db.Integer, primary_key=True, index=True, unique=True)
     name = db.Column(db.String(128))
     number = db.Column(db.Integer, default=500)  # порядковый номер
-    categories = db.relationship('CategoryType', backref='type', lazy='dynamic')
+    categories = db.relationship("CategoryType", backref="type", lazy="dynamic")
 
 
 class ServiceCategory(db.Model):
     id = db.Column(db.Integer, primary_key=True, index=True, unique=True)
-    service_id = db.Column(db.ForeignKey('service.id'))
-    category_id = db.Column(db.ForeignKey('category.id'))
+    service_id = db.Column(db.ForeignKey("service.id"))
+    category_id = db.Column(db.ForeignKey("category.id"))
     number = db.Column(db.Integer, default=500)  # порядковый номер
 
 
@@ -96,7 +91,7 @@ class Comment(db.Model):
     text = db.Column(db.Text)  # содержание
 
     def __repr__(self):
-        return f'{self.id}'
+        return f"{self.id}"
 
 
 class Admin(UserMixin, db.Model):

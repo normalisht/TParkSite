@@ -1,0 +1,42 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        name: "Trim trailing whitespace"
+        args: [ --markdown-linebreak-ext=md ]
+
+      - id: end-of-file-fixer
+        name: "Fix end of files"
+
+      - id: mixed-line-ending
+        name: "Fix mixed line endings"
+        args: [ --fix=lf ]
+        description: Forces LF line endings
+
+      - id: check-yaml
+        name: "Check YAML syntax"
+        args: [ --allow-multiple-documents ]
+
+      - id: check-json
+        name: "Check JSON syntax"
+
+      - id: check-toml
+        name: "Check TOML syntax"
+
+      - id: detect-private-key
+        name: "Detect private keys"
+
+      - id: check-merge-conflict
+        name: "Check for merge conflicts"
+        args: [ --assume-in-merge ]
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.0
+    hooks:
+      - id: ruff-check
+        name: "Ruff linter"
+        args: [ --fix, --output-format=concise ]
+
+      - id: ruff-format
+        name: "Ruff formatter"

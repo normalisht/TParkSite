@@ -14,4 +14,3 @@ function style_css() {
     }
     document.getElementById('style').append(link)
 }
-

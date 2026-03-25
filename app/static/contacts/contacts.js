@@ -48,5 +48,3 @@ function style_css_desctop() {
     }
     document.getElementById('style').append(link)
 }
-
-
