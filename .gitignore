@@ -1,17 +1,25 @@
+# Python / uv
 .venv/
 __pycache__/
 *.pyc
-.env
-/db.sqlite3*
-/media/
-/staticfiles/
-/static/css/tailwind.css
-/.django_tailwind_cli/
-/backups/
-/price_legacy.csv
-/.superpowers/
 .pytest_cache/
 .ruff_cache/
+
+# Окружение и локальные данные (dev — внутри src/)
+.env
+/src/db.sqlite3*
+/src/media/
+/src/staticfiles/
+/src/static/css/tailwind.css
+/src/.django_tailwind_cli/
+/src/price_legacy.csv
+
+# Инфраструктура
+/backups/
+/.superpowers/
+
+# Редакторы и ОС
 .idea/
 .DS_Store
+
 /old_version/app/static/images

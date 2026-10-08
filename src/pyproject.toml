@@ -33,7 +33,7 @@ filterwarnings = ["ignore:No directory at:UserWarning", "ignore:Overriding get_a
 [tool.ruff]
 target-version = "py314"
 line-length = 120
-extend-exclude = ["old_version", "docs", "*/migrations/*"]
+extend-exclude = ["*/migrations/*"]
 
 [tool.ruff.lint]
 # Списки в Meta и в миграциях — стандартная идиома Django.

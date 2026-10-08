@@ -8,11 +8,13 @@ ENV UV_COMPILE_BYTECODE=1 \
 WORKDIR /app
 
 RUN --mount=type=cache,target=/root/.cache/uv \
-    --mount=type=bind,source=uv.lock,target=uv.lock \
-    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    --mount=type=bind,source=src/uv.lock,target=uv.lock \
+    --mount=type=bind,source=src/pyproject.toml,target=pyproject.toml \
     uv sync --frozen --no-dev --no-install-project
 
-COPY . .
+# Django-проект живёт в src/ репозитория и копируется в /app.
+COPY src/ ./
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN --mount=type=cache,target=/root/.cache/uv uv sync --frozen --no-dev
 
 ENV PATH="/app/.venv/bin:$PATH" \
@@ -26,9 +28,9 @@ RUN SECRET_KEY=build-only python manage.py tailwind build \
  && useradd --system --uid 1000 --home-dir /app app \
  && mkdir -p /data/db /data/media \
  && chown -R app:app /data \
- && chmod +x /app/docker/entrypoint.sh
+ && chmod +x /usr/local/bin/entrypoint.sh
 
 USER app
 EXPOSE 8000
-ENTRYPOINT ["/app/docker/entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--access-logfile", "-", "--no-control-socket"]
