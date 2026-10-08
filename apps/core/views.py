@@ -1,7 +1,16 @@
 from django.db import connection
 from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, render
+
+from apps.core.models import InfoPage
+from apps.core.seo import make_seo
 
 
 def healthz(request):
     connection.ensure_connection()
     return HttpResponse("ok", content_type="text/plain")
+
+
+def info_page(request, slug):
+    page = get_object_or_404(InfoPage.objects.published(), slug=slug)
+    return render(request, "core/info.html", {"page": page, "seo": make_seo(page.title, page.body)})

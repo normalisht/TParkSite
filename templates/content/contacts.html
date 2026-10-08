@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="mx-auto max-w-6xl px-4 py-12">
+  <h1 class="text-4xl font-bold md:text-5xl">Контакты</h1>
+  <div class="mt-8 grid gap-10 lg:grid-cols-2">
+    <div class="space-y-6">
+      {% if site.address %}
+      <p class="flex gap-2 text-lg"><span class="icon mt-1 h-5 w-5 text-brand-600">{% include "icons/map-pin.svg" %}</span>
+        {% if site.map_url %}<a href="{{ site.map_url }}" target="_blank" rel="noopener" class="underline underline-offset-2 hover:text-brand-600">{{ site.address }}</a>{% else %}{{ site.address }}{% endif %}
+      </p>
+      {% endif %}
+      {% if phones %}
+      <ul class="space-y-2 text-lg">
+        {% for phone in phones %}<li><a href="{{ phone.tel_url }}" class="hover:text-brand-600">{{ phone.display }}</a></li>{% endfor %}
+      </ul>
+      {% endif %}
+      <div class="flex flex-wrap gap-3">{% include "partials/contact_links.html" %}</div>
+      {% if site.contacts_text %}<div class="rich-text">{{ site.contacts_text|safe }}</div>{% endif %}
+    </div>
+    {% if site.contacts_map %}<a href="{{ site.contacts_map.url }}" class="glightbox block overflow-hidden rounded-2xl"><img src="{{ site.contacts_map.url }}" alt="Схема проезда" loading="lazy" class="w-full"></a>{% endif %}
+  </div>
+</div>
+{% endblock %}
