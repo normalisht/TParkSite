@@ -1,0 +1,16 @@
+.git
+.venv
+.idea
+.pytest_cache
+.ruff_cache
+__pycache__
+.env
+db.sqlite3*
+media
+staticfiles
+backups
+old_version
+docs
+tests
+.django_tailwind_cli
+static/css/tailwind.css
