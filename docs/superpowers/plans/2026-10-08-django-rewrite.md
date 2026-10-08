@@ -27,7 +27,7 @@
 ## Review Focus
 
 1. **Перенос флага WhatsApp/Telegram с одного номера на другой за одно сохранение формы** — должен сохраняться без ошибки (Django проверяет ограничения модели построчно и видит старый флаг в БД). Тест: Task 6, `test_phone_flag_can_move_between_numbers`.
-2. **Отсутствующий или битый файл изображения** (в медиа или в старой папке `images/`) не должен ронять ни страницу, ни импорт: страница рендерится без картинки, импорт пишет предупреждение. Тесты: Task 7 `test_home_survives_missing_preview_file`, Task 13 `test_corrupt_image_is_warning_not_failure`.
+2. **Отсутствующий или битый файл изображения** (в медиа или в старой папке `../../../src/old_migrate/images/`) не должен ронять ни страницу, ни импорт: страница рендерится без картинки, импорт пишет предупреждение. Тесты: Task 7 `test_home_survives_missing_preview_file`, Task 13 `test_corrupt_image_is_warning_not_failure`.
 3. **Мусор в параметрах старых URL** (`/category?category_id=abc`, пустой параметр) — 404, а не 500. Тест: Task 9 `test_legacy_redirect_bad_param_is_404`.
 4. **Откат импорта** (ошибка посередине, в том числе с `--flush`) — БД возвращается к исходному состоянию, новые файлы удалены, файлы старого контента не удалены. Тест: Task 13 `test_failed_import_rolls_back_db_and_files`.
 5. **Коллизия имён сервисов во внешней сети прокси** — у контейнеров уникальные алиасы `tpark-web` и `tpark-media`, а не общие `web`/`media`. Проверка: Task 15, шаг проверки `docker compose config`.

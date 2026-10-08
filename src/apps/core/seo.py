@@ -14,3 +14,7 @@ def plaintext(value: str, limit: int = 160) -> str:
 
 def make_seo(title: str = "", description_html: str = "", image_url: str = "") -> dict:
     return {"title": title, "description": plaintext(description_html), "image": image_url}
+
+
+def absolute_url(request, url: str) -> str:
+    return request.build_absolute_uri(url) if url else ""

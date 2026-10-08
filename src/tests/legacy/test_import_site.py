@@ -24,8 +24,7 @@ def test_site_texts_and_contacts(legacy):
         geolocation="https://yandex.ru/maps/-/CCUufTqlWC",
         vk="https://vk.com/tparkprotva",
     )
-    legacy.image("staff/map.jpg")
-    legacy.run()
+    report = legacy.run()
     site = SiteSettings.load()
     assert site.home_intro == site.events_intro == "<p>Добро пожаловать</p>"
     assert site.about_text == "<p>О нас</p>"
@@ -33,9 +32,9 @@ def test_site_texts_and_contacts(legacy):
     assert site.nearby_text == "<p>Рядом</p>"
     assert site.contacts_text == "<p>Как добраться</p>"
     assert site.address == "Калужская область, село Восход"
-    assert site.map_url.endswith("CCUufTqlWC")
     assert site.vk_url == "https://vk.com/tparkprotva"
-    assert site.contacts_map and not site.about_map
+    assert site.map_embed_url == ""
+    assert any("Яндекс Карта не перенесена" in w and "CCUufTqlWC" in w for w in report.warnings)
 
 
 def test_phones_and_messenger_flags(legacy):
@@ -89,3 +88,11 @@ def test_command_prints_report(legacy, capsys, tmp_path):
     out = capsys.readouterr().out
     assert "Телефоны: 1" in out
     assert "Импорт завершён" in out
+
+
+def test_html_cleanup_trims_empty_edge_paragraphs(legacy):
+    add_texts(
+        legacy, filosofi="<p>&nbsp;</p>\r\n\r\n<p>Текст</p>\r\n\r\n<p>&nbsp;</p>\r\n\r\n<p>Ещё</p>\r\n<p><br /></p>"
+    )
+    legacy.run()
+    assert SiteSettings.load().philosophy_text == "<p>Текст</p>\n\n<p>&nbsp;</p>\n\n<p>Ещё</p>"

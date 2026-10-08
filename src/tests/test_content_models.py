@@ -3,7 +3,7 @@ from datetime import date
 import pytest
 from django.core.exceptions import ValidationError
 
-from apps.content.models import Event, GalleryPhoto
+from apps.content.models import Event, GalleryPhoto, Review
 
 pytestmark = pytest.mark.django_db
 
@@ -49,3 +49,16 @@ def test_uploaded_photo_is_downscaled(make_image, media_root):
     photo = GalleryPhoto.objects.create(image=make_image(size=(4000, 3000)))
     with Image.open(media_root / photo.image.name) as image:
         assert image.size == (1440, 1080)
+
+
+@pytest.mark.parametrize(
+    ("link", "label"),
+    [
+        ("https://reviews.yandex.ru/user/x", "Яндекс Карты"),
+        ("https://vk.com/wall1", "VK"),
+        ("https://www.example.org/r", "example.org"),
+        ("", ""),
+    ],
+)
+def test_review_source_label(link, label):
+    assert Review(link=link).source_label == label

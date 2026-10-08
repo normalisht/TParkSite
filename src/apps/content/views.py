@@ -1,10 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 
-from apps.content.models import Employee, Event, GalleryPhoto, Partner, Review
+from apps.content.models import Event, GalleryPhoto, Partner, Review
 from apps.core.images import safe_spec_url
 from apps.core.models import SiteSettings
-from apps.core.seo import make_seo
+from apps.core.seo import absolute_url, make_seo
 
 
 def events(request):
@@ -25,12 +25,43 @@ def events(request):
     )
 
 
+def event_detail(request, slug):
+    event = get_object_or_404(Event.objects.visible(), slug=slug)
+    settings = SiteSettings.load()
+    canonical = request.build_absolute_uri(event.get_absolute_url())
+    seo = make_seo(event.title, event.description, absolute_url(request, safe_spec_url(event, "card")))
+    structured = {
+        "@context": "https://schema.org",
+        "@type": "Event",
+        "name": event.title,
+        "startDate": event.date.isoformat(),
+        "eventStatus": "https://schema.org/EventScheduled",
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+        "url": canonical,
+        "location": {"@type": "Place", "name": "Т-Парк", "address": settings.address or "Т-Парк"},
+        "organizer": {"@type": "Organization", "name": "Т-Парк", "url": request.build_absolute_uri("/")},
+    }
+    if seo["description"]:
+        structured["description"] = seo["description"]
+    if seo["image"]:
+        structured["image"] = [seo["image"]]
+    return render(
+        request,
+        "content/event.html",
+        {
+            "event": event,
+            "seo": seo,
+            "canonical_url": canonical,
+            "structured_data": structured,
+        },
+    )
+
+
 def about(request):
     return render(
         request,
         "content/about.html",
         {
-            "employees": list(Employee.objects.all()),
             "partners": list(Partner.objects.all()),
             "seo": make_seo("О нас", SiteSettings.load().about_text),
         },

@@ -71,3 +71,22 @@ def test_safe_spec_url_swallows_errors():
 
     assert safe_spec_url(Broken(), "thumb") == ""
     assert safe_spec_url(object(), "missing") == ""
+
+
+@pytest.mark.parametrize(
+    ("n", "expected"),
+    [
+        (1, "1 отзыв"),
+        (3, "3 отзыва"),
+        (5, "5 отзывов"),
+        (11, "11 отзывов"),
+        (12, "12 отзывов"),
+        (21, "21 отзыв"),
+        (22, "22 отзыва"),
+        (111, "111 отзывов"),
+    ],
+)
+def test_ru_plural(n, expected):
+    from apps.core.templatetags.site_tags import ru_plural
+
+    assert ru_plural(n, "отзыв,отзыва,отзывов") == expected

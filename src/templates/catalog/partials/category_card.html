@@ -1,9 +1,14 @@
-{% load site_tags %}
-<a href="{{ category.get_absolute_url }}" class="group block overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-ink/5 transition hover:-translate-y-1 hover:shadow-lg">
-  <div class="aspect-[3/2] overflow-hidden bg-tint">
-    {% with url=category|spec_url:"preview_card" %}{% if url %}
-    <img src="{{ url }}" alt="{{ category.name }}" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
-    {% endif %}{% endwith %}
+{% load static site_tags %}
+{# Название поверх фото на затемнении снизу. На телефоне — одна колонка, карточка ниже (3:2) и без стрелки. #}
+<a href="{{ category.get_absolute_url }}" class="group relative block aspect-[3/2] overflow-hidden rounded-2xl bg-sand-200 shadow-sm transition outline-none hover:-translate-y-1 hover:shadow-lg focus-visible:ring-4 focus-visible:ring-brand-500 active:scale-[.98] sm:aspect-[4/3]">
+  {% with url=category|spec_url:"preview_card" %}{% if url %}
+  <img src="{{ url }}" alt="" loading="lazy" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105">
+  {% else %}
+  <img src="{% static 'img/logo.png' %}" alt="" class="absolute inset-0 m-auto w-1/2 opacity-30">
+  {% endif %}{% endwith %}
+  <div class="absolute inset-x-0 bottom-0 h-3/4 bg-linear-to-t from-black/75 via-black/30 to-transparent"></div>
+  <div class="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4 sm:p-5">
+    <h3 class="text-lg leading-snug font-semibold text-white [text-wrap:balance] sm:text-xl">{{ category.name }}</h3>
+    <span class="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/20 text-white ring-1 ring-white/40 backdrop-blur transition group-hover:bg-brand-500 group-hover:text-ink group-hover:ring-brand-500 sm:flex"><span class="icon h-5 w-5">{% include "icons/chevron-right.svg" %}</span></span>
   </div>
-  <div class="p-5"><h3 class="text-lg font-semibold group-hover:text-brand-600">{{ category.name }}</h3></div>
 </a>

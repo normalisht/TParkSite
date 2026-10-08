@@ -1,11 +1,12 @@
-from datetime import timedelta
+import re
+from datetime import date, timedelta
 
 import pytest
 from django.utils import timezone
 
 from apps.catalog.models import Category, CategoryPhoto, CategoryService, Service
-from apps.content.models import Employee, Event, GalleryPhoto, Partner, Review
-from apps.core.models import InfoPage
+from apps.content.models import Event, GalleryPhoto, Partner, Review
+from apps.core.models import InfoPage, SiteSettings
 
 pytestmark = pytest.mark.django_db
 
@@ -34,7 +35,10 @@ def test_category_page_lists_services(client, category):
         CategoryService.objects.create(category=category, service=service, order=order)
     html = client.get(category.get_absolute_url()).content.decode()
     assert "Описание сплавов" in html
-    assert "2000 руб / человек" in html and with_page.get_absolute_url() in html
+    assert with_page.get_absolute_url() in html
+    # Цена разбита по слешу: перенос только между ценой и единицей.
+    assert '<span class="inline-block whitespace-nowrap">2000 руб</span>' in html
+    assert '<span class="data-wrapped:invisible">/ </span>человек</span>' in html
     assert "Весло включено" in html
     assert "Скрытая услуга" not in html
     assert "swiper-slide" in html
@@ -74,23 +78,31 @@ def test_events_page_placeholder(client):
 
 
 def test_about_page(client, make_image):
-    Employee.objects.create(name="Иван", position="Инструктор")
     Partner.objects.create(name="Партнёр", link="https://example.com", logo=make_image())
     html = client.get("/about/").content.decode()
-    assert "Иван" in html and "Инструктор" in html and "https://example.com" in html
+    assert "https://example.com" in html
 
 
-def test_about_page_hides_empty_employees(client):
-    assert "Команда" not in client.get("/about/").content.decode()
-
-
-def test_reviews_manual_order_and_published(client):
-    Review.objects.create(author="Второй", text="<p>b</p>", order=2)
-    Review.objects.create(author="Первый", text="<p>a</p>", order=1)
+def test_reviews_newest_first_and_published(client):
+    Review.objects.create(author="Без даты", text="<p>n</p>")
+    Review.objects.create(author="Старый", text="<p>b</p>", date=date(2021, 6, 6))
+    Review.objects.create(author="Новый", text="<p>a</p>", date=date(2023, 10, 26))
     Review.objects.create(author="Скрытый", text="<p>c</p>", is_published=False)
     html = client.get("/reviews/").content.decode()
-    assert html.index("Первый") < html.index("Второй")
+    assert html.index("Новый") < html.index("Старый") < html.index("Без даты")
     assert "Скрытый" not in html
+
+
+def test_review_card_links_to_source_when_link_set(client):
+    Review.objects.create(
+        author="С ссылкой", text="<p>a</p>", link="https://reviews.yandex.ru/u/1", date=date(2022, 7, 20)
+    )
+    Review.objects.create(author="Без ссылки", text="<p>b</p>")
+    html = client.get("/reviews/").content.decode()
+    # Ссылка — только подпись источника, не вся карточка.
+    assert re.search(r'<a href="https://reviews\.yandex\.ru/u/1"[^>]*>Яндекс Карты<', html)
+    assert html.count('href="https://reviews.yandex.ru/u/1"') == 1
+    assert "after:inset-0" not in html and "20 июля 2022" in html
 
 
 def test_gallery_page(client, make_image):
@@ -110,3 +122,38 @@ def test_nav_has_all_sections(client):
     html = client.get("/").content.decode()
     for url in STATIC_PAGES:
         assert f'href="{url}"' in html
+
+
+def test_contacts_page_embeds_yandex_map_only_when_set(client):
+    site = SiteSettings.load()
+    assert "<iframe" not in client.get("/contacts/").content.decode()
+    site.map_embed_url = "https://yandex.ru/map-widget/v1/?um=constructor%3Aabc&source=constructor"
+    site.save()
+    html = client.get("/contacts/").content.decode()
+    assert 'src="https://yandex.ru/map-widget/v1/?um=constructor%3Aabc&amp;source=constructor"' in html
+
+
+def test_reviews_page_header_cta_and_tones(client):
+    site = SiteSettings.load()
+    for i in range(3):
+        Review.objects.create(text=f"<p>Отзыв {i}</p>", link="https://yandex.ru/maps/org/1/reviews/")
+    html = client.get("/reviews/").content.decode()
+    assert "3 отзыва" in html and "Гость Т-Парка" in html and "Яндекс Карты" in html
+    assert re.findall(r"review-tone-(\w+)", html) == ["green", "warm", "heather"]  # цвета по кругу
+    assert "Оставить отзыв" not in html  # без ссылки на Яндекс Карты кнопок нет
+    site.reviews_url = "https://yandex.ru/maps/org/t_park/1/reviews/"
+    site.save()
+    html = client.get("/reviews/").content.decode()
+    assert "Оставить отзыв" in html and "Все отзывы на Яндекс Картах" in html
+
+
+def test_home_shows_reviews_carousel(client):
+    assert "Отзывы гостей" not in client.get("/").content.decode()
+    Review.objects.create(author="Анна", text="<p>Классно</p>")
+    Review.objects.create(author="Скрытая", text="<p>x</p>", is_published=False)
+    Review.objects.create(author="Борис", text="<p>Отлично</p>")
+    html = client.get("/").content.decode()
+    assert "Отзывы гостей" in html and "Классно" in html and "Скрытая" not in html
+    # В карусели цвета чередуются по карточкам; кнопки — свои, по бокам.
+    assert re.findall(r"review-tone-(\w+)", html) == ["green", "warm"]
+    assert "js-carousel-prev" in html and "js-carousel-next" in html

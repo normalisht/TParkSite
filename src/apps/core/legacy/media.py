@@ -1,3 +1,4 @@
+from collections import defaultdict
 from pathlib import Path
 
 from django.core.files import File
@@ -20,6 +21,11 @@ def attach_image(instance, field_name: str, path: Path, report, *, missing_ok: b
         if not missing_ok:
             report.warn(f"Нет файла {path}")
         return False
+    report.use(path)
+    with path.open("rb") as fh:
+        if fh.read(5) == b"%PDF-":
+            report.warn(f"{path} — это PDF, а не изображение: загрузите картинку в админке вручную")
+            return False
     try:
         with Image.open(path) as image:
             image.verify()
@@ -29,3 +35,14 @@ def attach_image(instance, field_name: str, path: Path, report, *, missing_ok: b
         report.warn(f"Не удалось загрузить {path}: {exc}")
         return False
     return True
+
+
+def warn_unused_files(images: Path, report) -> None:
+    """Перечисляет файлы старой папки images, которые импорт не тронул: сироты удалённых записей, служебные картинки."""
+    unused = defaultdict(list)
+    for path in sorted(images.rglob("*")):
+        if path.suffix.lower() in IMAGE_SUFFIXES and path.is_file() and path.resolve() not in report.used_files:
+            unused[path.parent.relative_to(images).as_posix()].append(path.name)
+    for folder, names in unused.items():
+        names.sort(key=lambda n: (0, int(Path(n).stem), n) if Path(n).stem.isdigit() else (1, 0, n))
+        report.warn(f"Не перенесены файлы из {folder}/: {', '.join(names)}")

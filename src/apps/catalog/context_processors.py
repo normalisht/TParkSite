@@ -4,7 +4,7 @@ from apps.catalog.models import Category, CategoryGroup
 
 
 def menu(request):
-    groups = CategoryGroup.objects.prefetch_related(
+    groups = CategoryGroup.objects.published().prefetch_related(
         Prefetch(
             "categories",
             queryset=Category.objects.published().order_by("order", "id"),

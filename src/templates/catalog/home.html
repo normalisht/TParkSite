@@ -1,21 +1,42 @@
 {% extends "base.html" %}
 {% block content %}
 <section class="bg-tint">
-  <div class="mx-auto max-w-6xl px-4 py-14 md:py-20">
+  <div class="mx-auto max-w-6xl px-4 py-10 md:py-20">
     <h1 class="text-4xl font-bold md:text-6xl">Т-Парк</h1>
     {% if site.home_intro %}<div class="rich-text mt-5 max-w-3xl text-lg">{{ site.home_intro|safe }}</div>{% endif %}
-    <div class="mt-8 flex flex-wrap gap-3">{% include "partials/contact_links.html" %}</div>
+    <div class="mt-6 flex flex-wrap gap-3 md:mt-8">{% include "partials/contact_links.html" %}</div>
   </div>
 </section>
 
 {% for group in menu_groups %}
-<section class="mx-auto max-w-6xl px-4 py-10">
-  <h2 class="mb-6 text-2xl font-bold md:text-3xl">{{ group.name }}</h2>
-  <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+<section class="mx-auto max-w-6xl px-4 py-5 md:py-10">
+  <h2 class="mb-4 text-2xl font-bold md:mb-6 md:text-3xl">{{ group.name }}</h2>
+  <div class="grid gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-3">
     {% for category in group.published_categories %}{% include "catalog/partials/category_card.html" %}{% endfor %}
   </div>
 </section>
 {% empty %}
 <p class="mx-auto max-w-6xl px-4 py-16 text-ink/60">Скоро здесь появятся наши услуги.</p>
 {% endfor %}
+
+{% if reviews %}
+<section class="mx-auto max-w-6xl px-4 py-5 md:py-10">
+  <div class="mb-4 flex items-end justify-between gap-4 md:mb-6">
+    <h2 class="text-2xl font-bold md:text-3xl">Отзывы гостей</h2>
+    <a href="{% url 'content:reviews' %}" class="inline-flex shrink-0 items-center gap-1 font-semibold text-brand-700 hover:text-brand-600">Все отзывы<span class="icon h-4 w-4">{% include "icons/chevron-right.svg" %}</span></a>
+  </div>
+  {# Кнопки — по бокам карусели, в отступах обёртки (на телефоне листают свайпом). #}
+  <div class="js-carousel-wrap relative md:px-14">
+    <div class="swiper js-carousel">
+      <div class="swiper-wrapper">
+        {% for review in reviews %}
+        <div class="swiper-slide !h-auto {% cycle 'review-tone-green' 'review-tone-warm' 'review-tone-heather' 'review-tone-sand' %}">{% include "content/partials/review_card.html" %}</div>
+        {% endfor %}
+      </div>
+    </div>
+    <button type="button" aria-label="Предыдущие отзывы" class="js-carousel-prev absolute left-0 top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white text-ink/70 shadow-sm ring-1 ring-ink/10 transition hover:text-brand-700 hover:ring-brand-500 md:flex [&.swiper-button-disabled]:pointer-events-none [&.swiper-button-disabled]:opacity-40"><span class="icon h-5 w-5 rotate-180">{% include "icons/chevron-right.svg" %}</span></button>
+    <button type="button" aria-label="Следующие отзывы" class="js-carousel-next absolute right-0 top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white text-ink/70 shadow-sm ring-1 ring-ink/10 transition hover:text-brand-700 hover:ring-brand-500 md:flex [&.swiper-button-disabled]:pointer-events-none [&.swiper-button-disabled]:opacity-40"><span class="icon h-5 w-5">{% include "icons/chevron-right.svg" %}</span></button>
+  </div>
+</section>
+{% endif %}
 {% endblock %}

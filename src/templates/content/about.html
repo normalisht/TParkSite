@@ -10,29 +10,17 @@
     </div>
     <div class="space-y-10">
       {% if site.nearby_text %}<div class="rounded-2xl bg-tint p-6"><h2 class="mb-3 text-2xl font-bold">Что рядом</h2><div class="rich-text">{{ site.nearby_text|safe }}</div></div>{% endif %}
-      {% if site.about_map %}<a href="{{ site.about_map.url }}" class="glightbox block overflow-hidden rounded-2xl"><img src="{{ site.about_map.url }}" alt="Карта" loading="lazy" class="w-full"></a>{% endif %}
     </div>
   </div>
 
-  {% if employees %}
-  <h2 class="mb-6 mt-16 text-2xl font-bold">Команда</h2>
-  <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-    {% for employee in employees %}
-    <figure>
-      <div class="aspect-[4/5] overflow-hidden rounded-2xl bg-tint">{% with url=employee|spec_url:"portrait" %}{% if url %}<img src="{{ url }}" alt="{{ employee.name }}" loading="lazy" class="h-full w-full object-cover">{% endif %}{% endwith %}</div>
-      <figcaption class="mt-3"><p class="font-semibold">{{ employee.name }}</p><p class="text-sm text-ink/60">{{ employee.position }}</p></figcaption>
-    </figure>
-    {% endfor %}
-  </div>
-  {% endif %}
-
   {% if partners %}
   <h2 class="mb-6 mt-16 text-2xl font-bold">Партнёры</h2>
-  <div class="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-5">
+  <div class="grid grid-cols-2 items-center gap-4 sm:grid-cols-3 md:gap-6 lg:grid-cols-4">
     {% for partner in partners %}
     {% with url=partner|spec_url:"logo_small" %}
-    <a {% if partner.link %}href="{{ partner.link }}" target="_blank" rel="noopener"{% endif %} class="flex aspect-[2/1] items-center justify-center rounded-2xl bg-white p-4 ring-1 ring-ink/10 hover:ring-brand-500">
-      {% if url %}<img src="{{ url }}" alt="{% firstof partner.name 'Партнёр' %}" loading="lazy" class="max-h-full max-w-full object-contain">{% else %}{{ partner.name }}{% endif %}
+    {# Картинки партнёров — баннеры с текстом: показываем целиком, в своих пропорциях, без обрезки. #}
+    <a {% if partner.link %}href="{{ partner.link }}" target="_blank" rel="noopener"{% endif %} class="block overflow-hidden rounded-2xl transition{% if partner.link %} hover:-translate-y-1 hover:shadow-lg{% endif %}">
+      {% if url %}<img src="{{ url }}" alt="{% firstof partner.name 'Партнёр' %}" loading="lazy" class="h-auto w-full">{% else %}<span class="flex aspect-square items-center justify-center bg-tint p-4 text-center font-semibold">{{ partner.name }}</span>{% endif %}
     </a>
     {% endwith %}
     {% endfor %}

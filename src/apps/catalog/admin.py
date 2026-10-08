@@ -1,9 +1,9 @@
 from django import forms
 from django.contrib import admin
-from unfold.admin import ModelAdmin, TabularInline
+from unfold.admin import TabularInline
 
 from apps.catalog.models import Category, CategoryGroup, CategoryPhoto, CategoryService, Service, ServicePhoto
-from apps.core.admin_utils import image_preview
+from apps.core.admin_utils import SiteModelAdmin, image_preview
 from apps.core.bulk_upload import MultipleImageField, append_images
 
 
@@ -59,20 +59,20 @@ class ServiceAdminForm(forms.ModelForm):
 
 
 @admin.register(CategoryGroup)
-class CategoryGroupAdmin(ModelAdmin):
-    list_display = ["name"]
+class CategoryGroupAdmin(SiteModelAdmin):
+    list_display = ["name", "is_published"]
+    list_editable = ["is_published"]
     ordering = ["order", "id"]
     ordering_field = "order"
     hide_ordering_field = True
     filter_horizontal = ["categories"]
-    fields = ["name", "categories", "order"]
+    fields = ["name", "categories", "is_published", "order"]
 
 
 @admin.register(Category)
-class CategoryAdmin(ModelAdmin):
+class CategoryAdmin(SiteModelAdmin):
     form = CategoryAdminForm
-    list_display = ["card", "name", "is_published"]
-    list_display_links = ["name"]
+    list_display = ["name", "is_published"]
     list_editable = ["is_published"]
     ordering = ["order", "id"]
     ordering_field = "order"
@@ -81,13 +81,9 @@ class CategoryAdmin(ModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
     inlines = [CategoryPhotoInline, CategoryServiceInline]
     fieldsets = (
-        ("Основное", {"fields": ["name", "slug", "description", "preview_image", "preview", "is_published", "order"]}),
+        ("Основное", {"fields": ["name", "slug", "description", "preview", "is_published", "order"]}),
         ("Загрузка фото", {"fields": ["bulk_photos"]}),
     )
-    readonly_fields = ["preview_image"]
-    # Не называть атрибут `preview`: так называется поле модели, и форма перестала бы его редактировать.
-    card = image_preview("preview_card")
-    preview_image = image_preview("preview_card", size=120)
 
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)
@@ -95,9 +91,10 @@ class CategoryAdmin(ModelAdmin):
 
 
 @admin.register(Service)
-class ServiceAdmin(ModelAdmin):
+class ServiceAdmin(SiteModelAdmin):
     form = ServiceAdminForm
     list_display = ["name", "price_display", "is_published", "has_page"]
+    list_editable = ["is_published"]
     list_filter = ["is_published", "has_page", "category_links__category"]
     search_fields = ["name"]
     prepopulated_fields = {"slug": ("name",)}

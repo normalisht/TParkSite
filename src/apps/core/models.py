@@ -3,7 +3,8 @@ from django.db import models
 from django.db.models import Q
 from django.urls import reverse
 
-from apps.core.fields import HtmlField, photo_field
+from apps.core.fields import HtmlField
+from apps.core.maps import MapEmbedURLField
 from apps.core.slugs import unique_slug
 
 
@@ -22,16 +23,25 @@ class PublishedQuerySet(models.QuerySet):
 
 class SiteSettings(models.Model):
     address = models.CharField("Адрес", max_length=255, blank=True)
-    map_url = models.URLField("Ссылка на карту", max_length=500, blank=True)
+    map_embed_url = MapEmbedURLField(
+        "Яндекс Карта на странице контактов",
+        max_length=1000,
+        blank=True,
+        help_text="В Яндекс Картах: «Поделиться» → «Встроить карту» → скопируйте код и вставьте сюда целиком.",
+    )
     vk_url = models.URLField("VK", max_length=500, blank=True)
+    reviews_url = models.URLField(
+        "Отзывы на Яндекс Картах",
+        max_length=500,
+        blank=True,
+        help_text="Страница отзывов о Т-Парке: кнопки «Все отзывы» и «Оставить отзыв» на странице отзывов.",
+    )
     home_intro = HtmlField("Вступление на главной")
     events_intro = HtmlField("Вступление на странице мероприятий")
     about_text = HtmlField("О нас")
     philosophy_text = HtmlField("Философия")
     nearby_text = HtmlField("Что рядом")
     contacts_text = HtmlField("Текст на странице контактов")
-    contacts_map = photo_field("Карта на странице контактов", "site")
-    about_map = photo_field("Карта на странице «О нас»", "site")
 
     class Meta:
         verbose_name = "Настройки сайта"

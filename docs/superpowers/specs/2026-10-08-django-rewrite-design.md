@@ -10,7 +10,7 @@
 
 Переписать сайт t-camp.ru на Django с сохранением функционала, улучшить дизайн и удобство сайта и админки, перенести данные из старой SQLite и папки с изображениями.
 
-**В объёме:** витрина групп, категорий и услуг; мероприятия; отзывы; галерея; «О нас» (тексты, карта, сотрудники, партнёры); контакты; инфо-страницы; админка; импорт старых данных; 301-редиректы со старых URL; docker compose для продакшена; бэкап.
+**В объёме:** витрина групп, категорий и услуг; мероприятия; отзывы; галерея; «О нас» (тексты, партнёры); контакты; инфо-страницы; админка; импорт старых данных; 301-редиректы со старых URL; docker compose для продакшена; бэкап.
 
 **Вне объёма:** онлайн-бронирование, оплата, формы заявок, личный кабинет, многоязычность, React/SPA, объектное хранилище (MinIO/S3).
 
@@ -39,7 +39,7 @@ pyproject.toml, uv.lock, manage.py, .env.example
 config/            settings.py, urls.py, wsgi.py
 apps/core/         SiteSettings, Phone, InfoPage, редиректы, контекст-процессор, import_legacy
 apps/catalog/      CategoryGroup, Category, CategoryPhoto, Service, ServicePhoto, CategoryService
-apps/content/      Event, Review, Partner, Employee, GalleryPhoto
+apps/content/      Event, Review, Partner, GalleryPhoto
 templates/         base.html, страницы, partials
 static/            css/source.css (Tailwind), js/, img/ (логотип, иконки)
 tests/
@@ -61,9 +61,8 @@ old_version/       старая Flask-версия, только для спра
 ### core
 
 - **SiteSettings** (синглтон, `pk=1`, получение через `SiteSettings.load()`):
-  - контакты: `address`, `map_url` (Яндекс.Карты), `vk_url`;
+  - контакты: `address`, `map_embed_url` (виджет Яндекс Карты на странице контактов — единственная карта на сайте), `vk_url`;
   - тексты (HTML): `home_intro`, `events_intro`, `about_text`, `philosophy_text`, `nearby_text`, `contacts_text`;
-  - картинки: `contacts_map`, `about_map`.
 - **Phone**:
   - `settings` — FK на SiteSettings, `number` — 10 цифр без `+7`, `order`;
   - флаги `is_whatsapp` и `is_telegram`. Каждый флаг может стоять не более чем у одного номера — частичные `UniqueConstraint(fields=["settings"], condition=Q(is_whatsapp=True))` и то же для Telegram;
@@ -88,7 +87,6 @@ old_version/       старая Flask-версия, только для спра
   - Мероприятие «предстоящее», если `date >= today` по `Europe/Moscow`. Эквивалент старого правила «до 22:00 дня мероприятия»: в день мероприятия оно ещё считается предстоящим.
 - **Review**: `author`, `text`, `photo` (необязательно), `is_published`, `order`.
 - **Partner**: `name` (необязательно, используется как alt), `link`, `logo`, `order`.
-- **Employee**: `name`, `position`, `photo`, `order`.
 - **GalleryPhoto**: `image`, `caption` (необязательно), `order`.
 
 ## 5. Публичная часть
@@ -117,7 +115,7 @@ old_version/       старая Flask-версия, только для спра
 - **Шапка:**
   - логотип и меню: «Услуги» (выпадающий список категорий по группам), «Мероприятия», «О нас», «Отзывы», «Галерея», «Контакты»;
   - на ширине меньше `md` меню прячется в бургер (Alpine.js).
-- **Подвал:** адрес (ссылка на `map_url`), все телефоны (`tel:`), иконки WhatsApp, Telegram, VK.
+- **Подвал:** адрес (ссылка на страницу контактов), все телефоны (`tel:`), иконки WhatsApp, Telegram, VK.
 - **Кнопка «Связаться»:** плавающая, только на мобильных; раскрывается в «Позвонить» (первый номер), WhatsApp, Telegram. Пункт мессенджера скрыт, если флаг ни у кого не стоит.
 - **Дизайн:** сохраняем логотип, палитру и настроение старого сайта, вёрстку делаем современнее. Палитра — токены в `@theme` Tailwind.
 
@@ -133,10 +131,10 @@ old_version/       старая Flask-версия, только для спра
   - сверху `events_intro` и фото ближайшего предстоящего мероприятия;
   - карусель Swiper (`loop` только при ≥ 3 слайдах): сначала предстоящие по дате, затем прошедшие с `show_after_date`;
   - при отсутствии мероприятий — заглушка «Скоро анонсируем».
-- **О нас** — `about_text`, `philosophy_text`, `nearby_text`, `about_map`, сотрудники (блок скрыт, если их нет), партнёры (логотипы-ссылки).
-- **Отзывы** — опубликованные отзывы по `order`, сетка в стиле masonry (CSS columns).
+- **О нас** — `about_text`, `philosophy_text`, `nearby_text`, партнёры (логотипы-ссылки).
+- **Отзывы** — опубликованные отзывы от новых к старым (без даты — в конце), сетка по рядам; у отзыва необязательные имя (иначе «Гость Т-Парка»), ссылка на источник (ссылкой служит подпись источника) и дата; длинные тексты свёрнуты; кнопки «Все отзывы на Яндекс Картах» и «Оставить отзыв» — по `SiteSettings.reviews_url`. Карусель отзывов есть и на главной.
 - **Галерея** — сетка миниатюр, лайтбокс с полноразмерным фото.
-- **Контакты** — `contacts_text`, `contacts_map`, телефоны и мессенджеры.
+- **Контакты** — `contacts_text`, телефоны и мессенджеры, под ними на всю ширину — виджет Яндекс Карты (`map_embed_url`).
 - **Инфо-страница** — заголовок и текст.
 - **404 / 500** — в общем стиле; шаблон 500 не зависит от БД.
 
@@ -149,17 +147,18 @@ old_version/       старая Flask-версия, только для спра
 ## 6. Админка
 
 - Unfold, `LANGUAGE_CODE="ru"`, вход по `/admin/`, стандартные пользователи и группы Django.
-- **Боковое меню** (`UNFOLD["SIDEBAR"]`): Каталог (группы, категории, услуги); Контент (мероприятия, отзывы, галерея, партнёры, сотрудники); Сайт (настройки, инфо-страницы); Доступ (пользователи, группы).
+- **Боковое меню** (`UNFOLD["SIDEBAR"]`): Каталог (группы, категории, услуги); Контент (мероприятия, отзывы, галерея, партнёры); Сайт (настройки, инфо-страницы); Доступ (пользователи, группы).
 - **Общее:** миниатюры изображений в списках и формах; «Смотреть на сайте» (`get_absolute_url`) у категорий, услуг и инфо-страниц.
 
 | Раздел | Список | Форма |
 |---|---|---|
-| Настройки сайта | — (пункт меню открывает форму записи `pk=1`; добавление и удаление запрещены) | Вкладки «Контакты» (+ inline `Phone` с перетаскиванием), «Тексты», «Карты» |
+| Настройки сайта | — (пункт меню открывает форму записи `pk=1`; добавление и удаление запрещены) | Вкладки «Контакты» (+ inline `Phone` с перетаскиванием), «Тексты» |
 | Группы категорий | порядок перетаскиванием | `name`, `categories` (`filter_horizontal`) |
 | Категории | превью, название, `is_published` (переключатель), порядок перетаскиванием | Вкладки «Основное» (название, slug, описание, превью, публикация), «Фото» (inline `CategoryPhoto` с перетаскиванием + поле загрузки пачкой), «Услуги» (inline `CategoryService`, `autocomplete_fields=["service"]`, перетаскивание) |
 | Услуги | поиск по названию; фильтры: категория, `is_published`, `has_page` | Поля услуги; inline `ServicePhoto` + загрузка пачкой; inline `CategoryService` (`autocomplete_fields=["category"]`) |
 | Мероприятия | фото, заголовок, дата; фильтр «Предстоящие / Прошедшие»; `date_hierarchy` | Все поля |
-| Отзывы, партнёры, сотрудники | фото, основные поля, порядок перетаскиванием | Все поля |
+| Партнёры | фото, основные поля, порядок перетаскиванием | Все поля |
+| Отзывы | фото, имя, дата, «опубликовано»; по дате, фильтр по годам | Все поля |
 | Галерея | миниатюры, порядок перетаскиванием; кнопка «Загрузить пачкой» (отдельная admin-view с полем множественной загрузки) | `image`, `caption` |
 | Инфо-страницы | заголовок, `is_published` | Все поля |
 
@@ -182,26 +181,25 @@ manage.py import_legacy --db <путь к T_Park.db> --images <путь к па�
 |---|---|---|
 | `type` | `CategoryGroup` | `number` → `order` |
 | `category_type` | `CategoryGroup.categories` | пары с несуществующими id пропускаются |
-| `category` | `Category` (**id сохраняется**) | `status` → `is_published`; `number` → `order`; slug из `name`; `images/category/preview/<id>.jpg` → `preview` |
-| `images/category/<id>/*` | `CategoryPhoto` | по возрастанию номера |
+| `category` | `Category` (**id сохраняется**) | `status` → `is_published`; `number` → `order`; slug из `name`; `../../../src/old_migrate/images/category/preview/<id>.jpg` → `preview` |
+| `../../../src/old_migrate/images/category/<id>/*` | `CategoryPhoto` | по возрастанию номера |
 | `service` | `Service` (**id сохраняется**) | `time` → `price_unit`; `status` → `is_published` (`NULL` → `True`); `next` → `has_page`; slug из `name` |
-| `images/service/<id>/*` | `ServicePhoto` | по возрастанию номера |
+| `../../../src/old_migrate/images/service/<id>/*` | `ServicePhoto` | по возрастанию номера |
 | `service_category` | `CategoryService` | `number` → `order` (`NULL` → в конец); дубли схлопываются; **6 строк ссылаются на удалённые записи — пропускаются** |
-| `event` | `Event` | `after_date` → `show_after_date`; `images/events/<id>.jpg` → `image` (см. риск ниже) |
-| `comment` | `Review` | `name` → `author`; `is_published=True`; `order` по `id`; `images/comments/<id>.jpg` → `photo` |
-| `partner` | `Partner` | строки с `name="temp"` пропускаются; `name` в данных — это id (артефакт старой админки), поэтому импортируется пустым; `images/partner/<id>.jpg` → `logo`; `order` по `id` |
-| `employee` | — | **не импортируется**: все 7 записей — заглушки «Сотрудник» без фото. Блок сотрудников на «О нас» скрыт, пока их не заведут в админке |
-| `text` с `title` | `SiteSettings` | `main_text` → `home_intro` и `events_intro`; `about` → `about_text`; `filosofi` → `philosophy_text`; `structure` → `nearby_text`; `contacts_info` → `contacts_text`; `address`; `geolocation` → `map_url`; `vk` → `vk_url` |
+| `event` | `Event` | `after_date` → `show_after_date`; `../../../src/old_migrate/images/events/<id>.jpg` → `image` (см. риск ниже) |
+| `comment` | `Review` | `name` → `author`; `is_published=True`; `order` по `id`; `../../../src/old_migrate/images/comments/<id>.jpg` → `photo` |
+| `partner` | `Partner` | строки с `name="temp"` пропускаются; `name` в данных — это id (артефакт старой админки), поэтому импортируется пустым; `../../../src/old_migrate/images/partner/<id>.jpg` → `logo`; `order` по `id` |
+| `employee` | — | **не импортируется**: сотрудников на новом сайте нет (в старой БД были только заглушки «Сотрудник»); фото из `employee/` попадают в отчёт о неперенесённых файлах |
+| `text` с `title` | `SiteSettings` | `main_text` → `home_intro` и `events_intro`; `about` → `about_text`; `filosofi` → `philosophy_text`; `structure` → `nearby_text`; `contacts_info` → `contacts_text`; `address`; `vk` → `vk_url`; `geolocation` не переносится — код виджета карты задаётся в админке, импорт напоминает об этом в отчёте |
 | `text.phone_numbers` | `Phone` | номера через пробел → записи по порядку; первому номеру ставится `is_whatsapp`; `is_telegram` ставится номеру, найденному в значении `insta` (`tg://resolve?domain=+7…`) |
 | `text` без `title` | `InfoPage` (**id сохраняется**) | `status` → `is_published`; `title` — текст первого `<strong>` или `<h1-3>`, иначе «Страница N»; slug из `title` |
-| `images/gallery/*` | `GalleryPhoto` | по возрастанию номера |
-| `images/staff/map.jpg`, `map_about.jpg` | `SiteSettings.contacts_map`, `about_map` | — |
+| `../../../src/old_migrate/images/gallery/*` | `GalleryPhoto` | по возрастанию номера |
 | `price` | CSV-файл (`--price-csv`, по умолчанию `price_legacy.csv`) | в БД не переносится |
 | `admin`, `alembic_version` | — | не переносятся |
 
-**Известный риск:** фон слайдера старой страницы событий лежит в `images/events/0..2.jpg`, а у мероприятия с `id=2` фото тоже `events/2.jpg`. Импорт ставит этот файл мероприятию 2 и выводит в отчёте предупреждение — после импорта фото нужно проверить вручную. Файлы `0.jpg` и `1.jpg` игнорируются: мероприятий с такими id нет.
+**Известный риск:** фон слайдера старой страницы событий лежит в `../../../src/old_migrate/images/events/0..2.jpg`, а у мероприятия с `id=2` фото тоже `events/2.jpg`. Импорт ставит этот файл мероприятию 2 и выводит в отчёте предупреждение — после импорта фото нужно проверить вручную. Файлы `0.jpg` и `1.jpg` игнорируются: мероприятий с такими id нет.
 
-**Где взять картинки:** папки `images/` в репозитории нет, её нужно скопировать с текущего продакшен-сервера (`app/static/images`).
+**Где взять картинки:** папки `../../../src/old_migrate/images/` в репозитории нет, её нужно скопировать с текущего продакшен-сервера (`app/static/images`).
 
 ## 8. Инфраструктура
 
@@ -263,7 +261,7 @@ pytest + pytest-django, фабрики — простые хелперы или 
 ## 10. Решения, принятые при написании спецификации
 
 Требуют подтверждения при ревью:
-- сотрудники не импортируются (все записи — заглушки);
+- сотрудников на новом сайте нет, таблица `employee` не импортируется;
 - у партнёров название при импорте пустое;
 - `main_text` копируется и во вступление главной, и во вступление мероприятий (в старой версии это был один текст на обеих страницах);
 - «предстоящее мероприятие» — `date >= сегодня` по Москве;

@@ -1,0 +1,2 @@
+{# Цена и единица — неразрывные куски: перенос только по слешу; при переносе слеш скрывает site.js (fitPrices). #}
+{% if service.price %}<span class="inline-block whitespace-nowrap">{{ service.price }} руб</span>{% if service.price_unit %} <span class="js-price-unit inline-block"><span class="data-wrapped:invisible">/ </span>{{ service.price_unit }}</span>{% endif %}{% endif %}

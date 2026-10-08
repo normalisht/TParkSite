@@ -1,16 +1,15 @@
 from django.shortcuts import get_object_or_404, render
 
 from apps.catalog.models import Category, Service
+from apps.content.models import Review
 from apps.core.images import safe_spec_url
-from apps.core.seo import make_seo
+from apps.core.seo import absolute_url, make_seo
+
+HOME_REVIEWS = 8
 
 
 def home(request):
-    return render(request, "catalog/home.html")
-
-
-def _absolute(request, url: str) -> str:
-    return request.build_absolute_uri(url) if url else ""
+    return render(request, "catalog/home.html", {"reviews": list(Review.objects.published()[:HOME_REVIEWS])})
 
 
 def category_detail(request, slug):
@@ -24,7 +23,7 @@ def category_detail(request, slug):
             "category": category,
             "photos": photos,
             "services": category.published_services(),
-            "seo": make_seo(category.name, category.description, _absolute(request, image)),
+            "seo": make_seo(category.name, category.description, absolute_url(request, image)),
         },
     )
 
@@ -46,6 +45,8 @@ def service_detail(request, slug):
             "service": service,
             "photos": photos,
             "category": link.category if link else None,
-            "seo": make_seo(service.name, service.short_description or service.description, _absolute(request, image)),
+            "seo": make_seo(
+                service.name, service.short_description or service.description, absolute_url(request, image)
+            ),
         },
     )

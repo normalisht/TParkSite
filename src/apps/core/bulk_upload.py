@@ -2,11 +2,14 @@
 
 from django import forms
 from django.db.models import Max
+from unfold.widgets import UnfoldAdminImageFieldWidget
 
 from apps.core.fields import validate_image_upload
 
 
-class MultipleImageInput(forms.ClearableFileInput):
+class MultipleImageInput(UnfoldAdminImageFieldWidget):
+    """Виджет Unfold (как у обычных полей фото) — в нём работает перетаскивание из admin_dropzone.js."""
+
     allow_multiple_selected = True
 
 

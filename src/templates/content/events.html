@@ -6,7 +6,7 @@
   <div class="relative mx-auto max-w-6xl px-4 py-16 md:py-24">
     <h1 class="text-4xl font-bold md:text-6xl">Мероприятия</h1>
     {% if site.events_intro %}<div class="rich-text mt-5 max-w-3xl text-lg !text-white/90">{{ site.events_intro|safe }}</div>{% endif %}
-    {% if nearest %}<p class="mt-6 text-brand-300">Ближайшее: {{ nearest.title }}, {{ nearest.date|date:"j E" }}</p>{% endif %}
+    {% if nearest %}<p class="mt-6 text-brand-300">Ближайшее: <a href="{{ nearest.get_absolute_url }}" class="underline underline-offset-4 hover:text-white">{{ nearest.title }}</a>, {{ nearest.date|date:"j E" }}</p>{% endif %}
   </div>
 </section>
 
@@ -16,16 +16,16 @@
     <div class="swiper-wrapper">
       {% for event in events %}
       <article class="swiper-slide">
-        <div class="relative aspect-[4/3] overflow-hidden rounded-2xl bg-ink">
-          {% with url=event|spec_url:"card" %}{% if url %}<img src="{{ url }}" alt="{{ event.title }}" loading="lazy" class="absolute inset-0 h-full w-full object-cover">{% endif %}{% endwith %}
+        <a href="{{ event.get_absolute_url }}" class="group relative block aspect-[4/3] overflow-hidden rounded-2xl bg-ink">
+          {% with url=event|spec_url:"card" %}{% if url %}<img src="{{ url }}" alt="{{ event.title }}" loading="lazy" class="absolute inset-0 h-full w-full object-cover transition duration-300 group-hover:scale-105">{% endif %}{% endwith %}
           <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent"></div>
           <div class="absolute inset-x-0 bottom-0 p-5" style="color: {% firstof event.text_color '#ffffff' %}">
             <p class="text-sm font-semibold opacity-90">{{ event.date|date:"j E Y" }}</p>
             <h2 class="mt-1 text-xl font-bold">{{ event.title }}</h2>
           </div>
-        </div>
-        {% if event.description %}<div class="rich-text mt-4 text-sm">{{ event.description|safe }}</div>{% endif %}
-        {% if event.link %}<a href="{{ event.link }}" target="_blank" rel="noopener" class="mt-3 inline-flex items-center gap-1 font-semibold text-brand-700 hover:text-brand-600">Подробнее<span class="icon h-4 w-4">{% include "icons/external-link.svg" %}</span></a>{% endif %}
+        </a>
+        {% if event.description %}<p class="mt-4 text-sm text-ink/80">{{ event.description|plaintext:200 }}</p>{% endif %}
+        <a href="{{ event.get_absolute_url }}" class="mt-3 inline-flex items-center gap-1 font-semibold text-brand-700 hover:text-brand-600">Подробнее<span class="icon h-4 w-4">{% include "icons/chevron-right.svg" %}</span></a>
       </article>
       {% endfor %}
     </div>

@@ -1,0 +1,23 @@
+# Локальный запуск: docker compose -f compose.dev.yaml up --build → http://localhost:8000
+# Код из src/ примонтирован в контейнер: runserver перезапускается при правках, Tailwind пересобирается.
+# Продакшен — compose.yaml.
+services:
+  tpark-dev:
+    build: .
+    image: tpark-web
+    command: ["python", "manage.py", "tailwind", "runserver", "0.0.0.0:8000"]
+    environment:
+      DEBUG: "1"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src:/app
+      # Не даём локальным .venv и бинарнику Tailwind (собраны под macOS) перекрыть линуксовые из образа.
+      - /app/.venv
+      - /app/.django_tailwind_cli
+      - dev-db:/data/db
+      - dev-media:/data/media
+
+volumes:
+  dev-db:
+  dev-media:

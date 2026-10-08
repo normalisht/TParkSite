@@ -1,0 +1,10 @@
+# Переводы строк сторонних пакетов, у которых нет русской локали (Unfold).
+# После правки: uv run manage.py compilemessages -l ru (нужен gettext), .mo тоже коммитится.
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: ru\n"
+
+# unfold/helpers/tab_items.html — первая вкладка формы с инлайнами
+msgid "General"
+msgstr "Основное"

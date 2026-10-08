@@ -1,22 +1,36 @@
 {% extends "base.html" %}
 {% load site_tags %}
 {% block content %}
-<div class="mx-auto max-w-6xl px-4 py-12">
-  <h1 class="text-4xl font-bold md:text-5xl">Отзывы</h1>
+<div class="mx-auto max-w-6xl px-4 py-10 md:py-12">
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h1 class="text-4xl font-bold md:text-5xl">Отзывы</h1>
+      <p class="mt-3 text-lg text-ink/70">Что говорят гости Т-Парка{% if reviews %} · <span class="font-semibold text-brand-700">{{ reviews|length|ru_plural:"отзыв,отзыва,отзывов" }}</span>{% endif %}</p>
+    </div>
+    {% if site.reviews_url %}
+    <a href="{{ site.reviews_url }}" target="_blank" rel="noopener" class="btn btn-ghost">Все отзывы на Яндекс Картах<span class="icon h-4 w-4">{% include "icons/external-link.svg" %}</span></a>
+    {% endif %}
+  </div>
+
   {% if reviews %}
-  <div class="mt-8 gap-6 sm:columns-2 lg:columns-3">
+  {# «Кирпичная» раскладка (site.js): высота карточек — по тексту, порядок «от новых к старым» — слева направо. #}
+  <div class="review-grid js-masonry mt-8 grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
     {% for review in reviews %}
-    <article class="mb-6 break-inside-avoid rounded-2xl bg-tint p-6">
-      <div class="flex items-center gap-3">
-        {% with url=review|spec_url:"avatar" %}{% if url %}<img src="{{ url }}" alt="" loading="lazy" class="h-12 w-12 rounded-full object-cover">{% endif %}{% endwith %}
-        <p class="font-semibold">{{ review.author }}</p>
-      </div>
-      <div class="rich-text mt-4">{{ review.text|safe }}</div>
-    </article>
+    <div class="review-item {% cycle 'review-tone-green' 'review-tone-warm' 'review-tone-heather' 'review-tone-sand' %}">{% include "content/partials/review_card.html" %}</div>
     {% endfor %}
   </div>
   {% else %}
   <p class="mt-8 text-ink/60">Отзывов пока нет.</p>
+  {% endif %}
+
+  {% if site.reviews_url %}
+  <section class="mt-10 flex flex-col items-start gap-6 rounded-3xl bg-navy p-8 text-white md:flex-row md:items-center md:justify-between md:p-12">
+    <div>
+      <h2 class="text-2xl font-bold md:text-3xl">Были в Т-Парке?</h2>
+      <p class="mt-2 max-w-xl text-white/80">Расскажите, как всё прошло — нам важно каждое мнение, а другим гостям проще выбрать.</p>
+    </div>
+    <a href="{{ site.reviews_url }}" target="_blank" rel="noopener" class="btn btn-primary shrink-0">Оставить отзыв<span class="icon h-4 w-4">{% include "icons/external-link.svg" %}</span></a>
+  </section>
   {% endif %}
 </div>
 {% endblock %}

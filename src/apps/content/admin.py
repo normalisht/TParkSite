@@ -1,11 +1,10 @@
 from django.contrib import admin, messages
 from django.shortcuts import redirect, render
 from django.utils import timezone
-from unfold.admin import ModelAdmin
 from unfold.decorators import action
 
-from apps.content.models import Employee, Event, GalleryPhoto, Partner, Review
-from apps.core.admin_utils import image_preview
+from apps.content.models import Event, GalleryPhoto, Partner, Review
+from apps.core.admin_utils import SiteModelAdmin, image_preview
 from apps.core.bulk_upload import BulkUploadForm, append_images
 
 
@@ -26,28 +25,28 @@ class EventPeriodFilter(admin.SimpleListFilter):
 
 
 @admin.register(Event)
-class EventAdmin(ModelAdmin):
-    list_display = ["preview", "title", "date", "show_after_date"]
-    list_display_links = ["title"]
+class EventAdmin(SiteModelAdmin):
+    list_display = ["title", "date", "show_after_date"]
     list_filter = [EventPeriodFilter, "show_after_date"]
     date_hierarchy = "date"
     search_fields = ["title"]
-    fields = ["title", "date", "description", "link", "image", "text_color", "show_after_date"]
-    preview = image_preview("card")
+    fields = ["title", "slug", "date", "description", "link", "image", "text_color", "show_after_date"]
 
 
-class OrderedPhotoAdmin(ModelAdmin):
+class OrderedPhotoAdmin(SiteModelAdmin):
     ordering = ["order", "id"]
     ordering_field = "order"
     hide_ordering_field = True
 
 
 @admin.register(Review)
-class ReviewAdmin(OrderedPhotoAdmin):
-    list_display = ["preview", "author", "is_published"]
+class ReviewAdmin(SiteModelAdmin):
+    # Порядок — по дате (Meta.ordering), без перетаскивания.
+    list_display = ["preview", "author", "date", "is_published"]
     list_display_links = ["author"]
     list_filter = ["is_published"]
-    fields = ["author", "text", "photo", "is_published", "order"]
+    date_hierarchy = "date"
+    fields = ["author", "date", "text", "link", "photo", "is_published"]
     preview = image_preview("avatar")
 
 
@@ -57,14 +56,6 @@ class PartnerAdmin(OrderedPhotoAdmin):
     list_display_links = ["preview", "name"]
     fields = ["name", "link", "logo", "order"]
     preview = image_preview("logo_small")
-
-
-@admin.register(Employee)
-class EmployeeAdmin(OrderedPhotoAdmin):
-    list_display = ["preview", "name", "position"]
-    list_display_links = ["name"]
-    fields = ["name", "position", "photo", "order"]
-    preview = image_preview("portrait")
 
 
 @admin.register(GalleryPhoto)

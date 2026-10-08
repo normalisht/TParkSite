@@ -37,3 +37,9 @@ def test_category_meta(client, make_image):
     assert "<title>Байдарки — Т-Парк</title>" in html
     assert 'name="description" content="Сплавы по Протве для всей семьи"' in html
     assert 'property="og:image" content="http://testserver/media/' in html
+
+
+def test_favicon_redirects_to_static(client):
+    response = client.get("/favicon.ico")
+    assert response.status_code == 301
+    assert response["Location"].endswith("img/favicon.ico")

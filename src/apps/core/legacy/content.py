@@ -1,8 +1,10 @@
 import re
 from pathlib import Path
 
+from django.utils.html import escape
+
 from apps.content.models import Event, GalleryPhoto, Partner, Review
-from apps.core.legacy.html import clean_html, clean_url, parse_date
+from apps.core.legacy.html import clean_html, clean_line, clean_url, parse_date, parse_ru_date, split_lead_link
 from apps.core.legacy.media import attach_image, numbered_images
 
 COLOR_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
@@ -17,7 +19,7 @@ def import_content(db, images: Path, report) -> None:
             continue
         color = (row["text_color"] or "").strip()
         event = Event(
-            title=(row["title"] or "").strip()[:128] or f"Мероприятие {row['id']}",
+            title=clean_line(row["title"], 128) or f"Мероприятие {row['id']}",
             date=event_date,
             description=clean_html(row["description"]),
             link=clean_url(row["link"]),
@@ -33,10 +35,17 @@ def import_content(db, images: Path, report) -> None:
         event.save()
         report.add("Мероприятия")
 
-    for order, row in enumerate(db.rows("comment")):
-        review = Review(
-            author=(row["name"] or "").strip()[:128], text=clean_html(row["text"]), is_published=True, order=order
-        )
+    for row in db.rows("comment"):
+        # Старые отзывы — копии с Яндекс Карт: первый абзац — ссылка на отзыв, текст ссылки — его дата.
+        text, link, link_text = split_lead_link(clean_html(row["text"]))
+        review_date = parse_ru_date(link_text)
+        if link and not review_date and link_text:
+            text = "\n".join(
+                filter(None, [f"<p>{escape(link_text)}</p>", text])
+            )  # текст ссылки — не дата: не теряем его
+        # Имени в старых отзывах нет — на сайте их подпишет «Гость Т-Парка», источник берётся из ссылки.
+        author = clean_line(row["name"], 128)
+        review = Review(author=author, text=text, link=link, date=review_date, is_published=True)
         attach_image(review, "photo", images / "comments" / f"{row['id']}.jpg", report, missing_ok=True)
         review.save()
         report.add("Отзывы")
@@ -49,10 +58,6 @@ def import_content(db, images: Path, report) -> None:
         attach_image(partner, "logo", images / "partner" / f"{row['id']}.jpg", report)
         partner.save()
         report.add("Партнёры")
-
-    employees = db.rows("employee")
-    if employees:
-        report.warn(f"Сотрудники не перенесены: {len(employees)} записей-заглушек, заведите их в админке")
 
     for order, path in enumerate(numbered_images(images / "gallery")):
         photo = GalleryPhoto(order=order)

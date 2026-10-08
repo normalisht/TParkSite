@@ -4,7 +4,7 @@ from datetime import date
 import pytest
 
 from apps.catalog.models import Category
-from apps.content.models import Employee, Event, GalleryPhoto, Partner, Review
+from apps.content.models import Event, GalleryPhoto, Partner, Review
 from apps.core.legacy import runner
 
 pytestmark = pytest.mark.django_db(transaction=True)
@@ -34,25 +34,24 @@ def test_events(legacy):
     assert any("Без даты" in w or "#4" in w for w in report.warnings)
 
 
-def test_reviews_partners_employees_gallery(legacy):
+def test_reviews_partners_gallery(legacy):
     legacy.insert("comment", id=4, name="Анна", text='<p><a href="https://reviews.yandex.ru/x">Отзыв</a></p>')
     legacy.insert("comment", id=5, name="Борис", text="<p>Ещё</p>")
     legacy.image("comments/5.jpg")
     legacy.insert("partner", id=1, name="1", link="https://partner.ru")
     legacy.insert("partner", id=2, name="temp", link=None)
     legacy.image("partner/1.jpg")
-    legacy.insert("employee", id=1, name="Сотрудник", position=None, photo=None)
+    legacy.insert("employee", id=1, name="Сотрудник", position=None, photo=None)  # таблица больше не переносится
     for name in ["3.jpg", "12.jpg", "1.jpg"]:
         legacy.image(f"gallery/{name}", size=(30 + int(name.split(".")[0]), 30))
     report = legacy.run()
-    reviews = list(Review.objects.all())
-    assert [(r.author, r.order) for r in reviews] == [("Анна", 0), ("Борис", 1)]
-    assert 'href="https://reviews.yandex.ru/x"' in reviews[0].text
+    assert not any("отрудник" in w for w in report.warnings)
+    reviews = list(Review.objects.order_by("id"))
+    assert [r.author for r in reviews] == ["Анна", "Борис"]
+    assert (reviews[0].link, reviews[0].text) == ("https://reviews.yandex.ru/x", "<p>Отзыв</p>")
     assert not reviews[0].photo and reviews[1].photo
     partner = Partner.objects.get()
     assert (partner.name, partner.link) == ("", "https://partner.ru") and partner.logo
-    assert Employee.objects.count() == 0
-    assert any("Сотрудники не перенесены" in w for w in report.warnings)
     assert [p.image.width for p in GalleryPhoto.objects.all()] == [31, 33, 42]
 
 
@@ -108,3 +107,58 @@ def test_event_link_without_scheme_is_dropped(legacy):
     legacy.run()
     assert Event.objects.get(title="Без ссылки").link == ""
     assert Event.objects.get(title="Со ссылкой").link == "https://vk.com/e"
+
+
+def test_reviews_without_name(legacy):
+    legacy.insert("comment", id=1, name=None, text='<p><a href="https://reviews.yandex.ru/u">20.07.2022</a></p>')
+    legacy.insert("comment", id=2, name=" ", text="<p>Без ссылки</p>")
+    report = legacy.run()
+    reviews = list(Review.objects.order_by("id"))
+    assert [r.author for r in reviews] == ["", ""]  # без заглушек: подпись «Гость Т-Парка» — на сайте
+    assert [r.display_author for r in reviews] == ["Гость Т-Парка", "Гость Т-Парка"]
+    assert reviews[0].source_label == "Яндекс Карты"
+    assert not any("Отзыв #" in w for w in report.warnings)
+
+
+def test_review_lead_link_moves_to_fields(legacy):
+    legacy.insert(
+        "comment",
+        id=1,
+        name=None,
+        text='<p><a href="https://reviews.yandex.ru/u?a=1&amp;b=2" target="_blank">6.06.2021</a></p>\r\n\r\n'
+        "<p>Отлично!</p>\r\n\r\n<p>&nbsp;</p>",
+    )
+    legacy.insert("comment", id=2, name="Анна", text='<p><a href="https://vk.com/p">Пост в VK</a></p><p>Текст</p>')
+    legacy.insert("comment", id=3, name="Борис", text='<p>Начало <a href="https://vk.com/p">ссылка</a></p>')
+    legacy.run()
+    yandex, vk, inline = Review.objects.order_by("id")
+    assert (yandex.link, yandex.date, yandex.text) == (
+        "https://reviews.yandex.ru/u?a=1&b=2",
+        date(2021, 6, 6),
+        "<p>Отлично!</p>",
+    )
+    assert (vk.link, vk.date) == ("https://vk.com/p", None)
+    assert vk.text.startswith("<p>Пост в VK</p>") and "<a" not in vk.text
+    assert inline.link == "" and 'href="https://vk.com/p"' in inline.text
+
+
+def test_pdf_instead_of_image_is_warning(legacy):
+    legacy.insert("comment", id=1, name="Анна", text="<p>x</p>")
+    pdf = legacy.images / "comments" / "1.jpg"
+    pdf.parent.mkdir(parents=True)
+    pdf.write_bytes(b"%PDF-1.5\n...")
+    report = legacy.run()
+    assert not Review.objects.get().photo
+    assert any("1.jpg — это PDF" in w for w in report.warnings)
+
+
+def test_unused_files_are_reported(legacy):
+    legacy.insert("comment", id=1, name="Анна", text="<p>x</p>")
+    legacy.image("comments/1.jpg")
+    legacy.image("comments/10.jpg")
+    legacy.image("comments/3.jpg")
+    legacy.image("staff/0.jpg")
+    report = legacy.run()
+    assert "Не перенесены файлы из comments/: 3.jpg, 10.jpg" in report.warnings
+    assert "Не перенесены файлы из staff/: 0.jpg" in report.warnings
+    assert not any("1.jpg" in w for w in report.warnings)

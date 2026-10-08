@@ -1,7 +1,6 @@
 from pathlib import Path
 
 from apps.core.legacy.html import clean_html, extract_title, phone_digits
-from apps.core.legacy.media import attach_image
 from apps.core.models import InfoPage, Phone, SiteSettings
 
 TEXT_FIELDS = {
@@ -26,11 +25,14 @@ def import_site(db, images: Path, report) -> None:
     for key, field in TEXT_FIELDS.items():
         setattr(site, field, clean_html(texts.get(key)))
     site.address = (texts.get("address") or "").strip()[:255]
-    site.map_url = (texts.get("geolocation") or "").strip()[:500]
     site.vk_url = (texts.get("vk") or "").strip()[:500]
-    attach_image(site, "contacts_map", images / "staff" / "map.jpg", report, missing_ok=True)
-    attach_image(site, "about_map", images / "staff" / "map_about.jpg", report, missing_ok=True)
     site.save()
+    # Карта на новом сайте — только виджет Яндекс Карт: его код из старых данных не получить.
+    geolocation = (texts.get("geolocation") or "").strip()
+    report.warn(
+        "Яндекс Карта не перенесена: вставьте код «Поделиться → Встроить карту» в настройках сайта"
+        + (f" (старая ссылка на карту: {geolocation})" if geolocation else "")
+    )
     report.add("Настройки сайта")
 
     telegram = phone_digits(texts.get("insta") or "")

@@ -25,6 +25,14 @@ def test_home_shows_only_published_categories(client):
     assert "Пустая группа" not in html
 
 
+def test_home_hides_unpublished_group(client):
+    category = Category.objects.create(name="Байдарки", is_published=True)
+    CategoryGroup.objects.create(name="Скрытая группа", is_published=False).categories.add(category)
+    html = client.get("/").content.decode()
+    assert "Скрытая группа" not in html
+    assert "Байдарки" not in html
+
+
 def test_contacts_in_footer_and_contact_button(client):
     site = SiteSettings.load()
     site.address = "село Восход"

@@ -5,9 +5,10 @@ from django.conf import settings
 from django.db import transaction
 
 from apps.catalog.models import Category, CategoryGroup, CategoryPhoto, CategoryService, Service, ServicePhoto
-from apps.content.models import Employee, Event, GalleryPhoto, Partner, Review
+from apps.content.models import Event, GalleryPhoto, Partner, Review
 from apps.core.legacy.catalog import import_catalog
 from apps.core.legacy.content import import_content
+from apps.core.legacy.media import warn_unused_files
 from apps.core.legacy.reader import LegacyDB
 from apps.core.legacy.report import Report
 from apps.core.legacy.site import import_site
@@ -23,7 +24,6 @@ CONTENT_MODELS = [
     Event,
     Review,
     Partner,
-    Employee,
     GalleryPhoto,
     InfoPage,
     Phone,
@@ -79,6 +79,7 @@ def run_import(db_path: Path, images_dir: Path, *, flush: bool = False, price_cs
             for path in _media_files() - before:
                 path.unlink(missing_ok=True)
             raise
+        warn_unused_files(images_dir, report)
         if price_csv:
             export_prices(db, price_csv, report)
     finally:

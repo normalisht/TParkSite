@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
+from django.templatetags.static import static
 from django.urls import reverse_lazy
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -116,6 +117,7 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = "ru"
 TIME_ZONE = "Europe/Moscow"
 USE_I18N = True
+LOCALE_PATHS = [BASE_DIR / "locale"]  # перевод строк Unfold, у которого нет русской локали
 USE_TZ = True
 
 STATIC_URL = "/static/"
@@ -155,6 +157,41 @@ UNFOLD = {
     "SITE_TITLE": "Т-Парк",
     "SITE_HEADER": "Т-Парк",
     "SITE_URL": "/",
+    "SCRIPTS": [lambda request: static("js/admin_dropzone.js")],  # перетаскивание файлов во все поля загрузки
+    "SITE_FAVICONS": [
+        {"rel": "icon", "sizes": "48x48", "href": lambda request: static("img/favicon.ico")},
+        {"rel": "icon", "type": "image/svg+xml", "href": lambda request: static("img/favicon.svg")},
+        {"rel": "apple-touch-icon", "href": lambda request: static("img/apple-touch-icon.png")},
+    ],
+    # Цвета логотипа: зелёная ель — акцент, тёмно-синий текст — оттенок серых
+    "COLORS": {
+        "base": {
+            "50": "oklch(98.5% .003 230)",
+            "100": "oklch(96.7% .005 230)",
+            "200": "oklch(92.8% .009 230)",
+            "300": "oklch(87.2% .014 230)",
+            "400": "oklch(70.7% .028 230)",
+            "500": "oklch(55.1% .035 230)",
+            "600": "oklch(44.6% .04 230)",
+            "700": "oklch(37.3% .043 230)",
+            "800": "oklch(27.8% .04 230)",
+            "900": "oklch(21% .035 230)",
+            "950": "oklch(13% .028 230)",
+        },
+        "primary": {
+            "50": "oklch(98.2% .018 143)",
+            "100": "oklch(96.2% .044 143)",
+            "200": "oklch(92.5% .084 143)",
+            "300": "oklch(87.1% .15 143)",
+            "400": "oklch(79.2% .209 143)",
+            "500": "oklch(72.3% .219 143)",
+            "600": "oklch(62.7% .194 143)",
+            "700": "oklch(52.7% .154 143)",
+            "800": "oklch(44.8% .119 143)",
+            "900": "oklch(39.3% .095 143)",
+            "950": "oklch(26.6% .065 143)",
+        },
+    },
     "SIDEBAR": {
         "show_search": False,
         "show_all_applications": False,
@@ -175,7 +212,6 @@ UNFOLD = {
                     _nav("Отзывы", "reviews", "admin:content_review_changelist"),
                     _nav("Галерея", "photo_library", "admin:content_galleryphoto_changelist"),
                     _nav("Партнёры", "handshake", "admin:content_partner_changelist"),
-                    _nav("Сотрудники", "badge", "admin:content_employee_changelist"),
                 ],
             },
             {

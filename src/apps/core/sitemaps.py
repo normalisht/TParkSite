@@ -2,6 +2,7 @@ from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
 
 from apps.catalog.models import Category, Service
+from apps.content.models import Event
 from apps.core.models import InfoPage
 
 
@@ -35,9 +36,15 @@ class InfoPageSitemap(Sitemap):
         return InfoPage.objects.published().order_by("id")
 
 
+class EventSitemap(Sitemap):
+    def items(self):
+        return Event.objects.visible().order_by("-date", "-id")
+
+
 SITEMAPS = {
     "static": StaticSitemap,
     "categories": CategorySitemap,
     "services": ServiceSitemap,
     "info": InfoPageSitemap,
+    "events": EventSitemap,
 }

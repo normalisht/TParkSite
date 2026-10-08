@@ -1,19 +1,22 @@
-{% load static tailwind_cli %}<!doctype html>
+{% load static tailwind_cli site_tags %}<!doctype html>
 <html lang="ru" class="scroll-smooth">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% if seo.title %}{{ seo.title }} — Т-Парк{% else %}Т-Парк — активный отдых{% endif %}</title>
   <meta name="description" content="{% firstof seo.description default_description %}">
-  <meta property="og:type" content="website">
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}">
   <meta property="og:site_name" content="Т-Парк">
   <meta property="og:title" content="{% firstof seo.title 'Т-Парк' %}">
   <meta property="og:description" content="{% firstof seo.description default_description %}">
   {% if seo.image %}<meta property="og:image" content="{{ seo.image }}">{% endif %}
-  <link rel="icon" href="{% static 'img/logo.png' %}">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap&subset=cyrillic" rel="stylesheet">
+  {% if canonical_url %}<link rel="canonical" href="{{ canonical_url }}"><meta property="og:url" content="{{ canonical_url }}">{% endif %}
+  {% if structured_data %}{{ structured_data|ld_json }}{% endif %}
+  <link rel="icon" href="{% static 'img/favicon.ico' %}" sizes="48x48">
+  <link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}">
+  <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
+  <link rel="preload" href="{% static 'vendor/fonts/montserrat-cyrillic.woff2' %}" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="{% static 'vendor/fonts/montserrat-latin.woff2' %}" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="{% static 'vendor/swiper-bundle.min.css' %}">
   <link rel="stylesheet" href="{% static 'vendor/glightbox.min.css' %}">
   {% tailwind_css %}

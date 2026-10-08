@@ -9,6 +9,9 @@ from apps.core.slugs import unique_slug
 class CategoryGroup(OrderedModel):
     name = models.CharField("Название", max_length=128)
     categories = models.ManyToManyField("Category", related_name="groups", blank=True, verbose_name="Категории")
+    is_published = models.BooleanField("Опубликовано", default=True)
+
+    objects = PublishedQuerySet.as_manager()
 
     class Meta(OrderedModel.Meta):
         verbose_name = "Группа категорий"

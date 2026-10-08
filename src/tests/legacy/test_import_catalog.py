@@ -53,3 +53,16 @@ def test_services_and_links(legacy):
     links = list(CategoryService.objects.order_by("order").values_list("service_id", "order"))
     assert links == [(21, 2), (22, 10000)]
     assert any("#4" in w for w in report.warnings)
+
+
+def test_detached_links_and_category_outside_menu(legacy):
+    legacy.insert("category", id=1, name="  Сплавы   и\nпоходы ", status=1, number=1)
+    legacy.insert("category", id=2, name="Скрытая", status=0, number=2)
+    legacy.insert("type", id=1, name="Активный отдых", number=1)
+    legacy.insert("category_type", id=7, type_id=None, category_id=1)
+    legacy.insert("category_type", id=8, type_id=None, category_id=2)
+    report = legacy.run()
+    assert Category.objects.get(id=1).name == "Сплавы и походы"
+    assert "Пропущены связи группа–категория без группы (2): #7, #8" in report.warnings
+    outside = [w for w in report.warnings if "ни в одну группу" in w]
+    assert len(outside) == 1 and "#1" in outside[0]

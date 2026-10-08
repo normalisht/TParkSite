@@ -6,8 +6,8 @@ class ContentConfig(AppConfig):
     verbose_name = "Контент"
 
     def ready(self):
-        from apps.content.models import Employee, Event, GalleryPhoto, Partner, Review
+        from apps.content.models import Event, GalleryPhoto, Partner, Review
         from apps.core.files import register_file_cleanup
 
-        for model in (Event, Review, Partner, Employee, GalleryPhoto):
+        for model in (Event, Review, Partner, GalleryPhoto):
             register_file_cleanup(model)

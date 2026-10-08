@@ -1,6 +1,7 @@
 import pytest
 from django.db import IntegrityError
 
+from apps.content.models import Partner
 from apps.core.models import InfoPage, Phone, SiteSettings
 
 pytestmark = pytest.mark.django_db
@@ -49,32 +50,26 @@ def test_info_page_published_queryset():
 
 
 def test_files_deleted_after_commit(make_image, media_root, django_capture_on_commit_callbacks):
-    site = SiteSettings.load()
-    site.contacts_map = make_image()
-    site.save()
-    path = media_root / site.contacts_map.name
+    partner = Partner.objects.create(logo=make_image())
+    path = media_root / partner.logo.name
     assert path.exists()
     with django_capture_on_commit_callbacks(execute=True):
-        site.delete()
+        partner.delete()
     assert not path.exists()
 
 
 def test_replaced_file_deleted_after_commit(make_image, media_root, django_capture_on_commit_callbacks):
-    site = SiteSettings.load()
-    site.about_map = make_image()
-    site.save()
-    old_path = media_root / site.about_map.name
+    partner = Partner.objects.create(logo=make_image())
+    old_path = media_root / partner.logo.name
     with django_capture_on_commit_callbacks(execute=True):
-        site.about_map = make_image("new.jpg")
-        site.save()
+        partner.logo = make_image("new.jpg")
+        partner.save()
     assert not old_path.exists()
-    assert (media_root / site.about_map.name).exists()
+    assert (media_root / partner.logo.name).exists()
 
 
 def test_files_kept_when_transaction_rolls_back(make_image, media_root):
-    site = SiteSettings.load()
-    site.contacts_map = make_image()
-    site.save()
-    path = media_root / site.contacts_map.name
-    site.delete()  # без выполнения on_commit — как при откате
+    partner = Partner.objects.create(logo=make_image())
+    path = media_root / partner.logo.name
+    partner.delete()  # без выполнения on_commit — как при откате
     assert path.exists()

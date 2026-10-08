@@ -1,10 +1,12 @@
+import re
+
 import pytest
 from django.contrib import admin
 from django.urls import reverse
 
-from apps.catalog.models import Category, CategoryPhoto
+from apps.catalog.models import Category, CategoryPhoto, Service
 from apps.content.models import GalleryPhoto
-from apps.core.models import Phone, SiteSettings
+from apps.core.models import InfoPage, Phone, SiteSettings
 
 pytestmark = pytest.mark.django_db
 
@@ -28,7 +30,6 @@ def _settings_post(phones):
     """Данные формы настроек сайта с inline-телефонами."""
     data = {
         "address": "село Восход",
-        "map_url": "",
         "vk_url": "",
         "phones-TOTAL_FORMS": str(len(phones)),
         "phones-INITIAL_FORMS": str(sum(1 for p in phones if p.get("id"))),
@@ -170,3 +171,96 @@ def test_gallery_bulk_upload_requires_add_permission(client, django_user_model, 
     assert client.get(url).status_code == 403
     client.post(url, {"photos": [make_image("1.jpg")]})
     assert GalleryPhoto.objects.count() == 0
+
+
+def test_info_page_admin_shows_copy_url_button(admin_client):
+    page = InfoPage.objects.create(title="Правила", slug="pravila", body="<p>Текст</p>")
+    url = page.get_absolute_url()
+    for admin_url in (
+        reverse("admin:core_infopage_changelist"),
+        reverse("admin:core_infopage_change", args=[page.pk]),
+    ):
+        content = admin_client.get(admin_url).content.decode()
+        assert f'data-copy-url="{url}"' in content
+        assert "content_copy" in content
+        assert "js/admin_copy.js" in content
+
+
+def test_admin_uses_site_favicon(admin_client):
+    content = admin_client.get(reverse("admin:index")).content.decode()
+    assert "img/favicon.svg" in content
+
+
+def test_every_admin_warns_about_unsaved_changes(admin_client):
+    for model, model_admin in admin.site._registry.items():
+        assert "js/admin_unsaved.js" in str(model_admin.media), model
+    assert "js/admin_unsaved.js" in admin_client.get(reverse("admin:catalog_category_changelist")).content.decode()
+    # Собственный Media у наследника дополняет базовый, а не заменяет его.
+    content = admin_client.get(reverse("admin:core_infopage_add")).content.decode()
+    assert "js/admin_unsaved.js" in content and "js/admin_copy.js" in content
+
+
+@pytest.mark.parametrize(
+    ("model", "create_kwargs"),
+    [
+        (Service, {"name": "Баня", "slug": "banya"}),
+        (InfoPage, {"title": "Правила", "slug": "pravila", "body": "<p>Текст</p>"}),
+    ],
+)
+def test_is_published_editable_in_changelist(admin_client, model, create_kwargs):
+    obj = model.objects.create(is_published=True, **create_kwargs)
+    url = reverse(f"admin:{model._meta.app_label}_{model._meta.model_name}_changelist")
+    response = admin_client.post(
+        url,
+        {
+            "form-TOTAL_FORMS": "1",
+            "form-INITIAL_FORMS": "1",
+            "form-0-id": str(obj.pk),
+            "_save": "Сохранить",
+        },
+    )
+    assert response.status_code == 302
+    obj.refresh_from_db()
+    assert obj.is_published is False
+
+
+def test_general_tab_is_translated(admin_client):
+    category = Category.objects.create(name="Сплавы")
+    html = admin_client.get(f"/admin/catalog/category/{category.pk}/change/").content.decode()
+    tab = re.search(r'<a href="#general"[^>]*>\s*(\S+)', html)
+    assert tab and tab.group(1) == "Основное"
+
+
+MAP_CODE = (
+    '<iframe src="https://yandex.ru/map-widget/v1/?um=constructor%3Aabc&amp;source=constructor"'
+    ' width="500" height="400" frameborder="0"></iframe>'
+)
+
+
+def test_map_embed_accepts_pasted_iframe_code(admin_client):
+    SiteSettings.load()
+    url = reverse("admin:core_sitesettings_change", args=[1])
+    response = admin_client.post(url, {**_settings_post([]), "map_embed_url": MAP_CODE})
+    assert response.status_code == 302
+    assert (
+        SiteSettings.load().map_embed_url == "https://yandex.ru/map-widget/v1/?um=constructor%3Aabc&source=constructor"
+    )
+
+
+def test_map_embed_rejects_foreign_url(admin_client):
+    SiteSettings.load()
+    url = reverse("admin:core_sitesettings_change", args=[1])
+    response = admin_client.post(url, {**_settings_post([]), "map_embed_url": '<iframe src="https://evil.example/x">'})
+    assert response.status_code == 200
+    assert "Нужна ссылка виджета Яндекс Карт" in response.content.decode()
+    assert SiteSettings.load().map_embed_url == ""
+
+
+def test_file_fields_support_drag_and_drop(admin_client):
+    """Скрипт перетаскивания подключён ко всем страницам админки; поле «пачкой» — виджет Unfold с multiple."""
+    html = admin_client.get(reverse("admin:content_galleryphoto_bulk_upload")).content.decode()
+    assert "js/admin_dropzone" in html
+    assert re.search(r'<input type="file" name="photos"[^>]*\smultiple', html)
+    assert "material-symbols-outlined" in html  # разметка Unfold, а не голый <input type=file>
+    html = admin_client.get(reverse("admin:content_partner_add")).content.decode()
+    assert "js/admin_dropzone" in html
