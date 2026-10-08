@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
+from django.urls import reverse_lazy
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -138,4 +139,56 @@ LOGGING = {
     "disable_existing_loggers": False,
     "handlers": {"console": {"class": "logging.StreamHandler"}},
     "root": {"handlers": ["console"], "level": "INFO"},
+}
+
+
+def _nav(title: str, icon: str, url_name: str) -> dict:
+    return {"title": title, "icon": icon, "link": reverse_lazy(url_name)}
+
+
+UNFOLD = {
+    "SITE_TITLE": "Т-Парк",
+    "SITE_HEADER": "Т-Парк",
+    "SITE_URL": "/",
+    "SIDEBAR": {
+        "show_search": False,
+        "show_all_applications": False,
+        "navigation": [
+            {
+                "title": "Каталог",
+                "items": [
+                    _nav("Группы категорий", "workspaces", "admin:catalog_categorygroup_changelist"),
+                    _nav("Категории", "category", "admin:catalog_category_changelist"),
+                    _nav("Услуги", "inventory_2", "admin:catalog_service_changelist"),
+                ],
+            },
+            {
+                "title": "Контент",
+                "separator": True,
+                "items": [
+                    _nav("Мероприятия", "event", "admin:content_event_changelist"),
+                    _nav("Отзывы", "reviews", "admin:content_review_changelist"),
+                    _nav("Галерея", "photo_library", "admin:content_galleryphoto_changelist"),
+                    _nav("Партнёры", "handshake", "admin:content_partner_changelist"),
+                    _nav("Сотрудники", "badge", "admin:content_employee_changelist"),
+                ],
+            },
+            {
+                "title": "Сайт",
+                "separator": True,
+                "items": [
+                    _nav("Настройки сайта", "settings", "admin:core_sitesettings_changelist"),
+                    _nav("Инфо-страницы", "description", "admin:core_infopage_changelist"),
+                ],
+            },
+            {
+                "title": "Доступ",
+                "separator": True,
+                "items": [
+                    _nav("Пользователи", "person", "admin:auth_user_changelist"),
+                    _nav("Группы", "group", "admin:auth_group_changelist"),
+                ],
+            },
+        ],
+    },
 }

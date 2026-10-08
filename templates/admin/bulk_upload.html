@@ -1,0 +1,15 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<form method="post" enctype="multipart/form-data" class="flex max-w-xl flex-col gap-4">
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="text-red-600">{{ form.non_field_errors }}</div>{% endif %}
+  <label class="font-semibold" for="{{ form.photos.id_for_label }}">{{ form.photos.label }}</label>
+  {{ form.photos }}
+  <p class="text-sm opacity-70">{{ form.photos.help_text }}</p>
+  {% if form.photos.errors %}<div class="text-red-600">{{ form.photos.errors }}</div>{% endif %}
+  <div>
+    <button type="submit" class="bg-primary-600 rounded-md px-4 py-2 font-semibold text-white">Загрузить</button>
+  </div>
+</form>
+{% endblock %}
