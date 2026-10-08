@@ -33,4 +33,8 @@ filterwarnings = ["ignore:No directory at:UserWarning"]
 [tool.ruff]
 target-version = "py314"
 line-length = 120
-extend-exclude = ["old_version", "docs"]
+extend-exclude = ["old_version", "docs", "*/migrations/*"]
+
+[tool.ruff.lint]
+# Списки в Meta и в миграциях — стандартная идиома Django.
+ignore = ["RUF012"]
