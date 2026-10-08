@@ -36,7 +36,7 @@
 | 20 | **Пароль админа не переносим**, учётная запись создаётся через `createsuperuser` | В старой БД пароль хранится открытым текстом |
 | 21 | **У услуги появляется переключатель видимости**, публичная страница его учитывает | Сейчас статус услуги не проверяется и не редактируется |
 | 22 | **Старый проект перенесён в `old_version/`** (`git mv`, история сохранена). Новый проект создаётся в корне репозитория | Удобно разрабатывать и обращаться к старому коду и БД для импорта |
-| 23 | **Стек: Python 3.13 + Django 6.1.2** (`django>=6.1.2,<6.2`) | Выбор владельца проекта. Совместимость с Unfold, prose-editor, imagekit и tailwind-cli проверена smoke-тестом (2026-10-08). 6.1 не LTS — при выходе 6.2 LTS обновиться |
+| 23 | **Стек: Python 3.14 + Django 6.1.2** (`django>=6.1.2,<6.2`) | Python 3.14 и Django 6.1.2 — выбор владельца проекта; совместимость с Unfold, prose-editor, imagekit, tailwind-cli, Pillow и nh3 на 3.14 проверена smoke-тестом (2026-10-08). 6.1 не LTS — при выходе 6.2 LTS обновиться |
 | 24 | **Телефоны — отдельная модель `Phone`** (номер, порядок, `is_whatsapp`, `is_telegram`), inline в настройках сайта. Флаг каждого мессенджера — не более чем у одного номера (частичный `UniqueConstraint` + валидация). Ссылки `wa.me/7…` и `t.me/+7…` строятся из номера, отдельного поля Telegram нет | Номера и мессенджеры редактируются в одном месте |
 
 ## Модели (согласовано)
@@ -123,7 +123,7 @@
 |---|---|
 | 29 | Структура: `config/`, `apps/{core,catalog,content}/`, `templates/`, `static/`, `tests/`; настройки в одном `settings.py` из переменных окружения |
 | 30 | Разработка без Docker: `uv sync`, `uv run manage.py tailwind runserver`, `uv run pytest` |
-| 31 | Dockerfile на `ghcr.io/astral-sh/uv` (Python 3.13 slim): `uv sync --frozen --no-dev` → сборка Tailwind → `collectstatic`, непривилегированный пользователь, `migrate` при старте, gunicorn |
+| 31 | Dockerfile на `ghcr.io/astral-sh/uv` (Python 3.14 slim): `uv sync --frozen --no-dev` → сборка Tailwind → `collectstatic`, непривилегированный пользователь, `migrate` при старте, gunicorn |
 | 32 | SQLite в продакшене: WAL, `busy_timeout`, `transaction_mode="IMMEDIATE"` |
 | 33 | Бэкап: management-команда `backup_db` (`sqlite3` backup API) + `tar` тома `media`, запускает `scripts/backup.sh` по cron на хосте |
 | 34 | Импорт: отказ на непустой БД без `--flush`, одна транзакция, отчёт о перенесённом и пропущенном |

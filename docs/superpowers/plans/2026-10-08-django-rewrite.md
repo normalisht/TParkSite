@@ -6,13 +6,13 @@
 
 **Architecture:** Один Django-проект в корне репозитория: `config/` (настройки и URL), три приложения — `apps/core` (настройки сайта, телефоны, инфо-страницы, общие хелперы, SEO, редиректы, импорт, бэкап), `apps/catalog` (группы, категории, услуги, фото), `apps/content` (мероприятия, отзывы, партнёры, сотрудники, галерея). Страницы рендерятся сервером. Изображения — `ImageField` (django-imagekit), HTML — `django-prose-editor` с очисткой `nh3`. В продакшене два контейнера: `web` (gunicorn + WhiteNoise) и `media` (nginx), оба во внешней сети прокси.
 
-**Tech Stack:** Python 3.13, Django 6.1.2, uv, SQLite, django-unfold, django-prose-editor + nh3, django-imagekit + Pillow, django-tailwind-cli (Tailwind v4), Alpine.js, Swiper, GLightbox, unidecode, WhiteNoise, gunicorn, pytest + pytest-django, ruff, Docker.
+**Tech Stack:** Python 3.14, Django 6.1.2, uv, SQLite, django-unfold, django-prose-editor + nh3, django-imagekit + Pillow, django-tailwind-cli (Tailwind v4), Alpine.js, Swiper, GLightbox, unidecode, WhiteNoise, gunicorn, pytest + pytest-django, ruff, Docker.
 
 **Spec:** `docs/superpowers/specs/2026-10-08-django-rewrite-design.md` (журнал решений — `docs/decisions.md`, старый функционал — `docs/current-functionality.md`, старый код — `old_version/`).
 
 ## Global Constraints
 
-- Python 3.13; Django `>=6.1.2,<6.2`; зависимости только через uv (`pyproject.toml` + `uv.lock`), dev-зависимости в группе `dev`.
+- Python 3.14; Django `>=6.1.2,<6.2`; зависимости только через uv (`pyproject.toml` + `uv.lock`), dev-зависимости в группе `dev`.
 - БД — SQLite с `transaction_mode="IMMEDIATE"`, WAL (`init_command`), `timeout` 20 с.
 - Весь пользовательский текст (сайт, админка, сообщения команд) — на русском; `LANGUAGE_CODE = "ru"`, `TIME_ZONE = "Europe/Moscow"`, `USE_TZ = True`.
 - Изображения при загрузке пережимаются до ≤1920×1080, JPEG q85 (превью категорий — 1080×720); миниатюры — WebP через `ImageSpecField`. Допустимые форматы загрузки: jpg, jpeg, png, webp; до 20 МБ на файл.
@@ -78,7 +78,7 @@ Dockerfile, compose.yaml, docker/entrypoint.sh, docker/nginx-media.conf, scripts
 - [ ] **Step 1: Инициализировать uv-проект и поставить зависимости**
 
 ```bash
-uv init --bare --python 3.13 --name tpark
+uv init --bare --python 3.14 --name tpark
 uv add "django>=6.1.2,<6.2" django-unfold django-prose-editor nh3 django-imagekit pillow django-tailwind-cli whitenoise gunicorn unidecode
 uv add --dev pytest pytest-django ruff pre-commit
 uv run django-admin --version
@@ -95,7 +95,7 @@ testpaths = ["tests"]
 addopts = "-q"
 
 [tool.ruff]
-target-version = "py313"
+target-version = "py314"
 extend-exclude = ["old_version"]
 ```
 
@@ -4687,7 +4687,7 @@ static/css/tailwind.css
 `Dockerfile`:
 
 ```dockerfile
-FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim
+FROM ghcr.io/astral-sh/uv:python3.14-bookworm-slim
 
 ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \

@@ -18,7 +18,7 @@
 
 | Слой | Выбор |
 |---|---|
-| Язык и фреймворк | Python 3.13, Django 6.1.2 (`>=6.1.2,<6.2`) |
+| Язык и фреймворк | Python 3.14, Django 6.1.2 (`>=6.1.2,<6.2`) |
 | Зависимости | uv (`pyproject.toml`, `uv.lock`; группа `dev`) |
 | БД | SQLite (WAL, `busy_timeout`, `transaction_mode="IMMEDIATE"`) |
 | Админка | `django-unfold` (встроенная сортировка перетаскиванием) |
@@ -220,7 +220,7 @@ uv run manage.py import_legacy --db old_version/T_Park.db --images <путь>
 ### Docker
 
 - **Dockerfile:**
-  - база `ghcr.io/astral-sh/uv:python3.13-bookworm-slim`;
+  - база `ghcr.io/astral-sh/uv:python3.14-bookworm-slim`;
   - сборка: `uv sync --frozen --no-dev` → `manage.py tailwind build` → `collectstatic`;
   - запуск от непривилегированного пользователя;
   - entrypoint: `migrate --noinput`, затем gunicorn (3 sync-воркера; число задаётся переменной окружения).
