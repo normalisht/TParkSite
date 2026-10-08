@@ -14,3 +14,8 @@ def healthz(request):
 def info_page(request, slug):
     page = get_object_or_404(InfoPage.objects.published(), slug=slug)
     return render(request, "core/info.html", {"page": page, "seo": make_seo(page.title, page.body)})
+
+
+def robots_txt(request):
+    lines = ["User-agent: *", "Disallow: /admin/", f"Sitemap: {request.build_absolute_uri('/sitemap.xml')}"]
+    return HttpResponse("\n".join(lines) + "\n", content_type="text/plain; charset=utf-8")

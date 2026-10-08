@@ -1,15 +1,19 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path
 from django.views.generic import RedirectView
 
 from apps.core import legacy_redirects
-from apps.core.views import healthz
+from apps.core.sitemaps import SITEMAPS
+from apps.core.views import healthz, robots_txt
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("healthz/", healthz, name="healthz"),
+    path("sitemap.xml", sitemap, {"sitemaps": SITEMAPS}, name="sitemap"),
+    path("robots.txt", robots_txt, name="robots"),
     # 301 со старых URL Flask-версии
     path("TPark", RedirectView.as_view(url="/", permanent=True)),
     path("about_2", RedirectView.as_view(pattern_name="content:about", permanent=True)),
