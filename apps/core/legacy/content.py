@@ -2,7 +2,7 @@ import re
 from pathlib import Path
 
 from apps.content.models import Event, GalleryPhoto, Partner, Review
-from apps.core.legacy.html import clean_html, parse_date
+from apps.core.legacy.html import clean_html, clean_url, parse_date
 from apps.core.legacy.media import attach_image, numbered_images
 
 COLOR_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
@@ -20,7 +20,7 @@ def import_content(db, images: Path, report) -> None:
             title=(row["title"] or "").strip()[:128] or f"Мероприятие {row['id']}",
             date=event_date,
             description=clean_html(row["description"]),
-            link=(row["link"] or "").strip()[:500],
+            link=clean_url(row["link"]),
             text_color=color if COLOR_RE.match(color) else "",
             show_after_date=bool(row["after_date"]),
         )
@@ -45,7 +45,7 @@ def import_content(db, images: Path, report) -> None:
         if row["name"] == "temp":
             report.warn(f"Пропущена служебная запись партнёра #{row['id']} «temp»")
             continue
-        partner = Partner(name="", link=(row["link"] or "").strip()[:500], order=order)
+        partner = Partner(name="", link=clean_url(row["link"]), order=order)
         attach_image(partner, "logo", images / "partner" / f"{row['id']}.jpg", report)
         partner.save()
         report.add("Партнёры")

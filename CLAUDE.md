@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 uv sync                                   # зависимости (включая dev)
-cp .env.example .env                      # DEBUG=1 для разработки
+cp .env.example .env                      # затем поставить DEBUG=1 для разработки (в примере DEBUG=0 — продакшен-безопасно)
 uv run manage.py migrate
 uv run manage.py tailwind runserver       # dev-сервер + пересборка Tailwind (бинарник скачается в .django_tailwind_cli/)
 uv run pytest                             # все тесты (settings: config.settings_test)
@@ -33,4 +33,4 @@ docker compose up -d --build              # продакшен (нужна вн�
 - Порядок везде — `order` + перетаскивание Unfold (`ordering_field`). Неопубликованное — 404.
 - Миниатюры в шаблонах — только через фильтр `obj|spec_url:"spec"` (`{% load site_tags %}`): не падает на отсутствующем файле.
 - Фронт без Node и CDN: Tailwind через `django-tailwind-cli` (`tailwind/source.css` → `static/css/tailwind.css`, не в git), Alpine/Swiper/GLightbox — vendored в `static/vendor/`. При обновлении vendored-JS убрать комментарий `sourceMappingURL` — иначе `collectstatic` с манифестом упадёт (ловит `tests/test_static.py`).
-- Продакшен: `web` (gunicorn + WhiteNoise, алиас в сети прокси `tpark-web`) и `media` (nginx, алиас `tpark-media`); тома `db` и `media`; бэкап — `scripts/backup.sh` (cron на хосте).
+- Продакшен: `tpark-web` (gunicorn + WhiteNoise) и `tpark-media` (nginx) — имена сервисов уникальны, т. к. они же DNS-имена в общей сети прокси; тома `db` и `media`; бэкап — `scripts/backup.sh` (cron на хосте).

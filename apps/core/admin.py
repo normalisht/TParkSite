@@ -38,11 +38,16 @@ class PhoneFormSet(BaseInlineFormSet):
                 raise ValidationError(f"{label} можно отметить только у одного номера.")
 
     def save(self, commit=True):
-        # Снимаем флаг со всех номеров, если в форме он поставлен кому-то — иначе при сохранении
-        # нового владельца флага раньше старого сработает уникальное ограничение.
+        # Снимаем флаг с прежнего владельца, если в форме он поставлен другому номеру, — иначе при
+        # сохранении нового владельца раньше старого сработает уникальное ограничение. С самого владельца
+        # флаг не снимаем: неизменённая строка формы не пересохраняется, и флаг бы потерялся.
         for flag, _ in MESSENGER_FLAGS:
-            if any(f.cleaned_data.get(flag) for f in self._alive_forms()):
-                Phone.objects.filter(settings=self.instance, **{flag: True}).update(**{flag: False})
+            owners = [f for f in self._alive_forms() if f.cleaned_data.get(flag)]
+            if owners:
+                owner_pk = owners[0].instance.pk
+                Phone.objects.filter(settings=self.instance, **{flag: True}).exclude(pk=owner_pk).update(
+                    **{flag: False}
+                )
         return super().save(commit)
 
 

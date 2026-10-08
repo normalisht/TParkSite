@@ -8,10 +8,10 @@ KEEP="${BACKUP_KEEP:-14}"
 DEST="backups/$(date +%Y-%m-%d_%H%M)"
 mkdir -p "$DEST"
 
-docker compose exec -T web python manage.py backup_db /data/db/backup.sqlite3
-docker compose cp web:/data/db/backup.sqlite3 "$DEST/db.sqlite3"
-docker compose exec -T web rm -f /data/db/backup.sqlite3
-docker compose exec -T web tar -czf - -C /data media > "$DEST/media.tar.gz"
+docker compose exec -T tpark-web python manage.py backup_db /data/db/backup.sqlite3
+docker compose cp tpark-web:/data/db/backup.sqlite3 "$DEST/db.sqlite3"
+docker compose exec -T tpark-web rm -f /data/db/backup.sqlite3
+docker compose exec -T tpark-web tar -czf - -C /data media > "$DEST/media.tar.gz"
 
 ls -1dt backups/*/ | tail -n +$((KEEP + 1)) | xargs -r rm -rf
 echo "Бэкап готов: $DEST"

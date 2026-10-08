@@ -9,7 +9,7 @@ from apps.core.models import InfoPage
 
 def _id_param(request, name: str) -> int:
     value = request.GET.get(name, "")
-    if not value.isdigit():
+    if not (value.isascii() and value.isdecimal()):
         raise Http404
     return int(value)
 

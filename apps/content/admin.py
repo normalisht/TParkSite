@@ -75,7 +75,7 @@ class GalleryPhotoAdmin(OrderedPhotoAdmin):
     actions_list = ["bulk_upload"]
     preview = image_preview("thumb", size=96)
 
-    @action(description="Загрузить фото пачкой", url_path="bulk-upload")
+    @action(description="Загрузить фото пачкой", url_path="bulk-upload", permissions=["add"])
     def bulk_upload(self, request):
         form = BulkUploadForm(request.POST or None, request.FILES or None)
         if request.method == "POST" and form.is_valid():

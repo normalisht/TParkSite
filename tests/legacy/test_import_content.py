@@ -100,3 +100,11 @@ def test_failed_import_rolls_back_db_and_files(legacy, monkeypatch, media_root, 
     assert list(Category.objects.values_list("name", flat=True)) == ["Старая"]
     assert Photo.objects.filter(pk=kept.pk).exists() and kept_path.exists()
     assert {p for p in media_root.rglob("*") if p.is_file()} == files_before
+
+
+def test_event_link_without_scheme_is_dropped(legacy):
+    legacy.insert("event", id=7, title="Без ссылки", date="2022-09-24", link="#")
+    legacy.insert("event", id=8, title="Со ссылкой", date="2022-09-25", link=" https://vk.com/e ")
+    legacy.run()
+    assert Event.objects.get(title="Без ссылки").link == ""
+    assert Event.objects.get(title="Со ссылкой").link == "https://vk.com/e"

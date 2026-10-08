@@ -128,3 +128,45 @@ def test_gallery_bulk_upload_view(admin_client, make_image):
     response = admin_client.post(url, {"photos": [make_image("1.jpg"), make_image("2.jpg")]})
     assert response.status_code == 302
     assert list(GalleryPhoto.objects.values_list("order", flat=True)) == [1, 2]
+
+
+def test_editing_address_keeps_messenger_flags(admin_client):
+    site = SiteSettings.load()
+    phone = Phone.objects.create(settings=site, number="9000000001", order=0, is_whatsapp=True, is_telegram=True)
+    url = reverse("admin:core_sitesettings_change", args=[1])
+    data = _settings_post(
+        [{"id": phone.id, "number": "9000000001", "order": 0, "is_whatsapp": True, "is_telegram": True}]
+    )
+    data["address"] = "новый адрес"
+    response = admin_client.post(url, data)
+    assert response.status_code == 302, response.content.decode()[:2000]
+    phone.refresh_from_db()
+    assert phone.is_whatsapp and phone.is_telegram
+
+
+def test_editing_other_phone_keeps_messenger_flags(admin_client):
+    site = SiteSettings.load()
+    owner = Phone.objects.create(settings=site, number="9000000001", order=0, is_whatsapp=True)
+    other = Phone.objects.create(settings=site, number="9000000002", order=1)
+    url = reverse("admin:core_sitesettings_change", args=[1])
+    response = admin_client.post(
+        url,
+        _settings_post(
+            [
+                {"id": owner.id, "number": "9000000001", "order": 0, "is_whatsapp": True},
+                {"id": other.id, "number": "9000000003", "order": 1},
+            ]
+        ),
+    )
+    assert response.status_code == 302, response.content.decode()[:2000]
+    owner.refresh_from_db()
+    assert owner.is_whatsapp
+
+
+def test_gallery_bulk_upload_requires_add_permission(client, django_user_model, make_image):
+    staff = django_user_model.objects.create_user("staff", password="p", is_staff=True)
+    client.force_login(staff)
+    url = reverse("admin:content_galleryphoto_bulk_upload")
+    assert client.get(url).status_code == 403
+    client.post(url, {"photos": [make_image("1.jpg")]})
+    assert GalleryPhoto.objects.count() == 0

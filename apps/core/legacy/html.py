@@ -34,3 +34,9 @@ def parse_date(value) -> date | None:
 def phone_digits(value: str) -> str | None:
     digits = re.sub(r"\D", "", value or "")
     return digits[-10:] if len(digits) >= 10 else None
+
+
+def clean_url(value) -> str:
+    """Только абсолютные http(s)-ссылки: заглушки вроде «#» дали бы на сайте мёртвую кнопку."""
+    url = (value or "").strip()[:500]
+    return url if url.startswith(("http://", "https://")) else ""

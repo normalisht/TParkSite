@@ -52,6 +52,8 @@ def test_info(client):
         "/category?category_id=",
         "/category/service?service_id=-1",
         "/info?info_id=999",
+        "/category?category_id=%C2%B2",
+        "/info?info_id=%C2%B3",
     ],
 )
 def test_legacy_redirect_bad_param_is_404(client, url):
