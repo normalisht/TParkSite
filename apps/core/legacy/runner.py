@@ -7,6 +7,7 @@ from django.db import transaction
 from apps.catalog.models import Category, CategoryGroup, CategoryPhoto, CategoryService, Service, ServicePhoto
 from apps.content.models import Employee, Event, GalleryPhoto, Partner, Review
 from apps.core.legacy.catalog import import_catalog
+from apps.core.legacy.content import import_content
 from apps.core.legacy.reader import LegacyDB
 from apps.core.legacy.report import Report
 from apps.core.legacy.site import import_site
@@ -72,6 +73,7 @@ def run_import(db_path: Path, images_dir: Path, *, flush: bool = False, price_cs
                     flush_content()
                 import_site(db, images_dir, report)
                 import_catalog(db, images_dir, report)
+                import_content(db, images_dir, report)
         except Exception:
             # БД откатилась — удаляем файлы, которые успел записать импорт.
             for path in _media_files() - before:
