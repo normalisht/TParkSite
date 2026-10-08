@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "imagekit",
     "django_tailwind_cli",
     "apps.core",
+    "apps.catalog",
 ]
 
 MIDDLEWARE = [
