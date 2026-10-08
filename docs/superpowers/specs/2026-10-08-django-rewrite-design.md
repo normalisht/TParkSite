@@ -18,7 +18,7 @@
 
 | Слой | Выбор |
 |---|---|
-| Язык и фреймворк | Python 3.13, Django 5.2 LTS |
+| Язык и фреймворк | Python 3.13, Django 6.1.2 (`>=6.1.2,<6.2`) |
 | Зависимости | uv (`pyproject.toml`, `uv.lock`; группа `dev`) |
 | БД | SQLite (WAL, `busy_timeout`, `transaction_mode="IMMEDIATE"`) |
 | Админка | `django-unfold` (встроенная сортировка перетаскиванием) |
