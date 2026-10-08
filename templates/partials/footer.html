@@ -1,0 +1,24 @@
+<footer class="mt-16 bg-navy text-white/80">
+  <div class="mx-auto grid max-w-6xl gap-8 px-4 py-12 md:grid-cols-3">
+    <div>
+      <p class="text-lg font-bold text-white">Т-Парк</p>
+      {% if site.address %}
+      <a href="{% firstof site.map_url '#' %}" class="mt-3 flex gap-2 hover:text-brand-300" {% if site.map_url %}target="_blank" rel="noopener"{% endif %}>
+        <span class="icon mt-0.5 h-5 w-5">{% include "icons/map-pin.svg" %}</span>{{ site.address }}
+      </a>
+      {% endif %}
+    </div>
+    {% if phones %}
+    <ul class="space-y-2">
+      {% for phone in phones %}
+      <li><a href="{{ phone.tel_url }}" class="flex items-center gap-2 hover:text-brand-300"><span class="icon h-4 w-4">{% include "icons/phone.svg" %}</span>{{ phone.display }}</a></li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    <div class="flex gap-4">
+      {% if whatsapp_phone %}<a href="{{ whatsapp_phone.whatsapp_url }}" class="icon icon-fill h-8 w-8 hover:text-brand-300" target="_blank" rel="noopener" aria-label="WhatsApp">{% include "icons/whatsapp.svg" %}</a>{% endif %}
+      {% if telegram_phone %}<a href="{{ telegram_phone.telegram_url }}" class="icon icon-fill h-8 w-8 hover:text-brand-300" target="_blank" rel="noopener" aria-label="Telegram">{% include "icons/telegram.svg" %}</a>{% endif %}
+      {% if site.vk_url %}<a href="{{ site.vk_url }}" class="icon icon-fill h-8 w-8 hover:text-brand-300" target="_blank" rel="noopener" aria-label="VK">{% include "icons/vk.svg" %}</a>{% endif %}
+    </div>
+  </div>
+</footer>

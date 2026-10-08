@@ -1,0 +1,9 @@
+{% load site_tags %}
+<a href="{{ category.get_absolute_url }}" class="group block overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-ink/5 transition hover:-translate-y-1 hover:shadow-lg">
+  <div class="aspect-[3/2] overflow-hidden bg-tint">
+    {% with url=category|spec_url:"preview_card" %}{% if url %}
+    <img src="{{ url }}" alt="{{ category.name }}" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+    {% endif %}{% endwith %}
+  </div>
+  <div class="p-5"><h3 class="text-lg font-semibold group-hover:text-brand-600">{{ category.name }}</h3></div>
+</a>

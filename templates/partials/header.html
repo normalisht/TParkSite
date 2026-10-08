@@ -1,0 +1,56 @@
+{% load static %}
+<header x-data="{ open: false, services: false }" class="sticky top-0 z-40 border-b border-ink/5 bg-white/90 backdrop-blur">
+  <div class="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-3">
+    <a href="{% url 'catalog:home' %}" class="flex items-center gap-2" aria-label="Т-Парк, на главную">
+      <img src="{% static 'img/logo.png' %}" alt="Т-Парк" class="h-10 w-auto">
+    </a>
+
+    <nav class="hidden items-center gap-6 text-sm font-medium md:flex">
+      {% if menu_groups %}
+      <div class="relative" @mouseleave="services = false">
+        <button type="button" class="flex items-center gap-1 hover:text-brand-600"
+                @click="services = !services" @mouseenter="services = true" :aria-expanded="services">
+          Услуги <span class="icon h-4 w-4">{% include "icons/chevron-down.svg" %}</span>
+        </button>
+        <div x-show="services" x-transition x-cloak
+             class="absolute left-0 top-full grid w-[40rem] grid-cols-2 gap-6 rounded-2xl bg-white p-6 shadow-xl ring-1 ring-ink/5">
+          {% for group in menu_groups %}
+          <div>
+            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-ink/50">{{ group.name }}</p>
+            <ul class="space-y-1">
+              {% for category in group.published_categories %}
+              <li><a class="hover:text-brand-600" href="{{ category.get_absolute_url }}">{{ category.name }}</a></li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+      {% include "partials/nav_links.html" with link_class="hover:text-brand-600" %}
+    </nav>
+
+    <button type="button" class="icon h-8 w-8 md:hidden" @click="open = !open" :aria-expanded="open" aria-label="Меню">
+      <span x-show="!open">{% include "icons/menu.svg" %}</span>
+      <span x-show="open" x-cloak>{% include "icons/x.svg" %}</span>
+    </button>
+  </div>
+
+  <div x-show="open" x-transition x-cloak class="border-t border-ink/5 bg-white md:hidden">
+    <nav class="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-6">
+      {% for group in menu_groups %}
+      <div>
+        <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-ink/50">{{ group.name }}</p>
+        <ul class="space-y-2">
+          {% for category in group.published_categories %}
+          <li><a class="text-lg" href="{{ category.get_absolute_url }}">{{ category.name }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endfor %}
+      <div class="flex flex-col gap-3 border-t border-ink/5 pt-4 text-lg font-medium">
+        {% include "partials/nav_links.html" with link_class="" %}
+      </div>
+    </nav>
+  </div>
+</header>

@@ -1,0 +1,8 @@
+{% if phones %}
+<div x-data="{ open: false }" class="fixed bottom-4 right-4 z-50 md:hidden">
+  <div x-show="open" x-transition x-cloak class="mb-3 flex flex-col items-end gap-2">
+    {% include "partials/contact_links.html" %}
+  </div>
+  <button type="button" @click="open = !open" :aria-expanded="open" class="btn btn-primary shadow-lg">Связаться</button>
+</div>
+{% endif %}

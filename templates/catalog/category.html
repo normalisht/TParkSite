@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="mx-auto max-w-6xl px-4 py-8 md:py-12">
+  <nav class="mb-4 text-sm text-ink/50"><a href="{% url 'catalog:home' %}" class="hover:text-brand-600">Главная</a> / {{ category.name }}</nav>
+  <h1 class="text-3xl font-bold md:text-5xl">{{ category.name }}</h1>
+  <div class="mt-8 grid gap-8 lg:grid-cols-5">
+    {% if photos %}<div class="lg:col-span-3">{% include "catalog/partials/slider.html" with alt=category.name %}</div>{% endif %}
+    <div class="rich-text {% if photos %}lg:col-span-2{% else %}lg:col-span-5 max-w-3xl{% endif %}">{{ category.description|safe }}</div>
+  </div>
+  {% if services %}
+  <h2 class="mb-4 mt-12 text-2xl font-bold">Услуги и цены</h2>
+  <ul class="divide-y divide-ink/10 overflow-hidden rounded-2xl bg-white ring-1 ring-ink/10">
+    {% for service in services %}<li>{% include "catalog/partials/service_row.html" %}</li>{% endfor %}
+  </ul>
+  {% endif %}
+  <div class="mt-10 flex flex-wrap gap-3">{% include "partials/contact_links.html" %}</div>
+</div>
+{% endblock %}

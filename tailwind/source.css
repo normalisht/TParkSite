@@ -1,0 +1,37 @@
+@import "tailwindcss";
+@source "../templates";
+@source "../apps";
+
+@theme {
+  --font-sans: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  --color-brand-50: #fff8eb;
+  --color-brand-100: #ffedc6;
+  --color-brand-300: #ffcd5c;
+  --color-brand-500: #ffa300;
+  --color-brand-600: #e08600;
+  --color-brand-700: #b96202;
+  --color-ink: #1c1919;
+  --color-navy: #2b4757; /* тёмно-синий из логотипа */
+  --color-tint: #eef2fc;
+}
+
+[x-cloak] { display: none !important; }
+
+.icon { display: inline-flex; flex-shrink: 0; }
+.icon svg { width: 100%; height: 100%; }
+.icon-fill svg { fill: currentColor; }
+
+.btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition;
+}
+.btn-primary { @apply bg-brand-500 text-ink hover:bg-brand-600; }
+.btn-ghost { @apply bg-white text-ink ring-1 ring-ink/10 hover:ring-brand-500; }
+
+.rich-text { @apply leading-relaxed text-ink/85; }
+.rich-text > * + * { @apply mt-3; }
+.rich-text h2 { @apply mt-6 text-xl font-bold text-ink; }
+.rich-text h3 { @apply mt-4 text-lg font-semibold text-ink; }
+.rich-text a { @apply text-brand-700 underline underline-offset-2 hover:text-brand-600; }
+.rich-text ul { @apply list-disc pl-6; }
+.rich-text ol { @apply list-decimal pl-6; }
+.rich-text strong { @apply font-semibold text-ink; }

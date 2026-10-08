@@ -1,0 +1,31 @@
+{% load static tailwind_cli %}<!doctype html>
+<html lang="ru" class="scroll-smooth">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if seo.title %}{{ seo.title }} — Т-Парк{% else %}Т-Парк — активный отдых{% endif %}</title>
+  <meta name="description" content="{% firstof seo.description default_description %}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Т-Парк">
+  <meta property="og:title" content="{% firstof seo.title 'Т-Парк' %}">
+  <meta property="og:description" content="{% firstof seo.description default_description %}">
+  {% if seo.image %}<meta property="og:image" content="{{ seo.image }}">{% endif %}
+  <link rel="icon" href="{% static 'img/logo.png' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap&subset=cyrillic" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'vendor/swiper-bundle.min.css' %}">
+  <link rel="stylesheet" href="{% static 'vendor/glightbox.min.css' %}">
+  {% tailwind_css %}
+  <script defer src="{% static 'vendor/alpine.min.js' %}"></script>
+</head>
+<body class="flex min-h-screen flex-col bg-white font-sans text-ink antialiased">
+  {% include "partials/header.html" %}
+  <main class="flex-1">{% block content %}{% endblock %}</main>
+  {% include "partials/footer.html" %}
+  {% include "partials/contact_button.html" %}
+  <script src="{% static 'vendor/swiper-bundle.min.js' %}"></script>
+  <script src="{% static 'vendor/glightbox.min.js' %}"></script>
+  <script src="{% static 'js/site.js' %}"></script>
+</body>
+</html>
