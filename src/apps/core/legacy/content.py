@@ -43,9 +43,8 @@ def import_content(db, images: Path, report) -> None:
             text = "\n".join(
                 filter(None, [f"<p>{escape(link_text)}</p>", text])
             )  # текст ссылки — не дата: не теряем его
-        # Имени в старых отзывах нет — на сайте их подпишет «Гость Т-Парка», источник берётся из ссылки.
-        author = clean_line(row["name"], 128)
-        review = Review(author=author, text=text, link=link, date=review_date, is_published=True)
+        # Имя не переносим: на сайте все отзывы подписаны «Гость Т-Парка», источник берётся из ссылки.
+        review = Review(text=text, link=link, date=review_date, is_published=True)
         attach_image(review, "photo", images / "comments" / f"{row['id']}.jpg", report, missing_ok=True)
         review.save()
         report.add("Отзывы")

@@ -3,8 +3,8 @@
 <div class="swiper js-slider overflow-hidden rounded-2xl bg-tint">
   <div class="swiper-wrapper">
     {% for photo in photos %}{% with url=photo|spec_url:"slide" %}{% if url %}
-    <div class="swiper-slide">
-      <img src="{{ url }}" alt="{{ alt }}" class="aspect-[16/9] w-full object-cover" {% if not forloop.first %}loading="lazy"{% endif %}>
+    <div class="swiper-slide" data-full="{{ photo.image.url }}">
+      <img src="{{ url }}" alt="{{ alt }}" class="aspect-[16/9] w-full cursor-zoom-in object-cover" {% if not forloop.first %}loading="lazy"{% endif %}>
     </div>
     {% endif %}{% endwith %}{% endfor %}
   </div>

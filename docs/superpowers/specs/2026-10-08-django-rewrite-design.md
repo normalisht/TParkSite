@@ -85,7 +85,7 @@ old_version/       старая Flask-версия, только для спра
 
 - **Event**: `title`, `date`, `description` (HTML), `link` (URL, необязательно), `text_color` (необязательно), `show_after_date`, `image`.
   - Мероприятие «предстоящее», если `date >= today` по `Europe/Moscow`. Эквивалент старого правила «до 22:00 дня мероприятия»: в день мероприятия оно ещё считается предстоящим.
-- **Review**: `author`, `text`, `photo` (необязательно), `is_published`, `order`.
+- **Review**: `text`, `photo` (необязательно), `is_published`, `order`.
 - **Partner**: `name` (необязательно, используется как alt), `link`, `logo`, `order`.
 - **GalleryPhoto**: `image`, `caption` (необязательно), `order`.
 
@@ -132,7 +132,7 @@ old_version/       старая Flask-версия, только для спра
   - карусель Swiper (`loop` только при ≥ 3 слайдах): сначала предстоящие по дате, затем прошедшие с `show_after_date`;
   - при отсутствии мероприятий — заглушка «Скоро анонсируем».
 - **О нас** — `about_text`, `philosophy_text`, `nearby_text`, партнёры (логотипы-ссылки).
-- **Отзывы** — опубликованные отзывы от новых к старым (без даты — в конце), сетка по рядам; у отзыва необязательные имя (иначе «Гость Т-Парка»), ссылка на источник (ссылкой служит подпись источника) и дата; длинные тексты свёрнуты; кнопки «Все отзывы на Яндекс Картах» и «Оставить отзыв» — по `SiteSettings.reviews_url`. Карусель отзывов есть и на главной.
+- **Отзывы** — опубликованные отзывы от новых к старым (без даты — в конце), сетка по рядам; отзывы без имени — все подписаны «Гость Т-Парка»; у отзыва необязательные ссылка на источник (ссылкой служит подпись источника) и дата; длинные тексты свёрнуты; кнопки «Все отзывы на Яндекс Картах» и «Оставить отзыв» — по `SiteSettings.reviews_url`. Карусель отзывов есть и на главной.
 - **Галерея** — сетка миниатюр, лайтбокс с полноразмерным фото.
 - **Контакты** — `contacts_text`, телефоны и мессенджеры, под ними на всю ширину — виджет Яндекс Карты (`map_embed_url`).
 - **Инфо-страница** — заголовок и текст.
@@ -187,7 +187,7 @@ manage.py import_legacy --db <путь к T_Park.db> --images <путь к па�
 | `../../../src/old_migrate/images/service/<id>/*` | `ServicePhoto` | по возрастанию номера |
 | `service_category` | `CategoryService` | `number` → `order` (`NULL` → в конец); дубли схлопываются; **6 строк ссылаются на удалённые записи — пропускаются** |
 | `event` | `Event` | `after_date` → `show_after_date`; `../../../src/old_migrate/images/events/<id>.jpg` → `image` (см. риск ниже) |
-| `comment` | `Review` | `name` → `author`; `is_published=True`; `order` по `id`; `../../../src/old_migrate/images/comments/<id>.jpg` → `photo` |
+| `comment` | `Review` | `name` не переносится; `is_published=True`; `order` по `id`; `../../../src/old_migrate/images/comments/<id>.jpg` → `photo` |
 | `partner` | `Partner` | строки с `name="temp"` пропускаются; `name` в данных — это id (артефакт старой админки), поэтому импортируется пустым; `../../../src/old_migrate/images/partner/<id>.jpg` → `logo`; `order` по `id` |
 | `employee` | — | **не импортируется**: сотрудников на новом сайте нет (в старой БД были только заглушки «Сотрудник»); фото из `employee/` попадают в отчёт о неперенесённых файлах |
 | `text` с `title` | `SiteSettings` | `main_text` → `home_intro` и `events_intro`; `about` → `about_text`; `filosofi` → `philosophy_text`; `structure` → `nearby_text`; `contacts_info` → `contacts_text`; `address`; `vk` → `vk_url`; `geolocation` не переносится — код виджета карты задаётся в админке, импорт напоминает об этом в отчёте |

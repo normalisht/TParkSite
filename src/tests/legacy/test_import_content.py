@@ -47,7 +47,6 @@ def test_reviews_partners_gallery(legacy):
     report = legacy.run()
     assert not any("отрудник" in w for w in report.warnings)
     reviews = list(Review.objects.order_by("id"))
-    assert [r.author for r in reviews] == ["Анна", "Борис"]
     assert (reviews[0].link, reviews[0].text) == ("https://reviews.yandex.ru/x", "<p>Отзыв</p>")
     assert not reviews[0].photo and reviews[1].photo
     partner = Partner.objects.get()
@@ -114,8 +113,6 @@ def test_reviews_without_name(legacy):
     legacy.insert("comment", id=2, name=" ", text="<p>Без ссылки</p>")
     report = legacy.run()
     reviews = list(Review.objects.order_by("id"))
-    assert [r.author for r in reviews] == ["", ""]  # без заглушек: подпись «Гость Т-Парка» — на сайте
-    assert [r.display_author for r in reviews] == ["Гость Т-Парка", "Гость Т-Парка"]
     assert reviews[0].source_label == "Яндекс Карты"
     assert not any("Отзыв #" in w for w in report.warnings)
 

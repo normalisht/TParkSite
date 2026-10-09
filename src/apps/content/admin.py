@@ -1,9 +1,14 @@
 from django.contrib import admin, messages
+from django.core.exceptions import PermissionDenied
+from django.http import JsonResponse
 from django.shortcuts import redirect, render
+from django.urls import path, reverse
 from django.utils import timezone
+from django.utils.formats import localize_input
 from unfold.decorators import action
 
 from apps.content.models import Event, GalleryPhoto, Partner, Review
+from apps.content.yandex import ReviewFetchError, fetch_review
 from apps.core.admin_utils import SiteModelAdmin, image_preview
 from apps.core.bulk_upload import BulkUploadForm, append_images
 
@@ -42,12 +47,40 @@ class OrderedPhotoAdmin(SiteModelAdmin):
 @admin.register(Review)
 class ReviewAdmin(SiteModelAdmin):
     # Порядок — по дате (Meta.ordering), без перетаскивания.
-    list_display = ["preview", "author", "date", "is_published"]
-    list_display_links = ["author"]
+    list_display = ["__str__", "date", "is_published"]
     list_filter = ["is_published"]
     date_hierarchy = "date"
-    fields = ["author", "date", "text", "link", "photo", "is_published"]
-    preview = image_preview("avatar")
+    fields = ["link", "date", "text", "photo", "is_published"]
+
+    class Media:
+        js = ["js/admin_review_fetch.js"]
+
+    def get_urls(self):
+        fetch = path(
+            "fetch-yandex/", self.admin_site.admin_view(self.fetch_yandex_view), name="content_review_fetch_yandex"
+        )
+        return [fetch, *super().get_urls()]
+
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        field = super().formfield_for_dbfield(db_field, request, **kwargs)
+        if db_field.name == "link":
+            # Кнопку «Подтянуть» рядом с полем добавляет admin_review_fetch.js.
+            field.widget.attrs["data-yandex-fetch-url"] = reverse("admin:content_review_fetch_yandex")
+            field.help_text = (
+                "Ссылка на отзыв с Яндекса (reviews.yandex.ru): «Подтянуть» заполнит текст и дату. "
+                "Открывается по клику на подпись источника под отзывом."
+            )
+        return field
+
+    def fetch_yandex_view(self, request):
+        """Текст и дата отзыва по ссылке — JSON для кнопки «Подтянуть»."""
+        if not (self.has_add_permission(request) or self.has_change_permission(request)):
+            raise PermissionDenied
+        try:
+            review = fetch_review(request.GET.get("url", ""))
+        except ReviewFetchError as exc:
+            return JsonResponse({"error": str(exc)}, status=400)
+        return JsonResponse({"text": review.text, "date": localize_input(review.date) if review.date else ""})
 
 
 @admin.register(Partner)

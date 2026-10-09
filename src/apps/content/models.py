@@ -5,6 +5,8 @@ from django.db import models
 from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.html import strip_tags
+from django.utils.text import Truncator
 
 from apps.core.fields import HtmlField, image_spec, photo_field
 from apps.core.models import OrderedModel, PublishedQuerySet
@@ -68,9 +70,6 @@ REVIEW_SOURCES = {"yandex.": "Яндекс Карты", "vk.com": "VK", "2gis.":
 
 
 class Review(models.Model):
-    author = models.CharField(
-        "Имя", max_length=128, blank=True, help_text="Можно не указывать — на сайте будет «Гость Т-Парка»."
-    )
     text = HtmlField("Текст")
     link = models.URLField(
         "Ссылка на отзыв",
@@ -92,11 +91,8 @@ class Review(models.Model):
         verbose_name_plural = "Отзывы"
 
     def __str__(self):
-        return self.author or f"Отзыв #{self.pk}"
-
-    @property
-    def display_author(self) -> str:
-        return self.author or "Гость Т-Парка"
+        # Имени у отзыва нет (на сайте — «Гость Т-Парка»): в админке узнаём отзыв по началу текста.
+        return Truncator(strip_tags(self.text)).chars(60) or f"Отзыв #{self.pk}"
 
     @property
     def source_label(self) -> str:

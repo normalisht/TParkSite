@@ -58,6 +58,23 @@
 /* Место под полосу прокрутки всегда зарезервировано — короткие и длинные страницы не сдвигаются по горизонтали */
 html { scrollbar-gutter: stable; }
 
+/* GLightbox на телефоне прячет стрелки (только свайп) — возвращаем их по бокам. Без слоя: иначе vendored-CSS перебьёт. */
+@media (max-width: 768px) {
+  .glightbox-clean .gprev,
+  .glightbox-clean .gnext {
+    top: 50%;
+    width: 40px;
+    height: 40px;
+    border-radius: 9999px;
+    background-color: rgb(0 0 0 / 0.4);
+    transform: translateY(-50%);
+  }
+  .glightbox-clean .gprev { left: 8px; }
+  .glightbox-clean .gnext { right: 8px; }
+  .glightbox-clean .gprev svg,
+  .glightbox-clean .gnext svg { width: 20px; }
+}
+
 /* В слое components, иначе стили без слоя перебивают утилиты Tailwind (md:hidden и т. п.) */
 @layer components {
   .icon { display: inline-flex; flex-shrink: 0; }

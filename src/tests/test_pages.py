@@ -42,6 +42,8 @@ def test_category_page_lists_services(client, category):
     assert "Весло включено" in html
     assert "Скрытая услуга" not in html
     assert "swiper-slide" in html
+    # Полноэкранный просмотр открывает оригинал фото.
+    assert f'data-full="{category.photos.get().image.url}"' in html
 
 
 def test_unpublished_category_is_404(client):
@@ -84,20 +86,24 @@ def test_about_page(client, make_image):
 
 
 def test_reviews_newest_first_and_published(client):
-    Review.objects.create(author="Без даты", text="<p>n</p>")
-    Review.objects.create(author="Старый", text="<p>b</p>", date=date(2021, 6, 6))
-    Review.objects.create(author="Новый", text="<p>a</p>", date=date(2023, 10, 26))
-    Review.objects.create(author="Скрытый", text="<p>c</p>", is_published=False)
+    Review.objects.create(text="<p>Без даты</p>")
+    Review.objects.create(text="<p>Старый</p>", date=date(2021, 6, 6))
+    Review.objects.create(text="<p>Новый</p>", date=date(2023, 10, 26))
+    Review.objects.create(text="<p>Скрытый</p>", is_published=False)
     html = client.get("/reviews/").content.decode()
     assert html.index("Новый") < html.index("Старый") < html.index("Без даты")
     assert "Скрытый" not in html
 
 
+def test_review_signed_as_guest(client):
+    Review.objects.create(text="<p>Классно</p>")
+    for url in ("/reviews/", "/"):
+        assert "Гость Т-Парка" in client.get(url).content.decode()
+
+
 def test_review_card_links_to_source_when_link_set(client):
-    Review.objects.create(
-        author="С ссылкой", text="<p>a</p>", link="https://reviews.yandex.ru/u/1", date=date(2022, 7, 20)
-    )
-    Review.objects.create(author="Без ссылки", text="<p>b</p>")
+    Review.objects.create(text="<p>a</p>", link="https://reviews.yandex.ru/u/1", date=date(2022, 7, 20))
+    Review.objects.create(text="<p>b</p>")
     html = client.get("/reviews/").content.decode()
     # Ссылка — только подпись источника, не вся карточка.
     assert re.search(r'<a href="https://reviews\.yandex\.ru/u/1"[^>]*>Яндекс Карты<', html)
@@ -122,6 +128,8 @@ def test_nav_has_all_sections(client):
     html = client.get("/").content.decode()
     for url in STATIC_PAGES:
         assert f'href="{url}"' in html
+    # В мобильном меню первым пунктом — ссылка на главную (категории идут сразу за ней).
+    assert re.search(r'<a href="/" class="[^"]*">Главная</a>', html)
 
 
 def test_contacts_page_embeds_yandex_map_only_when_set(client):
@@ -149,11 +157,11 @@ def test_reviews_page_header_cta_and_tones(client):
 
 def test_home_shows_reviews_carousel(client):
     assert "Отзывы гостей" not in client.get("/").content.decode()
-    Review.objects.create(author="Анна", text="<p>Классно</p>")
-    Review.objects.create(author="Скрытая", text="<p>x</p>", is_published=False)
-    Review.objects.create(author="Борис", text="<p>Отлично</p>")
+    Review.objects.create(text="<p>Классно</p>")
+    Review.objects.create(text="<p>Скрытая</p>", is_published=False)
+    Review.objects.create(text="<p>Отлично</p>")
     html = client.get("/").content.decode()
     assert "Отзывы гостей" in html and "Классно" in html and "Скрытая" not in html
-    # В карусели цвета чередуются по карточкам; кнопки — свои, по бокам.
+    # В карусели цвета чередуются по карточкам; кнопки — свои (на ПК по бокам, на телефоне под карточками со счётчиком).
     assert re.findall(r"review-tone-(\w+)", html) == ["green", "warm"]
-    assert "js-carousel-prev" in html and "js-carousel-next" in html
+    assert "js-carousel-prev" in html and "js-carousel-next" in html and "js-carousel-counter" in html

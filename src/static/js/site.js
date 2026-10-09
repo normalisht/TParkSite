@@ -46,15 +46,42 @@ document.addEventListener("DOMContentLoaded", () => {
       navigation: nav(el),
       autoplay: autoplay && { delay: SLIDE_DELAY, disableOnInteraction: false },
     });
-    if (!autoplay) return;
 
     // Пользователь листает сам: останавливаем автопрокрутку и возобновляем через 20 с после последнего его действия.
     let resumeTimer;
     const pauseByUser = () => {
+      if (!autoplay) return;
       swiper.autoplay.stop();
       clearTimeout(resumeTimer);
       resumeTimer = setTimeout(() => swiper.autoplay.start(), USER_PAUSE);
     };
+
+    // Нажатие на фото — полноэкранный просмотр. Клик после свайпа Swiper гасит сам, кнопки и точки — не слайд.
+    if (window.GLightbox) {
+      const lightbox = GLightbox({
+        elements: [...slides].map((slide) => ({ href: slide.dataset.full, type: "image" })),
+        loop: true,
+      });
+      let viewed = 0;
+      lightbox.on("open", () => {
+        clearTimeout(resumeTimer);
+        if (autoplay) swiper.autoplay.stop();
+      });
+      lightbox.on("slide_changed", ({ current }) => {
+        viewed = current.index;
+      });
+      lightbox.on("close", () => {
+        swiper.slideToLoop(viewed, 0);
+        pauseByUser();
+      });
+      el.addEventListener("click", (event) => {
+        if (!event.target.closest(".swiper-slide")) return;
+        viewed = swiper.realIndex % count;
+        lightbox.openAt(viewed);
+      });
+    }
+    if (!autoplay) return;
+
     swiper.on("sliderFirstMove", pauseByUser);
     swiper.on("navigationNext", pauseByUser);
     swiper.on("navigationPrev", pauseByUser);
@@ -65,12 +92,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.querySelectorAll(".js-carousel").forEach((el) => {
     const count = el.querySelectorAll(".swiper-slide").length;
+    // Счётчик «3 / 12» между кнопками (на главной под отзывами, виден только на телефоне).
+    const counter = el.closest(".js-carousel-wrap")?.querySelector(".js-carousel-counter");
+    const showPosition = (swiper) => {
+      if (counter) counter.textContent = `${swiper.realIndex + 1} / ${count}`;
+    };
     new Swiper(el, {
       loop: count >= 6,
       spaceBetween: 24,
       slidesPerView: 1.1,
       breakpoints: { 768: { slidesPerView: 2.1 }, 1024: { slidesPerView: 3 } },
       navigation: nav(el),
+      on: { init: showPosition, slideChange: showPosition },
     });
   });
 

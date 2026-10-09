@@ -2,7 +2,7 @@
 {% block content %}
 <section class="bg-tint">
   <div class="mx-auto max-w-6xl px-4 py-10 md:py-20">
-    <h1 class="text-4xl font-bold md:text-6xl">Т-Парк</h1>
+    <h1 class="text-4xl font-bold md:text-6xl">Тренинг-парк Дмитрия Сергеева</h1>
     {% if site.home_intro %}<div class="rich-text mt-5 max-w-3xl text-lg">{{ site.home_intro|safe }}</div>{% endif %}
     <div class="mt-6 flex flex-wrap gap-3 md:mt-8">{% include "partials/contact_links.html" %}</div>
   </div>
@@ -25,7 +25,7 @@
     <h2 class="text-2xl font-bold md:text-3xl">Отзывы гостей</h2>
     <a href="{% url 'content:reviews' %}" class="inline-flex shrink-0 items-center gap-1 font-semibold text-brand-700 hover:text-brand-600">Все отзывы<span class="icon h-4 w-4">{% include "icons/chevron-right.svg" %}</span></a>
   </div>
-  {# Кнопки — по бокам карусели, в отступах обёртки (на телефоне листают свайпом). #}
+  {# На ПК кнопки — по бокам карусели, в отступах обёртки; на телефоне — рядом под карточками, между ними счётчик. #}
   <div class="js-carousel-wrap relative md:px-14">
     <div class="swiper js-carousel">
       <div class="swiper-wrapper">
@@ -34,8 +34,11 @@
         {% endfor %}
       </div>
     </div>
-    <button type="button" aria-label="Предыдущие отзывы" class="js-carousel-prev absolute left-0 top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white text-ink/70 shadow-sm ring-1 ring-ink/10 transition hover:text-brand-700 hover:ring-brand-500 md:flex [&.swiper-button-disabled]:pointer-events-none [&.swiper-button-disabled]:opacity-40"><span class="icon h-5 w-5 rotate-180">{% include "icons/chevron-right.svg" %}</span></button>
-    <button type="button" aria-label="Следующие отзывы" class="js-carousel-next absolute right-0 top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white text-ink/70 shadow-sm ring-1 ring-ink/10 transition hover:text-brand-700 hover:ring-brand-500 md:flex [&.swiper-button-disabled]:pointer-events-none [&.swiper-button-disabled]:opacity-40"><span class="icon h-5 w-5">{% include "icons/chevron-right.svg" %}</span></button>
+    <div class="mt-4 flex items-center justify-center gap-4 md:mt-0 md:block">
+      <button type="button" aria-label="Предыдущие отзывы" class="js-carousel-prev flex h-10 w-10 items-center justify-center rounded-full bg-white text-ink/70 shadow-sm ring-1 ring-ink/10 transition hover:text-brand-700 hover:ring-brand-500 md:absolute md:left-0 md:top-1/2 md:z-10 md:-translate-y-1/2 [&.swiper-button-disabled]:pointer-events-none [&.swiper-button-disabled]:opacity-40"><span class="icon h-5 w-5 rotate-180">{% include "icons/chevron-right.svg" %}</span></button>
+      <span class="js-carousel-counter min-w-12 text-center text-sm tabular-nums text-ink/60 md:hidden" aria-live="polite"></span>
+      <button type="button" aria-label="Следующие отзывы" class="js-carousel-next flex h-10 w-10 items-center justify-center rounded-full bg-white text-ink/70 shadow-sm ring-1 ring-ink/10 transition hover:text-brand-700 hover:ring-brand-500 md:absolute md:right-0 md:top-1/2 md:z-10 md:-translate-y-1/2 [&.swiper-button-disabled]:pointer-events-none [&.swiper-button-disabled]:opacity-40"><span class="icon h-5 w-5">{% include "icons/chevron-right.svg" %}</span></button>
+    </div>
   </div>
 </section>
 {% endif %}

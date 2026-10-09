@@ -55,6 +55,7 @@
        x-transition:leave="transition duration-200 ease-in" x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full"
        class="absolute inset-x-0 top-full h-[calc(100dvh-100%)] overflow-y-auto overscroll-contain border-t border-ink/5 bg-white shadow-xl md:hidden">
     <nav class="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-6">
+      <a href="{% url 'catalog:home' %}" class="border-b border-ink/5 pb-4 text-lg font-medium">Главная</a>
       {% for group in menu_groups %}
       <div>
         <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-ink/50">{{ group.name }}</p>
