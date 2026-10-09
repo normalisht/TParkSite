@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Layout
 
-- `src/` — весь Django-проект: `pyproject.toml`/`uv.lock`, `manage.py`, `config/`, `apps/`, `templates/`, `static/`, `tailwind/`, `tests/`. Dev-окружение (`.venv`, `.env` из `src/.env.example`, `db.sqlite3`, `media/`) тоже живёт в `src/`.
+- `src/` — весь Django-проект: `pyproject.toml`/`uv.lock`, `manage.py`, `config/`, `apps/`, `templates/`, `static/`, `tailwind/`, `tests/`. Dev-окружение (`.venv`, `.env` из `src/.env.example`, `current_content/db.sqlite3`, `current_content/media/`) тоже живёт в `src/`.
 - Корень — инфраструктура: `Dockerfile`, `compose.yaml`, `docker/`, `scripts/`, `.env.example` (продакшен, для compose), `.pre-commit-config.yaml`, `docs/`, `old_version/`.
 
 ## Commands
@@ -56,7 +56,7 @@ docker compose -f compose.nginx.yaml up -d --build # продакшен без �
 - Перетаскивание файлов во все поля загрузки админки — `static/js/admin_dropzone.js`, подключён через `UNFOLD["SCRIPTS"]` (работает и на кастомных страницах вроде загрузки пачкой); рассчитан на разметку виджетов Unfold, поэтому свои файловые поля делаем на `UnfoldAdmin*FieldWidget` (как `MultipleImageInput`).
 - У Unfold нет русской локали: недостающие строки переводятся в `locale/ru/LC_MESSAGES/django.po` (`LOCALE_PATHS`); после правки — `uv run manage.py compilemessages -l ru` (нужен gettext), `.mo` коммитится.
 - Порядок везде — `order` + перетаскивание Unfold (`ordering_field`). Неопубликованное — 404.
-- Единый стиль витрины — классы в `tailwind/source.css` (`@layer components`): шапка страницы `.page-hero` + `partials/hero_decor.html`, `.page-title`/`.page-lead`, `.eyebrow` (зелёный надзаголовок раздела) и `.field-label` (серая подпись поля), `.card`/`.card-link`. Цвета по смыслу: оранжевый (brand) — только кликабельное; зелёный (pine) — «природа и место» (`partials/find_us_card.html`, статусы, надзаголовки); navy — информационные иконки; серый текст — только `ink/75` и `ink/55`.
+- Единый стиль витрины — классы в `tailwind/source.css` (`@layer components`): шапка страницы `.page-hero` + `partials/hero_decor.html`, `.page-title`/`.page-lead`, `.eyebrow` (зелёный надзаголовок раздела) и `.field-label` (серая подпись поля), `.card`/`.card-link`. Цвета по смыслу: оранжевый (brand) — только кликабельное; зелёный (pine) — «природа и место» (`partials/find_us_card.html`, статусы, надзаголовки); navy — информационные иконки; серый текст — только `ink/75` и `ink/65` (`ink/55` и светлее не проходят контраст WCAG 4.5:1).
 - Миниатюры в шаблонах — только через фильтр `obj|spec_url:"spec"` (`{% load site_tags %}`): не падает на отсутствующем файле.
 - Swiper/GLightbox подключаются только там, где нужны: блоки `vendor_css`/`vendor_js` + `partials/vendor.html`.
 - Фронт без Node и CDN: Tailwind через `django-tailwind-cli` (`tailwind/source.css` → `static/css/tailwind.css`, не в git), Alpine/Swiper/GLightbox — vendored в `static/vendor/`. При обновлении vendored-JS убрать комментарий `sourceMappingURL` — иначе `collectstatic` с манифестом упадёт (ловит `tests/test_static.py`).

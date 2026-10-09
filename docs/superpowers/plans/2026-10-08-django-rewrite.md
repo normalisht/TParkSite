@@ -4829,7 +4829,7 @@ docker compose run --rm -v /tmp/tpark-legacy:/legacy web python manage.py import
 ls backups/*/
 docker compose down
 ```
-Expected: отчёт импорта (Категории: 13, Услуги: 109, …, предупреждения о пропущенных связях и сотрудниках); в `backups/<дата>/` лежат `db.sqlite3` и `media.tar.gz`.
+Expected: отчёт импорта (Категории: 13, Услуги: 109, …, предупреждения о пропущенных связях и сотрудниках); в `backups/<дата>/` лежат `../../../current_content/db.sqlite3` и `media.tar.gz`.
 
 - [ ] **Step 5: Commit**
 
