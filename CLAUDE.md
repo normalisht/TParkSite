@@ -36,7 +36,7 @@ uv run --project src pre-commit run --all-files   # ruff в pre-commit закр�
 docker compose -f compose.dev.yaml up --build    # локально в Docker: http://localhost:8000, DEBUG=1, src/ примонтирован (hot reload + Tailwind watch)
 docker compose -f compose.dev.yaml exec tpark-dev python manage.py createsuperuser
 docker compose up -d --build                      # продакшен (корневой .env из .env.example, нужна внешняя сеть PROXY_NETWORK)
-docker compose -f compose.nginx.yaml up -d --build # продакшен без общего прокси: свой nginx на 80/443 + Let's Encrypt с хоста (README)
+docker compose -f compose.nginx.yaml up -d --build # продакшен без общего прокси: свой nginx на 80/443, сам выпускает сертификат Let's Encrypt (README)
 ```
 
 ## Architecture
@@ -60,4 +60,4 @@ docker compose -f compose.nginx.yaml up -d --build # продакшен без �
 - Миниатюры в шаблонах — только через фильтр `obj|spec_url:"spec"` (`{% load site_tags %}`): не падает на отсутствующем файле.
 - Swiper/GLightbox подключаются только там, где нужны: блоки `vendor_css`/`vendor_js` + `partials/vendor.html`.
 - Фронт без Node и CDN: Tailwind через `django-tailwind-cli` (`tailwind/source.css` → `static/css/tailwind.css`, не в git), Alpine/Swiper/GLightbox — vendored в `static/vendor/`. При обновлении vendored-JS убрать комментарий `sourceMappingURL` — иначе `collectstatic` с манифестом упадёт (ловит `tests/test_static.py`).
-- Продакшен: образ собирается из `src/` (`.dockerignore` — allowlist), `tpark-web` (gunicorn + WhiteNoise) и `tpark-media` (nginx) — имена сервисов уникальны, т. к. они же DNS-имена в общей сети прокси; тома `db` и `media`; бэкап — `scripts/backup.sh` (cron на хосте). Без общего прокси — `compose.nginx.yaml`: свой `tpark-nginx` (80/443, TLS, `/media/`; конфиг `docker/nginx.conf.template`), выбирается через `COMPOSE_FILE` в `.env`.
+- Продакшен: образ собирается из `src/` (`.dockerignore` — allowlist), `tpark-web` (gunicorn + WhiteNoise) и `tpark-media` (nginx) — имена сервисов уникальны, т. к. они же DNS-имена в общей сети прокси; тома `db` и `media`; бэкап — `scripts/backup.sh` (cron на хосте). Без общего прокси — `compose.nginx.yaml`: свой `tpark-nginx` (80/443, `/media/`, сертификат Let's Encrypt — сам через `ngx_http_acme_module`, состояние в томе `acme`; конфиг — целый `nginx.conf` в `docker/nginx.conf.template`), выбирается через `COMPOSE_FILE` в `.env`.

@@ -14,9 +14,10 @@ Django-проект — в [src/](src/), в корне — инфраструк�
 
 ### Вариант со своим nginx
 
-Если общего reverse-proxy на сервере нет — `compose.nginx.yaml`: nginx сам слушает 80/443, терминирует HTTPS, отдаёт `/media/` и проксирует остальное в gunicorn (конфиг — `docker/nginx.conf.template`). `PROXY_NETWORK` не нужен.
+Если общего reverse-proxy на сервере нет — `compose.nginx.yaml`: nginx сам слушает 80/443, терминирует HTTPS, отдаёт `/media/` и проксирует остальное в gunicorn (конфиг — `docker/nginx.conf.template`). `PROXY_NETWORK` не нужен. Сертификат Let's Encrypt nginx выпускает и продлевает сам (модуль `ngx_http_acme_module`, проверка HTTP-01), certbot не нужен.
 
-1. В `.env` добавить `COMPOSE_FILE=compose.nginx.yaml` (тогда `docker compose`, `make up`/`logs`/`prod-superuser` и `scripts/backup.sh` работают с этим файлом без `-f`); при необходимости — `SERVER_NAME`, `CERT_NAME` и пути к сертификатам (см. `.env.example`).
-2. Первый выпуск сертификата, пока порт 80 свободен: `certbot certonly --standalone -d t-camp.ru -d www.t-camp.ru`.
-3. `docker compose up -d --build`, дальше — как выше (createsuperuser, импорт, бэкап).
-4. Продление — через webroot, без остановки nginx: в `/etc/letsencrypt/renewal/t-camp.ru.conf` выставить `authenticator = webroot` и `webroot_path = /var/www/certbot`, а перезагрузку nginx — deploy-hook'ом: `certbot renew --deploy-hook "cd /srv/tpark && docker compose exec -T tpark-nginx nginx -s reload"`.
+1. DNS всех доменов из `SERVER_NAME` указывает на сервер, порты 80 и 443 открыты.
+2. В `.env`: `COMPOSE_FILE=compose.nginx.yaml` (тогда `docker compose`, `make up`/`logs`/`prod-superuser` и `scripts/backup.sh` работают с этим файлом без `-f`), `ACME_EMAIL`, при другом домене — `SERVER_NAME` (через пробел; см. `.env.example`).
+3. `docker compose up -d --build`, дальше — как выше (createsuperuser, импорт, бэкап). Сертификат появится через несколько секунд после старта; ход выпуска — в `docker compose logs tpark-nginx`.
+
+Ключ аккаунта и сертификаты лежат в томе `acme` — не удалять, иначе упрёмся в лимиты Let's Encrypt. Для отладки — `ACME_SERVER` с тестовым сервером (браузер такому сертификату не доверяет); при возврате на боевой удалить том `acme`.

@@ -1,7 +1,8 @@
 # Продакшен без общего reverse-proxy: свой nginx публикует 80/443, сам терминирует HTTPS,
 # отдаёт /media/ из тома и проксирует остальное в gunicorn.
 #   docker compose -f compose.nginx.yaml up -d --build
-# Сертификаты Let's Encrypt выпускает certbot на хосте (см. README); nginx читает их из LETSENCRYPT_DIR.
+# Сертификат Let's Encrypt nginx выпускает и продлевает сам (ngx_http_acme_module): нужны ACME_EMAIL в .env,
+# DNS доменов из SERVER_NAME на этот сервер и открытый порт 80. Состояние ACME — в томе acme.
 # Тома те же, что у compose.yaml (db, media) — при переходе между вариантами данные сохраняются.
 services:
   tpark-web:
@@ -26,17 +27,22 @@ services:
       tpark-web:
         condition: service_healthy
     environment:
+      # Подставляются в docker/nginx.conf.template (envsubst образа nginx); шаблон — целый nginx.conf.
+      NGINX_ENVSUBST_OUTPUT_DIR: /etc/nginx
       SERVER_NAME: ${SERVER_NAME:-t-camp.ru www.t-camp.ru}
-      CERT_NAME: ${CERT_NAME:-t-camp.ru}
+      ACME_EMAIL: ${ACME_EMAIL:?Укажите ACME_EMAIL в .env — почта для Let's Encrypt}
+      # Для проверки без лимитов: https://acme-staging-v02.api.letsencrypt.org/directory
+      ACME_SERVER: ${ACME_SERVER:-https://acme-v02.api.letsencrypt.org/directory}
     ports:
       - "${HTTP_PORT:-80}:80"
       - "${HTTPS_PORT:-443}:443"
     volumes:
       - media:/data/media:ro
-      - ./docker/nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
-      - ${LETSENCRYPT_DIR:-/etc/letsencrypt}:/etc/letsencrypt:ro
-      - ${ACME_WEBROOT:-/var/www/certbot}:/var/www/certbot:ro
+      - ./docker/nginx.conf.template:/etc/nginx/templates/nginx.conf.template:ro
+      # Ключ аккаунта и сертификаты: без тома каждый перезапуск выпускал бы новый (лимиты Let's Encrypt).
+      - acme:/var/cache/nginx/acme-letsencrypt
 
 volumes:
   db:
   media:
+  acme:
