@@ -47,8 +47,23 @@ class Category(SeoModel, OrderedModel):
         return reverse("catalog:category", args=[self.slug])
 
     def published_services(self) -> list[Service]:
-        links = self.service_links.filter(service__is_published=True).select_related("service").order_by("order", "id")
+        links = (
+            self.service_links.filter(service__is_published=True)
+            .select_related("service")
+            .prefetch_related("service__photos")
+            .order_by("order", "id")
+        )
         return [link.service for link in links]
+
+    def related_categories(self, limit: int = 4) -> list[Category]:
+        """Опубликованные категории из тех же групп меню — «Другие категории» внизу страницы."""
+        related = (
+            Category.objects.published()
+            .filter(groups__in=self.groups.filter(is_published=True))
+            .exclude(pk=self.pk)
+            .distinct()
+        )
+        return list(related[:limit])
 
 
 class CategoryPhoto(OrderedModel):
@@ -101,6 +116,12 @@ class Service(SeoModel):
             return ""
         return f"{self.price} руб / {self.price_unit}" if self.price_unit else f"{self.price} руб"
 
+    @property
+    def cover(self) -> ServicePhoto | None:
+        """Первое фото — обложка карточки (берёт из prefetch, если он был)."""
+        photos = self.photos.all()
+        return photos[0] if photos else None
+
 
 class CategoryService(OrderedModel):
     category = models.ForeignKey(
@@ -122,6 +143,7 @@ class ServicePhoto(OrderedModel):
     image = photo_field("Фото", "catalog/services", blank=False)
     slide = image_spec("image", 1600, 900, crop=False)
     thumb = image_spec("image", 320, 240)
+    card = image_spec("image", 640, 480)
 
     class Meta(OrderedModel.Meta):
         verbose_name = "Фото услуги"

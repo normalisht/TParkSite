@@ -75,6 +75,7 @@ def test_safe_spec_url_swallows_errors():
 
     assert safe_spec_url(Broken(), "thumb") == ""
     assert safe_spec_url(object(), "missing") == ""
+    assert safe_spec_url(None, "thumb") == ""
 
 
 @pytest.mark.parametrize(

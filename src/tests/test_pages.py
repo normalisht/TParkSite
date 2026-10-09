@@ -5,7 +5,7 @@ from decimal import Decimal
 import pytest
 from django.utils import timezone
 
-from apps.catalog.models import Category, CategoryPhoto, CategoryService, Service
+from apps.catalog.models import Category, CategoryGroup, CategoryPhoto, CategoryService, Service, ServicePhoto
 from apps.content.models import Event, GalleryPhoto, Partner, Review
 from apps.core.models import FounderFact, InfoPage, ParkFormat, Phone, SiteSettings
 
@@ -45,6 +45,35 @@ def test_category_page_lists_services(client, category):
     assert "swiper-slide" in html
     # Полноэкранный просмотр открывает оригинал фото.
     assert f'data-full="{category.photos.get().image.url}"' in html
+    # Услуга со страницей — карточкой, без страницы — в списке «Ещё услуги».
+    cards, rows = html.split("Услуги и цены</h2>")[1].split("Ещё услуги")
+    assert "Однодневный сплав" in cards and "Аренда байдарки" not in cards
+    assert "Аренда байдарки" in rows
+
+
+def test_category_page_cta_and_related(client, category, make_image):
+    Phone.objects.create(settings=SiteSettings.load(), number="9029856594")
+    group = CategoryGroup.objects.create(name="Активный отдых")
+    neighbour = Category.objects.create(name="Походы", is_published=True)
+    draft = Category.objects.create(name="Черновик", is_published=False)
+    group.categories.add(category, neighbour, draft)
+    service = Service.objects.create(name="Сплав", short_description="<p>Коротко&nbsp;о главном</p>", has_page=True)
+    ServicePhoto.objects.create(service=service, image=make_image(), order=0)
+    CategoryService.objects.create(category=category, service=service)
+    html = client.get(category.get_absolute_url()).content.decode()
+    assert "Забронировать или задать вопрос" in html
+    assert "Другие категории" in html and neighbour.get_absolute_url() in html
+    assert draft.get_absolute_url() not in html
+    assert "Коротко о главном" in html
+    assert "Ещё услуги" not in html
+
+
+def test_category_page_without_services(client):
+    category = Category.objects.create(name="Утренники", description="<p>Скоро</p>", is_published=True)
+    html = client.get(category.get_absolute_url()).content.decode()
+    assert "Скоро" in html
+    assert "Услуги и цены" not in html
+    assert "Другие категории" not in html
 
 
 def test_unpublished_category_is_404(client):
@@ -57,6 +86,24 @@ def test_service_page(client):
     response = client.get(service.get_absolute_url())
     assert response.status_code == 200
     assert "Полное описание" in response.content.decode()
+
+
+def test_service_page_booking_card_and_related(client):
+    Phone.objects.create(settings=SiteSettings.load(), number="9029856594")
+    category = Category.objects.create(name="Сплавы", is_published=True)
+    services = [
+        Service.objects.create(name=name, price="2000", price_unit="человек", has_page=has_page)
+        for name, has_page in [("Сплав", True), ("Сплав ночной", True), ("Аренда весла", False)]
+    ]
+    for order, service in enumerate(services):
+        CategoryService.objects.create(category=category, service=service, order=order)
+    html = client.get(services[0].get_absolute_url()).content.decode()
+    assert "Стоимость" in html
+    assert "tel:" in html.split("<aside")[1].split("</aside>")[0]
+    related = html.split("Ещё в категории «Сплавы»")[1]
+    assert services[1].get_absolute_url() in related
+    assert services[0].get_absolute_url() not in related
+    assert "Аренда весла" not in related
 
 
 @pytest.mark.parametrize("kwargs", [{"has_page": False}, {"has_page": True, "is_published": False}])

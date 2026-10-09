@@ -35,6 +35,11 @@ def category_detail(request, slug):
             "category": category,
             "photos": photos,
             "services": services,
+            # Услуги со своей страницей — карточками, остальные — компактным списком.
+            "service_cards": [s for s in services if s.has_page],
+            "service_rows": [s for s in services if not s.has_page],
+            "hero": image,
+            "related": category.related_categories(),
             "breadcrumbs": crumbs,
             "seo": make_seo(
                 category.name,
@@ -68,12 +73,15 @@ def service_detail(request, slug):
         (service.name, ""),
     ]
     image = safe_spec_url(photos[0], "slide") if photos else ""
+    related = [s for s in category.published_services() if s.has_page and s.pk != service.pk][:3] if category else []
     return render(
         request,
         "catalog/service.html",
         {
             "service": service,
             "photos": photos,
+            "category": category,
+            "related": related,
             "breadcrumbs": crumbs,
             "seo": make_seo(
                 service.name,

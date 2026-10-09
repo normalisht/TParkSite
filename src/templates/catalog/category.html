@@ -2,17 +2,49 @@
 {% block vendor_css %}{% include "partials/vendor.html" with part="css" swiper=1 glightbox=1 %}{% endblock %}
 {% block vendor_js %}{% include "partials/vendor.html" with part="js" swiper=1 glightbox=1 %}{% endblock %}
 {% block content %}
-<div class="mx-auto max-w-6xl px-4 py-8 md:py-12">
-  {% include "partials/breadcrumbs.html" %}
-  <h1 class="text-3xl font-bold md:text-5xl">{{ category.name }}</h1>
-  {% if photos %}<div class="mt-8">{% include "catalog/partials/slider.html" with alt=category.name %}</div>{% endif %}
-  {% if category.description %}<div class="rich-text mt-8 max-w-3xl">{{ category.description|safe }}</div>{% endif %}
-  {% if services %}
-  <h2 class="mb-4 mt-12 text-2xl font-bold">Услуги и цены</h2>
+<section class="bg-sand-100">
+  <div class="mx-auto grid max-w-6xl items-center gap-8 px-4 py-8 md:py-12 {% if hero %}lg:grid-cols-2 lg:gap-12{% endif %}">
+    <div class="min-w-0">
+      {% include "partials/breadcrumbs.html" %}
+      <h1 class="text-3xl font-bold md:text-5xl">{{ category.name }}</h1>
+      {% if category.description %}<div class="rich-text mt-5 max-w-3xl">{{ category.description|safe }}</div>{% endif %}
+    </div>
+    {% if hero %}<img src="{{ hero }}" alt="{{ category.name }}" class="aspect-[3/2] w-full rounded-2xl object-cover shadow-lg" fetchpriority="high">{% endif %}
+  </div>
+</section>
+
+{% if services %}
+<section class="mx-auto max-w-6xl px-4 pt-10 md:pt-16">
+  <h2 class="mb-4 text-2xl font-bold md:mb-6 md:text-3xl">Услуги и цены</h2>
+  {% if service_cards %}
+  <div class="grid gap-3 sm:grid-cols-2 sm:gap-4 md:gap-6 lg:grid-cols-3">
+    {% for service in service_cards %}{% include "catalog/partials/service_card.html" %}{% endfor %}
+  </div>
+  {% endif %}
+  {% if service_rows %}
+  {% if service_cards %}<h3 class="mb-4 mt-10 text-xl font-bold">Ещё услуги</h3>{% endif %}
   <ul class="-mx-4 divide-y divide-ink/10 border-y border-ink/10 bg-white sm:mx-0 sm:overflow-hidden sm:rounded-2xl sm:border-0 sm:ring-1 sm:ring-ink/10">
-    {% for service in services %}<li>{% include "catalog/partials/service_row.html" %}</li>{% endfor %}
+    {% for service in service_rows %}<li>{% include "catalog/partials/service_row.html" %}</li>{% endfor %}
   </ul>
   {% endif %}
-  <div class="mt-10 flex flex-wrap gap-3">{% include "partials/contact_links.html" %}</div>
-</div>
+</section>
+{% endif %}
+
+{% if photos %}
+<section class="mx-auto max-w-6xl px-4 pt-10 md:pt-16">
+  <h2 class="mb-4 text-2xl font-bold md:mb-6 md:text-3xl">Фотографии</h2>
+  {% include "catalog/partials/slider.html" with alt=category.name %}
+</section>
+{% endif %}
+
+{% if related %}
+<section class="mx-auto max-w-6xl px-4 pt-10 md:pt-16">
+  <h2 class="mb-4 text-2xl font-bold md:mb-6 md:text-3xl">Другие категории</h2>
+  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    {% for category in related %}{% include "catalog/partials/category_card.html" %}{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<div class="pt-10 md:pt-16">{% include "partials/cta_card.html" with title="Забронировать или задать вопрос" text="Позвоните или напишите — расскажем подробности, подберём программу и удобную дату." %}</div>
 {% endblock %}
