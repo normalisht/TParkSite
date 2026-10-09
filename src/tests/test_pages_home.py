@@ -1,6 +1,10 @@
+from datetime import timedelta
+
 import pytest
+from django.utils import timezone
 
 from apps.catalog.models import Category, CategoryGroup
+from apps.content.models import Event
 from apps.core.models import Phone, SiteSettings
 from apps.core.seo import plaintext
 
@@ -23,6 +27,33 @@ def test_home_shows_only_published_categories(client):
     assert "Активный отдых" in html and "Байдарки" in html
     assert "Скрытая" not in html
     assert "Пустая группа" not in html
+
+
+@pytest.mark.parametrize("show", [True, False])
+def test_home_upcoming_events_toggle(client, show):
+    site = SiteSettings.load()
+    site.home_show_events = show
+    site.save()
+    today = timezone.localdate()
+    Event.objects.create(title="Сплав выходного дня", date=today + timedelta(days=3))
+    Event.objects.create(title="Было", date=today - timedelta(days=3), show_after_date=True)
+    html = client.get("/").content.decode()
+    assert ("Ближайшие мероприятия" in html) is show
+    assert ("Сплав выходного дня" in html) is show
+    assert "Было" not in html
+
+
+def test_home_hero_hours_and_route(client):
+    site = SiteSettings.load()
+    site.address = "село Восход"
+    site.opening_hours = "Mo-Su 10:00-18:00"
+    site.latitude, site.longitude = 54.9, 36.6
+    site.save()
+    Phone.objects.create(settings=site, number="9029856594")
+    html = client.get("/").content.decode()
+    assert "Ежедневно, 10:00–18:00" in html
+    assert "Как добраться" in html and "rtext=~54.900000,36.600000" in html
+    assert "Приезжайте в Т-Парк" in html
 
 
 def test_home_hides_unpublished_group(client):

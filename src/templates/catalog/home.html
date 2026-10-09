@@ -2,30 +2,60 @@
 {% block vendor_css %}{% include "partials/vendor.html" with part="css" swiper=1 %}{% endblock %}
 {% block vendor_js %}{% include "partials/vendor.html" with part="js" swiper=1 %}{% endblock %}
 {% block content %}
-<section class="bg-tint">
-  <div class="mx-auto max-w-6xl px-4 py-10 md:py-20">
-    <h1 class="text-4xl font-bold md:text-6xl">Тренинг-парк Дмитрия Сергеева</h1>
-    {% if site.home_intro %}<div class="rich-text mt-5 max-w-3xl text-lg">{{ site.home_intro|safe }}</div>{% endif %}
-    <div class="mt-6 flex flex-wrap gap-3 md:mt-8">{% include "partials/contact_links.html" %}</div>
+<section class="bg-sand-100">
+  <div class="mx-auto grid max-w-6xl items-center gap-8 px-4 py-10 md:py-16 {% if hero %}lg:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] lg:gap-12{% endif %}">
+    <div class="min-w-0">
+      <h1 class="text-4xl font-bold md:text-6xl">Тренинг-парк Дмитрия Сергеева</h1>
+      {% if site.about_motto %}<p class="mt-4 max-w-2xl text-xl font-semibold text-pine-700 md:text-2xl">{{ site.about_motto }}</p>{% endif %}
+      {% if site.home_intro %}<div class="rich-text mt-5 max-w-3xl text-lg">{{ site.home_intro|safe }}</div>{% endif %}
+      <div class="mt-6 flex flex-wrap gap-3 md:mt-8">{% include "partials/contact_links.html" %}</div>
+      {% if hours or site.address %}
+      <ul class="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-ink/75">
+        {% for line in hours %}<li class="flex items-center gap-2"><span class="icon h-5 w-5 text-pine-700">{% include "icons/clock.svg" %}</span>{{ line }}</li>{% endfor %}
+        {% if site.address %}<li><a href="{% url 'content:contacts' %}" class="group flex gap-2"><span class="icon mt-0.5 h-5 w-5 shrink-0 text-pine-700">{% include "icons/map-pin.svg" %}</span><span>{{ site.address }} — <span class="font-semibold text-brand-700 group-hover:text-brand-600">как добраться</span></span></a></li>{% endif %}
+      </ul>
+      {% endif %}
+    </div>
+    {% if hero %}<img src="{{ hero }}" alt="Т-Парк" width="960" height="720" class="aspect-[4/3] w-full rounded-2xl object-cover shadow-lg" fetchpriority="high">{% endif %}
   </div>
 </section>
 
 {% for group in menu_groups %}
-<section class="mx-auto max-w-6xl px-4 py-5 md:py-10">
+{% with count=group.published_categories|length %}
+<section class="mx-auto max-w-6xl px-4 pt-10 md:pt-16">
   <h2 class="mb-4 text-2xl font-bold md:mb-6 md:text-3xl">{{ group.name }}</h2>
-  <div class="grid gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-3">
-    {% for category in group.published_categories %}{% include "catalog/partials/category_card.html" %}{% endfor %}
+  {# На телефоне — лента со свайпом (следующая карточка выглядывает с края), с sm — сетка; группа из 1–2 категорий — широкими карточками. #}
+  <div class="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 md:gap-6 {% if count > 2 %}lg:grid-cols-3{% endif %}">
+    {% for category in group.published_categories %}
+    <div class="{% if count > 1 %}w-[82%]{% else %}w-full{% endif %} shrink-0 snap-start scroll-ml-4 sm:w-auto">{% if count > 2 %}{% include "catalog/partials/category_card.html" %}{% else %}{% include "catalog/partials/category_card.html" with wide=True %}{% endif %}</div>
+    {% endfor %}
   </div>
 </section>
+{% endwith %}
 {% empty %}
 <p class="mx-auto max-w-6xl px-4 py-16 text-ink/60">Скоро здесь появятся наши услуги.</p>
 {% endfor %}
 
+{% if events %}
+<section class="mx-auto max-w-6xl px-4 pt-10 md:pt-16">
+  <div class="mb-4 flex items-end justify-between gap-4 md:mb-6">
+    <h2 class="text-2xl font-bold md:text-3xl">Ближайшие мероприятия</h2>
+    <a href="{% url 'content:events' %}" class="inline-flex shrink-0 items-center gap-1 font-semibold text-brand-700 hover:text-brand-600">Все мероприятия<span class="icon h-4 w-4">{% include "icons/chevron-right.svg" %}</span></a>
+  </div>
+  <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    {% for event in events %}<article>{% include "content/partials/event_card.html" with heading="h3" %}</article>{% endfor %}
+  </div>
+</section>
+{% endif %}
+
 {% if reviews %}
-<section class="mx-auto max-w-6xl px-4 py-5 md:py-10">
+<section class="mx-auto max-w-6xl px-4 pt-10 md:pt-16">
   <div class="mb-4 flex items-end justify-between gap-4 md:mb-6">
     <h2 class="text-2xl font-bold md:text-3xl">Отзывы гостей</h2>
-    <a href="{% url 'content:reviews' %}" class="inline-flex shrink-0 items-center gap-1 font-semibold text-brand-700 hover:text-brand-600">Все отзывы<span class="icon h-4 w-4">{% include "icons/chevron-right.svg" %}</span></a>
+    <div class="flex shrink-0 flex-wrap justify-end gap-x-5 gap-y-1">
+      {% if site.reviews_url %}<a href="{{ site.reviews_url }}" class="hidden items-center gap-1 font-semibold text-brand-700 hover:text-brand-600 sm:inline-flex" target="_blank" rel="noopener">Оставить отзыв<span class="icon h-4 w-4">{% include "icons/external-link.svg" %}</span></a>{% endif %}
+      <a href="{% url 'content:reviews' %}" class="inline-flex items-center gap-1 font-semibold text-brand-700 hover:text-brand-600">Все отзывы<span class="icon h-4 w-4">{% include "icons/chevron-right.svg" %}</span></a>
+    </div>
   </div>
   {# На ПК кнопки — по бокам карусели, в отступах обёртки; на телефоне — рядом под карточками, между ними счётчик. #}
   <div class="js-carousel-wrap relative md:px-14">
@@ -42,6 +72,32 @@
       <button type="button" aria-label="Следующие отзывы" class="js-carousel-next flex h-10 w-10 items-center justify-center rounded-full bg-white text-ink/70 shadow-sm ring-1 ring-ink/10 transition hover:text-brand-700 hover:ring-brand-500 md:absolute md:right-0 md:top-1/2 md:z-10 md:-translate-y-1/2 [&.swiper-button-disabled]:pointer-events-none [&.swiper-button-disabled]:opacity-40"><span class="icon h-5 w-5">{% include "icons/chevron-right.svg" %}</span></button>
     </div>
   </div>
+</section>
+{% endif %}
+
+{% if photos %}
+<section class="mx-auto max-w-6xl px-4 pt-10 md:pt-16">{% include "content/partials/photo_strip.html" %}</section>
+{% endif %}
+
+{% if phones or site.address %}
+<section class="mx-auto grid max-w-6xl gap-6 px-4 pt-10 md:pt-16 {% if phones and site.address %}lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]{% endif %}">
+  {% if phones %}
+  <div class="rounded-2xl bg-sand-100 px-6 py-8 md:px-10 md:py-12">
+    <h2 class="text-2xl font-bold md:text-3xl">Приезжайте в Т-Парк</h2>
+    <p class="mt-2 text-ink/75">Расскажем о программах и подберём формат для вас, семьи или команды.</p>
+    <div class="mt-6 flex flex-wrap gap-3">{% include "partials/contact_links.html" %}</div>
+  </div>
+  {% endif %}
+  {% if site.address %}
+  <div class="rounded-2xl bg-pine-50 px-6 py-8 md:px-8 md:py-12">
+    <h2 class="text-2xl font-bold md:text-3xl">Как добраться</h2>
+    <p class="mt-3 flex gap-2"><span class="icon mt-0.5 h-5 w-5 shrink-0 text-pine-700">{% include "icons/map-pin.svg" %}</span>{{ site.address }}</p>
+    <div class="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
+      {% if route %}<a href="{{ route.yandex }}" class="btn btn-primary" target="_blank" rel="noopener"><span class="icon h-5 w-5">{% include "icons/navigation.svg" %}</span>Маршрут</a>{% endif %}
+      <a href="{% url 'content:contacts' %}" class="inline-flex items-center gap-1 font-semibold text-brand-700 hover:text-brand-600">Карта и контакты<span class="icon h-4 w-4">{% include "icons/chevron-right.svg" %}</span></a>
+    </div>
+  </div>
+  {% endif %}
 </section>
 {% endif %}
 {% endblock %}

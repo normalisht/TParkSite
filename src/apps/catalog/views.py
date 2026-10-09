@@ -1,20 +1,30 @@
 from django.shortcuts import get_object_or_404, render
 
 from apps.catalog.models import Category, Service
-from apps.content.models import Review
+from apps.content.models import Event, GalleryPhoto, Review
 from apps.core import structured_data as ld
 from apps.core.images import safe_spec_url
-from apps.core.models import PARK_ADDRESS
+from apps.core.maps import route_links
+from apps.core.models import PARK_ADDRESS, SiteSettings
+from apps.core.opening_hours import human_opening_hours
 from apps.core.seo import absolute_url, make_seo, page_seo
 
 HOME_REVIEWS = 8
+HOME_EVENTS = 3
+HOME_PHOTOS = 6
 
 
 def home(request):
+    site = SiteSettings.load()
     return render(
         request,
         "catalog/home.html",
         {
+            "hero": safe_spec_url(site, "about_card"),
+            "hours": human_opening_hours(site.opening_hours),
+            "route": route_links(site.latitude, site.longitude),
+            "events": list(Event.objects.upcoming()[:HOME_EVENTS]) if site.home_show_events else [],
+            "photos": list(GalleryPhoto.objects.all()[:HOME_PHOTOS]),
             "reviews": list(Review.objects.published()[:HOME_REVIEWS]),
             "seo": page_seo("home"),
             "structured_data": [ld.organization(request)],

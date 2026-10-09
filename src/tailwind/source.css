@@ -109,6 +109,12 @@ html { scrollbar-gutter: stable; }
 }
 
 /* Тон карточки отзыва — набор переменных; карточка берёт из них фон, кавычку и аватар. */
+/* Горизонтальная лента со свайпом без полосы прокрутки (категории на главной на телефоне). */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
 @utility review-tone-warm {
   --rv-bg: var(--color-brand-50);
   --rv-quote: var(--color-brand-300);

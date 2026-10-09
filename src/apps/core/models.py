@@ -69,6 +69,11 @@ class SiteSettings(models.Model):
         help_text="Страница отзывов о Т-Парке: кнопки «Все отзывы» и «Оставить отзыв» на странице отзывов.",
     )
     home_intro = HtmlField("Вступление на главной")
+    home_show_events = models.BooleanField(
+        "Ближайшие мероприятия на главной",
+        default=True,
+        help_text="Блок появляется, только если есть предстоящие мероприятия.",
+    )
     events_intro = HtmlField("Вступление на странице мероприятий")
     contacts_text = HtmlField("Текст на странице контактов")
 

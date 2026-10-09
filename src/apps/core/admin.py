@@ -89,13 +89,8 @@ class SiteSettingsAdmin(SiteModelAdmin):
     formfield_overrides = {MapEmbedURLField: {"widget": UnfoldAdminTextareaWidget(attrs={"rows": 3})}}
     fieldsets = (
         ("Контакты", {"classes": ["tab"], "fields": ["address", "map_embed_url", "vk_url", "reviews_url"]}),
-        (
-            "Тексты",
-            {
-                "classes": ["tab"],
-                "fields": ["home_intro", "events_intro", "contacts_text"],
-            },
-        ),
+        ("Главная", {"classes": ["tab"], "fields": ["home_intro", "home_show_events"]}),
+        ("Тексты", {"classes": ["tab"], "fields": ["events_intro", "contacts_text"]}),
         (
             "О нас",
             {

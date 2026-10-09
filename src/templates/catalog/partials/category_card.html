@@ -1,6 +1,6 @@
 {% load static site_tags %}
-{# Название поверх фото на затемнении снизу. На телефоне — одна колонка, карточка ниже (3:2) и без стрелки. #}
-<a href="{{ category.get_absolute_url }}" class="group relative block aspect-[3/2] overflow-hidden rounded-2xl bg-sand-200 shadow-sm transition outline-none hover:-translate-y-1 hover:shadow-lg focus-visible:ring-4 focus-visible:ring-brand-500 active:scale-[.98] sm:aspect-[4/3]">
+{# Название поверх фото на затемнении снизу. На телефоне карточка ниже (3:2) и без стрелки; wide — пониже на ПК (группа из 1–2 категорий). #}
+<a href="{{ category.get_absolute_url }}" class="group relative block aspect-[3/2] overflow-hidden rounded-2xl bg-sand-200 shadow-sm transition outline-none hover:-translate-y-1 hover:shadow-lg focus-visible:ring-4 focus-visible:ring-brand-500 active:scale-[.98] {% if wide %}sm:aspect-[16/9]{% else %}sm:aspect-[4/3]{% endif %}">
   {% with url=category|spec_url:"preview_card" %}{% if url %}
   <img src="{{ url }}" alt="" width="640" height="427" loading="lazy" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105">
   {% else %}
