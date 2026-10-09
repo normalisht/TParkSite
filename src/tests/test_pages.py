@@ -68,6 +68,22 @@ def test_category_page_cta_and_related(client, category, make_image):
     assert "Ещё услуги" not in html
 
 
+def test_category_hero_opens_full_photo(client, make_image):
+    category = Category.objects.create(name="Сплавы", is_published=True)
+    photo = CategoryPhoto.objects.create(category=category, image=make_image(), order=0)
+    second = CategoryPhoto.objects.create(category=category, image=make_image("second.jpg"), order=1)
+    html = client.get(category.get_absolute_url()).content.decode()
+    # Шапка — первое фото, остальные листаются следом; первое не дублируется.
+    assert html.count(f'href="{photo.image.url}" class="glightbox') == 1
+    assert f'<a href="{second.image.url}" class="glightbox" data-gallery="category" hidden>' in html
+
+    category.preview = make_image("preview.jpg")
+    category.save()
+    html = client.get(category.get_absolute_url()).content.decode()
+    assert f'<a href="{category.preview.url}" class="glightbox block cursor-zoom-in" data-gallery="category">' in html
+    assert f'<a href="{photo.image.url}" class="glightbox" data-gallery="category" hidden>' in html
+
+
 def test_category_page_without_services(client):
     category = Category.objects.create(name="Утренники", description="<p>Скоро</p>", is_published=True)
     html = client.get(category.get_absolute_url()).content.decode()

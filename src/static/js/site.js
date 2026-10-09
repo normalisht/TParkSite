@@ -153,6 +153,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   if (window.GLightbox && document.querySelector(".glightbox")) {
-    GLightbox({ selector: ".glightbox" });
+    GLightbox({ selector: ".glightbox", loop: true });
   }
 });

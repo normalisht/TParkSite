@@ -16,9 +16,11 @@
 
     <p class="hidden shrink-0 whitespace-nowrap text-sm font-semibold text-navy lg:block">Тренинг-парк Дмитрия Сергеева</p>
 
-    <button type="button" class="icon h-8 w-8 md:hidden" @click="open = !open" :aria-expanded="open" aria-label="Меню">
-      <span x-show="!open">{% include "icons/menu.svg" %}</span>
-      <span x-show="open" x-cloak>{% include "icons/x.svg" %}</span>
+    <button type="button" class="icon h-8 w-8 md:hidden" @click="open = !open" :aria-expanded="open" :aria-label="open ? 'Закрыть меню' : 'Меню'">
+      {# Три полоски плавно складываются в крестик — стили .burger в tailwind/source.css #}
+      <svg class="burger" :class="open && 'is-open'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <path d="M4 5h16" /><path d="M4 12h16" /><path d="M4 19h16" />
+      </svg>
     </button>
   </div>
 

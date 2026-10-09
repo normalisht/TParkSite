@@ -1,8 +1,17 @@
 {% if phones %}
-<div x-data="{ open: false }" class="fixed bottom-4 right-4 z-50 md:hidden">
-  <div x-show="open" x-transition x-cloak class="mb-3 flex flex-col items-end gap-2">
+{# items-end: кнопка прижата к правому краю и не сдвигается, когда раскрывается более широкий список ссылок. #}
+<div x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false" class="fixed bottom-4 right-4 z-50 flex flex-col items-end md:hidden">
+  <div id="contact-menu" x-show="open" x-cloak
+       x-transition:enter="transition duration-150 ease-out" x-transition:enter-start="translate-y-2 opacity-0" x-transition:enter-end="translate-y-0 opacity-100"
+       x-transition:leave="transition duration-100 ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+       class="mb-3 flex flex-col items-end gap-2">
     {% include "partials/contact_links.html" %}
   </div>
-  <button type="button" @click="open = !open" :aria-expanded="open" class="btn btn-primary shadow-lg">Связаться</button>
+  <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="contact-menu" class="btn btn-primary shadow-lg">
+    {# Иконки одного размера: при переключении ширина кнопки не меняется. #}
+    <span x-show="!open" class="icon h-5 w-5" aria-hidden="true">{% include "icons/phone.svg" %}</span>
+    <span x-show="open" x-cloak class="icon h-5 w-5" aria-hidden="true">{% include "icons/x.svg" %}</span>
+    <span>Связаться</span><span x-show="open" x-cloak class="sr-only">— закрыть</span>
+  </button>
 </div>
 {% endif %}

@@ -36,7 +36,12 @@ def category_detail(request, slug):
     category = get_object_or_404(Category.objects.published(), slug=slug)
     photos = list(category.photos.all())
     services = category.published_services()
-    image = safe_spec_url(category, "preview_card") or (safe_spec_url(photos[0], "slide") if photos else "")
+    image = safe_spec_url(category, "preview_card")
+    # Полноразмерное фото для просмотра на весь экран при нажатии на картинку в шапке.
+    image_full = category.preview.url if image else ""
+    if not image and photos:
+        image = safe_spec_url(photos[0], "slide")
+        image_full = photos[0].image.url if image else ""
     crumbs = [ld.home_crumb(), (category.name, "")]
     return render(
         request,
@@ -49,6 +54,7 @@ def category_detail(request, slug):
             "service_cards": [s for s in services if s.has_page],
             "service_rows": [s for s in services if not s.has_page],
             "hero": image,
+            "hero_full": image_full,
             "related": category.related_categories(),
             "breadcrumbs": crumbs,
             "seo": make_seo(

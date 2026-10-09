@@ -10,7 +10,11 @@
       <h1 class="page-title">{{ category.name }}</h1>
       {% if category.description %}<div class="rich-text mt-5 max-w-3xl">{{ category.description|safe }}</div>{% endif %}
     </div>
-    {% if hero %}<img src="{{ hero }}" alt="{{ category.name }}" class="aspect-[3/2] w-full rounded-2xl object-cover shadow-lg" fetchpriority="high">{% endif %}
+    {% if hero %}
+    <a href="{{ hero_full }}" class="glightbox block cursor-zoom-in" data-gallery="category"><img src="{{ hero }}" alt="{{ category.name }}" class="aspect-[3/2] w-full rounded-2xl object-cover shadow-lg" fetchpriority="high"></a>
+    {# Остальные фото категории — чтобы из шапки их можно было пролистать на весь экран. #}
+    {% for photo in photos %}{% if photo.image.url != hero_full %}<a href="{{ photo.image.url }}" class="glightbox" data-gallery="category" hidden></a>{% endif %}{% endfor %}
+    {% endif %}
   </div>
 </section>
 
