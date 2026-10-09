@@ -1,6 +1,6 @@
 {% extends "base.html" %}
-{% block vendor_css %}{% include "partials/vendor.html" with part="css" swiper=1 %}{% endblock %}
-{% block vendor_js %}{% include "partials/vendor.html" with part="js" swiper=1 %}{% endblock %}
+{# Swiper нужен только карусели отзывов внизу страницы: стили подключаются в body перед ней, чтобы не задерживать первую отрисовку. #}
+{% block vendor_js %}{% if reviews %}{% include "partials/vendor.html" with part="js" swiper=1 %}{% endif %}{% endblock %}
 {% block content %}
 <section class="page-hero">
   {% include "partials/hero_decor.html" %}
@@ -21,6 +21,8 @@
   </div>
 </section>
 
+{# Без фото в шапке первый ряд первой группы — на первом экране: его фото грузятся сразу, первое — с высоким приоритетом (LCP). #}
+{% with first_screen=menu_groups.0.published_categories|slice:":3" %}
 {% for group in menu_groups %}
 {% with count=group.published_categories|length %}
 <section class="mx-auto max-w-6xl px-4 pt-10 md:pt-16">
@@ -28,14 +30,15 @@
   {# На телефоне — лента со свайпом (следующая карточка выглядывает с края), с sm — сетка; группа из 1–2 категорий — широкими карточками. #}
   <div class="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 md:gap-6 {% if count > 2 %}lg:grid-cols-3{% endif %}">
     {% for category in group.published_categories %}
-    <div class="{% if count > 1 %}w-[82%]{% else %}w-full{% endif %} shrink-0 snap-start scroll-ml-4 sm:w-auto">{% if count > 2 %}{% include "catalog/partials/category_card.html" %}{% else %}{% include "catalog/partials/category_card.html" with wide=True %}{% endif %}</div>
+    <div class="{% if count > 1 %}w-[82%]{% else %}w-full{% endif %} shrink-0 snap-start scroll-ml-4 sm:w-auto">{% if count > 2 %}{% include "catalog/partials/category_card.html" with first_screen=first_screen lcp=lcp_card %}{% else %}{% include "catalog/partials/category_card.html" with wide=True first_screen=first_screen lcp=lcp_card %}{% endif %}</div>
     {% endfor %}
   </div>
 </section>
 {% endwith %}
 {% empty %}
-<p class="mx-auto max-w-6xl px-4 py-16 text-ink/55">Скоро здесь появятся наши услуги.</p>
+<p class="mx-auto max-w-6xl px-4 py-16 text-ink/65">Скоро здесь появятся наши услуги.</p>
 {% endfor %}
+{% endwith %}
 
 {% if events %}
 <section class="mx-auto max-w-6xl px-4 pt-10 md:pt-16">
@@ -59,6 +62,7 @@
     </div>
   </div>
   {# На ПК кнопки — по бокам карусели, в отступах обёртки; на телефоне — рядом под карточками, между ними счётчик. #}
+  {% include "partials/vendor.html" with part="css" swiper=1 %}
   <div class="js-carousel-wrap relative md:px-14">
     <div class="swiper js-carousel">
       <div class="swiper-wrapper">
@@ -69,7 +73,7 @@
     </div>
     <div class="mt-4 flex items-center justify-center gap-4 md:mt-0 md:block">
       <button type="button" aria-label="Предыдущие отзывы" class="js-carousel-prev flex h-10 w-10 items-center justify-center rounded-full bg-white text-ink/75 shadow-sm ring-1 ring-ink/10 transition hover:text-brand-700 hover:ring-brand-500 md:absolute md:left-0 md:top-1/2 md:z-10 md:-translate-y-1/2 [&.swiper-button-disabled]:pointer-events-none [&.swiper-button-disabled]:opacity-40"><span class="icon h-5 w-5 rotate-180">{% include "icons/chevron-right.svg" %}</span></button>
-      <span class="js-carousel-counter min-w-12 text-center text-sm tabular-nums text-ink/55 md:hidden" aria-live="polite"></span>
+      <span class="js-carousel-counter min-w-12 text-center text-sm tabular-nums text-ink/65 md:hidden" aria-live="polite"></span>
       <button type="button" aria-label="Следующие отзывы" class="js-carousel-next flex h-10 w-10 items-center justify-center rounded-full bg-white text-ink/75 shadow-sm ring-1 ring-ink/10 transition hover:text-brand-700 hover:ring-brand-500 md:absolute md:right-0 md:top-1/2 md:z-10 md:-translate-y-1/2 [&.swiper-button-disabled]:pointer-events-none [&.swiper-button-disabled]:opacity-40"><span class="icon h-5 w-5">{% include "icons/chevron-right.svg" %}</span></button>
     </div>
   </div>

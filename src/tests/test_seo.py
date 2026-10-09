@@ -4,7 +4,7 @@ import re
 import pytest
 
 from apps.catalog.models import Category, CategoryService, Service
-from apps.content.models import GalleryPhoto
+from apps.content.models import GalleryPhoto, Review
 from apps.core.models import InfoPage, Phone, SiteSettings
 
 pytestmark = pytest.mark.django_db
@@ -214,6 +214,8 @@ def test_vendor_scripts_only_where_needed(client):
     assert "glightbox" not in client.get("/contacts/").content.decode()
     gallery = client.get("/gallery/").content.decode()
     assert "glightbox.min.js" in gallery and "swiper-bundle" not in gallery
+    assert "swiper-bundle" not in client.get("/").content.decode()  # на главной Swiper — только для карусели отзывов
+    Review.objects.create(text="<p>Классно</p>")
     assert "swiper-bundle.min.js" in client.get("/").content.decode()
 
 

@@ -1,10 +1,13 @@
+import re
 from datetime import timedelta
+from pathlib import Path
 
 import pytest
+from django.conf import settings
 from django.utils import timezone
 
 from apps.catalog.models import Category, CategoryGroup
-from apps.content.models import Event
+from apps.content.models import Event, Review
 from apps.core.models import Phone, SiteSettings
 from apps.core.seo import plaintext
 
@@ -97,3 +100,62 @@ def test_plaintext_strips_and_truncates():
     long = "<p>" + "слово " * 100 + "</p>"
     result = plaintext(long)
     assert len(result) <= 160 and result.endswith("…")
+
+
+def _preview_imgs(html: str) -> list[str]:
+    return [tag for tag in re.findall(r"<img [^>]*>", html) if "catalog/previews" in tag]
+
+
+def test_home_first_screen_cards_load_eagerly(client, make_image):
+    """Без фото в шапке LCP — первая карточка: первый ряд первой группы без lazy, первая — с высоким приоритетом."""
+    first, second = CategoryGroup.objects.create(name="Первая"), CategoryGroup.objects.create(name="Вторая")
+    for i in range(4):
+        first.categories.add(Category.objects.create(name=f"Первая {i}", is_published=True, preview=make_image()))
+    second.categories.add(Category.objects.create(name="Вторая 0", is_published=True, preview=make_image()))
+    imgs = _preview_imgs(client.get("/").content.decode())
+    assert len(imgs) == 5
+    assert ['loading="lazy"' in tag for tag in imgs] == [False, False, False, True, True]
+    assert ['fetchpriority="high"' in tag for tag in imgs] == [True, False, False, False, False]
+
+
+def test_home_cards_lazy_when_hero_photo_set(client, make_image):
+    site = SiteSettings.load()
+    site.about_photo = make_image("hero.jpg")
+    site.save()
+    group = CategoryGroup.objects.create(name="Группа")
+    group.categories.add(Category.objects.create(name="Байдарки", is_published=True, preview=make_image()))
+    html = client.get("/").content.decode()
+    assert html.count('fetchpriority="high"') == 1  # только фото в шапке
+    assert all('loading="lazy"' in tag for tag in _preview_imgs(html))
+
+
+def test_home_swiper_css_not_render_blocking(client):
+    """Карусель отзывов внизу страницы: стили Swiper — в body перед ней, не в head; без отзывов Swiper не нужен."""
+    html = client.get("/").content.decode()
+    assert "swiper-bundle" not in html
+    Review.objects.create(text="<p>Классно</p>")
+    html = client.get("/").content.decode()
+    head, body = html.split("</head>")
+    assert "swiper-bundle" not in head
+    assert body.index("swiper-bundle.min.css") < body.index("js-carousel-wrap")
+    assert "swiper-bundle.min.js" in body
+
+
+LOW_CONTRAST_TEXT = re.compile(r"\btext-ink/([0-9]+)\b")
+
+
+def test_no_low_contrast_gray_text():
+    """Серый текст — не светлее ink/65: ink/55 и светлее не проходят контраст WCAG 4.5:1 на белом."""
+    root = Path(settings.BASE_DIR)
+    files = [
+        *(root / "templates").rglob("*.html"),
+        root / "tailwind" / "source.css",
+        *(root / "static" / "js").glob("*.js"),
+    ]
+    offenders = [
+        f"{path.relative_to(root)}: text-ink/{match.group(1)}"
+        for path in files
+        for match in LOW_CONTRAST_TEXT.finditer(path.read_text())
+        if int(match.group(1)) < 65
+    ]
+    assert offenders == []

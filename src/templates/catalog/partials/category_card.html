@@ -1,8 +1,8 @@
 {% load static site_tags %}
-{# Название поверх фото на затемнении снизу. На телефоне карточка ниже (3:2) и без стрелки; wide — пониже на ПК (группа из 1–2 категорий). #}
+{# Название поверх фото на затемнении снизу. На телефоне карточка ниже (3:2) и без стрелки; wide — пониже на ПК (группа из 1–2 категорий). first_screen — категории первого экрана: если lcp (в шапке страницы нет фото), их фото грузятся без lazy, первое — с fetchpriority="high". #}
 <a href="{{ category.get_absolute_url }}" class="group relative block aspect-[3/2] overflow-hidden rounded-2xl bg-sand-200 shadow-sm ring-1 ring-ink/5 card-link active:scale-[.98] {% if wide %}sm:aspect-[16/9]{% else %}sm:aspect-[4/3]{% endif %}">
   {% with url=category|spec_url:"preview_card" %}{% if url %}
-  <img src="{{ url }}" alt="" width="640" height="427" loading="lazy" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105">
+  <img src="{{ url }}" alt="" width="640" height="427" {% if lcp and category in first_screen %}{% if category == first_screen.0 %}fetchpriority="high"{% else %}decoding="async"{% endif %}{% else %}loading="lazy"{% endif %} class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105">
   {% else %}
   <img src="{% static 'img/logo.png' %}" alt="" class="absolute inset-0 m-auto w-1/2 opacity-30">
   {% endif %}{% endwith %}

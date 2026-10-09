@@ -16,11 +16,14 @@ HOME_PHOTOS = 6
 
 def home(request):
     site = SiteSettings.load()
+    hero = safe_spec_url(site, "about_card")
     return render(
         request,
         "catalog/home.html",
         {
-            "hero": safe_spec_url(site, "about_card"),
+            "hero": hero,
+            # Без фото в шапке крупнейший элемент первого экрана (LCP) — первая карточка категории.
+            "lcp_card": not hero,
             "hours": human_opening_hours(site.opening_hours),
             "route": route_links(site.latitude, site.longitude),
             "events": list(Event.objects.upcoming()[:HOME_EVENTS]) if site.home_show_events else [],
