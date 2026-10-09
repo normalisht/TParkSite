@@ -13,6 +13,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 
+Основное есть в корневом `Makefile` (`make help`): `make install`, `make run`, `make test`, `make check`, `make dev`, `make up`, `make backup`.
+
 Python-команды запускаются из `src/`:
 
 ```bash
@@ -44,7 +46,8 @@ docker compose up -d --build                      # продакшен (корн
   - `fields.py` — `HtmlField` (prose-editor с очисткой nh3; `sanitize_html` — та же очистка для импорта), `photo_field` (пережатие при загрузке), `image_spec` (WebP-миниатюры), `UploadTo` (случайные имена файлов);
   - `files.py` — удаление файлов при удалении/замене записи, только после коммита (`on_commit`), чтобы откат не терял файлы;
   - `maps.py` — поле встраиваемой Яндекс Карты (`MapEmbedURLField`: принимает код `<iframe>` или ссылку, только `yandex.ru/map-widget/`);
-  - `bulk_upload.py` — загрузка фото пачкой в админке; `legacy_redirects.py` — 301 со старых URL; `sitemaps.py`, `seo.py`;
+  - `bulk_upload.py` — загрузка фото пачкой в админке; `legacy_redirects.py` — 301 со старых URL; `sitemaps.py` (`lastmod` из `updated_at`);
+  - SEO: `SeoModel` (поля `seo_title`/`seo_description`/`updated_at` у категорий, услуг, мероприятий, инфо-страниц; в админке — вкладка `SEO_FIELDSET` со справкой из `templates/admin/seo/` через `seo_help`, счётчиками символов и превью сниппета — `static/js/admin_seo.js`), `seo.py` (`make_seo` для объектов, `page_seo` для статических страниц с умолчаниями `PAGE_DEFAULTS`), `structured_data.py` (JSON-LD узлы; список в `structured_data` контекста → `@graph` через фильтр `ld_json`), `middleware.CanonicalHostMiddleware` (301 с www на `CANONICAL_HOST`). Canonical, `og:image` по умолчанию и Метрика — из контекст-процессора `site`; адрес парка — `PARK_ADDRESS`;
   - `legacy/` — `import_legacy` (одна транзакция, отказ на непустой БД без `--flush`, отчёт с предупреждениями); `backup_db` — снимок SQLite.
 - `apps/catalog` — `CategoryGroup` ↔ `Category` (M2M) и `Category` ↔ `Service` через `CategoryService` с полем порядка. Меню (`menu_groups`) приходит из контекст-процессора; настройки и телефоны — из `apps.core.context_processors.site`.
 - `apps/content` — мероприятия (`upcoming()` / `past_visible()`; страница `/events/<slug>/` и sitemap — только для `visible()`, slug из «заголовок + год», JSON-LD `schema.org/Event` через фильтр `ld_json`), отзывы (HTML, без имени — все «Гость Т-Парка»; кнопка «Подтянуть» в админке берёт текст и дату со страницы Яндекс Отзывов — `yandex.py` + `static/js/admin_review_fetch.js`, вставка в prose-editor через событие `prose-editor:ready`), партнёры, сотрудники, галерея.
@@ -53,5 +56,6 @@ docker compose up -d --build                      # продакшен (корн
 - У Unfold нет русской локали: недостающие строки переводятся в `locale/ru/LC_MESSAGES/django.po` (`LOCALE_PATHS`); после правки — `uv run manage.py compilemessages -l ru` (нужен gettext), `.mo` коммитится.
 - Порядок везде — `order` + перетаскивание Unfold (`ordering_field`). Неопубликованное — 404.
 - Миниатюры в шаблонах — только через фильтр `obj|spec_url:"spec"` (`{% load site_tags %}`): не падает на отсутствующем файле.
+- Swiper/GLightbox подключаются только там, где нужны: блоки `vendor_css`/`vendor_js` + `partials/vendor.html`.
 - Фронт без Node и CDN: Tailwind через `django-tailwind-cli` (`tailwind/source.css` → `static/css/tailwind.css`, не в git), Alpine/Swiper/GLightbox — vendored в `static/vendor/`. При обновлении vendored-JS убрать комментарий `sourceMappingURL` — иначе `collectstatic` с манифестом упадёт (ловит `tests/test_static.py`).
 - Продакшен: образ собирается из `src/` (`.dockerignore` — allowlist), `tpark-web` (gunicorn + WhiteNoise) и `tpark-media` (nginx) — имена сервисов уникальны, т. к. они же DNS-имена в общей сети прокси; тома `db` и `media`; бэкап — `scripts/backup.sh` (cron на хосте).

@@ -1,3 +1,4 @@
+import json
 import re
 
 import pytest
@@ -264,3 +265,32 @@ def test_file_fields_support_drag_and_drop(admin_client):
     assert "material-symbols-outlined" in html  # разметка Unfold, а не голый <input type=file>
     html = admin_client.get(reverse("admin:content_partner_add")).content.decode()
     assert "js/admin_dropzone" in html
+
+
+def test_seo_help_in_admin_forms(admin_client):
+    site = SiteSettings.load()
+    site.seo_title_suffix = "Т-Парк, село Восход"
+    site.save()
+    html = admin_client.get(reverse("admin:catalog_category_add")).content.decode()
+    assert "крупной ссылкой в выдаче" in html
+    assert 'data-seo-preview data-suffix="Т-Парк, село Восход"' in html
+    assert "js/admin_seo.js" in html
+    html = admin_client.get(reverse("admin:core_sitesettings_change", args=[1])).content.decode()
+    assert "Что ещё влияет на позиции в поиске" in html
+    # Превью страниц в настройках: данные «по умолчанию» для каждой статической страницы.
+    assert "data-seo-site-preview" in html
+    pages = json.loads(re.search(r'id="seo-site-pages"[^>]*>(.*?)</script>', html, re.DOTALL).group(1))
+    assert [page["key"] for page in pages] == ["home", "events", "about", "reviews", "gallery", "contacts"]
+    assert pages[3]["title"] == "Отзывы о Т-Парке — Жуковский район, Калужская область"
+    assert "css/admin_seo.css" in html
+    assert 'class="seo-details"' in html and "seo-chevron" in html
+    assert "Региональность" in html
+    assert "Координаты" in html
+
+
+@pytest.mark.parametrize("model", ["catalog_category", "catalog_service", "content_event", "core_infopage"])
+def test_seo_is_separate_tab(admin_client, model):
+    html = admin_client.get(reverse(f"admin:{model}_add")).content.decode()
+    tabs = re.findall(r"activeFieldsetTab = '([^']+)'\"", html)
+    assert tabs[0] == "основное"
+    assert "seo" in tabs

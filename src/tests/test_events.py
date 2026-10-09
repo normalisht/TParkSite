@@ -43,7 +43,7 @@ def test_event_page(client, make_image):
     html = response.content.decode()
     assert "Полное описание мероприятия" in html
     assert "https://vk.com/tpark" in html
-    assert "<title>Слёт — Т-Парк</title>" in html
+    assert "<title>Слёт — Т-Парк, Калужская область</title>" in html
     assert 'name="description" content="Полное описание мероприятия"' in html
     assert 'property="og:image" content="http://testserver/media/' in html
     assert f'rel="canonical" href="http://testserver{event.get_absolute_url()}"' in html
@@ -53,11 +53,14 @@ def test_event_page_json_ld(client):
     event = make_event(description="<p>Описание</p>")
     html = client.get(event.get_absolute_url()).content.decode()
     raw = re.search(r'<script type="application/ld\+json">(.*?)</script>', html, re.DOTALL).group(1)
-    data = json.loads(raw)
-    assert data["@type"] == "Event"
+    nodes = {node["@type"]: node for node in json.loads(raw)["@graph"]}
+    data = nodes["Event"]
     assert data["name"] == "Слёт"
-    assert data["startDate"] == event.date.isoformat()
+    assert data["startDate"] == data["endDate"] == event.date.isoformat()
     assert data["description"] == "Описание"
+    assert data["location"]["address"]["addressRegion"] == "Калужская область"
+    assert data["organizer"] == {"@id": nodes["LocalBusiness"]["@id"]}
+    assert [item["name"] for item in nodes["BreadcrumbList"]["itemListElement"]] == ["Главная", "Мероприятия", "Слёт"]
 
 
 def test_past_visible_event_page(client):

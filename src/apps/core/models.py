@@ -3,7 +3,7 @@ from django.db import models
 from django.db.models import Q
 from django.urls import reverse
 
-from apps.core.fields import HtmlField
+from apps.core.fields import HtmlField, image_spec, photo_field
 from apps.core.maps import MapEmbedURLField
 from apps.core.slugs import unique_slug
 
@@ -16,13 +16,44 @@ class OrderedModel(models.Model):
         ordering = ["order", "id"]
 
 
+PARK_ADDRESS = "Калужская область, Жуковский район, село Восход"
+DEFAULT_TITLE_SUFFIX = "Т-Парк, Калужская область"
+
+
+class SeoModel(models.Model):
+    """SEO-поля страницы: свой title и description (пусто — собираются из названия и текста) и дата изменения для sitemap."""
+
+    seo_title = models.CharField(
+        "Заголовок для поисковиков (title)",
+        max_length=70,
+        blank=True,
+        help_text="До 60–70 символов, выводится как есть. Пусто — «Название — Т-Парк, Калужская область».",
+    )
+    seo_description = models.CharField(
+        "Описание для поисковиков (description)",
+        max_length=300,
+        blank=True,
+        help_text="Лучше 120–160 символов: это текст под ссылкой в выдаче. Пусто — начало текста страницы.",
+    )
+    updated_at = models.DateTimeField("Изменено", auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
 class PublishedQuerySet(models.QuerySet):
     def published(self):
         return self.filter(is_published=True)
 
 
+def _seo_pair(page: str):
+    title = models.CharField(f"{page}: title", max_length=70, blank=True)
+    description = models.CharField(f"{page}: description", max_length=300, blank=True)
+    return title, description
+
+
 class SiteSettings(models.Model):
-    address = models.CharField("Адрес", max_length=255, blank=True)
+    address = models.CharField("Адрес", max_length=255, blank=True, default=PARK_ADDRESS)
     map_embed_url = MapEmbedURLField(
         "Яндекс Карта на странице контактов",
         max_length=1000,
@@ -42,6 +73,65 @@ class SiteSettings(models.Model):
     philosophy_text = HtmlField("Философия")
     nearby_text = HtmlField("Что рядом")
     contacts_text = HtmlField("Текст на странице контактов")
+
+    # Разметка организации (schema.org LocalBusiness)
+    address_region = models.CharField("Регион", max_length=128, blank=True, default="Калужская область")
+    address_locality = models.CharField(
+        "Населённый пункт", max_length=128, blank=True, default="Жуковский район, село Восход"
+    )
+    street_address = models.CharField("Улица, дом", max_length=255, blank=True)
+    postal_code = models.CharField("Индекс", max_length=6, blank=True)
+    latitude = models.DecimalField("Широта", max_digits=9, decimal_places=6, null=True, blank=True)
+    longitude = models.DecimalField("Долгота", max_digits=9, decimal_places=6, null=True, blank=True)
+    opening_hours = models.CharField(
+        "Часы работы", max_length=128, blank=True, help_text="В формате schema.org, например: Mo-Su 09:00-21:00."
+    )
+    price_range = models.CharField("Уровень цен", max_length=32, blank=True, help_text="Например: ₽₽ или 500–5000 ₽.")
+    yandex_maps_url = models.URLField(
+        "Т-Парк на Яндекс Картах",
+        max_length=500,
+        blank=True,
+        help_text="Ссылка на карточку организации: поисковики свяжут сайт с карточкой, её рейтингом и отзывами.",
+    )
+
+    # SEO
+    seo_title_suffix = models.CharField(
+        "Окончание заголовков",
+        max_length=64,
+        blank=True,
+        default=DEFAULT_TITLE_SUFFIX,
+        help_text="Добавляется к названию страницы: «Сплавы — Т-Парк, Калужская область».",
+    )
+    og_image = photo_field(
+        "Картинка для соцсетей",
+        "seo",
+        size=(2400, 1260),
+        help_text="Показывается в превью ссылки в VK, Telegram и мессенджерах, если у страницы нет своего фото. "
+        "Лучше горизонтальная, 1200×630.",
+    )
+    og_card = image_spec("og_image", 1200, 630)
+    seo_home_title, seo_home_description = _seo_pair("Главная")
+    seo_events_title, seo_events_description = _seo_pair("Мероприятия")
+    seo_about_title, seo_about_description = _seo_pair("О нас")
+    seo_reviews_title, seo_reviews_description = _seo_pair("Отзывы")
+    seo_gallery_title, seo_gallery_description = _seo_pair("Галерея")
+    seo_contacts_title, seo_contacts_description = _seo_pair("Контакты")
+
+    # Вебмастер и Метрика
+    yandex_verification = models.CharField(
+        "Код подтверждения Яндекс Вебмастера",
+        max_length=64,
+        blank=True,
+        help_text='Из мета-тега: content="…". Регион сайта (Калужская область) задаётся в Вебмастере: '
+        "«Информация о сайте» → «Региональность».",
+    )
+    google_verification = models.CharField("Код подтверждения Google Search Console", max_length=128, blank=True)
+    yandex_metrika_id = models.CharField(
+        "Номер счётчика Яндекс Метрики",
+        max_length=16,
+        blank=True,
+        validators=[RegexValidator(r"^\d+$", "Только цифры номера счётчика.")],
+    )
 
     class Meta:
         verbose_name = "Настройки сайта"
@@ -101,7 +191,7 @@ class Phone(models.Model):
         return f"+7 ({n[:3]}) {n[3:6]}-{n[6:8]}-{n[8:]}" if len(n) == 10 else n
 
 
-class InfoPage(models.Model):
+class InfoPage(SeoModel):
     title = models.CharField("Заголовок", max_length=255)
     slug = models.SlugField("Адрес страницы", max_length=255, unique=True, blank=True)
     body = HtmlField("Текст")

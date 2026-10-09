@@ -1,5 +1,5 @@
 {% load static %}
-<header x-data="{ open: false, services: false }"
+<header x-data="{ open: false }"
         x-effect="document.documentElement.classList.toggle('overflow-hidden', open)"
         @keydown.escape.window="open = false"
         @resize.window="if (window.innerWidth >= 768) open = false"
@@ -10,27 +10,7 @@
     </a>
 
     <nav class="hidden items-center gap-6 text-sm font-medium md:flex">
-      {% if menu_groups %}
-      <div class="relative" @mouseleave="services = false">
-        <button type="button" class="flex items-center gap-1 hover:text-brand-600"
-                @click="services = !services" @mouseenter="services = true" :aria-expanded="services">
-          Услуги <span class="icon h-4 w-4">{% include "icons/chevron-down.svg" %}</span>
-        </button>
-        <div x-show="services" x-transition x-cloak
-             class="absolute left-0 top-full grid w-[40rem] grid-cols-2 gap-6 rounded-2xl bg-white p-6 shadow-xl ring-1 ring-ink/5">
-          {% for group in menu_groups %}
-          <div>
-            <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-ink/50">{{ group.name }}</p>
-            <ul class="space-y-1">
-              {% for category in group.published_categories %}
-              <li><a class="hover:text-brand-600" href="{{ category.get_absolute_url }}">{{ category.name }}</a></li>
-              {% endfor %}
-            </ul>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-      {% endif %}
+      <a href="{% url 'catalog:home' %}" class="hover:text-brand-600">Услуги</a>
       {% include "partials/nav_links.html" with link_class="hover:text-brand-600" %}
     </nav>
 

@@ -44,6 +44,8 @@ if not SECRET_KEY:
 # localhost нужен healthcheck'у контейнера.
 ALLOWED_HOSTS = [*env_list("ALLOWED_HOSTS"), "localhost", "127.0.0.1"]
 CSRF_TRUSTED_ORIGINS = env_list("CSRF_TRUSTED_ORIGINS")
+# Главный домен сайта: с www.<CANONICAL_HOST> — 301 сюда (apps.core.middleware). Пусто — без редиректа.
+CANONICAL_HOST = os.environ.get("CANONICAL_HOST", "").strip().lower()
 
 INSTALLED_APPS = [
     "unfold",
@@ -64,6 +66,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "apps.core.middleware.CanonicalHostMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -138,7 +141,10 @@ if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    SECURE_HSTS_SECONDS = int(os.environ.get("HSTS_SECONDS", "3600"))
+    SECURE_HSTS_SECONDS = int(os.environ.get("HSTS_SECONDS", "31536000"))
+    # http → https силами Django; включать, только если прокси передаёт X-Forwarded-Proto (иначе — петля редиректов).
+    SECURE_SSL_REDIRECT = env_bool("SECURE_SSL_REDIRECT")
+    SECURE_REDIRECT_EXEMPT = [r"^healthz/$"]
     SECURE_CONTENT_TYPE_NOSNIFF = True
 
 LOGGING = {

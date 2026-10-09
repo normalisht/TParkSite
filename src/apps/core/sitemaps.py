@@ -21,22 +21,29 @@ class StaticSitemap(Sitemap):
         return reverse(item)
 
 
-class CategorySitemap(Sitemap):
+class ModelSitemap(Sitemap):
+    """Страницы моделей с `SeoModel.updated_at`: lastmod подсказывает поисковикам, что переобойти."""
+
+    def lastmod(self, obj):
+        return obj.updated_at
+
+
+class CategorySitemap(ModelSitemap):
     def items(self):
         return Category.objects.published().order_by("order", "id")
 
 
-class ServiceSitemap(Sitemap):
+class ServiceSitemap(ModelSitemap):
     def items(self):
         return Service.objects.published().filter(has_page=True).order_by("id")
 
 
-class InfoPageSitemap(Sitemap):
+class InfoPageSitemap(ModelSitemap):
     def items(self):
         return InfoPage.objects.published().order_by("id")
 
 
-class EventSitemap(Sitemap):
+class EventSitemap(ModelSitemap):
     def items(self):
         return Event.objects.visible().order_by("-date", "-id")
 

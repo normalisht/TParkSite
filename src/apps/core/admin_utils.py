@@ -1,15 +1,43 @@
 from django.contrib import admin
+from django.template.loader import render_to_string
+from django.utils.functional import lazy
 from django.utils.html import format_html
 from unfold.admin import ModelAdmin
 
 from apps.core.images import safe_spec_url
 
 
+def _render_seo_help(name: str) -> str:
+    from apps.core.models import DEFAULT_TITLE_SUFFIX, SiteSettings
+    from apps.core.seo import STATIC_PAGES, page_fallback
+
+    site = SiteSettings.load()
+    suffix = site.seo_title_suffix or DEFAULT_TITLE_SUFFIX
+    # Для превью в настройках: что выведется на странице, если её поля оставить пустыми.
+    pages = []
+    for key, (label, path, _text_field) in STATIC_PAGES.items():
+        title, description = page_fallback(key, site)
+        pages.append({"key": key, "label": label, "path": path, "title": title, "description": description})
+    return render_to_string(f"admin/seo/{name}.html", {"suffix": suffix, "pages": pages})
+
+
+# Справка в описании вкладки (templates/admin/seo/): рендерится при показе формы — с текущим окончанием заголовков.
+seo_help = lazy(_render_seo_help, str)
+
+# Вкладка SEO в формах страниц с `apps.core.models.SeoModel`.
+SEO_FIELDSET = (
+    "SEO",
+    {"classes": ["tab"], "description": seo_help("object"), "fields": ["seo_title", "seo_description"]},
+)
+
+
 class SiteModelAdmin(ModelAdmin):
-    """Базовая админка проекта: предупреждает при уходе со страницы с несохранёнными изменениями."""
+    """Базовая админка проекта: предупреждает при уходе со страницы с несохранёнными изменениями,
+    у SEO-полей показывает счётчики символов и превью сниппета (admin_seo.js)."""
 
     class Media:
-        js = ["js/admin_unsaved.js"]
+        css = {"all": ["css/admin_seo.css"]}
+        js = ["js/admin_unsaved.js", "js/admin_seo.js"]
 
 
 def image_preview(spec_name: str, size: int = 64):

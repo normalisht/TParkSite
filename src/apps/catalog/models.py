@@ -2,7 +2,7 @@ from django.db import models
 from django.urls import reverse
 
 from apps.core.fields import HtmlField, image_spec, photo_field
-from apps.core.models import OrderedModel, PublishedQuerySet
+from apps.core.models import OrderedModel, PublishedQuerySet, SeoModel
 from apps.core.slugs import unique_slug
 
 
@@ -21,7 +21,7 @@ class CategoryGroup(OrderedModel):
         return self.name
 
 
-class Category(OrderedModel):
+class Category(SeoModel, OrderedModel):
     name = models.CharField("Название", max_length=128)
     slug = models.SlugField("Адрес страницы", max_length=255, unique=True, blank=True)
     description = HtmlField("Описание")
@@ -65,7 +65,7 @@ class CategoryPhoto(OrderedModel):
         return f"Фото #{self.pk}"
 
 
-class Service(models.Model):
+class Service(SeoModel):
     name = models.CharField("Название", max_length=128)
     slug = models.SlugField("Адрес страницы", max_length=255, unique=True, blank=True)
     short_description = HtmlField("Краткое описание")

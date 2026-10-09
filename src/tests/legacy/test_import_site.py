@@ -35,6 +35,9 @@ def test_site_texts_and_contacts(legacy):
     assert site.vk_url == "https://vk.com/tparkprotva"
     assert site.map_embed_url == ""
     assert any("Яндекс Карта не перенесена" in w and "CCUufTqlWC" in w for w in report.warnings)
+    # Импорт пересоздаёт настройки — начальные SEO-данные заполняются заново.
+    assert site.opening_hours == "Mo-Su 10:00-18:00"
+    assert site.seo_home_title.startswith("Т-Парк")
 
 
 def test_phones_and_messenger_flags(legacy):

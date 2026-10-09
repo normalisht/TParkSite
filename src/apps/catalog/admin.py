@@ -3,7 +3,7 @@ from django.contrib import admin
 from unfold.admin import TabularInline
 
 from apps.catalog.models import Category, CategoryGroup, CategoryPhoto, CategoryService, Service, ServicePhoto
-from apps.core.admin_utils import SiteModelAdmin, image_preview
+from apps.core.admin_utils import SEO_FIELDSET, SiteModelAdmin, image_preview
 from apps.core.bulk_upload import MultipleImageField, append_images
 
 
@@ -81,8 +81,12 @@ class CategoryAdmin(SiteModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
     inlines = [CategoryPhotoInline, CategoryServiceInline]
     fieldsets = (
-        ("Основное", {"fields": ["name", "slug", "description", "preview", "is_published", "order"]}),
-        ("Загрузка фото", {"fields": ["bulk_photos"]}),
+        (
+            "Основное",
+            {"classes": ["tab"], "fields": ["name", "slug", "description", "preview", "is_published", "order"]},
+        ),
+        ("Загрузка фото", {"classes": ["tab"], "fields": ["bulk_photos"]}),
+        SEO_FIELDSET,
     )
 
     def save_related(self, request, form, formsets, change):
@@ -103,6 +107,7 @@ class ServiceAdmin(SiteModelAdmin):
         (
             "Основное",
             {
+                "classes": ["tab"],
                 "fields": [
                     "name",
                     "slug",
@@ -110,10 +115,11 @@ class ServiceAdmin(SiteModelAdmin):
                     "short_description",
                     "description",
                     ("is_published", "has_page"),
-                ]
+                ],
             },
         ),
-        ("Загрузка фото", {"fields": ["bulk_photos"]}),
+        ("Загрузка фото", {"classes": ["tab"], "fields": ["bulk_photos"]}),
+        SEO_FIELDSET,
     )
 
     @admin.display(description="Цена")

@@ -12,7 +12,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const USER_PAUSE = 20_000; // после ручной прокрутки — пауза 20 секунд
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  document.querySelectorAll(".js-slider").forEach((el) => {
+  // Swiper и GLightbox подключаются только на страницах со слайдерами (partials/vendor.html).
+  if (window.Swiper) document.querySelectorAll(".js-slider").forEach((el) => {
     const slides = el.querySelectorAll(".swiper-slide");
     const count = slides.length;
     const autoplay = count > 1 && !reducedMotion;
@@ -90,7 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  document.querySelectorAll(".js-carousel").forEach((el) => {
+  if (window.Swiper) document.querySelectorAll(".js-carousel").forEach((el) => {
     const count = el.querySelectorAll(".swiper-slide").length;
     // Счётчик «3 / 12» между кнопками (на главной под отзывами, виден только на телефоне).
     const counter = el.closest(".js-carousel-wrap")?.querySelector(".js-carousel-counter");

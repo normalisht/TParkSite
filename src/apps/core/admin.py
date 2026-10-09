@@ -10,7 +10,7 @@ from unfold.admin import TabularInline
 from unfold.forms import AdminPasswordChangeForm, UserChangeForm, UserCreationForm
 from unfold.widgets import UnfoldAdminTextareaWidget
 
-from apps.core.admin_utils import SiteModelAdmin, copy_url_button
+from apps.core.admin_utils import SEO_FIELDSET, SiteModelAdmin, copy_url_button, seo_help
 from apps.core.maps import MapEmbedURLField
 from apps.core.models import InfoPage, Phone, SiteSettings
 
@@ -85,6 +85,43 @@ class SiteSettingsAdmin(SiteModelAdmin):
                 ],
             },
         ),
+        (
+            "SEO",
+            {
+                "classes": ["tab"],
+                "description": seo_help("site"),
+                "fields": [
+                    "seo_title_suffix",
+                    "og_image",
+                    *[
+                        (f"seo_{page}_title", f"seo_{page}_description")
+                        for page in ("home", "events", "about", "reviews", "gallery", "contacts")
+                    ],
+                ],
+            },
+        ),
+        (
+            "Разметка организации",
+            {
+                "classes": ["tab"],
+                "description": seo_help("organization"),
+                "fields": [
+                    ("address_region", "address_locality"),
+                    ("street_address", "postal_code"),
+                    ("latitude", "longitude"),
+                    ("opening_hours", "price_range"),
+                    "yandex_maps_url",
+                ],
+            },
+        ),
+        (
+            "Вебмастер и Метрика",
+            {
+                "classes": ["tab"],
+                "description": seo_help("webmaster"),
+                "fields": ["yandex_verification", "google_verification", "yandex_metrika_id"],
+            },
+        ),
     )
 
     def has_add_permission(self, request):
@@ -104,7 +141,10 @@ class InfoPageAdmin(SiteModelAdmin):
     list_filter = ["is_published"]
     search_fields = ["title"]
     prepopulated_fields = {"slug": ("title",)}
-    fields = ["title", "slug", "page_url", "body", "is_published"]
+    fieldsets = (
+        ("Основное", {"classes": ["tab"], "fields": ["title", "slug", "page_url", "body", "is_published"]}),
+        SEO_FIELDSET,
+    )
     readonly_fields = ["page_url"]
 
     class Media:

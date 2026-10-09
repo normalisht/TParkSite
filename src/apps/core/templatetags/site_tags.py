@@ -24,7 +24,12 @@ _JSON_ESCAPES = {ord("<"): "\\u003C", ord(">"): "\\u003E", ord("&"): "\\u0026"}
 
 @register.filter
 def ld_json(value) -> str:
-    """Структурированные данные schema.org: `<script type="application/ld+json">` с экранированием, как у json_script."""
+    """Структурированные данные schema.org: `<script type="application/ld+json">` с экранированием, как у json_script.
+
+    Список узлов становится `@graph` — так узлы могут ссылаться друг на друга по `@id`.
+    """
+    if isinstance(value, list):
+        value = {"@context": "https://schema.org", "@graph": value}
     data = json.dumps(value, ensure_ascii=False).translate(_JSON_ESCAPES)
     return mark_safe(f'<script type="application/ld+json">{data}</script>')
 

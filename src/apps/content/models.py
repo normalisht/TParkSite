@@ -9,7 +9,7 @@ from django.utils.html import strip_tags
 from django.utils.text import Truncator
 
 from apps.core.fields import HtmlField, image_spec, photo_field
-from apps.core.models import OrderedModel, PublishedQuerySet
+from apps.core.models import OrderedModel, PublishedQuerySet, SeoModel
 from apps.core.slugs import unique_slug
 
 
@@ -28,7 +28,7 @@ class EventQuerySet(models.QuerySet):
         return self.filter(Q(date__gte=today) | Q(show_after_date=True))
 
 
-class Event(models.Model):
+class Event(SeoModel):
     title = models.CharField("Заголовок", max_length=128)
     slug = models.SlugField(
         "Адрес страницы", max_length=255, unique=True, blank=True, help_text="Пусто — из заголовка и года."

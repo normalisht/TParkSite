@@ -3,15 +3,11 @@
 {% block og_type %}article{% endblock %}
 {% block content %}
 <div class="mx-auto max-w-6xl px-4 py-8 md:py-12">
-  <nav class="mb-4 text-sm text-ink/50">
-    <a href="{% url 'catalog:home' %}" class="hover:text-brand-600">Главная</a>
-    / <a href="{% url 'content:events' %}" class="hover:text-brand-600">Мероприятия</a>
-    / {{ event.title }}
-  </nav>
+  {% include "partials/breadcrumbs.html" %}
   <p class="font-semibold text-brand-700"><time datetime="{{ event.date|date:'Y-m-d' }}">{{ event.date|date:"j E Y" }}</time></p>
   <h1 class="mt-1 text-3xl font-bold md:text-5xl">{{ event.title }}</h1>
   {% with url=event|spec_url:"card" %}{% if url %}
-  <img src="{{ url }}" alt="{{ event.title }}" class="mt-8 aspect-[4/3] w-full max-w-3xl rounded-2xl object-cover">
+  <img src="{{ url }}" alt="{{ event.title }}" width="800" height="600" fetchpriority="high" class="mt-8 aspect-[4/3] w-full max-w-3xl rounded-2xl object-cover">
   {% endif %}{% endwith %}
   {% if event.description %}<div class="rich-text mt-8 max-w-3xl">{{ event.description|safe }}</div>{% endif %}
   <div class="mt-10 flex flex-wrap gap-3">

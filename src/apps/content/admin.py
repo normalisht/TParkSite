@@ -9,7 +9,7 @@ from unfold.decorators import action
 
 from apps.content.models import Event, GalleryPhoto, Partner, Review
 from apps.content.yandex import ReviewFetchError, fetch_review
-from apps.core.admin_utils import SiteModelAdmin, image_preview
+from apps.core.admin_utils import SEO_FIELDSET, SiteModelAdmin, image_preview
 from apps.core.bulk_upload import BulkUploadForm, append_images
 
 
@@ -35,7 +35,16 @@ class EventAdmin(SiteModelAdmin):
     list_filter = [EventPeriodFilter, "show_after_date"]
     date_hierarchy = "date"
     search_fields = ["title"]
-    fields = ["title", "slug", "date", "description", "link", "image", "text_color", "show_after_date"]
+    fieldsets = (
+        (
+            "Основное",
+            {
+                "classes": ["tab"],
+                "fields": ["title", "slug", "date", "description", "link", "image", "text_color", "show_after_date"],
+            },
+        ),
+        SEO_FIELDSET,
+    )
 
 
 class OrderedPhotoAdmin(SiteModelAdmin):

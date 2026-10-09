@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 {% load site_tags %}
+{% block vendor_css %}{% include "partials/vendor.html" with part="css" swiper=1 %}{% endblock %}
+{% block vendor_js %}{% include "partials/vendor.html" with part="js" swiper=1 %}{% endblock %}
 {% block content %}
 <section class="relative overflow-hidden bg-ink text-white">
   {% if hero_image %}<img src="{{ hero_image }}" alt="" class="absolute inset-0 h-full w-full object-cover opacity-40">{% endif %}
@@ -17,7 +19,7 @@
       {% for event in events %}
       <article class="swiper-slide">
         <a href="{{ event.get_absolute_url }}" class="group relative block aspect-[4/3] overflow-hidden rounded-2xl bg-ink">
-          {% with url=event|spec_url:"card" %}{% if url %}<img src="{{ url }}" alt="{{ event.title }}" loading="lazy" class="absolute inset-0 h-full w-full object-cover transition duration-300 group-hover:scale-105">{% endif %}{% endwith %}
+          {% with url=event|spec_url:"card" %}{% if url %}<img src="{{ url }}" alt="{{ event.title }}" width="800" height="600" loading="lazy" class="absolute inset-0 h-full w-full object-cover transition duration-300 group-hover:scale-105">{% endif %}{% endwith %}
           <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent"></div>
           <div class="absolute inset-x-0 bottom-0 p-5" style="color: {% firstof event.text_color '#ffffff' %}">
             <p class="text-sm font-semibold opacity-90">{{ event.date|date:"j E Y" }}</p>

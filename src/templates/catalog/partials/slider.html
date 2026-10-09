@@ -4,7 +4,7 @@
   <div class="swiper-wrapper">
     {% for photo in photos %}{% with url=photo|spec_url:"slide" %}{% if url %}
     <div class="swiper-slide" data-full="{{ photo.image.url }}">
-      <img src="{{ url }}" alt="{{ alt }}" class="aspect-[16/9] w-full cursor-zoom-in object-cover" {% if not forloop.first %}loading="lazy"{% endif %}>
+      <img src="{{ url }}" alt="{{ alt }} — фото {{ forloop.counter }}" width="1600" height="900" class="aspect-[16/9] w-full cursor-zoom-in object-cover" {% if forloop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %}>
     </div>
     {% endif %}{% endwith %}{% endfor %}
   </div>

@@ -1,11 +1,9 @@
 {% extends "base.html" %}
+{% block vendor_css %}{% include "partials/vendor.html" with part="css" swiper=1 glightbox=1 %}{% endblock %}
+{% block vendor_js %}{% include "partials/vendor.html" with part="js" swiper=1 glightbox=1 %}{% endblock %}
 {% block content %}
 <div class="mx-auto max-w-6xl px-4 py-8 md:py-12">
-  <nav class="mb-4 text-sm text-ink/50">
-    <a href="{% url 'catalog:home' %}" class="hover:text-brand-600">Главная</a>
-    {% if category %} / <a href="{{ category.get_absolute_url }}" class="hover:text-brand-600">{{ category.name }}</a>{% endif %}
-    / {{ service.name }}
-  </nav>
+  {% include "partials/breadcrumbs.html" %}
   <h1 class="text-3xl font-bold md:text-5xl">{{ service.name }}</h1>
   {% if service.price_display %}<p class="mt-3 inline-block rounded-full bg-brand-100 px-4 py-1 text-lg font-semibold">{{ service.price_display }}</p>{% endif %}
   {% if photos %}<div class="mt-8">{% include "catalog/partials/slider.html" with alt=service.name %}</div>{% endif %}
