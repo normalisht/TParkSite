@@ -23,6 +23,7 @@ def info_page(request, slug):
         "core/info.html",
         {
             "page": page,
+            "breadcrumbs": crumbs,
             "seo": make_seo(page.title, page.body, obj=page),
             "structured_data": [ld.breadcrumbs(request, crumbs)],
         },

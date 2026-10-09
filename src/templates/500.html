@@ -1,10 +1,28 @@
-<!doctype html>
+{% load static tailwind_cli %}<!doctype html>
+{# Без base.html: при ошибке 500 нет контекста (меню, настройки), а запросы к БД могут снова упасть. Только статика. #}
 <html lang="ru">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Ошибка — Т-Парк</title></head>
-<body style="font-family:Arial,sans-serif;text-align:center;padding:80px 16px;color:#1c1919">
-  <p style="font-size:64px;font-weight:700;color:#ffa300;margin:0">500</p>
-  <h1>Что-то пошло не так</h1>
-  <p>Мы уже разбираемся. Попробуйте обновить страницу чуть позже.</p>
-  <a href="/" style="color:#b96202">На главную</a>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Ошибка — Т-Парк</title>
+  <link rel="icon" href="{% static 'img/favicon.ico' %}" sizes="48x48">
+  <link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}">
+  {% tailwind_css %}
+</head>
+<body class="flex min-h-screen flex-col bg-white font-sans text-ink antialiased">
+  <header class="mx-auto w-full max-w-6xl px-4 py-4"><a href="/" class="inline-block"><img src="{% static 'img/logo.png' %}" alt="Т-Парк" class="h-10 w-auto"></a></header>
+  <main class="page-hero flex flex-1 items-center">
+    {% include "partials/hero_decor.html" %}
+    <div class="mx-auto max-w-3xl px-4 py-14 text-center md:py-20">
+      {% include "partials/error_code.html" with code="500" %}
+      <h1 class="mt-8 text-3xl font-bold [text-wrap:balance] md:text-4xl">Что-то пошло не так</h1>
+      <p class="mx-auto mt-3 max-w-xl text-lg text-ink/75">На сервере случилась ошибка, мы уже разбираемся. Обычно помогает обновить страницу через пару минут.</p>
+      <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <button type="button" onclick="location.reload()" class="btn btn-primary">Обновить страницу</button>
+        <a href="/" class="btn btn-ghost">На главную</a>
+      </div>
+    </div>
+  </main>
 </body>
 </html>

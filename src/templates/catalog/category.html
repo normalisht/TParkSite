@@ -2,11 +2,12 @@
 {% block vendor_css %}{% include "partials/vendor.html" with part="css" swiper=1 glightbox=1 %}{% endblock %}
 {% block vendor_js %}{% include "partials/vendor.html" with part="js" swiper=1 glightbox=1 %}{% endblock %}
 {% block content %}
-<section class="bg-sand-100">
-  <div class="mx-auto grid max-w-6xl items-center gap-8 px-4 py-8 md:py-12 {% if hero %}lg:grid-cols-2 lg:gap-12{% endif %}">
+<section class="page-hero">
+  {% include "partials/hero_decor.html" %}
+  <div class="mx-auto grid max-w-6xl items-center gap-8 px-4 py-10 md:py-14 {% if hero %}lg:grid-cols-2 lg:gap-12{% endif %}">
     <div class="min-w-0">
       {% include "partials/breadcrumbs.html" %}
-      <h1 class="text-3xl font-bold md:text-5xl">{{ category.name }}</h1>
+      <h1 class="page-title">{{ category.name }}</h1>
       {% if category.description %}<div class="rich-text mt-5 max-w-3xl">{{ category.description|safe }}</div>{% endif %}
     </div>
     {% if hero %}<img src="{{ hero }}" alt="{{ category.name }}" class="aspect-[3/2] w-full rounded-2xl object-cover shadow-lg" fetchpriority="high">{% endif %}

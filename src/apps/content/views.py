@@ -73,6 +73,7 @@ def about(request):
         {
             "formats": list(site.park_formats.select_related("category")),
             "facts": list(site.founder_facts.all()),
+            "route": route_links(site.latitude, site.longitude),
             "safety_page": site.safety_page if site.safety_page and site.safety_page.is_published else None,
             "photos": list(GalleryPhoto.objects.all()[:GALLERY_STRIP_SIZE]),
             "partners": list(Partner.objects.all()),

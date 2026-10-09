@@ -2,7 +2,7 @@
 <button type="button" data-copy="{{ value }}" aria-label="Скопировать: {{ value }}"
         x-data="{ copied: false }"
         @click="navigator.clipboard.writeText($el.dataset.copy).then(() => { copied = true; setTimeout(() => copied = false, 1500) })"
-        class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-sm font-semibold text-ink/70 ring-1 ring-ink/10 transition hover:text-brand-700 hover:ring-brand-500">
+        class="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-sm font-semibold text-ink/75 ring-1 ring-ink/10 transition hover:text-brand-700 hover:ring-brand-500">
   <span class="icon h-4 w-4" x-show="!copied">{% include "icons/copy.svg" %}</span>
   <span class="icon h-4 w-4 text-pine-700" x-show="copied" x-cloak>{% include "icons/check.svg" %}</span>
   <span x-text="copied ? 'Скопировано' : 'Скопировать'">Скопировать</span>

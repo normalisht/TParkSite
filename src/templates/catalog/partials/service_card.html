@@ -1,6 +1,6 @@
 {% load static site_tags %}
 {# На телефоне — строка с квадратной миниатюрой (длинный список не растягивается), с sm — карточка с фото сверху. #}
-<a href="{{ service.get_absolute_url }}" class="group flex overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-ink/10 transition outline-none hover:-translate-y-1 hover:shadow-lg focus-visible:ring-4 focus-visible:ring-brand-500 sm:flex-col">
+<a href="{{ service.get_absolute_url }}" class="card card-link group flex overflow-hidden sm:flex-col">
   <div class="relative w-28 shrink-0 overflow-hidden bg-sand-200 sm:aspect-[4/3] sm:w-full">
     {% with url=service.cover|spec_url:"card" %}{% if url %}
     <img src="{{ url }}" alt="" width="640" height="480" loading="lazy" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105">
@@ -10,7 +10,7 @@
   </div>
   <div class="flex min-w-0 flex-1 flex-col p-4 sm:p-5">
     <h3 class="font-semibold leading-snug [text-wrap:balance] sm:text-lg">{{ service.name }}</h3>
-    {% if service.short_description %}<p class="mt-1 hidden text-sm text-ink/70 sm:line-clamp-3">{{ service.short_description|plaintext:200 }}</p>{% endif %}
+    {% if service.short_description %}<p class="mt-1 hidden text-sm text-ink/75 sm:line-clamp-3">{{ service.short_description|plaintext:200 }}</p>{% endif %}
     <div class="mt-auto flex items-end justify-between gap-3 pt-3">
       {% if service.price %}<p class="font-bold text-brand-700">{% include "catalog/partials/price.html" %}</p>{% else %}<span></span>{% endif %}
       <span class="hidden h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-700 transition group-hover:bg-brand-500 group-hover:text-ink sm:flex"><span class="icon h-5 w-5">{% include "icons/chevron-right.svg" %}</span></span>

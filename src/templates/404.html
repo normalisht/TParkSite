@@ -2,10 +2,17 @@
 {% block title %}Страница не найдена — Т-Парк{% endblock %}
 {% block canonical %}{% endblock %}
 {% block content %}
-<div class="mx-auto max-w-3xl px-4 py-24 text-center">
-  <p class="text-7xl font-bold text-brand-500">404</p>
-  <h1 class="mt-4 text-2xl font-bold">Страница не найдена</h1>
-  <p class="mt-2 text-ink/60">Возможно, она переехала. Начните с главной.</p>
-  <a href="{% url 'catalog:home' %}" class="btn btn-primary mt-8">На главную</a>
-</div>
+{# Шапка до самого подвала: без белой полосы между ними (у подвала свой mt-10 / md:mt-16). #}
+<section class="page-hero -mb-10 md:-mb-16">
+  {% include "partials/hero_decor.html" %}
+  <div class="mx-auto max-w-3xl px-4 py-14 text-center md:py-20">
+    {% include "partials/error_code.html" with code="404" %}
+    <h1 class="mt-8 text-3xl font-bold [text-wrap:balance] md:text-4xl">Кажется, вы сошли с тропы</h1>
+    <p class="mx-auto mt-3 max-w-xl text-lg text-ink/75">Такой страницы нет: возможно, она переехала или в ссылке опечатка. Вернём вас на маршрут.</p>
+    <div class="mt-8 flex justify-center"><a href="{% url 'catalog:home' %}" class="btn btn-primary">На главную<span class="icon h-5 w-5">{% include "icons/chevron-right.svg" %}</span></a></div>
+    <p class="field-label mt-10">Или загляните сюда</p>
+    <nav aria-label="Разделы сайта" class="mt-3 flex flex-wrap justify-center gap-2">{% include "partials/nav_links.html" with link_class="btn btn-ghost" %}</nav>
+    {% if phones %}<p class="mt-8 text-ink/75">Не нашли, что искали? Позвоните — подскажем: <a href="{{ phones.0.tel_url }}" class="whitespace-nowrap font-semibold text-brand-700 hover:text-brand-600">{{ phones.0.display }}</a></p>{% endif %}
+  </div>
+</section>
 {% endblock %}

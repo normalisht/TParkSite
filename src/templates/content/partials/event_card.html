@@ -1,6 +1,6 @@
 {% load static site_tags %}
 {# Всё, кроме метки «Через N дней», — под фото: читается на любом снимке. #}
-<a href="{{ event.get_absolute_url }}" class="group flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-ink/10 transition outline-none hover:-translate-y-1 hover:shadow-lg focus-visible:ring-4 focus-visible:ring-brand-500">
+<a href="{{ event.get_absolute_url }}" class="card card-link group flex h-full flex-col overflow-hidden">
   <div class="relative aspect-[4/3] overflow-hidden bg-sand-200">
     {% with url=event|spec_url:"card" %}{% if url %}
     <img src="{{ url }}" alt="" width="800" height="600" loading="lazy" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105">
@@ -10,9 +10,9 @@
     <span class="absolute right-3 top-3">{% include "content/partials/event_timing.html" %}</span>
   </div>
   <div class="flex flex-1 flex-col p-5">
-    <p class="text-sm font-semibold text-pine-700"><time datetime="{{ event.date|date:'Y-m-d' }}">{% include "content/partials/event_when.html" %}</time></p>
+    <p class="text-sm font-semibold text-navy"><time datetime="{{ event.date|date:'Y-m-d' }}">{% include "content/partials/event_when.html" %}</time></p>
     <{{ heading|default:"h3" }} class="mt-1 text-lg font-semibold leading-snug [text-wrap:balance]">{{ event.title }}</{{ heading|default:"h3" }}>
-    {% if event.description %}<p class="mt-2 line-clamp-3 text-sm text-ink/70">{{ event.description|plaintext:200 }}</p>{% endif %}
+    {% if event.description %}<p class="mt-2 line-clamp-3 text-sm text-ink/75">{{ event.description|plaintext:200 }}</p>{% endif %}
     <div class="mt-auto flex items-end justify-between gap-3 pt-4">
       {% if event.price %}<p class="font-bold text-brand-700">{{ event.price }}</p>{% else %}<span></span>{% endif %}
       <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-700 transition group-hover:bg-brand-500 group-hover:text-ink"><span class="icon h-5 w-5">{% include "icons/chevron-right.svg" %}</span></span>

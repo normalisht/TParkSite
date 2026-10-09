@@ -38,7 +38,7 @@
       <a href="{% url 'catalog:home' %}" class="border-b border-ink/5 pb-4 text-lg font-medium">Главная</a>
       {% for group in menu_groups %}
       <div>
-        <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-ink/50">{{ group.name }}</p>
+        <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-ink/55">{{ group.name }}</p>
         <ul class="space-y-2">
           {% for category in group.published_categories %}
           <li><a class="text-lg" href="{{ category.get_absolute_url }}">{{ category.name }}</a></li>

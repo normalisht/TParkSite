@@ -6,7 +6,7 @@
 </div>
 <div class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
   {% for photo in photos %}{% with url=photo|spec_url:"thumb" %}{% if url %}
-  <a href="{% url 'content:gallery' %}" class="group block aspect-square overflow-hidden rounded-xl bg-tint">
+  <a href="{% url 'content:gallery' %}" class="group block aspect-square overflow-hidden rounded-xl bg-sand-200">
     <img src="{{ url }}" alt="{% if photo.caption %}{{ photo.caption }}{% else %}Т-Парк — фото {{ forloop.counter }}{% endif %}" width="600" height="600" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
   </a>
   {% endif %}{% endwith %}{% endfor %}

@@ -1,15 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
-<section class="bg-sand-100">
+<section class="page-hero">
+  {% include "partials/hero_decor.html" %}
   <div class="mx-auto max-w-6xl px-4 py-10 md:py-14">
-    <h1 class="text-4xl font-bold md:text-5xl">Контакты</h1>
-    <p class="mt-3 max-w-2xl text-lg text-ink/75">Звоните или пишите — расскажем о программах и поможем выбрать формат.</p>
+    <h1 class="page-title">Контакты</h1>
+    <p class="page-lead">Звоните или пишите — расскажем о программах и поможем выбрать формат.</p>
 
     <div class="mt-8 grid gap-6 {% if site.map_embed_url %}lg:grid-cols-[minmax(0,24rem)_1fr]{% else %}md:max-w-xl{% endif %}">
-      <div class="space-y-7 rounded-2xl bg-white p-6 shadow-sm md:p-8">
+      <div class="card space-y-7 p-6 md:p-8">
         {% if phones %}
         <div>
-          <h2 class="text-sm font-bold uppercase tracking-widest text-ink/45">Телефоны</h2>
+          <h2 class="field-label">Телефоны</h2>
           <ul class="mt-3 space-y-2.5">
             {% for phone in phones %}
             <li><a href="{{ phone.tel_url }}" class="group inline-flex items-center gap-3 text-xl font-semibold tabular-nums transition hover:text-brand-700"><span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-700 transition group-hover:bg-brand-500 group-hover:text-ink"><span class="icon h-5 w-5">{% include "icons/phone.svg" %}</span></span>{{ phone.display }}</a></li>
@@ -20,7 +21,7 @@
 
         {% if whatsapp_phone or telegram_phone or site.vk_url %}
         <div>
-          <h2 class="text-sm font-bold uppercase tracking-widest text-ink/45">Написать</h2>
+          <h2 class="field-label">Написать</h2>
           <div class="mt-3 flex flex-wrap gap-2">
             {% if whatsapp_phone %}<a href="{{ whatsapp_phone.whatsapp_url }}" class="btn btn-ghost" target="_blank" rel="noopener"><span class="icon icon-fill h-5 w-5 text-[#25D366]">{% include "icons/whatsapp.svg" %}</span>WhatsApp</a>{% endif %}
             {% if telegram_phone %}<a href="{{ telegram_phone.telegram_url }}" class="btn btn-ghost" target="_blank" rel="noopener"><span class="icon icon-fill h-5 w-5 text-[#26A5E4]">{% include "icons/telegram.svg" %}</span>Telegram</a>{% endif %}
@@ -31,7 +32,7 @@
 
         {% if hours %}
         <div>
-          <h2 class="text-sm font-bold uppercase tracking-widest text-ink/45">Часы работы</h2>
+          <h2 class="field-label">Часы работы</h2>
           <ul class="mt-3 space-y-1">
             {% for line in hours %}<li class="flex items-center gap-3"><span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-sand-100 text-navy"><span class="icon h-5 w-5">{% include "icons/clock.svg" %}</span></span>{{ line }}</li>{% endfor %}
           </ul>
@@ -41,7 +42,7 @@
 
       {% if site.map_embed_url %}
       <iframe src="{{ site.map_embed_url }}" title="Т-Парк на Яндекс Картах" loading="lazy" allowfullscreen
-              class="block h-96 w-full rounded-2xl bg-white shadow-sm lg:h-full lg:min-h-[28rem]"></iframe>
+              class="card block h-96 w-full lg:h-full lg:min-h-[28rem]"></iframe>
       {% endif %}
     </div>
   </div>
@@ -53,14 +54,14 @@
   <div class="grid gap-6 md:grid-cols-2">
     <div class="rounded-2xl bg-pine-50 p-6">
       {% if site.address %}
-      <p class="text-sm font-semibold text-ink/60">Адрес</p>
+      <p class="field-label">Адрес</p>
       <div class="mt-1 flex items-start gap-3">
         <p class="flex min-w-0 flex-1 gap-2 text-lg font-semibold"><span class="icon mt-1 h-5 w-5 text-pine-700">{% include "icons/map-pin.svg" %}</span>{{ site.address }}</p>
         {% include "partials/copy_button.html" with value=site.address %}
       </div>
       {% endif %}
       {% if route %}
-      <p class="mt-5 text-sm font-semibold text-ink/60">Координаты для навигатора</p>
+      <p class="field-label mt-5">Координаты для навигатора</p>
       <div class="mt-1 flex items-center gap-3">
         <p class="min-w-0 flex-1 font-mono text-lg">{{ route.coordinates }}</p>
         {% include "partials/copy_button.html" with value=route.coordinates %}
@@ -86,17 +87,6 @@
 {% endif %}
 
 {% if site.reviews_url %}
-<section class="mx-auto max-w-6xl px-4 pt-10 md:pt-16">
-  <div class="flex flex-col gap-5 rounded-2xl bg-sand-100 p-6 md:flex-row md:items-center md:justify-between md:p-8">
-    <div class="flex gap-4">
-      <span class="icon icon-fill h-8 w-8 shrink-0 text-brand-500">{% include "icons/star.svg" %}</span>
-      <div>
-        <p class="text-xl font-bold">Уже были у нас?</p>
-        <p class="mt-1 text-ink/75">Расскажите, как всё прошло: отзыв на Яндекс Картах поможет другим гостям выбрать Т-Парк.</p>
-      </div>
-    </div>
-    <a href="{{ site.reviews_url }}" target="_blank" rel="noopener" class="btn btn-primary shrink-0">Оставить отзыв<span class="icon h-4 w-4">{% include "icons/external-link.svg" %}</span></a>
-  </div>
-</section>
+<section class="mx-auto max-w-6xl px-4 pt-10 md:pt-16">{% include "partials/review_cta.html" %}</section>
 {% endif %}
 {% endblock %}

@@ -275,3 +275,21 @@ def test_home_shows_reviews_carousel(client):
     # В карусели цвета чередуются по карточкам; кнопки — свои (на ПК по бокам, на телефоне под карточками со счётчиком).
     assert re.findall(r"review-tone-(\w+)", html) == ["green", "warm"]
     assert "js-carousel-prev" in html and "js-carousel-next" in html and "js-carousel-counter" in html
+
+
+def test_not_found_page(client):
+    Phone.objects.create(settings=SiteSettings.load(), number="9029856594")
+    response = client.get("/net-takoi-stranitsy/")
+    assert response.status_code == 404
+    content = response.content.decode()
+    assert "Кажется, вы сошли с тропы" in content
+    assert 'aria-label="Ошибка 404"' in content
+    assert "+7 (902) 985-65-94" in content
+
+
+def test_server_error_page_renders_without_context():
+    from django.template.loader import render_to_string
+
+    content = render_to_string("500.html")
+    assert "Что-то пошло не так" in content
+    assert "error-tree-fallen" in content
