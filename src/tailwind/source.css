@@ -28,7 +28,7 @@
   --color-brand-300: #ffcd5c;
   --color-brand-500: #ffa300;
   --color-brand-600: #e08600;
-  --color-brand-700: #b96202;
+  --color-brand-700: #a85802;
   /* Зелёный ели из логотипа (тот же тон, что primary в админке Unfold) */
   --color-pine-50: oklch(98.2% .018 143);
   --color-pine-100: oklch(96.2% .044 143);
@@ -106,7 +106,7 @@ html { scrollbar-gutter: stable; }
 
   /* Надзаголовок раздела — зелёный (оранжевый оставляем кликабельному); подпись поля — серая. */
   .eyebrow { @apply text-sm font-bold uppercase tracking-widest text-pine-700; }
-  .field-label { @apply text-sm font-bold uppercase tracking-widest text-ink/55; }
+  .field-label { @apply text-sm font-bold uppercase tracking-widest text-ink/65; }
 
   /* Карточка; .card-link — карточка-ссылка целиком (подъём и тень при наведении, видимый фокус). */
   .card { @apply rounded-2xl bg-white shadow-sm ring-1 ring-ink/10; }

@@ -1,4 +1,4 @@
 {# Хлебные крошки из списка [(название, путь)]: тот же список уходит в разметку BreadcrumbList (apps.core.structured_data). #}
-<nav aria-label="Хлебные крошки" class="mb-4 text-sm text-ink/55">
+<nav aria-label="Хлебные крошки" class="mb-4 text-sm text-ink/65">
   {% for name, url in breadcrumbs %}{% if not forloop.first %} / {% endif %}{% if url %}<a href="{{ url }}" class="hover:text-brand-600">{{ name }}</a>{% else %}<span aria-current="page">{{ name }}</span>{% endif %}{% endfor %}
 </nav>

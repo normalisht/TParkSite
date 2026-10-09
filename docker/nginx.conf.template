@@ -76,8 +76,9 @@ http {
         location /media/ {
             alias /data/media/;
             autoindex off;
-            expires 30d;
-            add_header Cache-Control "public";
+            # Имена файлов уникальны (UploadTo — случайные, CACHE/ imagekit — хеши), поэтому кешируем навсегда.
+            expires 1y;
+            add_header Cache-Control "public, immutable";
         }
 
         location / {

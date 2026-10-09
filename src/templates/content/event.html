@@ -37,7 +37,7 @@
         {% if route %}<a href="{{ route.yandex }}" class="mt-1 inline-flex items-center gap-1 font-semibold text-brand-700 hover:text-brand-600" target="_blank" rel="noopener"><span class="icon h-4 w-4">{% include "icons/navigation.svg" %}</span>Маршрут</a>{% endif %}
         {% endif %}
         {% if phones and not event.is_past %}
-        <p class="mt-6 text-sm text-ink/55">Записаться и задать вопрос:</p>
+        <p class="mt-6 text-sm text-ink/65">Записаться и задать вопрос:</p>
         <div class="mt-2 flex flex-wrap gap-2 lg:flex-col lg:[&>.btn]:w-full">{% include "partials/contact_links.html" %}</div>
         {% endif %}
         {% if event.link %}
