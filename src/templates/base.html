@@ -1,0 +1,40 @@
+{% load static tailwind_cli site_tags %}<!doctype html>
+<html lang="ru" class="scroll-smooth">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{% firstof seo.title "Т-Парк — тренинг-парк и активный отдых в Калужской области" %}{% endblock %}</title>
+  <meta name="description" content="{% firstof seo.description default_description %}">
+  {% block canonical %}{% if canonical_url %}<link rel="canonical" href="{{ canonical_url }}">{% endif %}{% endblock %}
+  {% if site.yandex_verification %}<meta name="yandex-verification" content="{{ site.yandex_verification }}">{% endif %}
+  {% if site.google_verification %}<meta name="google-site-verification" content="{{ site.google_verification }}">{% endif %}
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:site_name" content="Т-Парк">
+  <meta property="og:title" content="{% firstof seo.og_title 'Т-Парк' %}">
+  <meta property="og:description" content="{% firstof seo.description default_description %}">
+  {% if canonical_url %}<meta property="og:url" content="{{ canonical_url }}">{% endif %}
+  {% with og_image=seo.image|default:default_og_image %}
+  {% if og_image %}<meta property="og:image" content="{{ og_image }}">{% endif %}
+  <meta name="twitter:card" content="{% if og_image %}summary_large_image{% else %}summary{% endif %}">
+  {% endwith %}
+  {% if structured_data %}{{ structured_data|ld_json }}{% endif %}
+  <link rel="icon" href="{% static 'img/favicon.ico' %}" sizes="48x48">
+  <link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}">
+  <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
+  <link rel="preload" href="{% static 'vendor/fonts/montserrat-cyrillic.woff2' %}" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="{% static 'vendor/fonts/montserrat-latin.woff2' %}" as="font" type="font/woff2" crossorigin>
+  {% block vendor_css %}{% endblock %}
+  {% tailwind_css %}
+  <script defer src="{% static 'vendor/alpine.min.js' %}"></script>
+</head>
+<body class="flex min-h-screen flex-col bg-white font-sans text-ink antialiased">
+  {% include "partials/header.html" %}
+  <main class="flex-1">{% block content %}{% endblock %}</main>
+  {% include "partials/footer.html" %}
+  {% include "partials/contact_button.html" %}
+  {% block vendor_js %}{% endblock %}
+  <script defer src="{% static 'js/site.js' %}"></script>
+  {% if metrika_enabled %}{% include "partials/metrika.html" %}{% endif %}
+</body>
+</html>

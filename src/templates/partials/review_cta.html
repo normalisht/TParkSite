@@ -1,0 +1,11 @@
+{# Просьба оставить отзыв на Яндекс Картах (контакты, отзывы): светлая карточка — тёмный блок сливался бы с подвалом. #}
+<div class="flex flex-col gap-5 rounded-2xl bg-sand-100 p-6 md:flex-row md:items-center md:justify-between md:p-8">
+  <div class="flex gap-4">
+    <span class="icon icon-fill h-8 w-8 shrink-0 text-brand-500">{% include "icons/star.svg" %}</span>
+    <div>
+      <p class="text-xl font-bold">Уже были у нас?</p>
+      <p class="mt-1 text-ink/75">Расскажите, как всё прошло: отзыв на Яндекс Картах поможет другим гостям выбрать Т-Парк.</p>
+    </div>
+  </div>
+  <a href="{{ site.reviews_url }}" target="_blank" rel="noopener" class="btn btn-primary shrink-0">Оставить отзыв<span class="icon h-4 w-4">{% include "icons/external-link.svg" %}</span></a>
+</div>

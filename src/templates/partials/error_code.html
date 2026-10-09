@@ -1,0 +1,12 @@
+{# Код ошибки крупными цифрами; ноль — солнце с елью, как в логотипе (ель покачивается). В «500» последняя ель повалилась. #}
+<p class="flex items-center justify-center gap-1 text-[7rem] font-extrabold leading-none text-navy sm:gap-2 sm:text-[10rem]" aria-label="Ошибка {{ code }}">
+  {% for ch in code %}{% if ch == "0" %}<svg viewBox="0 0 100 100" class="h-[0.78em] w-[0.78em] shrink-0" aria-hidden="true">
+    <circle cx="50" cy="50" r="47" class="fill-brand-500"/>
+    <g class="{% if code == "500" and forloop.last %}error-tree-fallen{% else %}error-tree{% endif %}">
+      <polygon points="50,16 33,42 67,42" class="fill-pine-700"/>
+      <polygon points="50,30 27,61 73,61" class="fill-pine-700"/>
+      <polygon points="50,46 21,80 79,80" class="fill-pine-700"/>
+      <rect x="45" y="80" width="10" height="11" rx="1.5" class="fill-navy"/>
+    </g>
+  </svg>{% else %}<span aria-hidden="true">{{ ch }}</span>{% endif %}{% endfor %}
+</p>

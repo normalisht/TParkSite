@@ -1,0 +1,9 @@
+{% if phones %}
+<a href="{{ phones.0.tel_url }}" class="btn btn-primary"><span class="icon h-5 w-5">{% include "icons/phone.svg" %}</span>{{ phones.0.display }}</a>
+{% endif %}
+{% if whatsapp_phone %}
+<a href="{{ whatsapp_phone.whatsapp_url }}" class="btn btn-ghost" target="_blank" rel="noopener"><span class="icon icon-fill h-5 w-5 text-[#25D366]">{% include "icons/whatsapp.svg" %}</span>WhatsApp</a>
+{% endif %}
+{% if telegram_phone %}
+<a href="{{ telegram_phone.telegram_url }}" class="btn btn-ghost" target="_blank" rel="noopener"><span class="icon icon-fill h-5 w-5 text-[#26A5E4]">{% include "icons/telegram.svg" %}</span>Telegram</a>
+{% endif %}

@@ -1,0 +1,10 @@
+{% load static %}{# Вкладка браузера и сниппет в выдаче; текст подставляет static/js/admin_seo.js. #}
+<div class="seo-preview-caption">Вкладка браузера и результат в поиске Яндекса или Google</div>
+<div class="seo-browser">
+  <div class="seo-browser-tab"><img src="{% static 'img/favicon.svg' %}" alt=""><span data-seo-preview-tab></span></div>
+</div>
+<div class="seo-serp">
+  <div class="seo-serp-url" data-seo-preview-url>t-camp.ru</div>
+  <div class="seo-serp-title" data-seo-preview-title></div>
+  <div class="seo-serp-description" data-seo-preview-description></div>
+</div>

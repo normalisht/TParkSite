@@ -1,0 +1,16 @@
+# В образ попадает только Python-проект из src/ и entrypoint; всё остальное (docs, old_version, бэкапы…) — нет.
+*
+!src
+!docker/entrypoint.sh
+
+src/.venv
+src/.env
+src/db.sqlite3*
+src/media
+src/staticfiles
+src/tests
+src/.django_tailwind_cli
+src/static/css/tailwind.css
+**/__pycache__
+**/.pytest_cache
+**/.ruff_cache

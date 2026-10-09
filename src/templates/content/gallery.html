@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load site_tags %}
+{% block vendor_css %}{% include "partials/vendor.html" with part="css" glightbox=1 %}{% endblock %}
+{% block vendor_js %}{% include "partials/vendor.html" with part="js" glightbox=1 %}{% endblock %}
+{% block content %}
+<section class="page-hero">
+  {% include "partials/hero_decor.html" %}
+  <div class="mx-auto max-w-6xl px-4 py-10 md:py-14">
+    <h1 class="page-title">Галерея</h1>
+    <p class="page-lead">Фото из жизни парка{% if photos %} · <span class="font-semibold text-brand-700">{{ photos|length|ru_plural:"фотография,фотографии,фотографий" }}</span>{% endif %}</p>
+  </div>
+</section>
+
+<div class="mx-auto max-w-6xl px-4 pt-10 md:pt-12">
+  {% if photos %}
+  <div class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
+    {% for photo in photos %}{% with url=photo|spec_url:"thumb" %}{% if url %}
+    <a href="{{ photo.image.url }}" class="glightbox group block aspect-square overflow-hidden rounded-xl bg-sand-200" data-gallery="gallery" {% if photo.caption %}data-title="{{ photo.caption }}"{% endif %}>
+      <img src="{{ url }}" alt="{% if photo.caption %}{{ photo.caption }}{% else %}Т-Парк, Калужская область — фото {{ forloop.counter }}{% endif %}" width="600" height="600" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+    </a>
+    {% endif %}{% endwith %}{% endfor %}
+  </div>
+  {% else %}
+  <p class="text-ink/55">Фото скоро появятся.</p>
+  {% endif %}
+</div>
+{% endblock %}

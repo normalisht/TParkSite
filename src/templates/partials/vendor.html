@@ -1,0 +1,5 @@
+{% load static %}{# Swiper и GLightbox — только на страницах со слайдерами и галереей: {% include … with part="css"|"js" swiper=1 glightbox=1 %} #}
+{% if part == "css" %}{% if swiper %}<link rel="stylesheet" href="{% static 'vendor/swiper-bundle.min.css' %}">{% endif %}
+{% if glightbox %}<link rel="stylesheet" href="{% static 'vendor/glightbox.min.css' %}">{% endif %}
+{% else %}{% if swiper %}<script defer src="{% static 'vendor/swiper-bundle.min.js' %}"></script>{% endif %}
+{% if glightbox %}<script defer src="{% static 'vendor/glightbox.min.js' %}"></script>{% endif %}{% endif %}

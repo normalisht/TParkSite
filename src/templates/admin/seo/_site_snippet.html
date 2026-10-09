@@ -1,0 +1,9 @@
+{# Превью для настроек сайта: выбор страницы; при вводе в поля страницы превью переключается на неё. #}
+{{ pages|json_script:"seo-site-pages" }}
+<div class="seo-preview" data-seo-site-preview data-domain="t-camp.ru">
+  <div class="seo-preview-pages" role="group" aria-label="Страница для превью">
+    {% for page in pages %}<button type="button" data-page="{{ page.key }}" aria-pressed="false">{{ page.label }}</button>{% endfor %}
+  </div>
+  {% include "admin/seo/_browser.html" %}
+  <div class="seo-preview-note" data-seo-preview-note></div>
+</div>

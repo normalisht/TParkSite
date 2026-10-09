@@ -1,0 +1,13 @@
+{% load site_tags %}
+{# Полоса из нескольких фото галереи со ссылкой на всю галерею («О нас», главная). #}
+<div class="mb-4 flex items-end justify-between gap-4 md:mb-6">
+  <h2 class="text-2xl font-bold md:text-3xl">Как это выглядит</h2>
+  <a href="{% url 'content:gallery' %}" class="inline-flex shrink-0 items-center gap-1 font-semibold text-brand-700 hover:text-brand-600">Вся галерея<span class="icon h-4 w-4">{% include "icons/chevron-right.svg" %}</span></a>
+</div>
+<div class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
+  {% for photo in photos %}{% with url=photo|spec_url:"thumb" %}{% if url %}
+  <a href="{% url 'content:gallery' %}" class="group block aspect-square overflow-hidden rounded-xl bg-sand-200">
+    <img src="{{ url }}" alt="{% if photo.caption %}{{ photo.caption }}{% else %}Т-Парк — фото {{ forloop.counter }}{% endif %}" width="600" height="600" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+  </a>
+  {% endif %}{% endwith %}{% endfor %}
+</div>

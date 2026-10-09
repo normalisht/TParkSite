@@ -1,0 +1,170 @@
+@import "tailwindcss";
+
+/* Montserrat (переменный, wght 100–900) — свой, без Google Fonts; кириллица предзагружается в base.html */
+@font-face {
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("../vendor/fonts/montserrat-cyrillic.woff2") format("woff2");
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("../vendor/fonts/montserrat-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@source "../templates";
+@source "../apps";
+@source inline("flex min-w-0 flex-col gap-6"); /* колонки «кирпичной» раскладки отзывов создаёт site.js */
+
+@theme {
+  --font-sans: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  --color-brand-50: #fff8eb;
+  --color-brand-100: #ffedc6;
+  --color-brand-300: #ffcd5c;
+  --color-brand-500: #ffa300;
+  --color-brand-600: #e08600;
+  --color-brand-700: #b96202;
+  /* Зелёный ели из логотипа (тот же тон, что primary в админке Unfold) */
+  --color-pine-50: oklch(98.2% .018 143);
+  --color-pine-100: oklch(96.2% .044 143);
+  --color-pine-300: oklch(87.1% .15 143);
+  --color-pine-700: oklch(52.7% .154 143);
+  /* Тёплый серо-бежевый — третий тон карточек отзывов (между кремовым оранжевым и зелёным, без синевы) */
+  --color-sand-100: #f8f5f0;
+  --color-sand-200: #ede7dd;
+  --color-sand-300: #ddd3c4;
+  /* Вересковый (светло-лавандовый) — четвёртый тон карточек отзывов, прохладный без синевы */
+  --color-heather-50: #f4f0fa;
+  --color-heather-100: #e8dff5;
+  --color-heather-300: #cfbfe8;
+  --color-heather-700: #6b4f96;
+  --color-ink: #1c1919;
+  --color-navy: #2b4757; /* тёмно-синий из логотипа */
+}
+
+[x-cloak] { display: none !important; }
+
+/* Ель в коде ошибки (partials/error_code.html) покачивается от основания. */
+@keyframes tree-sway { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+.error-tree, .error-tree-fallen { transform-box: fill-box; transform-origin: 50% 100%; }
+.error-tree-fallen { transform: rotate(32deg); }
+@media (prefers-reduced-motion: no-preference) { .error-tree { animation: tree-sway 4s ease-in-out infinite; } }
+
+/* Tailwind 4 сбрасывает курсор у кнопок на стрелку — возвращаем «руку», чтобы было видно, что это кнопка. */
+@layer base {
+  button:not(:disabled), [role="button"]:not([aria-disabled="true"]) { cursor: pointer; }
+}
+
+/* Место под полосу прокрутки всегда зарезервировано — короткие и длинные страницы не сдвигаются по горизонтали */
+html { scrollbar-gutter: stable; }
+
+/* GLightbox на телефоне прячет стрелки (только свайп) — возвращаем их по бокам. Без слоя: иначе vendored-CSS перебьёт. */
+@media (max-width: 768px) {
+  .glightbox-clean .gprev,
+  .glightbox-clean .gnext {
+    top: 50%;
+    width: 40px;
+    height: 40px;
+    border-radius: 9999px;
+    background-color: rgb(0 0 0 / 0.4);
+    transform: translateY(-50%);
+  }
+  .glightbox-clean .gprev { left: 8px; }
+  .glightbox-clean .gnext { right: 8px; }
+  .glightbox-clean .gprev svg,
+  .glightbox-clean .gnext svg { width: 20px; }
+}
+
+/* В слое components, иначе стили без слоя перебивают утилиты Tailwind (md:hidden и т. п.) */
+@layer components {
+  .icon { display: inline-flex; flex-shrink: 0; }
+  .icon svg { width: 100%; height: 100%; }
+  .icon-fill svg { fill: currentColor; }
+
+  /* Кнопка мобильного меню: полоски съезжают к центру и поворачиваются в крестик (partials/header.html). */
+  .burger path { transform-box: view-box; transform-origin: 12px 12px; transition: transform 300ms ease, opacity 200ms ease; }
+  .burger.is-open path:nth-child(1) { transform: rotate(45deg) translateY(7px); }
+  .burger.is-open path:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .burger.is-open path:nth-child(3) { transform: rotate(-45deg) translateY(-7px); }
+  @media (prefers-reduced-motion: reduce) { .burger path { transition: none; } }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition;
+  }
+  .btn-primary { @apply bg-brand-500 text-ink hover:bg-brand-600; }
+  .btn-ghost { @apply bg-white text-ink ring-1 ring-ink/10 hover:ring-brand-500; }
+
+  /* Шапка страницы: песочный градиент + пятна фирменных цветов (partials/hero_decor.html). */
+  .page-hero { @apply relative isolate overflow-hidden bg-gradient-to-br from-sand-100 via-sand-100 to-brand-50; }
+  .page-title { @apply text-3xl font-bold [text-wrap:balance] sm:text-4xl md:text-5xl; }
+  .page-lead { @apply mt-3 max-w-2xl text-lg text-ink/75; }
+
+  /* Надзаголовок раздела — зелёный (оранжевый оставляем кликабельному); подпись поля — серая. */
+  .eyebrow { @apply text-sm font-bold uppercase tracking-widest text-pine-700; }
+  .field-label { @apply text-sm font-bold uppercase tracking-widest text-ink/55; }
+
+  /* Карточка; .card-link — карточка-ссылка целиком (подъём и тень при наведении, видимый фокус). */
+  .card { @apply rounded-2xl bg-white shadow-sm ring-1 ring-ink/10; }
+  .card-link { @apply transition outline-none hover:-translate-y-1 hover:shadow-lg focus-visible:ring-4 focus-visible:ring-brand-500; }
+
+  /* Длинный отзыв свёрнут до ~8 строк с плавным затуханием; «Читать полностью» снимает класс (Alpine). */
+  .review-text.is-clamped {
+    max-height: 13rem;
+    overflow: hidden;
+    mask-image: linear-gradient(to bottom, #000 65%, transparent);
+  }
+
+  .rich-text { @apply leading-relaxed text-ink/85; }
+  .rich-text > * + * { @apply mt-3; }
+  .rich-text h2 { @apply mt-6 text-xl font-bold text-ink; }
+  .rich-text h3 { @apply mt-4 text-lg font-semibold text-ink; }
+  .rich-text a { @apply text-brand-700 underline underline-offset-2 hover:text-brand-600; }
+  .rich-text ul { @apply list-disc pl-6; }
+  .rich-text ol { @apply list-decimal pl-6; }
+  .rich-text strong { @apply font-semibold text-ink; }
+  /* Список в тексте — сеткой карточек (регалии основателя на «О нас»). */
+  .rich-text-cards ul { @apply grid list-none gap-3 pl-0 sm:grid-cols-2; }
+  .rich-text-cards li { @apply rounded-xl bg-white p-4 text-[0.95rem] shadow-sm ring-1 ring-ink/5; }
+  .rich-text-cards li > * + * { @apply mt-2; }
+}
+
+/* Тон карточки отзыва — набор переменных; карточка берёт из них фон, кавычку и аватар. */
+/* Горизонтальная лента со свайпом без полосы прокрутки (категории на главной на телефоне). */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+@utility review-tone-warm {
+  --rv-bg: var(--color-brand-50);
+  --rv-quote: var(--color-brand-300);
+  --rv-avatar-bg: var(--color-brand-100);
+  --rv-avatar-fg: var(--color-brand-700);
+}
+@utility review-tone-green {
+  --rv-bg: var(--color-pine-50);
+  --rv-quote: var(--color-pine-300);
+  --rv-avatar-bg: var(--color-pine-100);
+  --rv-avatar-fg: var(--color-pine-700);
+}
+@utility review-tone-sand {
+  --rv-bg: var(--color-sand-100);
+  --rv-quote: var(--color-sand-300);
+  --rv-avatar-bg: var(--color-sand-200);
+  --rv-avatar-fg: var(--color-navy);
+}
+
+@utility review-tone-heather {
+  --rv-bg: var(--color-heather-50);
+  --rv-quote: var(--color-heather-300);
+  --rv-avatar-bg: var(--color-heather-100);
+  --rv-avatar-fg: var(--color-heather-700);
+}
+
+/* Тон задаётся в шаблонах по кругу: зелёный → оранжевый → вересковый → песочный ({% cycle %}).
+   В «кирпичной» раскладке сосед сверху отстоит на 1–3 карточки, поэтому одинаковых соседей не бывает. */

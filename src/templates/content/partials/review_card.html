@@ -1,0 +1,21 @@
+{% load site_tags %}
+{# Карточка отзыва. Цвета — из переменных тона (review-tone-* у родителя, см. tailwind/source.css). #}
+<article class="flex h-full flex-col rounded-3xl bg-(--rv-bg) p-6"
+         x-data="{ open: false, long: true }" x-init="$nextTick(() => long = $refs.text.scrollHeight > $refs.text.clientHeight + 4)">
+  <span class="icon icon-fill h-8 w-8 text-(--rv-quote)" aria-hidden="true">{% include "icons/quote.svg" %}</span>
+  <div x-ref="text" class="review-text is-clamped rich-text mt-3" :class="{ 'is-clamped': long && !open }">{{ review.text|safe }}</div>
+  <button type="button" x-show="long" @click="open = !open" class="mt-2 cursor-pointer self-start text-sm font-semibold text-brand-700 underline-offset-2 hover:text-brand-600 hover:underline"
+          x-text="open ? 'Свернуть' : 'Читать полностью'">Читать полностью</button>
+  <footer class="mt-auto flex items-center gap-3 pt-5">
+    {% with url=review|spec_url:"avatar" %}
+    {% if url %}<img src="{{ url }}" alt="" width="160" height="160" loading="lazy" class="h-11 w-11 shrink-0 rounded-full object-cover">
+    {% else %}<span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-(--rv-avatar-bg) text-(--rv-avatar-fg)"><span class="icon h-5 w-5">{% include "icons/user.svg" %}</span></span>
+    {% endif %}{% endwith %}
+    <div class="min-w-0">
+      <p class="font-semibold">Гость Т-Парка</p>{# имя автора на сайт не выводим #}
+      {% if review.link or review.date %}
+      <p class="text-sm text-ink/55">{% if review.link %}<a href="{{ review.link }}" target="_blank" rel="noopener nofollow" class="inline-flex items-center gap-1 underline decoration-ink/20 underline-offset-2 hover:text-brand-700 hover:decoration-brand-500">{{ review.source_label }}<span class="icon h-3.5 w-3.5">{% include "icons/external-link.svg" %}</span></a>{% endif %}{% if review.link and review.date %} · {% endif %}{% if review.date %}<time datetime="{{ review.date|date:'Y-m-d' }}">{{ review.date|date:"j E Y" }}</time>{% endif %}</p>
+      {% endif %}
+    </div>
+  </footer>
+</article>
