@@ -1,9 +1,13 @@
+from decimal import Decimal
+
 import pytest
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 from apps.core.fields import UploadTo, sanitize_html, validate_image_upload
 from apps.core.images import safe_spec_url
+from apps.core.maps import route_links
+from apps.core.opening_hours import human_opening_hours
 from apps.core.slugs import slugify_ru
 
 
@@ -90,3 +94,24 @@ def test_ru_plural(n, expected):
     from apps.core.templatetags.site_tags import ru_plural
 
     assert ru_plural(n, "отзыв,отзыва,отзывов") == expected
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Mo-Su 10:00-18:00", ["Ежедневно, 10:00–18:00"]),
+        ("Mo-Fr 09:00-18:00; Sa,Su 10:00-16:00", ["Пн–пт, 09:00–18:00", "Сб, вс, 10:00–16:00"]),
+        ("", []),
+        ("Круглосуточно", []),
+        ("Mo-Fr 09:00-18:00; что-то", []),
+    ],
+)
+def test_human_opening_hours(value, expected):
+    assert human_opening_hours(value) == expected
+
+
+def test_route_links():
+    assert route_links(None, 36.7) == {}
+    links = route_links(Decimal("54.956545"), Decimal("36.769595"))
+    assert links["yandex"] == "https://yandex.ru/maps/?rtext=~54.956545,36.769595&rtt=auto"
+    assert links["coordinates"] == "54.956545, 36.769595"

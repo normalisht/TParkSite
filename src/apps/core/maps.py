@@ -1,4 +1,5 @@
-"""Встраиваемая Яндекс Карта: в админке можно вставить и ссылку, и целиком код <iframe> из «Поделиться → Встроить»."""
+"""Встраиваемая Яндекс Карта (в админке можно вставить и ссылку, и целиком код <iframe> из «Поделиться → Встроить»)
+и ссылки «Построить маршрут» до координат парка."""
 
 import html
 import re
@@ -46,3 +47,16 @@ class MapEmbedURLField(models.URLField):
         kwargs.setdefault("form_class", MapEmbedFormField)
         kwargs.setdefault("widget", forms.Textarea(attrs={"rows": 3}))
         return super().formfield(**kwargs)
+
+
+def route_links(latitude, longitude) -> dict[str, str]:
+    """Маршрут до точки в картографических сервисах; без координат — пусто."""
+    if latitude is None or longitude is None:
+        return {}
+    point = f"{float(latitude):.6f},{float(longitude):.6f}"
+    lat, lon = point.split(",")
+    return {
+        "yandex": f"https://yandex.ru/maps/?rtext=~{point}&rtt=auto",
+        "google": f"https://www.google.com/maps/dir/?api=1&destination={point}",
+        "coordinates": f"{lat}, {lon}",
+    }

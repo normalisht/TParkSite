@@ -1,12 +1,13 @@
 import re
 from datetime import date, timedelta
+from decimal import Decimal
 
 import pytest
 from django.utils import timezone
 
 from apps.catalog.models import Category, CategoryPhoto, CategoryService, Service
 from apps.content.models import Event, GalleryPhoto, Partner, Review
-from apps.core.models import FounderFact, InfoPage, ParkFormat, SiteSettings
+from apps.core.models import FounderFact, InfoPage, ParkFormat, Phone, SiteSettings
 
 pytestmark = pytest.mark.django_db
 
@@ -159,6 +160,32 @@ def test_nav_has_all_sections(client):
         assert f'href="{url}"' in html
     # В мобильном меню первым пунктом — ссылка на главную (категории идут сразу за ней).
     assert re.search(r'<a href="/" class="[^"]*">Главная</a>', html)
+
+
+def test_contacts_page_hours_routes_and_reviews(client):
+    site = SiteSettings.load()
+    site.opening_hours = "Mo-Su 10:00-18:00"
+    site.latitude, site.longitude = Decimal("54.956545"), Decimal("36.769595")
+    site.reviews_url = "https://yandex.ru/maps/org/1/reviews/"
+    site.vk_url = "https://vk.com/tparkprotva"
+    site.save()
+    Phone.objects.create(settings=site, number="9029856594", is_whatsapp=True)
+    html = client.get("/contacts/").content.decode()
+    assert "Ежедневно, 10:00–18:00" in html
+    assert "rtext=~54.956545,36.769595" in html
+    assert "54.956545, 36.769595" in html
+    assert "Оставить отзыв" in html and "https://vk.com/tparkprotva" in html
+    main = html[html.index("<main") : html.index("</main>")]
+    assert main.count("+7 (902) 985-65-94") == 1  # номер больше не дублируется кнопкой
+
+
+def test_contacts_page_without_coordinates_has_no_routes(client):
+    site = SiteSettings.load()
+    site.latitude = site.longitude = None
+    site.reviews_url = ""
+    site.save()
+    html = client.get("/contacts/").content.decode()
+    assert "rtext=" not in html and "Оставить отзыв" not in html
 
 
 def test_contacts_page_embeds_yandex_map_only_when_set(client):
