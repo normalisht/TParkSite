@@ -32,7 +32,17 @@ def postal_address(site: SiteSettings) -> dict:
     return address
 
 
-def organization(request) -> dict:
+def founder(request, site: SiteSettings) -> dict | None:
+    """Основатель (`Person`) для узла организации на странице «О нас»."""
+    if not site.founder_name:
+        return None
+    photo = safe_spec_url(site, "founder_card")
+    return _compact(
+        {"@type": "Person", "name": site.founder_name, "image": request.build_absolute_uri(photo) if photo else None}
+    )
+
+
+def organization(request, *, with_founder: bool = False) -> dict:
     """Т-Парк как местная организация: адрес, телефоны, координаты, ссылки на VK и Яндекс Карты."""
     site = SiteSettings.load()
     data = {
@@ -49,6 +59,7 @@ def organization(request) -> dict:
         "openingHours": site.opening_hours or None,
         "priceRange": site.price_range or None,
         "sameAs": [url for url in (site.vk_url, site.yandex_maps_url) if url] or None,
+        "founder": founder(request, site) if with_founder else None,
     }
     if site.latitude is not None and site.longitude is not None:
         data["geo"] = {"@type": "GeoCoordinates", "latitude": float(site.latitude), "longitude": float(site.longitude)}

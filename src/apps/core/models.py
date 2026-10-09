@@ -3,6 +3,7 @@ from django.db import models
 from django.db.models import Q
 from django.urls import reverse
 
+from apps.core import about_defaults
 from apps.core.fields import HtmlField, image_spec, photo_field
 from apps.core.maps import MapEmbedURLField
 from apps.core.slugs import unique_slug
@@ -69,10 +70,36 @@ class SiteSettings(models.Model):
     )
     home_intro = HtmlField("Вступление на главной")
     events_intro = HtmlField("Вступление на странице мероприятий")
-    about_text = HtmlField("О нас")
-    philosophy_text = HtmlField("Философия")
-    nearby_text = HtmlField("Что рядом")
     contacts_text = HtmlField("Текст на странице контактов")
+
+    # Страница «О нас»
+    about_motto = models.CharField(
+        "Цитата в шапке",
+        max_length=255,
+        blank=True,
+        default=about_defaults.MOTTO,
+        help_text="Одна фраза крупным шрифтом в начале страницы.",
+    )
+    about_photo = photo_field("Фото в шапке", "about", help_text="Лучше горизонтальное: парк, лес, река, люди.")
+    about_card = image_spec("about_photo", 960, 720)
+    about_text = HtmlField("О нас")
+    founder_name = models.CharField("Основатель: имя", max_length=128, blank=True, default=about_defaults.FOUNDER_NAME)
+    founder_lead = models.CharField(
+        "Основатель: подзаголовок", max_length=255, blank=True, default=about_defaults.FOUNDER_LEAD
+    )
+    founder_photo = photo_field("Основатель: фото", "about", help_text="Портрет, лучше вертикальный.")
+    founder_card = image_spec("founder_photo", 600, 750)
+    founder_text = HtmlField("Основатель: о нём", help_text="Регалии и роли — удобнее списком.")
+    nearby_text = HtmlField("Что рядом")
+    safety_page = models.ForeignKey(
+        "InfoPage",
+        verbose_name="Правила безопасности",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        help_text="Инфо-страница, на которую ведёт плашка «Правила безопасности» на странице «О нас».",
+    )
 
     # Разметка организации (schema.org LocalBusiness)
     address_region = models.CharField("Регион", max_length=128, blank=True, default="Калужская область")
@@ -189,6 +216,51 @@ class Phone(models.Model):
     def display(self) -> str:
         n = self.number
         return f"+7 ({n[:3]}) {n[3:6]}-{n[6:8]}-{n[8:]}" if len(n) == 10 else n
+
+
+class ParkFormat(models.Model):
+    settings = models.ForeignKey(SiteSettings, on_delete=models.CASCADE, related_name="park_formats")
+    name = models.CharField("Название", max_length=32, help_text="Например: T-park.")
+    caption = models.CharField("Подпись", max_length=128, help_text="Например: тренинг-парк.")
+    description = models.CharField("Описание", max_length=255, blank=True, help_text="Одна-две фразы, необязательно.")
+    category = models.ForeignKey(
+        "catalog.Category",
+        verbose_name="Ссылка на категорию",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        help_text="Карточка станет ссылкой, если категория опубликована.",
+    )
+    order = models.PositiveIntegerField("Порядок", default=0, db_index=True)
+
+    class Meta:
+        verbose_name = "Формат"
+        verbose_name_plural = "Форматы (О нас)"
+        ordering = ["order", "id"]
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def url(self) -> str:
+        category = self.category
+        return category.get_absolute_url() if category and category.is_published else ""
+
+
+class FounderFact(models.Model):
+    settings = models.ForeignKey(SiteSettings, on_delete=models.CASCADE, related_name="founder_facts")
+    value = models.CharField("Число", max_length=16, help_text="Например: 1000+.")
+    label = models.CharField("Подпись", max_length=128, help_text="Например: тренингов провёл.")
+    order = models.PositiveIntegerField("Порядок", default=0, db_index=True)
+
+    class Meta:
+        verbose_name = "Цифра"
+        verbose_name_plural = "Основатель в цифрах (О нас)"
+        ordering = ["order", "id"]
+
+    def __str__(self):
+        return f"{self.value} {self.label}"
 
 
 class InfoPage(SeoModel):

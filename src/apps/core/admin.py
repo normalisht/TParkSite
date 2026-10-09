@@ -12,7 +12,7 @@ from unfold.widgets import UnfoldAdminTextareaWidget
 
 from apps.core.admin_utils import SEO_FIELDSET, SiteModelAdmin, copy_url_button, seo_help
 from apps.core.maps import MapEmbedURLField
-from apps.core.models import InfoPage, Phone, SiteSettings
+from apps.core.models import FounderFact, InfoPage, ParkFormat, Phone, SiteSettings
 
 MESSENGER_FLAGS = (("is_whatsapp", "WhatsApp"), ("is_telegram", "Telegram"))
 
@@ -64,9 +64,27 @@ class PhoneInline(TabularInline):
     fields = ["number", "is_whatsapp", "is_telegram", "order"]
 
 
+class ParkFormatInline(TabularInline):
+    model = ParkFormat
+    extra = 0
+    tab = True
+    ordering_field = "order"
+    hide_ordering_field = True
+    fields = ["name", "caption", "description", "category", "order"]
+
+
+class FounderFactInline(TabularInline):
+    model = FounderFact
+    extra = 0
+    tab = True
+    ordering_field = "order"
+    hide_ordering_field = True
+    fields = ["value", "label", "order"]
+
+
 @admin.register(SiteSettings)
 class SiteSettingsAdmin(SiteModelAdmin):
-    inlines = [PhoneInline]
+    inlines = [PhoneInline, ParkFormatInline, FounderFactInline]
     # Unfold ставит URL-полям <input type="url">: браузер не пропустит вставленный код <iframe>.
     formfield_overrides = {MapEmbedURLField: {"widget": UnfoldAdminTextareaWidget(attrs={"rows": 3})}}
     fieldsets = (
@@ -75,13 +93,23 @@ class SiteSettingsAdmin(SiteModelAdmin):
             "Тексты",
             {
                 "classes": ["tab"],
+                "fields": ["home_intro", "events_intro", "contacts_text"],
+            },
+        ),
+        (
+            "О нас",
+            {
+                "classes": ["tab"],
+                "description": "Форматы и цифры основателя — на вкладках «Форматы (О нас)» и «Основатель в цифрах (О нас)».",
                 "fields": [
-                    "home_intro",
-                    "events_intro",
+                    "about_motto",
+                    "about_photo",
                     "about_text",
-                    "philosophy_text",
+                    ("founder_name", "founder_lead"),
+                    "founder_photo",
+                    "founder_text",
                     "nearby_text",
-                    "contacts_text",
+                    "safety_page",
                 ],
             },
         ),

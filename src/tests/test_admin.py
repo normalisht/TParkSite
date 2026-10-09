@@ -37,6 +37,8 @@ def _settings_post(phones):
         "phones-MIN_NUM_FORMS": "0",
         "phones-MAX_NUM_FORMS": "1000",
     }
+    for prefix in ("park_formats", "founder_facts"):
+        data.update({f"{prefix}-TOTAL_FORMS": "0", f"{prefix}-INITIAL_FORMS": "0", f"{prefix}-MIN_NUM_FORMS": "0"})
     for i, phone in enumerate(phones):
         for key, value in phone.items():
             if value is True:

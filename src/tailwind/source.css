@@ -102,6 +102,10 @@ html { scrollbar-gutter: stable; }
   .rich-text ul { @apply list-disc pl-6; }
   .rich-text ol { @apply list-decimal pl-6; }
   .rich-text strong { @apply font-semibold text-ink; }
+  /* Список в тексте — сеткой карточек (регалии основателя на «О нас»). */
+  .rich-text-cards ul { @apply grid list-none gap-3 pl-0 sm:grid-cols-2; }
+  .rich-text-cards li { @apply rounded-xl bg-white p-4 text-[0.95rem] shadow-sm ring-1 ring-ink/5; }
+  .rich-text-cards li > * + * { @apply mt-2; }
 }
 
 /* Тон карточки отзыва — набор переменных; карточка берёт из них фон, кавычку и аватар. */

@@ -1,20 +1,105 @@
 {% extends "base.html" %}
 {% load site_tags %}
 {% block content %}
-<div class="mx-auto max-w-6xl px-4 py-12">
-  <h1 class="text-4xl font-bold md:text-5xl">О нас</h1>
-  <div class="mt-8 grid gap-10 lg:grid-cols-2">
-    <div class="space-y-10">
-      {% if site.about_text %}<div class="rich-text text-lg">{{ site.about_text|safe }}</div>{% endif %}
-      {% if site.philosophy_text %}<div><h2 class="mb-3 text-2xl font-bold">Философия</h2><div class="rich-text">{{ site.philosophy_text|safe }}</div></div>{% endif %}
+{% with hero=site|spec_url:"about_card" founder_photo=site|spec_url:"founder_card" %}
+
+<section class="bg-tint">
+  <div class="mx-auto grid max-w-6xl items-center gap-8 px-4 py-10 md:py-16 {% if hero %}lg:grid-cols-2{% endif %}">
+    <div>
+      <h1 class="text-sm font-bold uppercase tracking-widest text-brand-700">О нас</h1>
+      {% if site.about_motto %}
+      <p class="mt-4 text-3xl font-bold leading-tight md:text-5xl">{{ site.about_motto }}</p>
+      {% else %}
+      <p class="mt-4 text-3xl font-bold leading-tight md:text-5xl">Т-Парк</p>
+      {% endif %}
     </div>
-    <div class="space-y-10">
-      {% if site.nearby_text %}<div class="rounded-2xl bg-tint p-6"><h2 class="mb-3 text-2xl font-bold">Что рядом</h2><div class="rich-text">{{ site.nearby_text|safe }}</div></div>{% endif %}
+    {% if hero %}<img src="{{ hero }}" alt="Т-Парк" width="960" height="720" class="aspect-[4/3] w-full rounded-2xl object-cover shadow-lg">{% endif %}
+  </div>
+</section>
+
+{% if site.about_text or formats %}
+<section class="mx-auto max-w-6xl px-4 py-10 md:py-16">
+  {% if site.about_text %}<div class="rich-text max-w-3xl text-lg">{{ site.about_text|safe }}</div>{% endif %}
+  {% if formats %}
+  <h2 class="mb-6 mt-12 text-2xl font-bold md:text-3xl">Приключение и тренинг в одном событии</h2>
+  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    {% for format in formats %}
+    {% with link=format.url %}
+    <{% if link %}a href="{{ link }}"{% else %}div{% endif %} class="{% cycle 'review-tone-green' 'review-tone-warm' 'review-tone-heather' 'review-tone-sand' %} block rounded-2xl bg-(--rv-bg) p-6{% if link %} transition hover:-translate-y-1 hover:shadow-lg{% endif %}">
+      <p class="text-3xl font-extrabold text-(--rv-avatar-fg)">{{ format.name }}</p>
+      <p class="mt-1 font-semibold">{{ format.caption }}</p>
+      {% if format.description %}<p class="mt-3 text-sm text-ink/75">{{ format.description }}</p>{% endif %}
+      {% if link %}<span class="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-brand-700">Подробнее<span class="icon h-4 w-4">{% include "icons/chevron-right.svg" %}</span></span>{% endif %}
+    </{% if link %}a{% else %}div{% endif %}>
+    {% endwith %}
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>
+{% endif %}
+
+{% if site.founder_name or site.founder_text or facts %}
+<section class="bg-sand-100">
+  <div class="mx-auto grid max-w-6xl gap-8 px-4 py-10 md:py-16 {% if founder_photo %}lg:grid-cols-[minmax(0,20rem)_1fr] lg:gap-12{% endif %}">
+    {% if founder_photo %}<img src="{{ founder_photo }}" alt="{{ site.founder_name }}" width="600" height="750" loading="lazy" class="aspect-[4/5] w-full max-w-sm rounded-2xl object-cover shadow-lg">{% endif %}
+    <div class="min-w-0">
+      <h2 class="text-sm font-bold uppercase tracking-widest text-brand-700">Основатель</h2>
+      {% if site.founder_name %}<p class="mt-3 text-3xl font-bold md:text-4xl">{{ site.founder_name }}</p>{% endif %}
+      {% if site.founder_lead %}<p class="mt-2 text-lg text-ink/75">{{ site.founder_lead }}</p>{% endif %}
+      {% if facts %}
+      <dl class="mt-8 grid grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-3 xl:grid-cols-5">
+        {% for fact in facts %}
+        <div class="flex flex-col-reverse justify-end">
+          <dt class="mt-1 text-sm leading-snug text-ink/70">{{ fact.label }}</dt>
+          <dd class="text-3xl font-extrabold text-brand-600 md:text-4xl">{{ fact.value }}</dd>
+        </div>
+        {% endfor %}
+      </dl>
+      {% endif %}
+      {% if site.founder_text %}<div class="rich-text rich-text-cards mt-8">{{ site.founder_text|safe }}</div>{% endif %}
     </div>
   </div>
+</section>
+{% endif %}
 
-  {% if partners %}
-  <h2 class="mb-6 mt-16 text-2xl font-bold">Партнёры</h2>
+{% if site.nearby_text or site.address or safety_page %}
+<section class="mx-auto grid max-w-6xl gap-6 px-4 py-10 md:py-16 lg:grid-cols-3">
+  {% if site.nearby_text %}<div class="rounded-2xl bg-tint p-6 lg:col-span-2"><h2 class="mb-3 text-2xl font-bold">Что рядом</h2><div class="rich-text">{{ site.nearby_text|safe }}</div></div>{% endif %}
+  <div class="space-y-6">
+    <div class="rounded-2xl bg-pine-50 p-6">
+      <h2 class="mb-3 text-2xl font-bold">Как добраться</h2>
+      {% if site.address %}<p class="flex gap-2"><span class="icon mt-0.5 h-5 w-5 text-pine-700">{% include "icons/map-pin.svg" %}</span>{{ site.address }}</p>{% endif %}
+      <a href="{% url 'content:contacts' %}" class="mt-4 inline-flex items-center gap-1 font-semibold text-brand-700 hover:text-brand-600">Карта и контакты<span class="icon h-4 w-4">{% include "icons/chevron-right.svg" %}</span></a>
+    </div>
+    {% if safety_page %}
+    <a href="{{ safety_page.get_absolute_url }}" class="block rounded-2xl bg-brand-50 p-6 ring-1 ring-brand-300 transition hover:-translate-y-1 hover:shadow-lg">
+      <p class="text-xl font-bold">Правила безопасности</p>
+      <p class="mt-1 text-sm text-ink/70">Что важно знать перед приездом в парк</p>
+    </a>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+
+{% if photos %}
+<section class="mx-auto max-w-6xl px-4 pb-10 md:pb-16">
+  <div class="mb-4 flex items-end justify-between gap-4 md:mb-6">
+    <h2 class="text-2xl font-bold md:text-3xl">Как это выглядит</h2>
+    <a href="{% url 'content:gallery' %}" class="inline-flex shrink-0 items-center gap-1 font-semibold text-brand-700 hover:text-brand-600">Вся галерея<span class="icon h-4 w-4">{% include "icons/chevron-right.svg" %}</span></a>
+  </div>
+  <div class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
+    {% for photo in photos %}{% with url=photo|spec_url:"thumb" %}{% if url %}
+    <a href="{% url 'content:gallery' %}" class="group block aspect-square overflow-hidden rounded-xl bg-tint">
+      <img src="{{ url }}" alt="{% if photo.caption %}{{ photo.caption }}{% else %}Т-Парк — фото {{ forloop.counter }}{% endif %}" width="600" height="600" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+    </a>
+    {% endif %}{% endwith %}{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if partners %}
+<section class="mx-auto max-w-6xl px-4 pb-10 md:pb-16">
+  <h2 class="mb-6 text-2xl font-bold md:text-3xl">Партнёры</h2>
   <div class="grid grid-cols-2 items-center gap-4 sm:grid-cols-3 md:gap-6 lg:grid-cols-4">
     {% for partner in partners %}
     {% with url=partner|spec_url:"logo_small" %}
@@ -25,6 +110,18 @@
     {% endwith %}
     {% endfor %}
   </div>
-  {% endif %}
-</div>
+</section>
+{% endif %}
+
+{% if phones %}
+<section class="mx-auto max-w-6xl px-4">
+  <div class="rounded-2xl bg-tint px-6 py-8 md:px-10 md:py-12">
+    <h2 class="text-2xl font-bold md:text-3xl">Приезжайте в Т-Парк</h2>
+    <p class="mt-2 text-ink/75">Расскажем о программах и подберём формат для вас, семьи или команды.</p>
+    <div class="mt-6 flex flex-wrap gap-3">{% include "partials/contact_links.html" %}</div>
+  </div>
+</section>
+{% endif %}
+
+{% endwith %}
 {% endblock %}

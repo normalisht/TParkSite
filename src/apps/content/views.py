@@ -6,7 +6,7 @@ from django.utils.formats import date_format
 from apps.content.models import Event, GalleryPhoto, Partner, Review
 from apps.core import structured_data as ld
 from apps.core.images import safe_spec_url
-from apps.core.models import PARK_ADDRESS
+from apps.core.models import PARK_ADDRESS, SiteSettings
 from apps.core.seo import absolute_url, make_seo, page_seo
 
 
@@ -54,13 +54,24 @@ def event_detail(request, slug):
     )
 
 
+ABOUT_GALLERY_SIZE = 6
+
+
 def about(request):
+    site = SiteSettings.load()
+    seo = page_seo("about")
+    seo["image"] = absolute_url(request, safe_spec_url(site, "about_card"))
     return render(
         request,
         "content/about.html",
         {
+            "formats": list(site.park_formats.select_related("category")),
+            "facts": list(site.founder_facts.all()),
+            "safety_page": site.safety_page if site.safety_page and site.safety_page.is_published else None,
+            "photos": list(GalleryPhoto.objects.all()[:ABOUT_GALLERY_SIZE]),
             "partners": list(Partner.objects.all()),
-            "seo": page_seo("about"),
+            "seo": seo,
+            "structured_data": [ld.organization(request, with_founder=True)],
         },
     )
 

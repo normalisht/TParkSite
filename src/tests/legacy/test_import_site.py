@@ -28,8 +28,10 @@ def test_site_texts_and_contacts(legacy):
     site = SiteSettings.load()
     assert site.home_intro == site.events_intro == "<p>Добро пожаловать</p>"
     assert site.about_text == "<p>О нас</p>"
-    assert site.philosophy_text == "<p>Философия</p>"
+    assert site.founder_text == "<p>Философия</p>"
     assert site.nearby_text == "<p>Рядом</p>"
+    assert [f.name for f in site.park_formats.all()] == ["T-park", "T-camp", "T-club", "T-raid"]
+    assert site.founder_facts.first().value == "1000+"
     assert site.contacts_text == "<p>Как добраться</p>"
     assert site.address == "Калужская область, село Восход"
     assert site.vk_url == "https://vk.com/tparkprotva"
@@ -98,4 +100,4 @@ def test_html_cleanup_trims_empty_edge_paragraphs(legacy):
         legacy, filosofi="<p>&nbsp;</p>\r\n\r\n<p>Текст</p>\r\n\r\n<p>&nbsp;</p>\r\n\r\n<p>Ещё</p>\r\n<p><br /></p>"
     )
     legacy.run()
-    assert SiteSettings.load().philosophy_text == "<p>Текст</p>\n\n<p>&nbsp;</p>\n\n<p>Ещё</p>"
+    assert SiteSettings.load().founder_text == "<p>Текст</p>\n\n<p>&nbsp;</p>\n\n<p>Ещё</p>"

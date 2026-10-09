@@ -6,7 +6,7 @@ from django.utils import timezone
 
 from apps.catalog.models import Category, CategoryPhoto, CategoryService, Service
 from apps.content.models import Event, GalleryPhoto, Partner, Review
-from apps.core.models import InfoPage, SiteSettings
+from apps.core.models import FounderFact, InfoPage, ParkFormat, SiteSettings
 
 pytestmark = pytest.mark.django_db
 
@@ -83,6 +83,35 @@ def test_about_page(client, make_image):
     Partner.objects.create(name="Партнёр", link="https://example.com", logo=make_image())
     html = client.get("/about/").content.decode()
     assert "https://example.com" in html
+
+
+def test_about_page_sections(client):
+    site = SiteSettings.load()
+    site.about_text = "<p>Природа и тренинг</p>"
+    site.founder_text = "<ul><li>Педагог</li></ul>"
+    site.safety_page = InfoPage.objects.create(title="Правила безопасности", body="<p>Каски</p>")
+    site.save()
+    published = Category.objects.create(name="Верёвочный парк", is_published=True)
+    hidden = Category.objects.create(name="Черновик", is_published=False)
+    ParkFormat.objects.create(settings=site, name="T-park", caption="Тренинг-парк", category=published, order=0)
+    ParkFormat.objects.create(settings=site, name="T-camp", caption="Тренинговый лагерь", category=hidden, order=1)
+    FounderFact.objects.create(settings=site, value="1000+", label="тренингов провёл")
+
+    html = client.get("/about/").content.decode()
+    assert site.about_motto in html
+    assert "Природа и тренинг" in html and "Педагог" in html
+    assert "T-park" in html and "T-camp" in html and "1000+" in html
+    assert published.get_absolute_url() in html
+    assert hidden.get_absolute_url() not in html
+    assert site.safety_page.get_absolute_url() in html
+    assert '"founder"' in html and "Дмитрий Сергеев" in html
+
+
+def test_about_hides_unpublished_safety_page(client):
+    site = SiteSettings.load()
+    site.safety_page = InfoPage.objects.create(title="Правила", body="<p>x</p>", is_published=False)
+    site.save()
+    assert site.safety_page.get_absolute_url() not in client.get("/about/").content.decode()
 
 
 def test_reviews_newest_first_and_published(client):
