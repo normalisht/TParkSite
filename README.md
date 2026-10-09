@@ -18,6 +18,14 @@ Django-проект — в [src/](src/), в корне — инфраструк�
 
 1. DNS всех доменов из `SERVER_NAME` указывает на сервер, порты 80 и 443 открыты.
 2. В `.env`: `COMPOSE_FILE=compose.nginx.yaml` (тогда `docker compose`, `make up`/`logs`/`prod-superuser` и `scripts/backup.sh` работают с этим файлом без `-f`), `ACME_EMAIL`, при другом домене — `SERVER_NAME` (через пробел; см. `.env.example`).
-3. `docker compose up -d --build`, дальше — как выше (createsuperuser, импорт, бэкап). Сертификат появится через несколько секунд после старта; ход выпуска — в `docker compose logs tpark-nginx`.
+3. Данные лежат в каталогах на хосте (не в томах Docker): БД — `data/db/db.sqlite3`, медиа — `data/media/` (другие пути — `DB_DIR`/`MEDIA_DIR` в `.env`). Чтобы поднять сайт с готовыми данными, положить их туда до запуска, например из бэкапа `scripts/backup.sh`:
+   ```bash
+   mkdir -p data/db
+   cp backups/<дата>/db.sqlite3 data/db/db.sqlite3
+   tar -xzf backups/<дата>/media.tar.gz -C data     # распакуется в data/media/
+   sudo chown -R 1000:1000 data                     # контейнер работает от uid 1000
+   ```
+   Миграции применяются при старте. Пустые каталоги тоже подойдут (новый сайт), но их владелец тоже должен быть uid 1000 — иначе Docker создаст их от root и gunicorn не сможет писать.
+4. `docker compose up -d --build`, дальше — как выше (createsuperuser, импорт, бэкап). Сертификат появится через несколько секунд после старта; ход выпуска — в `docker compose logs tpark-nginx`.
 
 Ключ аккаунта и сертификаты лежат в томе `acme` — не удалять, иначе упрёмся в лимиты Let's Encrypt. Для отладки — `ACME_SERVER` с тестовым сервером (браузер такому сертификату не доверяет); при возврате на боевой удалить том `acme`.

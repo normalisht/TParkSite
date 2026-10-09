@@ -17,6 +17,7 @@ __pycache__/
 
 # Инфраструктура
 /backups/
+/data/
 /.superpowers/
 
 # Редакторы и ОС

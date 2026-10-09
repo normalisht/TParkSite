@@ -3,7 +3,10 @@
 #   docker compose -f compose.nginx.yaml up -d --build
 # Сертификат Let's Encrypt nginx выпускает и продлевает сам (ngx_http_acme_module): нужны ACME_EMAIL в .env,
 # DNS доменов из SERVER_NAME на этот сервер и открытый порт 80. Состояние ACME — в томе acme.
-# Тома те же, что у compose.yaml (db, media) — при переходе между вариантами данные сохраняются.
+# БД и медиа — каталоги на хосте (bind mount), а не именованные тома: их можно подложить готовыми.
+#   DB_DIR (по умолчанию ./data/db)       — в нём db.sqlite3; каталог целиком, т. к. SQLite пишет рядом журнал;
+#   MEDIA_DIR (по умолчанию ./data/media) — содержимое MEDIA_ROOT (папки как в src/media).
+# Владелец обоих каталогов — uid 1000 (пользователь app в образе): sudo chown -R 1000:1000 data
 services:
   tpark-web:
     build: .
@@ -11,8 +14,8 @@ services:
     env_file: .env
     restart: unless-stopped
     volumes:
-      - db:/data/db
-      - media:/data/media
+      - ${DB_DIR:-./data/db}:/data/db
+      - ${MEDIA_DIR:-./data/media}:/data/media
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz/', timeout=5)"]
       interval: 30s
@@ -37,12 +40,10 @@ services:
       - "${HTTP_PORT:-80}:80"
       - "${HTTPS_PORT:-443}:443"
     volumes:
-      - media:/data/media:ro
+      - ${MEDIA_DIR:-./data/media}:/data/media:ro
       - ./docker/nginx.conf.template:/etc/nginx/templates/nginx.conf.template:ro
       # Ключ аккаунта и сертификаты: без тома каждый перезапуск выпускал бы новый (лимиты Let's Encrypt).
       - acme:/var/cache/nginx/acme-letsencrypt
 
 volumes:
-  db:
-  media:
   acme:
