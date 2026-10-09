@@ -15,7 +15,7 @@
     </div>
     <nav aria-label="Разделы сайта">
       <p class="text-sm font-bold uppercase tracking-widest text-white/50">Разделы</p>
-      <div class="mt-3 grid grid-cols-2 gap-x-6 gap-y-2 md:grid-cols-1">{% include "partials/nav_links.html" with link_class="hover:text-brand-300" %}</div>
+      <div class="mt-3 grid grid-cols-2 gap-x-6 gap-y-2 md:grid-cols-1"><a href="{% url 'catalog:home' %}" class="hover:text-brand-300">Главная</a>{% include "partials/nav_links.html" with link_class="hover:text-brand-300" %}</div>
     </nav>
     {% if phones %}
     <div>
