@@ -20,15 +20,14 @@ def test_events(legacy):
     legacy.image("events/0.jpg")
     report = legacy.run()
     splav = Event.objects.get(title="Сплав")
-    assert (splav.date, splav.text_color, splav.show_after_date, splav.link) == (
+    assert (splav.date, splav.show_after_date, splav.link) == (
         date(2022, 9, 24),
-        "#ffffff",
         True,
         "https://vk.com/e",
     )
     assert splav.image
     kvest = Event.objects.get(title="Квест")
-    assert (kvest.date, kvest.text_color, kvest.show_after_date) == (date(2022, 10, 16), "", False)
+    assert (kvest.date, kvest.show_after_date) == (date(2022, 10, 16), False)
     assert not Event.objects.filter(title="Без даты").exists()
     assert any("слайдера" in w and "#2" in w for w in report.warnings)
     assert any("Без даты" in w or "#4" in w for w in report.warnings)

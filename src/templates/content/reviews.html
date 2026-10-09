@@ -23,6 +23,8 @@
   <p class="mt-8 text-ink/60">Отзывов пока нет.</p>
   {% endif %}
 
+  {% if photos %}<section class="mt-10 md:mt-16">{% include "content/partials/photo_strip.html" %}</section>{% endif %}
+
   {% if site.reviews_url %}
   <section class="mt-10 flex flex-col items-start gap-6 rounded-3xl bg-navy p-8 text-white md:flex-row md:items-center md:justify-between md:p-12">
     <div>

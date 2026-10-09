@@ -42,8 +42,8 @@
     <h2 class="text-2xl font-bold md:text-3xl">Ближайшие мероприятия</h2>
     <a href="{% url 'content:events' %}" class="inline-flex shrink-0 items-center gap-1 font-semibold text-brand-700 hover:text-brand-600">Все мероприятия<span class="icon h-4 w-4">{% include "icons/chevron-right.svg" %}</span></a>
   </div>
-  <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-    {% for event in events %}<article>{% include "content/partials/event_card.html" with heading="h3" %}</article>{% endfor %}
+  <div class="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 lg:grid-cols-3">
+    {% for event in events %}<article class="{% if events|length > 1 %}w-[82%] shrink-0 snap-start scroll-ml-4 sm:w-auto{% else %}w-full{% endif %}">{% include "content/partials/event_card.html" %}</article>{% endfor %}
   </div>
 </section>
 {% endif %}

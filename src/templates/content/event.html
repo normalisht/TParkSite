@@ -4,16 +4,59 @@
 {% block content %}
 <div class="mx-auto max-w-6xl px-4 py-8 md:py-12">
   {% include "partials/breadcrumbs.html" %}
-  <p class="font-semibold text-brand-700"><time datetime="{{ event.date|date:'Y-m-d' }}">{{ event.date|date:"j E Y" }}</time></p>
-  <h1 class="mt-1 text-3xl font-bold md:text-5xl">{{ event.title }}</h1>
-  {% with url=event|spec_url:"card" %}{% if url %}
-  <img src="{{ url }}" alt="{{ event.title }}" width="800" height="600" fetchpriority="high" class="mt-8 aspect-[4/3] w-full max-w-3xl rounded-2xl object-cover">
-  {% endif %}{% endwith %}
-  {% if event.description %}<div class="rich-text mt-8 max-w-3xl">{{ event.description|safe }}</div>{% endif %}
-  <div class="mt-10 flex flex-wrap gap-3">
-    {% if event.link %}<a href="{{ event.link }}" target="_blank" rel="noopener" class="btn btn-ghost">Сайт мероприятия<span class="icon h-5 w-5">{% include "icons/external-link.svg" %}</span></a>{% endif %}
-    {% include "partials/contact_links.html" %}
+  <h1 class="text-3xl font-bold [text-wrap:balance] md:text-5xl">{{ event.title }}</h1>
+  {% if event.is_past %}
+  <p class="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl bg-sand-100 px-5 py-4">
+    <span class="font-semibold">Мероприятие уже прошло.</span>
+    <a href="{% url 'content:events' %}" class="inline-flex items-center gap-1 font-semibold text-brand-700 hover:text-brand-600">Смотреть ближайшие<span class="icon h-4 w-4">{% include "icons/chevron-right.svg" %}</span></a>
+  </p>
+  {% endif %}
+  {# На ПК карточка «когда и как записаться» — справа и едет за прокруткой; на телефоне — сразу под заголовком. #}
+  <div class="mt-6 grid gap-8 md:mt-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-12">
+    <aside class="lg:order-2">
+      <div class="rounded-2xl bg-sand-100 p-5 md:p-6 lg:sticky lg:top-24">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <p class="text-sm font-bold uppercase tracking-widest text-pine-700">Когда</p>
+          {% include "content/partials/event_timing.html" %}
+        </div>
+        <p class="mt-1 text-2xl font-extrabold"><time datetime="{{ event.date|date:'Y-m-d' }}">{{ event.period }}</time></p>
+        <p class="mt-1 text-ink/75">{% if event.end_date %}{{ event.date|date:"l"|capfirst }} — {{ event.end_date|date:"l" }}{% else %}{{ event.date|date:"l"|capfirst }}{% endif %}{% if event.start_time %}, начало в {{ event.start_time|time:"H:i" }}{% endif %}</p>
+        {% if event.price %}
+        <p class="mt-5 text-sm font-bold uppercase tracking-widest text-pine-700">Стоимость</p>
+        <p class="mt-1 text-xl font-extrabold">{{ event.price }}</p>
+        {% endif %}
+        {% if site.address %}
+        <p class="mt-5 text-sm font-bold uppercase tracking-widest text-pine-700">Где</p>
+        <p class="mt-1">{{ site.address }}</p>
+        {% if route %}<a href="{{ route.yandex }}" class="mt-1 inline-flex items-center gap-1 font-semibold text-brand-700 hover:text-brand-600" target="_blank" rel="noopener"><span class="icon h-4 w-4">{% include "icons/navigation.svg" %}</span>Маршрут</a>{% endif %}
+        {% endif %}
+        {% if phones and not event.is_past %}
+        <p class="mt-6 text-sm text-ink/70">Записаться и задать вопрос:</p>
+        <div class="mt-2 flex flex-wrap gap-2 lg:flex-col lg:[&>.btn]:w-full">{% include "partials/contact_links.html" %}</div>
+        {% endif %}
+        {% if event.link %}
+        <a href="{{ event.link }}" target="_blank" rel="noopener" class="mt-5 inline-flex items-center gap-1.5 font-semibold text-brand-700 hover:text-brand-600">Сайт мероприятия<span class="icon h-4 w-4">{% include "icons/external-link.svg" %}</span></a>
+        {% endif %}
+      </div>
+    </aside>
+    <div class="min-w-0 lg:order-1">
+      {% with url=event|spec_url:"card" %}{% if url %}
+      <img src="{{ url }}" alt="{{ event.title }}" width="800" height="600" fetchpriority="high" class="aspect-[4/3] w-full rounded-2xl object-cover">
+      {% endif %}{% endwith %}
+      {% if event.description %}<div class="rich-text mt-8">{{ event.description|safe }}</div>{% endif %}
+    </div>
   </div>
-  <a href="{% url 'content:events' %}" class="mt-10 inline-flex items-center gap-1 font-semibold text-brand-700 hover:text-brand-600">← Все мероприятия</a>
 </div>
+
+{% if related %}
+<section class="mx-auto max-w-6xl px-4">
+  <div class="mb-4 flex items-end justify-between gap-4 md:mb-6">
+    <h2 class="text-2xl font-bold md:text-3xl">{% if event.is_past %}Ближайшие мероприятия{% else %}Другие мероприятия{% endif %}</h2>
+    <a href="{% url 'content:events' %}" class="inline-flex shrink-0 items-center gap-1 font-semibold text-brand-700 hover:text-brand-600">Все мероприятия<span class="icon h-4 w-4">{% include "icons/chevron-right.svg" %}</span></a>
+  </div>
+  <div class="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 lg:grid-cols-3">
+    {% for event in related %}<article class="{% if related|length > 1 %}w-[82%] shrink-0 snap-start scroll-ml-4 sm:w-auto{% else %}w-full{% endif %}">{% include "content/partials/event_card.html" %}</article>{% endfor %}
+  </div>
+</section>
+{% endif %}
 {% endblock %}

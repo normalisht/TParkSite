@@ -1,4 +1,3 @@
-import re
 from pathlib import Path
 
 from django.utils.html import escape
@@ -7,7 +6,6 @@ from apps.content.models import Event, GalleryPhoto, Partner, Review
 from apps.core.legacy.html import clean_html, clean_line, clean_url, parse_date, parse_ru_date, split_lead_link
 from apps.core.legacy.media import attach_image, numbered_images
 
-COLOR_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
 OLD_BANNER_IDS = {0, 1, 2}  # events/0..2.jpg — фон слайдера старой страницы событий
 
 
@@ -17,13 +15,11 @@ def import_content(db, images: Path, report) -> None:
         if event_date is None:
             report.warn(f"Мероприятие #{row['id']} «{row['title']}» без даты — пропущено")
             continue
-        color = (row["text_color"] or "").strip()
         event = Event(
             title=clean_line(row["title"], 128) or f"Мероприятие {row['id']}",
             date=event_date,
             description=clean_html(row["description"]),
             link=clean_url(row["link"]),
-            text_color=color if COLOR_RE.match(color) else "",
             show_after_date=bool(row["after_date"]),
         )
         path = images / "events" / f"{row['id']}.jpg"

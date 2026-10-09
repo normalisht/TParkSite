@@ -1,7 +1,8 @@
-from datetime import date
+from datetime import date, timedelta
 
 import pytest
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 from apps.content.models import Event, GalleryPhoto, Review
 
@@ -10,8 +11,8 @@ pytestmark = pytest.mark.django_db
 TODAY = date(2026, 7, 1)
 
 
-def make_event(title, day, show_after=False):
-    return Event.objects.create(title=title, date=day, show_after_date=show_after)
+def make_event(title, day, show_after=False, **kwargs):
+    return Event.objects.create(title=title, date=day, show_after_date=show_after, **kwargs)
 
 
 def test_upcoming_includes_today_sorted():
@@ -28,10 +29,58 @@ def test_past_visible_only_flagged_newest_first():
     assert list(Event.objects.past_visible(TODAY)) == [newer, older]
 
 
-def test_text_color_must_be_hex():
-    event = Event(title="x", date=TODAY, text_color="red; background:url(x)")
-    with pytest.raises(ValidationError):
+def test_multi_day_event_is_upcoming_until_it_ends():
+    running = make_event("Идёт", date(2026, 6, 20), end_date=date(2026, 7, 5))
+    over = make_event("Закончилось", date(2026, 6, 1), show_after=True, end_date=date(2026, 6, 30))
+    assert list(Event.objects.upcoming(TODAY)) == [running]
+    assert list(Event.objects.past_visible(TODAY)) == [over]
+    assert set(Event.objects.visible(TODAY)) == {running, over}
+
+
+def test_end_date_before_start_is_invalid():
+    event = Event(title="x", date=TODAY, end_date=date(2026, 6, 30), description="<p>x</p>")
+    with pytest.raises(ValidationError) as error:
         event.full_clean()
+    assert "end_date" in error.value.message_dict
+
+
+def test_end_date_same_as_start_is_dropped():
+    event = Event(title="x", date=TODAY, end_date=TODAY, description="<p>x</p>")
+    event.full_clean()
+    assert event.end_date is None
+
+
+@pytest.mark.parametrize(
+    ("start", "end", "expected"),
+    [
+        (date(2022, 12, 3), None, "3 декабря 2022"),
+        (date(2027, 11, 18), date(2027, 11, 25), "18–25 ноября 2027"),
+        (date(2027, 11, 18), date(2027, 12, 17), "18 ноября — 17 декабря 2027"),
+        (date(2026, 12, 28), date(2027, 1, 5), "28 декабря 2026 — 5 января 2027"),
+    ],
+)
+def test_event_period(start, end, expected):
+    assert Event(title="x", date=start, end_date=end).period == expected
+
+
+@pytest.mark.parametrize(
+    ("offset", "length", "expected"),
+    [
+        (-3, 0, "Прошло"),
+        (-2, 5, "Идёт сейчас"),
+        (0, 2, "Идёт сейчас"),
+        (0, 0, "Сегодня"),
+        (1, 0, "Завтра"),
+        (2, 0, "Через 2 дня"),
+        (5, 0, "Через 5 дней"),
+        (21, 0, "Через 21 день"),
+        (40, 0, ""),
+    ],
+)
+def test_event_timing(offset, length, expected):
+    start = timezone.localdate() + timedelta(days=offset)
+    end = start + timedelta(days=length) if length else None
+    assert Event(title="x", date=start, end_date=end).timing == expected
 
 
 def test_gallery_photo_file_removed_on_delete(make_image, media_root, django_capture_on_commit_callbacks):

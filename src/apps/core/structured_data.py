@@ -4,6 +4,8 @@
 каждой страницы, где есть такие ссылки.
 """
 
+import re
+
 from django.templatetags.static import static
 from django.urls import reverse
 
@@ -116,22 +118,35 @@ def service_list(request, category, services) -> dict:
     }
 
 
+def price_offer(text: str, url: str) -> dict | None:
+    """Цена из свободного текста («1000 ₽ с участника», «Бесплатно») — `Offer`; без числа — None."""
+    if "бесплатн" in text.lower():
+        amount = "0"
+    elif match := re.search(r"\d[\d\s\u00a0]*", text):
+        amount = re.sub(r"\D", "", match.group())
+    else:
+        return None
+    return {"@type": "Offer", "price": amount, "priceCurrency": "RUB", "url": url}
+
+
 def event(request, event, seo: dict) -> dict:
     site = SiteSettings.load()
-    date = event.date.isoformat()
+    url = request.build_absolute_uri(event.get_absolute_url())
+    starts_at = event.starts_at
     return _compact(
         {
             "@type": "Event",
             "name": event.title,
-            "startDate": date,
-            "endDate": date,
+            "startDate": starts_at.isoformat() if starts_at else event.date.isoformat(),
+            "endDate": event.last_date.isoformat(),
             "eventStatus": "https://schema.org/EventScheduled",
             "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
-            "url": request.build_absolute_uri(event.get_absolute_url()),
+            "url": url,
             "description": seo["description"] or None,
             "image": [seo["image"]] if seo["image"] else None,
             "location": {"@type": "Place", "name": SITE_NAME, "address": postal_address(site)},
             "organizer": {"@id": organization_id(request)},
+            "offers": price_offer(event.price, url) if event.price else None,
         }
     )
 

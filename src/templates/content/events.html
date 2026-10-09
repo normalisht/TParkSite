@@ -1,34 +1,77 @@
 {% extends "base.html" %}
-{% load site_tags %}
-{% block vendor_css %}{% include "partials/vendor.html" with part="css" swiper=1 %}{% endblock %}
-{% block vendor_js %}{% include "partials/vendor.html" with part="js" swiper=1 %}{% endblock %}
+{% load static site_tags %}
 {% block content %}
-<section class="relative overflow-hidden bg-ink text-white">
-  {% if hero_image %}<img src="{{ hero_image }}" alt="" class="absolute inset-0 h-full w-full object-cover opacity-40">{% endif %}
-  <div class="relative mx-auto max-w-6xl px-4 py-16 md:py-24">
+<section class="bg-sand-100">
+  <div class="mx-auto max-w-6xl px-4 py-10 md:py-16">
     <h1 class="text-4xl font-bold md:text-6xl">Мероприятия</h1>
-    {% if site.events_intro %}<div class="rich-text mt-5 max-w-3xl text-lg !text-white/90">{{ site.events_intro|safe }}</div>{% endif %}
-    {% if nearest %}<p class="mt-6 text-brand-300">Ближайшее: <a href="{{ nearest.get_absolute_url }}" class="underline underline-offset-4 hover:text-white">{{ nearest.title }}</a>, {{ nearest.date|date:"j E" }}</p>{% endif %}
+    {% if site.events_intro %}<div class="rich-text mt-5 max-w-3xl text-lg">{{ site.events_intro|safe }}</div>{% endif %}
+
+    {% if nearest %}
+    {% with event=nearest %}
+    <article class="mt-8 grid overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-ink/10 md:mt-10 lg:grid-cols-2">
+      <a href="{{ event.get_absolute_url }}" class="group relative block aspect-[4/3] overflow-hidden bg-sand-200 lg:aspect-auto lg:min-h-80" tabindex="-1" aria-hidden="true">
+        {% with url=event|spec_url:"card" %}{% if url %}
+        <img src="{{ url }}" alt="" width="800" height="600" fetchpriority="high" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105">
+        {% else %}
+        <img src="{% static 'img/logo.png' %}" alt="" class="absolute inset-0 m-auto w-1/2 opacity-30">
+        {% endif %}{% endwith %}
+      </a>
+      <div class="flex flex-col p-6 md:p-8">
+        <div class="flex flex-wrap items-center gap-3">
+          <span class="text-sm font-bold uppercase tracking-widest text-pine-700">Ближайшее</span>
+          {% include "content/partials/event_timing.html" %}
+        </div>
+        <h2 class="mt-3 text-2xl font-bold [text-wrap:balance] md:text-3xl"><a href="{{ event.get_absolute_url }}" class="hover:text-brand-700">{{ event.title }}</a></h2>
+        <ul class="mt-4 space-y-2 text-ink/80">
+          <li class="flex items-center gap-2"><span class="icon h-5 w-5 shrink-0 text-pine-700">{% include "icons/calendar.svg" %}</span><time datetime="{{ event.date|date:'Y-m-d' }}">{% include "content/partials/event_when.html" %}</time></li>
+          {% if event.price %}<li class="flex items-center gap-2"><span class="icon h-5 w-5 shrink-0 text-pine-700">{% include "icons/ticket.svg" %}</span>{{ event.price }}</li>{% endif %}
+        </ul>
+        {% if event.description %}<p class="mt-4 line-clamp-4 text-ink/75">{{ event.description|plaintext:320 }}</p>{% endif %}
+        <div class="mt-6 flex flex-wrap items-center gap-3 lg:mt-auto lg:pt-6">
+          <a href="{{ event.get_absolute_url }}" class="btn btn-primary">Подробнее<span class="icon h-5 w-5">{% include "icons/chevron-right.svg" %}</span></a>
+        </div>
+      </div>
+    </article>
+    {% endwith %}
+    {% else %}
+    <div class="mt-8 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-ink/10 md:mt-10 md:p-8">
+      <p class="text-xl font-bold">Скоро анонсируем новые мероприятия</p>
+      <p class="mt-2 text-ink/75">{% if site.vk_url %}Анонсы первыми появляются в нашей группе VK. {% endif %}А программу для своей компании можно заказать в любое время.</p>
+      <div class="mt-5 flex flex-wrap gap-3">
+        {% if site.vk_url %}<a href="{{ site.vk_url }}" class="btn btn-ghost" target="_blank" rel="noopener"><span class="icon icon-fill h-5 w-5 text-[#0077FF]">{% include "icons/vk.svg" %}</span>Группа VK</a>{% endif %}
+        {% include "partials/contact_links.html" %}
+      </div>
+    </div>
+    {% endif %}
   </div>
 </section>
 
-<section class="mx-auto max-w-6xl px-4 py-12">
-  {% if events %}
-  <div class="swiper js-carousel">
-    <div class="swiper-wrapper">
-      {% for event in events %}
-      <article class="swiper-slide">
-        {% include "content/partials/event_card.html" %}
-      </article>
-      {% endfor %}
-    </div>
-    <div class="mt-6 flex justify-end gap-2">
-      <div class="swiper-button-prev !static !m-0 !h-10 !w-10 rounded-full bg-tint !text-ink after:!text-base"></div>
-      <div class="swiper-button-next !static !m-0 !h-10 !w-10 rounded-full bg-tint !text-ink after:!text-base"></div>
-    </div>
+{% if upcoming %}
+<section class="mx-auto max-w-6xl px-4 pt-10 md:pt-16">
+  <h2 class="mb-4 text-2xl font-bold md:mb-6 md:text-3xl">Предстоящие</h2>
+  {# На телефоне — лента со свайпом (следующая карточка выглядывает с края), с sm — сетка. #}
+  <div class="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 lg:grid-cols-3">
+    {% for event in upcoming %}<article class="{% if upcoming|length > 1 %}w-[82%] shrink-0 snap-start scroll-ml-4 sm:w-auto{% else %}w-full{% endif %}">{% include "content/partials/event_card.html" %}</article>{% endfor %}
   </div>
-  {% else %}
-  <p class="py-10 text-center text-lg text-ink/60">Скоро анонсируем новые мероприятия.</p>
+</section>
+{% endif %}
+
+{% if past %}
+<section class="mx-auto max-w-6xl px-4 pt-10 md:pt-16" x-data="{ all: false }">
+  <h2 class="mb-4 text-2xl font-bold md:mb-6 md:text-3xl">Прошедшие</h2>
+  {# На телефоне лента листается целиком; в сетке (с sm) сверх {{ past_shown }} — по кнопке. #}
+  <div class="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 lg:grid-cols-3">
+    {% for event in past %}
+    <article class="{% if past|length > 1 %}w-[82%] shrink-0 snap-start scroll-ml-4 sm:w-auto{% else %}w-full{% endif %}{% if forloop.counter > past_shown %} sm:hidden{% endif %}"{% if forloop.counter > past_shown %} :class="all && '!block'"{% endif %}>{% include "content/partials/event_card.html" %}</article>
+    {% endfor %}
+  </div>
+  {% if past|length > past_shown %}
+  <div class="mt-6 hidden text-center sm:block" x-show="!all"><button type="button" class="btn btn-ghost" @click="all = true">Показать все прошедшие</button></div>
   {% endif %}
 </section>
+{% endif %}
+
+<div class="pt-10 md:pt-16">
+  {% include "partials/cta_card.html" with title="Своё событие в Т-Парке" text="Корпоратив, день рождения, выпускной или выезд класса — придумаем программу и всё организуем." %}
+</div>
 {% endblock %}

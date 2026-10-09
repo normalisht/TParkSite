@@ -188,6 +188,13 @@ def test_review_card_links_to_source_when_link_set(client):
     assert "after:inset-0" not in html and "20 июля 2022" in html
 
 
+def test_reviews_page_photo_strip(client, make_image):
+    assert "Как это выглядит" not in client.get("/reviews/").content.decode()
+    GalleryPhoto.objects.create(image=make_image(), caption="Закат")
+    html = client.get("/reviews/").content.decode()
+    assert "Как это выглядит" in html and 'alt="Закат"' in html
+
+
 def test_gallery_page(client, make_image):
     GalleryPhoto.objects.create(image=make_image(), caption="Закат")
     html = client.get("/gallery/").content.decode()

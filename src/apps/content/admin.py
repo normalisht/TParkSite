@@ -23,9 +23,9 @@ class EventPeriodFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         today = timezone.localdate()
         if self.value() == "upcoming":
-            return queryset.filter(date__gte=today)
+            return queryset.upcoming(today)
         if self.value() == "past":
-            return queryset.filter(date__lt=today)
+            return queryset.past(today)
         return queryset
 
 
@@ -40,7 +40,16 @@ class EventAdmin(SiteModelAdmin):
             "Основное",
             {
                 "classes": ["tab"],
-                "fields": ["title", "slug", "date", "description", "link", "image", "text_color", "show_after_date"],
+                "fields": [
+                    "title",
+                    "slug",
+                    ("date", "end_date", "start_time"),
+                    "price",
+                    "description",
+                    "link",
+                    "image",
+                    "show_after_date",
+                ],
             },
         ),
         SEO_FIELDSET,

@@ -11,20 +11,21 @@ from apps.core.models import PARK_ADDRESS, SiteSettings
 from apps.core.opening_hours import human_opening_hours
 from apps.core.seo import absolute_url, make_seo, page_seo
 
+PAST_EVENTS_SHOWN = 6
+RELATED_EVENTS = 3
+
 
 def events(request):
     today = timezone.localdate()
     upcoming = list(Event.objects.upcoming(today))
-    past = list(Event.objects.past_visible(today))
-    nearest = upcoming[0] if upcoming else None
-    hero = safe_spec_url(nearest, "card") if nearest else ""
     return render(
         request,
         "content/events.html",
         {
-            "events": upcoming + past,
-            "nearest": nearest,
-            "hero_image": hero,
+            "nearest": upcoming[0] if upcoming else None,
+            "upcoming": upcoming[1:],
+            "past": list(Event.objects.past_visible(today)),
+            "past_shown": PAST_EVENTS_SHOWN,
             "seo": page_seo("events"),
         },
     )
@@ -40,11 +41,14 @@ def event_detail(request, slug):
         default_description=f"{event.title}, {date_format(event.date, 'j E Y')} — мероприятие в Т-Парке. {PARK_ADDRESS}.",
     )
     crumbs = [ld.home_crumb(), ("Мероприятия", reverse("content:events")), (event.title, "")]
+    site = SiteSettings.load()
     return render(
         request,
         "content/event.html",
         {
             "event": event,
+            "related": list(Event.objects.upcoming().exclude(pk=event.pk)[:RELATED_EVENTS]),
+            "route": route_links(site.latitude, site.longitude),
             "seo": seo,
             "breadcrumbs": crumbs,
             "structured_data": [
@@ -56,7 +60,7 @@ def event_detail(request, slug):
     )
 
 
-ABOUT_GALLERY_SIZE = 6
+GALLERY_STRIP_SIZE = 6
 
 
 def about(request):
@@ -70,7 +74,7 @@ def about(request):
             "formats": list(site.park_formats.select_related("category")),
             "facts": list(site.founder_facts.all()),
             "safety_page": site.safety_page if site.safety_page and site.safety_page.is_published else None,
-            "photos": list(GalleryPhoto.objects.all()[:ABOUT_GALLERY_SIZE]),
+            "photos": list(GalleryPhoto.objects.all()[:GALLERY_STRIP_SIZE]),
             "partners": list(Partner.objects.all()),
             "seo": seo,
             "structured_data": [ld.organization(request, with_founder=True)],
@@ -79,7 +83,15 @@ def about(request):
 
 
 def reviews(request):
-    return render(request, "content/reviews.html", {"reviews": Review.objects.published(), "seo": page_seo("reviews")})
+    return render(
+        request,
+        "content/reviews.html",
+        {
+            "reviews": Review.objects.published(),
+            "photos": list(GalleryPhoto.objects.all()[:GALLERY_STRIP_SIZE]),
+            "seo": page_seo("reviews"),
+        },
+    )
 
 
 def gallery(request):

@@ -1,6 +1,6 @@
 import json
 import re
-from datetime import date, timedelta
+from datetime import date, time, timedelta
 
 import pytest
 from django.utils import timezone
@@ -63,9 +63,49 @@ def test_event_page_json_ld(client):
     assert [item["name"] for item in nodes["BreadcrumbList"]["itemListElement"]] == ["Главная", "Мероприятия", "Слёт"]
 
 
+def test_event_page_json_ld_time_period_and_offer(client):
+    event = make_event(
+        days=5, end_date=timezone.localdate() + timedelta(days=7), start_time=time(18, 0), price="1 500 ₽"
+    )
+    html = client.get(event.get_absolute_url()).content.decode()
+    raw = re.search(r'<script type="application/ld\+json">(.*?)</script>', html, re.DOTALL).group(1)
+    data = next(node for node in json.loads(raw)["@graph"] if node["@type"] == "Event")
+    assert data["startDate"] == f"{event.date.isoformat()}T18:00:00+03:00"
+    assert data["endDate"] == event.end_date.isoformat()
+    assert data["offers"] == {"@type": "Offer", "price": "1500", "priceCurrency": "RUB", "url": data["url"]}
+
+
+def test_event_page_booking_card(client):
+    make_event("Другое", days=10)
+    event = make_event(days=5, start_time=time(18, 0), price="1000 ₽ с участника")
+    html = client.get(event.get_absolute_url()).content.decode()
+    assert "начало в 18:00" in html and "1000 ₽ с участника" in html
+    assert "Через 5 дней" in html
+    assert "Другие мероприятия" in html and "Другое" in html
+    assert "уже прошло" not in html
+
+
 def test_past_visible_event_page(client):
+    make_event("Скоро снова", days=3)
     event = make_event(days=-5, show_after_date=True)
-    assert client.get(event.get_absolute_url()).status_code == 200
+    response = client.get(event.get_absolute_url())
+    assert response.status_code == 200
+    html = response.content.decode()
+    assert "Мероприятие уже прошло" in html
+    assert "Ближайшие мероприятия" in html and "Скоро снова" in html
+    assert "Записаться" not in html
+
+
+def test_events_list_sections(client):
+    make_event("Первое", days=2)
+    make_event("Второе", days=9)
+    for i in range(8):
+        make_event(f"Архив {i}", days=-10 - i, show_after_date=True)
+    html = client.get("/events/").content.decode()
+    assert html.index("Ближайшее") < html.index("Первое") < html.index("Предстоящие") < html.index("Второе")
+    assert html.index("Второе") < html.index("Прошедшие") < html.index("Архив 0")
+    assert "Показать все прошедшие" in html
+    assert html.count(":class=\"all && '!block'\"") == 2
 
 
 def test_hidden_past_event_is_404(client):
