@@ -159,3 +159,11 @@ def test_no_low_contrast_gray_text():
         if int(match.group(1)) < 65
     ]
     assert offenders == []
+
+
+def test_header_logo_is_lightweight(client):
+    """В шапке — уменьшенный логотип (3× от 122×40), а не исходник 600×197: он грузится вместе с LCP-фото."""
+    html = client.get("/").content.decode()
+    assert re.search(r'<img src="/static/img/logo-header\.png" alt="Т-Парк" width="122" height="40"', html)
+    logo = Path(settings.BASE_DIR) / "static/img/logo-header.png"
+    assert logo.stat().st_size < 8 * 1024

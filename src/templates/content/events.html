@@ -11,8 +11,8 @@
     {% with event=nearest %}
     <article class="card mt-8 grid overflow-hidden md:mt-10 lg:grid-cols-2">
       <a href="{{ event.get_absolute_url }}" class="group relative block aspect-[4/3] overflow-hidden bg-sand-200 lg:aspect-auto lg:min-h-80" tabindex="-1" aria-hidden="true">
-        {% with url=event|spec_url:"card" %}{% if url %}
-        <img src="{{ url }}" alt="" width="800" height="600" fetchpriority="high" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105">
+        {% with url=event|spec_url:"card" small=event|spec_url:"card_small" %}{% if url %}
+        <img src="{{ url }}"{% if small %} srcset="{{ small }} 640w, {{ url }} 800w" sizes="(min-width: 1024px) 560px, calc(100vw - 32px)"{% endif %} alt="" width="800" height="600" fetchpriority="high" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105">
         {% else %}
         <img src="{% static 'img/logo.png' %}" alt="" class="absolute inset-0 m-auto w-1/2 opacity-30">
         {% endif %}{% endwith %}

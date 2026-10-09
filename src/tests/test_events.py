@@ -128,3 +128,13 @@ def test_sitemap_lists_visible_events(client):
     xml = client.get("/sitemap.xml").content.decode()
     assert shown.get_absolute_url() in xml
     assert hidden.get_absolute_url() not in xml
+
+
+def test_event_cards_offer_smaller_photo(client, make_image):
+    nearest = make_event("Ближайшее событие", days=2, image=make_image())
+    make_event("Следующее", days=9, image=make_image())
+    html = client.get("/events/").content.decode()
+    srcsets = re.findall(r'srcset="([^"]+)"', html)
+    assert len(srcsets) == 2
+    assert f"{nearest.card_small.url} 640w, {nearest.card.url} 800w" in srcsets
+    assert html.count('sizes="(min-width') == 2

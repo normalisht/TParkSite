@@ -1,9 +1,9 @@
 {% load static site_tags %}
-{# Всё, кроме метки «Через N дней», — под фото: читается на любом снимке. #}
+{# Всё, кроме метки «Через N дней», — под фото: читается на любом снимке. sizes — ширина карточки в сетках главной и /events/ (лента 82% на телефоне, 2 колонки с sm, 3 с lg). #}
 <a href="{{ event.get_absolute_url }}" class="card card-link group flex h-full flex-col overflow-hidden">
   <div class="relative aspect-[4/3] overflow-hidden bg-sand-200">
-    {% with url=event|spec_url:"card" %}{% if url %}
-    <img src="{{ url }}" alt="" width="800" height="600" loading="lazy" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105">
+    {% with url=event|spec_url:"card" small=event|spec_url:"card_small" %}{% if url %}
+    <img src="{{ url }}"{% if small %} srcset="{{ small }} 640w, {{ url }} 800w" sizes="(min-width: 1024px) 360px, (min-width: 640px) calc(50vw - 28px), calc(82vw - 26px)"{% endif %} alt="" width="800" height="600" loading="lazy" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105">
     {% else %}
     <img src="{% static 'img/logo.png' %}" alt="" class="absolute inset-0 m-auto w-2/3 opacity-30">
     {% endif %}{% endwith %}

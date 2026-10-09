@@ -65,6 +65,7 @@ class Event(SeoModel):
     show_after_date = models.BooleanField("Показывать после даты", default=False)
     image = photo_field("Фото", "events")
     card = image_spec("image", 800, 600)
+    card_small = image_spec("image", 640, 480)  # карточки в сетке и на телефоне: srcset с card
 
     objects = EventQuerySet.as_manager()
 
