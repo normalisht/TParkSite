@@ -6,7 +6,7 @@ import pytest
 from django.utils import timezone
 
 from apps.content.models import Event
-from apps.core.models import SiteSettings
+from apps.core.models import PARK_ADDRESS, SiteSettings
 
 pytestmark = pytest.mark.django_db
 
@@ -163,3 +163,21 @@ def test_event_with_venue_replaces_park_address_and_route(client):
     assert SiteSettings.load().address not in aside
     assert "Маршрут" not in aside
     assert data["location"] == {"@type": "Place", "name": "Лагерь «Сосны», Калуга", "address": "Лагерь «Сосны», Калуга"}
+
+
+def _meta_description(client, event):
+    html = client.get(event.get_absolute_url()).content.decode()
+    return re.search(r'name="description" content="(.*?)"', html).group(1)
+
+
+def test_event_default_description_in_park(client):
+    description = _meta_description(client, make_event())
+    assert "мероприятие в Т-Парке" in description
+    assert SiteSettings.load().address in description
+
+
+def test_event_default_description_uses_venue_instead_of_park(client):
+    description = _meta_description(client, make_event(venue="ТИЦ Обнинска"))
+    assert "ТИЦ Обнинска" in description
+    assert "в Т-Парке" not in description
+    assert PARK_ADDRESS not in description

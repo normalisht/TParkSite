@@ -33,12 +33,19 @@ def events(request):
 
 def event_detail(request, slug):
     event = get_object_or_404(Event.objects.visible(), slug=slug)
+    when = date_format(event.date, "j E Y")
+    # Место проведения вне парка: описание не должно утверждать, что событие в Т-Парке (как «Где» и JSON-LD на странице).
+    default_description = (
+        f"{event.title}, {when} — {event.venue}."
+        if event.venue
+        else f"{event.title}, {when} — мероприятие в Т-Парке. {PARK_ADDRESS}."
+    )
     seo = make_seo(
         event.title,
         event.description,
         absolute_url(request, safe_spec_url(event, "card")),
         obj=event,
-        default_description=f"{event.title}, {date_format(event.date, 'j E Y')} — мероприятие в Т-Парке. {PARK_ADDRESS}.",
+        default_description=default_description,
     )
     crumbs = [ld.home_crumb(), ("Мероприятия", reverse("content:events")), (event.title, "")]
     site = SiteSettings.load()
