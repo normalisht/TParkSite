@@ -108,6 +108,15 @@ class SiteSettings(models.Model):
         related_name="+",
         help_text="Инфо-страница, на которую ведёт плашка «Правила безопасности» на странице «О нас».",
     )
+    privacy_page = models.ForeignKey(
+        "InfoPage",
+        verbose_name="Политика конфиденциальности",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        help_text="Инфо-страница, на которую ведёт ссылка в подвале сайта. Пока не указана или не опубликована — ссылки нет.",
+    )
 
     # Разметка организации (schema.org LocalBusiness)
     address_region = models.CharField("Регион", max_length=128, blank=True, default="Калужская область")

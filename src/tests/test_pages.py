@@ -181,6 +181,46 @@ def test_about_hides_unpublished_safety_page(client):
     assert site.safety_page.get_absolute_url() not in client.get("/about/").content.decode()
 
 
+def _footer(client):
+    html = client.get("/").content.decode()
+    return html[html.index("<footer") : html.index("</footer>")]
+
+
+@pytest.mark.parametrize(
+    ("field", "title"),
+    [("privacy_page", "Политика конфиденциальности"), ("safety_page", "Правила безопасности")],
+)
+def test_footer_legal_link_only_when_published(client, field, title):
+    page = InfoPage.objects.create(title=title, body="<p>x</p>")
+    site = SiteSettings.load()
+    setattr(site, field, page)
+    site.save()
+    footer = _footer(client)
+    assert f'href="{page.get_absolute_url()}"' in footer
+    assert title in footer
+
+    page.is_published = False
+    page.save()
+    footer = _footer(client)
+    assert page.get_absolute_url() not in footer
+    assert title not in footer
+
+
+def test_footer_legal_links_without_pages(client):
+    footer = _footer(client)
+    assert "Политика конфиденциальности" not in footer
+    assert "Правила безопасности" not in footer
+    assert " · " not in footer
+
+
+def test_footer_legal_links_separated(client):
+    site = SiteSettings.load()
+    site.privacy_page = InfoPage.objects.create(title="Политика конфиденциальности", body="<p>x</p>")
+    site.safety_page = InfoPage.objects.create(title="Правила безопасности", body="<p>y</p>")
+    site.save()
+    assert _footer(client).count("·") == 2
+
+
 def test_reviews_newest_first_and_published(client):
     Review.objects.create(text="<p>Без даты</p>")
     Review.objects.create(text="<p>Старый</p>", date=date(2021, 6, 6))

@@ -8,9 +8,15 @@ from apps.core.seo import SITE_DESCRIPTION, absolute_url, plaintext
 def site(request):
     settings_obj = SiteSettings.load()
     phones = list(settings_obj.phones.all())
+    privacy_page, safety_page = (
+        page if page and page.is_published else None for page in (settings_obj.privacy_page, settings_obj.safety_page)
+    )
     return {
         "site": settings_obj,
         "phones": phones,
+        # Ссылки в подвале: только опубликованные страницы.
+        "privacy_page": privacy_page,
+        "safety_page": safety_page,
         "whatsapp_phone": next((p for p in phones if p.is_whatsapp), None),
         "telegram_phone": next((p for p in phones if p.is_telegram), None),
         "default_description": plaintext(settings_obj.home_intro) or SITE_DESCRIPTION,

@@ -108,6 +108,7 @@ class SiteSettingsAdmin(SiteModelAdmin):
                 ],
             },
         ),
+        ("Юридическое", {"classes": ["tab"], "fields": ["privacy_page"]}),
         (
             "SEO",
             {
