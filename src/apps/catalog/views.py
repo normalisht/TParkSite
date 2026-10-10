@@ -6,7 +6,6 @@ from apps.core import structured_data as ld
 from apps.core.images import safe_spec_url
 from apps.core.maps import route_links
 from apps.core.models import PARK_ADDRESS, SiteSettings
-from apps.core.opening_hours import human_opening_hours
 from apps.core.seo import absolute_url, make_seo, page_seo
 
 HOME_REVIEWS = 8
@@ -24,7 +23,6 @@ def home(request):
             "hero": hero,
             # Без фото в шапке крупнейший элемент первого экрана (LCP) — первая карточка категории.
             "lcp_card": not hero,
-            "hours": human_opening_hours(site.opening_hours),
             "route": route_links(site.latitude, site.longitude),
             "events": list(Event.objects.upcoming()[:HOME_EVENTS]) if site.home_show_events else [],
             "photos": list(GalleryPhoto.objects.all()[:HOME_PHOTOS]),
@@ -53,6 +51,8 @@ def category_detail(request, slug):
             "category": category,
             "photos": photos,
             "services": services,
+            # Тема первого сообщения в WhatsApp (фильтр whatsapp_url).
+            "contact_topic": category.name,
             # Услуги со своей страницей — карточками, остальные — компактным списком.
             "service_cards": [s for s in services if s.has_page],
             "service_rows": [s for s in services if not s.has_page],
@@ -76,6 +76,23 @@ def category_detail(request, slug):
     )
 
 
+RELATED_SERVICES = 3
+
+
+def related_services(category, service, limit: int = RELATED_SERVICES) -> list:
+    """Другие услуги категории со своей страницей; варианты с тем же названием (в т. ч. текущей услуги) — один раз."""
+    seen = {service.name.casefold()}
+    result = []
+    for item in category.published_services():
+        name = item.name.casefold()
+        if item.has_page and name not in seen:
+            seen.add(name)
+            result.append(item)
+            if len(result) == limit:
+                break
+    return result
+
+
 def service_detail(request, slug):
     service = get_object_or_404(Service.objects.published().filter(has_page=True), slug=slug)
     photos = list(service.photos.all())
@@ -92,12 +109,13 @@ def service_detail(request, slug):
         (service.name, ""),
     ]
     image = safe_spec_url(photos[0], "slide") if photos else ""
-    related = [s for s in category.published_services() if s.has_page and s.pk != service.pk][:3] if category else []
+    related = related_services(category, service) if category else []
     return render(
         request,
         "catalog/service.html",
         {
             "service": service,
+            "contact_topic": service.name,
             "photos": photos,
             "category": category,
             "related": related,

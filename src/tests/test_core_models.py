@@ -1,8 +1,12 @@
+import importlib
+
 import pytest
+from django.apps import apps as django_apps
 from django.db import IntegrityError
 
 from apps.content.models import Partner
 from apps.core.models import InfoPage, Phone, SiteSettings
+from apps.core.privacy_defaults import PRIVACY_SLUG, ensure_privacy_page
 
 pytestmark = pytest.mark.django_db
 
@@ -73,3 +77,54 @@ def test_files_kept_when_transaction_rolls_back(make_image, media_root):
     path = media_root / partner.logo.name
     partner.delete()  # без выполнения on_commit — как при откате
     assert path.exists()
+
+
+def _privacy_migration():
+    return importlib.import_module("apps.core.migrations.0014_privacy_policy")
+
+
+def test_privacy_page_created_unpublished_and_selected(client):
+    InfoPage.objects.filter(slug=PRIVACY_SLUG).delete()  # миграция могла создать её в тестовой БД
+    site = SiteSettings.load()
+    _privacy_migration().forwards(django_apps, None)
+    page = InfoPage.objects.get(slug=PRIVACY_SLUG)
+    assert page.title == "Политика конфиденциальности" and not page.is_published
+    for required in (
+        "152-ФЗ",
+        "Оператор",
+        "Яндекс Метрика",
+        "cookie",
+        "Роскомнадзор",
+        "[укажите ИНН]",
+        "[укажите e-mail]",
+    ):
+        assert required in page.body, required
+    assert page.body.count("<h2>") == 10
+    site.refresh_from_db()
+    assert site.privacy_page == page
+    assert page.get_absolute_url() not in client.get("/").content.decode()  # пока не опубликована — ссылки нет
+    page.is_published = True
+    page.save()
+    assert page.get_absolute_url() in client.get("/").content.decode().split("<footer", 1)[1]
+
+
+def test_ensure_privacy_page_keeps_existing_choice():
+    InfoPage.objects.filter(slug=PRIVACY_SLUG).delete()
+    site = SiteSettings.load()
+    own = InfoPage.objects.create(title="Наша политика", body="<p>x</p>")
+    site.privacy_page = own
+    site.save()
+    page = ensure_privacy_page(InfoPage, SiteSettings)
+    assert ensure_privacy_page(InfoPage, SiteSettings) == page  # второй вызов ничего не создаёт
+    assert InfoPage.objects.filter(slug=PRIVACY_SLUG).count() == 1
+    site.refresh_from_db()
+    assert site.privacy_page == own
+
+
+def test_founder_text_migration_drops_repeated_heading():
+    site = SiteSettings.load()
+    site.founder_text = "<p><strong>Дмитрий Сергеев</strong></p>\n\n<p>Этот человек придумал и создал Т-парк:</p>\n\n<ul><li>Педагог</li></ul>"
+    site.save()
+    importlib.import_module("apps.core.migrations.0015_founder_text_heading").forwards(django_apps, None)
+    site.refresh_from_db()
+    assert site.founder_text == "<ul><li>Педагог</li></ul>"

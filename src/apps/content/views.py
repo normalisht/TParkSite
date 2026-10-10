@@ -8,11 +8,11 @@ from apps.core import structured_data as ld
 from apps.core.images import safe_spec_url
 from apps.core.maps import route_links
 from apps.core.models import PARK_ADDRESS, SiteSettings
-from apps.core.opening_hours import human_opening_hours
 from apps.core.seo import absolute_url, make_seo, page_seo
 
 PAST_EVENTS_SHOWN = 6
 RELATED_EVENTS = 3
+GALLERY_PAGE = 24
 
 
 def events(request):
@@ -33,12 +33,19 @@ def events(request):
 
 def event_detail(request, slug):
     event = get_object_or_404(Event.objects.visible(), slug=slug)
+    when = date_format(event.date, "j E Y")
+    # Место проведения вне парка: описание не должно утверждать, что событие в Т-Парке (как «Где» и JSON-LD на странице).
+    default_description = (
+        f"{event.title}, {when} — {event.venue}."
+        if event.venue
+        else f"{event.title}, {when} — мероприятие в Т-Парке. {PARK_ADDRESS}."
+    )
     seo = make_seo(
         event.title,
         event.description,
         absolute_url(request, safe_spec_url(event, "card")),
         obj=event,
-        default_description=f"{event.title}, {date_format(event.date, 'j E Y')} — мероприятие в Т-Парке. {PARK_ADDRESS}.",
+        default_description=default_description,
     )
     crumbs = [ld.home_crumb(), ("Мероприятия", reverse("content:events")), (event.title, "")]
     site = SiteSettings.load()
@@ -47,6 +54,7 @@ def event_detail(request, slug):
         "content/event.html",
         {
             "event": event,
+            "contact_topic": "" if event.is_past else event.title,
             "related": list(Event.objects.upcoming().exclude(pk=event.pk)[:RELATED_EVENTS]),
             "route": route_links(site.latitude, site.longitude),
             "seo": seo,
@@ -74,7 +82,6 @@ def about(request):
             "formats": list(site.park_formats.select_related("category")),
             "facts": list(site.founder_facts.all()),
             "route": route_links(site.latitude, site.longitude),
-            "safety_page": site.safety_page if site.safety_page and site.safety_page.is_published else None,
             "photos": list(GalleryPhoto.objects.all()[:GALLERY_STRIP_SIZE]),
             "partners": list(Partner.objects.all()),
             "seo": seo,
@@ -96,7 +103,13 @@ def reviews(request):
 
 
 def gallery(request):
-    return render(request, "content/gallery.html", {"photos": GalleryPhoto.objects.all(), "seo": page_seo("gallery")})
+    photos = list(GalleryPhoto.objects.all())
+    context = {
+        "photos": photos,
+        "page_size": GALLERY_PAGE,
+        "seo": page_seo("gallery"),
+    }
+    return render(request, "content/gallery.html", context)
 
 
 def contacts(request):
@@ -105,7 +118,6 @@ def contacts(request):
         request,
         "content/contacts.html",
         {
-            "hours": human_opening_hours(site.opening_hours),
             "route": route_links(site.latitude, site.longitude),
             "seo": page_seo("contacts"),
             "structured_data": [ld.organization(request)],

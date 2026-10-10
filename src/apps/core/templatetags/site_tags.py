@@ -1,6 +1,9 @@
 import json
+import re
+from urllib.parse import quote
 
 from django import template
+from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 
 from apps.core.images import safe_spec_url
@@ -46,3 +49,21 @@ def ru_plural(number, forms: str) -> str:
     else:
         word = many
     return f"{number} {word}"
+
+
+_BRAND = re.compile(r"(?:Т-Парк|Тренинг-парк)[а-яё]*", re.IGNORECASE)
+
+
+@register.filter(needs_autoescape=True)
+def nobr(value, autoescape=True) -> str:
+    """«Т-Парк», «Тренинг-парк» в любом падеже — без переноса по дефису (иначе «Т-/Парке» на телефоне)."""
+    text = conditional_escape(value) if autoescape else str(value)
+    return mark_safe(_BRAND.sub(lambda m: f'<span class="whitespace-nowrap">{m.group(0)}</span>', text))
+
+
+@register.filter
+def whatsapp_url(phone, topic: str = "") -> str:
+    """Ссылка на чат; со страницы услуги или мероприятия — с готовым первым сообщением."""
+    if not topic:
+        return phone.whatsapp_url
+    return f"{phone.whatsapp_url}?text={quote(f'Здравствуйте! Интересует «{topic}»')}"

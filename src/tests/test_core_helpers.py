@@ -9,6 +9,7 @@ from apps.core.images import safe_spec_url
 from apps.core.maps import route_links
 from apps.core.opening_hours import human_opening_hours
 from apps.core.slugs import slugify_ru
+from apps.core.templatetags.site_tags import nobr
 
 
 def test_sanitize_keeps_allowed_and_strips_scripts():
@@ -116,3 +117,33 @@ def test_route_links():
     links = route_links(Decimal("54.956545"), Decimal("36.769595"))
     assert links["yandex"] == "https://yandex.ru/maps/?rtext=~54.956545,36.769595&rtt=auto"
     assert links["coordinates"] == "54.956545, 36.769595"
+
+
+def test_nobr_keeps_brand_on_one_line():
+    assert nobr("Своё событие в Т-Парке") == 'Своё событие в <span class="whitespace-nowrap">Т-Парке</span>'
+    assert nobr("Тренинг-парк Дмитрия") == '<span class="whitespace-nowrap">Тренинг-парк</span> Дмитрия'
+
+
+def test_nobr_escapes_html():
+    assert nobr("<b>Т-Парк</b>") == '&lt;b&gt;<span class="whitespace-nowrap">Т-Парк</span>&lt;/b&gt;'
+
+
+FOUNDER_NAME, FOUNDER_LEAD = "Дмитрий Сергеев", "Этот человек придумал и создал Т-Парк"
+
+
+def test_strip_founder_heading_removes_repeated_name_and_lead():
+    from apps.core.about_defaults import strip_founder_heading
+
+    text = (
+        "<p><strong>Дмитрий Сергеев</strong></p>\n\n<p>Этот человек придумал и создал Т-парк:</p>\n\n"
+        "<ul><li><p>Педагог</p></li></ul>"
+    )
+    assert strip_founder_heading(text, FOUNDER_NAME, FOUNDER_LEAD) == "<ul><li><p>Педагог</p></li></ul>"
+
+
+def test_strip_founder_heading_keeps_other_text():
+    from apps.core.about_defaults import strip_founder_heading
+
+    text = "<p>Дмитрий Сергеев родился в Калуге.</p>\n\n<p>Этот человек придумал и создал Т-Парк:</p>"
+    assert strip_founder_heading(text, FOUNDER_NAME, FOUNDER_LEAD) == text
+    assert strip_founder_heading("", FOUNDER_NAME, FOUNDER_LEAD) == ""

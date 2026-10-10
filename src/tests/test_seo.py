@@ -257,3 +257,14 @@ def test_fill_seo_content_fills_only_empty(db):
     assert rope.seo_title == "Верёвочный парк под Обнинском — цены | Т-Парк"
     assert boats.seo_title == "Своё" and boats.seo_description.startswith("Лодочная станция")
     assert other.seo_title == ""
+
+
+def test_metrika_tracks_contact_clicks(client, settings):
+    settings.DEBUG = False
+    site = SiteSettings.load()
+    site.yandex_metrika_id = "12345"
+    site.save()
+    html = client.get("/").content.decode()
+    assert 'ym(12345, "reachGoal", goal)' in html
+    for goal in ("call", "whatsapp", "telegram", "vk", "max"):
+        assert f'"{goal}"' in html

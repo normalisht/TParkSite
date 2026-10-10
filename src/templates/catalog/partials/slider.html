@@ -2,14 +2,14 @@
 {% if photos %}
 <div class="swiper js-slider overflow-hidden rounded-2xl bg-sand-200">
   <div class="swiper-wrapper">
-    {% for photo in photos %}{% with url=photo|spec_url:"slide" %}{% if url %}
+    {% for photo in photos %}{% with url=photo|spec_url:"slide" small=photo|spec_url:"slide_small" %}{% if url %}
     <div class="swiper-slide" data-full="{{ photo.image.url }}">
-      <img src="{{ url }}" alt="{{ alt }} — фото {{ forloop.counter }}" width="1600" height="900" class="aspect-[16/9] w-full cursor-zoom-in object-cover" {% if forloop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %}>
+      <img src="{{ url }}"{% if small %} srcset="{{ small }} 800w, {{ url }} 1600w" sizes="{{ sizes }}"{% endif %} alt="{{ alt }} — фото {{ forloop.counter }}" width="1600" height="900" class="aspect-[16/9] w-full cursor-zoom-in object-cover" {% if forloop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %}>
     </div>
     {% endif %}{% endwith %}{% endfor %}
   </div>
   <div class="swiper-pagination"></div>
-  <div class="swiper-button-prev !text-white"></div>
-  <div class="swiper-button-next !text-white"></div>
+  <div class="swiper-button-prev"></div>
+  <div class="swiper-button-next"></div>
 </div>
 {% endif %}

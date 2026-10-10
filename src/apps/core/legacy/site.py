@@ -1,8 +1,9 @@
 from pathlib import Path
 
-from apps.core.about_defaults import fill_about_defaults
+from apps.core.about_defaults import fill_about_defaults, strip_founder_heading
 from apps.core.legacy.html import clean_html, extract_title, phone_digits
 from apps.core.models import PARK_ADDRESS, FounderFact, InfoPage, ParkFormat, Phone, SiteSettings
+from apps.core.privacy_defaults import PRIVACY_SLUG, ensure_privacy_page
 
 TEXT_FIELDS = {
     "about": "about_text",
@@ -25,6 +26,7 @@ def import_site(db, images: Path, report) -> None:
     site.home_intro = site.events_intro = main_text
     for key, field in TEXT_FIELDS.items():
         setattr(site, field, clean_html(texts.get(key)))
+    site.founder_text = strip_founder_heading(site.founder_text, site.founder_name, site.founder_lead)
     site.address = (texts.get("address") or "").strip()[:255] or PARK_ADDRESS
     site.vk_url = (texts.get("vk") or "").strip()[:500]
     site.save()
@@ -53,6 +55,8 @@ def import_site(db, images: Path, report) -> None:
         telegram_used = telegram_used or is_telegram
         report.add("Телефоны")
 
+    # Политику создаёт миграция; импорт кладёт инфо-страницы с исходными id — убираем её на время, чтобы не было конфликта.
+    InfoPage.objects.filter(slug=PRIVACY_SLUG).delete()
     for row in info_rows:
         body = clean_html(row["text"])
         InfoPage.objects.create(
@@ -62,3 +66,5 @@ def import_site(db, images: Path, report) -> None:
             is_published=bool(row["status"]),
         )
         report.add("Инфо-страницы")
+
+    ensure_privacy_page(InfoPage, SiteSettings)

@@ -37,9 +37,9 @@
     {% else %}
     <div class="card mt-8 p-6 md:mt-10 md:p-8">
       <p class="text-xl font-bold">Скоро анонсируем новые мероприятия</p>
-      <p class="mt-2 text-ink/75">{% if site.vk_url %}Анонсы первыми появляются в нашей группе VK. {% endif %}А программу для своей компании можно заказать в любое время.</p>
+      <p class="mt-2 text-ink/75">{% if site.vk_url %}Анонсы первыми появляются в нашей группе ВКонтакте. {% endif %}А программу для своей компании можно заказать в любое время.</p>
       <div class="mt-5 flex flex-wrap gap-3">
-        {% if site.vk_url %}<a href="{{ site.vk_url }}" class="btn btn-ghost" target="_blank" rel="noopener"><span class="icon icon-fill h-5 w-5 text-[#0077FF]">{% include "icons/vk.svg" %}</span>Группа VK</a>{% endif %}
+        {% if site.vk_url %}<a href="{{ site.vk_url }}" class="btn btn-ghost" target="_blank" rel="noopener"><span class="icon icon-fill h-5 w-5 text-[#0077FF]">{% include "icons/vk.svg" %}</span>Группа ВКонтакте</a>{% endif %}
         {% include "partials/contact_links.html" %}
       </div>
     </div>

@@ -61,7 +61,10 @@ class SiteSettings(models.Model):
         blank=True,
         help_text="В Яндекс Картах: «Поделиться» → «Встроить карту» → скопируйте код и вставьте сюда целиком.",
     )
-    vk_url = models.URLField("VK", max_length=500, blank=True)
+    vk_url = models.URLField("ВКонтакте", max_length=500, blank=True)
+    max_url = models.URLField(
+        "MAX", max_length=500, blank=True, help_text="Ссылка на профиль или канал в MAX. Пусто — кнопки нет."
+    )
     reviews_url = models.URLField(
         "Отзывы на Яндекс Картах",
         max_length=500,
@@ -105,6 +108,15 @@ class SiteSettings(models.Model):
         related_name="+",
         help_text="Инфо-страница, на которую ведёт плашка «Правила безопасности» на странице «О нас».",
     )
+    privacy_page = models.ForeignKey(
+        "InfoPage",
+        verbose_name="Политика конфиденциальности",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        help_text="Инфо-страница, на которую ведёт ссылка в подвале сайта. Пока не указана или не опубликована — ссылки нет.",
+    )
 
     # Разметка организации (schema.org LocalBusiness)
     address_region = models.CharField("Регион", max_length=128, blank=True, default="Калужская область")
@@ -138,7 +150,7 @@ class SiteSettings(models.Model):
         "Картинка для соцсетей",
         "seo",
         size=(2400, 1260),
-        help_text="Показывается в превью ссылки в VK, Telegram и мессенджерах, если у страницы нет своего фото. "
+        help_text="Показывается в превью ссылки во ВКонтакте, Telegram и мессенджерах, если у страницы нет своего фото. "
         "Лучше горизонтальная, 1200×630.",
     )
     og_card = image_spec("og_image", 1200, 630)

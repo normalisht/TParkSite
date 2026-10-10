@@ -8,7 +8,7 @@ from django.utils import timezone
 
 from apps.catalog.models import Category, CategoryGroup
 from apps.content.models import Event, Review
-from apps.core.models import Phone, SiteSettings
+from apps.core.models import InfoPage, Phone, SiteSettings
 from apps.core.seo import plaintext
 
 pytestmark = pytest.mark.django_db
@@ -56,7 +56,7 @@ def test_home_hero_hours_and_route(client):
     html = client.get("/").content.decode()
     assert "Ежедневно, 10:00–18:00" in html
     assert "Как добраться" in html and "rtext=~54.900000,36.600000" in html
-    assert "Приезжайте в Т-Парк" in html
+    assert 'Приезжайте в <span class="whitespace-nowrap">Т-Парк</span>' in html
 
 
 def test_home_hides_unpublished_group(client):
@@ -167,3 +167,222 @@ def test_header_logo_is_lightweight(client):
     assert re.search(r'<img src="/static/img/logo-header\.png" alt="Т-Парк" width="122" height="40"', html)
     logo = Path(settings.BASE_DIR) / "static/img/logo-header.png"
     assert logo.stat().st_size < 8 * 1024
+
+
+def _header(html: str) -> str:
+    return html.split("<header", 1)[1].split("</header>", 1)[0]
+
+
+def test_header_contact_dropdown_on_desktop(client):
+    site = SiteSettings.load()
+    Phone.objects.create(settings=site, number="9029856594", is_whatsapp=True)
+    header = _header(client.get("/").content.decode())
+    wrapper = re.search(
+        r'<div x-data="hoverMenu"[^>]*class="([^"]*)"[^>]*>\s*<button[^>]*aria-controls="header-contact-menu"', header
+    )
+    assert wrapper and "hidden" in wrapper.group(1).split() and "lg:block" in wrapper.group(1)
+    menu = header.split('id="header-contact-menu"', 1)[1].split("</div>", 1)[0]
+    assert 'href="tel:+79029856594"' in menu and "+7 (902) 985-65-94" in menu
+    assert "https://wa.me/79029856594" in menu
+    assert ">Написать<" not in header
+    assert "Тренинг-парк Дмитрия Сергеева" not in header
+
+
+def test_header_has_no_contact_dropdown_without_phones(client):
+    assert 'id="header-contact-menu"' not in _header(client.get("/").content.decode())
+
+
+def test_header_services_dropdown_lists_published_categories(client):
+    group = CategoryGroup.objects.create(name="Активный отдых")
+    visible = Category.objects.create(name="Байдарки", is_published=True)
+    hidden = Category.objects.create(name="Черновик", is_published=False)
+    group.categories.add(visible, hidden)
+    header = _header(client.get("/").content.decode())
+    assert re.search(r'<button type="button"[^>]*aria-controls="services-menu"', header)
+    panel = header.split('id="services-menu"', 1)[1].split("</nav>", 1)[0]
+    assert "Активный отдых" in panel
+    assert f'href="{visible.get_absolute_url()}"' in panel
+    assert "Черновик" not in panel and hidden.get_absolute_url() not in panel
+    assert "Все услуги" in panel
+    # Ширина панели ограничена шириной шапки: иначе на 768 px длинные списки вылезут за край и обрежутся.
+    panel_tag = header.split('id="services-menu"', 1)[1].split(">", 1)[0]
+    assert "max-w-[min(48rem,calc(100%-2rem))]" in panel_tag
+
+
+def test_hover_menu_script_loads_before_alpine(client):
+    html = client.get("/").content.decode()
+    assert html.index("js/hover_menu.js") < html.index("vendor/alpine.min.js")
+
+
+def test_header_services_dropdown_opens_on_hover(client):
+    CategoryGroup.objects.create(name="Активный отдых").categories.add(
+        Category.objects.create(name="Байдарки", is_published=True)
+    )
+    header = _header(client.get("/").content.decode())
+    wrapper = re.search(r'<div x-data="hoverMenu"[^>]*>', header).group(0)
+    assert '@mouseenter="enter()"' in wrapper and '@mouseleave="leave()"' in wrapper
+    # Клик по пустому месту панели даёт focusout с relatedTarget = null: он не должен закрывать меню.
+    assert '@focusout="if ($event.relatedTarget && !$el.contains($event.relatedTarget)) close()"' in wrapper
+    assert re.search(r'<button type="button"[^>]*@click="toggle\(\)"[^>]*aria-controls="services-menu"', header)
+
+
+def test_header_services_is_plain_link_without_groups(client):
+    header = _header(client.get("/").content.decode())
+    assert 'aria-controls="services-menu"' not in header and 'id="services-menu"' not in header
+    assert re.search(r'<a href="/"[^>]*>Услуги</a>', header)
+
+
+def test_contact_button_yields_to_menu_and_footer(client):
+    Phone.objects.create(settings=SiteSettings.load(), number="9029856594")
+    html = client.get("/").content.decode()
+    fab = re.search(r'<div [^>]*class="(contact-fab [^"]*)"', html).group(1)
+    assert "lg:hidden" in fab and "md:hidden" not in fab
+    # Меню помечает <html> классом menu-open — по нему кнопка прячется (tailwind/source.css).
+    assert "toggle('menu-open', open)" in html
+    # Подвал не прячется под кнопкой: снизу место под неё, на ПК — обычный отступ.
+    assert "pb-20 lg:pb-5" in html.split("<footer", 1)[1]
+
+
+def _contact_menu(html: str) -> str:
+    return html.split('id="contact-menu"', 1)[1].split("</div>", 1)[0]
+
+
+def test_contact_links_include_vk_and_max(client):
+    site = SiteSettings.load()
+    site.vk_url = "https://vk.com/tpark"
+    site.save()
+    Phone.objects.create(settings=site, number="9029856594")
+    menu = _contact_menu(client.get("/").content.decode())
+    assert 'href="https://vk.com/tpark"' in menu
+    assert "MAX" not in menu  # ссылка не указана — кнопки нет
+    site.max_url = "https://max.ru/u/tpark"
+    site.save()
+    html = client.get("/").content.decode()
+    assert 'href="https://max.ru/u/tpark"' in _contact_menu(html)
+    assert 'href="https://max.ru/u/tpark"' in html.split("<footer", 1)[1]
+    assert 'href="https://max.ru/u/tpark"' in client.get("/contacts/").content.decode()
+
+
+def test_home_categories_grid_on_phone(client):
+    group = CategoryGroup.objects.create(name="Групповые приключения")
+    for i in range(6):
+        group.categories.add(Category.objects.create(name=f"Категория {i}", is_published=True))
+    html = client.get("/").content.decode()
+    section = html.split("Групповые приключения</h2>", 1)[1].split("</section>", 1)[0]
+    assert "grid grid-cols-2" in section
+    assert "overflow-x-auto" not in section
+
+
+def test_category_card_shade_covers_card_on_phone(client):
+    """На телефоне подпись бывает в три строки и начинается почти у верха — затемнение на всю высоту, с sm — на 3/4."""
+    group = CategoryGroup.objects.create(name="Группа")
+    group.categories.add(Category.objects.create(name="Дни рождения и выпускные", is_published=True))
+    html = client.get("/").content.decode()
+    assert re.search(r'<div class="absolute inset-x-0 bottom-0 h-full sm:h-3/4 bg-linear-to-t', html)
+
+
+def _cookie_notice(html: str) -> str:
+    return html.split('aria-label="Уведомление о cookie"', 1)[1].split("</section>", 1)[0]
+
+
+def test_cookie_notice_with_metrika_links_to_privacy(client):
+    site = SiteSettings.load()
+    site.yandex_metrika_id = "12345"
+    site.privacy_page = InfoPage.objects.create(title="Политика конфиденциальности", body="<p>x</p>")
+    site.save()
+    Phone.objects.create(settings=site, number="9029856594")
+    html = client.get("/").content.decode()
+    notice = _cookie_notice(html)
+    assert "Мы используем cookie и Яндекс Метрику" in notice
+    assert f'href="{site.privacy_page.get_absolute_url()}"' in notice
+    assert "Понятно" in notice
+    # Баннер скрыт до инициализации Alpine, а доступ к localStorage защищён от приватного режима.
+    assert "x-cloak" in html.split('aria-label="Уведомление о cookie"', 1)[0].rsplit("<section", 1)[1]
+    assert "cookie-ok" in html and "try" in html
+    assert html.index("Уведомление о cookie") < html.index('class="contact-fab')
+    # Класс нужен правилу в tailwind/source.css: баннер прячется, пока открыто мобильное меню.
+    assert 'class="cookie-notice fixed ' in html
+
+
+def test_cookie_notice_without_privacy_page_has_no_link(client):
+    site = SiteSettings.load()
+    site.yandex_metrika_id = "12345"
+    site.save()
+    notice = _cookie_notice(client.get("/").content.decode())
+    assert "<a " not in notice
+    assert "Понятно" in notice
+
+
+def test_no_cookie_notice_without_metrika(client):
+    html = client.get("/").content.decode()
+    assert "Уведомление о cookie" not in html
+    assert "cookie-ok" not in html
+
+
+def test_contact_button_hidden_while_cookie_notice_open():
+    css = (Path(settings.BASE_DIR) / "tailwind/source.css").read_text()
+    assert "html.cookie-open .contact-fab { display: none; }" in css
+
+
+def test_cookie_notice_hidden_while_menu_open():
+    """Баннер не закрывает нижние пункты открытого мобильного меню."""
+    css = (Path(settings.BASE_DIR) / "tailwind/source.css").read_text()
+    assert "html.menu-open .cookie-notice { display: none; }" in css
+
+
+def _footer(html: str) -> str:
+    return html.split("<footer", 1)[1].split("</footer>", 1)[0]
+
+
+def test_footer_lists_published_categories(client):
+    published = Category.objects.create(name="Байдарки", is_published=True)
+    draft = Category.objects.create(name="Черновик", is_published=False)
+    CategoryGroup.objects.create(name="Вода", is_published=True).categories.add(published, draft)
+    footer = _footer(client.get("/").content.decode())
+    assert f'href="{published.get_absolute_url()}"' in footer
+    assert "Байдарки" in footer
+    assert "Черновик" not in footer
+    assert "Услуги" in footer
+
+
+def test_footer_hides_services_column_without_categories(client):
+    assert "Услуги" not in _footer(client.get("/").content.decode())
+
+
+def test_footer_shows_at_most_eight_categories_without_duplicates(client):
+    categories = [Category.objects.create(name=f"Категория {i}", is_published=True) for i in range(10)]
+    CategoryGroup.objects.create(name="Первая").categories.add(*categories[:6])
+    CategoryGroup.objects.create(name="Вторая").categories.add(*categories[4:])
+    footer = _footer(client.get("/").content.decode())
+    assert len(re.findall(r'href="/category/[^"]+"', footer)) == 8
+
+
+def test_footer_shows_opening_hours_on_any_page(client):
+    site = SiteSettings.load()
+    site.opening_hours = "Mo-Su 10:00-18:00"
+    site.save()
+    for url in ("/", "/about/", "/contacts/"):
+        assert "Ежедневно, 10:00–18:00" in _footer(client.get(url).content.decode())
+
+
+def test_header_services_panel_is_animated(client):
+    CategoryGroup.objects.create(name="Активный отдых").categories.add(
+        Category.objects.create(name="Байдарки", is_published=True)
+    )
+    panel_tag = _header(client.get("/").content.decode()).split('id="services-menu"', 1)[1].split(">", 1)[0]
+    assert 'x-transition:enter="transition duration-150 ease-out"' in panel_tag
+    assert 'x-transition:leave="transition duration-100 ease-in"' in panel_tag
+
+
+def test_contact_button_icons_morph(client):
+    """Трубка и крестик лежат друг на друге и меняются плавно (по aria-expanded кнопки), а не через x-show."""
+    Phone.objects.create(settings=SiteSettings.load(), number="9029856594")
+    fab = client.get("/").content.decode().split('class="contact-fab', 1)[1].split("</button>", 1)[0]
+    button = re.search(r'<button type="button"[^>]*class="([^"]*)"', fab).group(1)
+    assert "group" in button.split()
+    icons = re.findall(r'<span class="(icon [^"]*)" aria-hidden="true">', fab)
+    assert len(icons) == 2
+    phone, cross = icons
+    assert "group-aria-expanded:opacity-0" in phone and "group-aria-expanded:opacity-100" in cross
+    assert all("transition" in icon and "motion-reduce:transition-none" in icon for icon in icons)
+    assert 'x-show="!open"' not in fab

@@ -22,12 +22,16 @@ dev = [
     "pytest-django>=4.14.0",
     "ruff>=0.16.10",
 ]
+e2e = [
+    "pytest-playwright>=0.10.0",
+]
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings_test"
 pythonpath = ["."]
 testpaths = ["tests"]
-addopts = "-q"
+addopts = "-q -m 'not e2e'"
+markers = ["e2e: браузерные тесты вёрстки (make e2e)"]
 filterwarnings = ["ignore:No directory at:UserWarning", "ignore:Overriding get_action_choices"]
 
 [tool.ruff]

@@ -6,7 +6,7 @@
   {% include "partials/hero_decor.html" %}
   <div class="mx-auto grid max-w-6xl items-center gap-8 px-4 py-10 md:py-16 {% if hero %}lg:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] lg:gap-12{% endif %}">
     <div class="min-w-0">
-      <h1 class="page-title md:text-6xl">Тренинг-парк Дмитрия Сергеева</h1>
+      <h1 class="page-title md:text-6xl"><span class="whitespace-nowrap">Тренинг-парк</span> Дмитрия Сергеева</h1>
       {% if site.about_motto %}<p class="mt-5 max-w-2xl border-l-4 border-brand-500 pl-4 text-xl font-medium leading-snug text-navy md:text-2xl">{{ site.about_motto }}</p>{% endif %}
       {% if site.home_intro %}<div class="rich-text mt-5 max-w-3xl text-lg">{{ site.home_intro|safe }}</div>{% endif %}
       <div class="mt-6 flex flex-wrap gap-3 md:mt-8">{% include "partials/contact_links.html" %}</div>
@@ -27,10 +27,10 @@
 {% with count=group.published_categories|length %}
 <section class="mx-auto max-w-6xl px-4 pt-10 md:pt-16">
   <h2 class="mb-4 text-2xl font-bold md:mb-6 md:text-3xl">{{ group.name }}</h2>
-  {# На телефоне — лента со свайпом (следующая карточка выглядывает с края), с sm — сетка; группа из 1–2 категорий — широкими карточками. #}
-  <div class="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 md:gap-6 {% if count > 2 %}lg:grid-cols-3{% endif %}">
+  {# Сетка: на телефоне 2 колонки — все направления группы видны сразу; при нечётном числе первая карточка широкая (без «дыры»). Группа из 1–2 категорий — широкими карточками на ПК. #}
+  <div class="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 {% if count > 2 %}lg:grid-cols-3{% endif %}">
     {% for category in group.published_categories %}
-    <div class="{% if count > 1 %}w-[82%]{% else %}w-full{% endif %} shrink-0 snap-start scroll-ml-4 sm:w-auto">{% if count > 2 %}{% include "catalog/partials/category_card.html" with first_screen=first_screen lcp=lcp_card %}{% else %}{% include "catalog/partials/category_card.html" with wide=True first_screen=first_screen lcp=lcp_card %}{% endif %}</div>
+    <div class="{% if count == 1 %}col-span-2 sm:col-span-1{% elif count|divisibleby:2 is False and forloop.first %}col-span-2 lg:col-span-1{% endif %}">{% if count > 2 %}{% include "catalog/partials/category_card.html" with first_screen=first_screen lcp=lcp_card %}{% else %}{% include "catalog/partials/category_card.html" with wide=True first_screen=first_screen lcp=lcp_card %}{% endif %}</div>
     {% endfor %}
   </div>
 </section>
@@ -42,8 +42,8 @@
 
 {% if events %}
 <section class="mx-auto max-w-6xl px-4 pt-10 md:pt-16">
-  <div class="mb-4 flex items-end justify-between gap-4 md:mb-6">
-    <h2 class="text-2xl font-bold md:text-3xl">Ближайшие мероприятия</h2>
+  <div class="mb-4 flex flex-wrap items-end justify-between gap-x-4 gap-y-2 md:mb-6">
+    <h2 class="min-w-0 text-2xl font-bold md:text-3xl">Ближайшие мероприятия</h2>
     <a href="{% url 'content:events' %}" class="inline-flex shrink-0 items-center gap-1 font-semibold text-brand-700 hover:text-brand-600">Все мероприятия<span class="icon h-4 w-4">{% include "icons/chevron-right.svg" %}</span></a>
   </div>
   <div class="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 lg:grid-cols-3">
@@ -54,9 +54,9 @@
 
 {% if reviews %}
 <section class="mx-auto max-w-6xl px-4 pt-10 md:pt-16">
-  <div class="mb-4 flex items-end justify-between gap-4 md:mb-6">
-    <h2 class="text-2xl font-bold md:text-3xl">Отзывы гостей</h2>
-    <div class="flex shrink-0 flex-wrap justify-end gap-x-5 gap-y-1">
+  <div class="mb-4 flex flex-wrap items-end justify-between gap-x-4 gap-y-2 md:mb-6">
+    <h2 class="min-w-0 text-2xl font-bold md:text-3xl">Отзывы гостей</h2>
+    <div class="flex flex-wrap justify-end gap-x-5 gap-y-1">
       {% if site.reviews_url %}<a href="{{ site.reviews_url }}" class="hidden items-center gap-1 font-semibold text-brand-700 hover:text-brand-600 sm:inline-flex" target="_blank" rel="noopener">Оставить отзыв<span class="icon h-4 w-4">{% include "icons/external-link.svg" %}</span></a>{% endif %}
       <a href="{% url 'content:reviews' %}" class="inline-flex items-center gap-1 font-semibold text-brand-700 hover:text-brand-600">Все отзывы<span class="icon h-4 w-4">{% include "icons/chevron-right.svg" %}</span></a>
     </div>
@@ -88,7 +88,7 @@
 <section class="mx-auto grid max-w-6xl gap-6 px-4 pt-10 md:pt-16 {% if phones and site.address %}lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]{% endif %}">
   {% if phones %}
   <div class="rounded-2xl bg-sand-100 px-6 py-8 md:px-10 md:py-12">
-    <h2 class="text-2xl font-bold md:text-3xl">Приезжайте в Т-Парк</h2>
+    <h2 class="text-2xl font-bold md:text-3xl">Приезжайте в <span class="whitespace-nowrap">Т-Парк</span></h2>
     <p class="mt-2 text-ink/75">Расскажем о программах и подберём формат для вас, семьи или команды.</p>
     <div class="mt-6 flex flex-wrap gap-3">{% include "partials/contact_links.html" %}</div>
   </div>

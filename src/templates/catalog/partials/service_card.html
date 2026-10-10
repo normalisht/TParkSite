@@ -2,8 +2,8 @@
 {# На телефоне — строка с квадратной миниатюрой (длинный список не растягивается), с sm — карточка с фото сверху. #}
 <a href="{{ service.get_absolute_url }}" class="card card-link group flex overflow-hidden sm:flex-col">
   <div class="relative w-28 shrink-0 overflow-hidden bg-sand-200 sm:aspect-[4/3] sm:w-full">
-    {% with url=service.cover|spec_url:"card" %}{% if url %}
-    <img src="{{ url }}" alt="" width="640" height="480" loading="lazy" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105">
+    {% with url=service.cover|spec_url:"card" row=service.cover|spec_url:"row" %}{% if url %}
+    <picture><source media="(min-width: 640px)" srcset="{{ url }}"><img src="{% firstof row url %}" alt="" width="640" height="480" loading="lazy" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"></picture>
     {% else %}
     <img src="{% static 'img/logo.png' %}" alt="" class="absolute inset-0 m-auto w-2/3 opacity-30">
     {% endif %}{% endwith %}

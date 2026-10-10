@@ -12,6 +12,38 @@ document.addEventListener("DOMContentLoaded", () => {
   const USER_PAUSE = 20_000; // после ручной прокрутки — пауза 20 секунд
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // Плавное раскрытие <details data-smooth>: анимируется высота обёртки [data-details-body]; без JS и при
+  // «уменьшить движение» — обычный <details>. Сворачивание до конца анимации помечено атрибутом data-closing.
+  document.querySelectorAll("details[data-smooth]").forEach((details) => {
+    const summary = details.querySelector("summary");
+    const body = details.querySelector("[data-details-body]");
+    let animation = null;
+    const animate = (from, to, done) => {
+      animation?.cancel();
+      animation = body.animate({ height: [`${from}px`, `${to}px`] }, { duration: 300, easing: "ease-out" });
+      animation.onfinish = () => {
+        animation = null;
+        done?.();
+      };
+    };
+    summary.addEventListener("click", (event) => {
+      if (reducedMotion) return;
+      event.preventDefault();
+      const height = body.getBoundingClientRect().height;
+      if (!details.open || details.hasAttribute("data-closing")) {
+        details.removeAttribute("data-closing");
+        details.open = true;
+        animate(height, body.scrollHeight);
+      } else {
+        details.setAttribute("data-closing", "");
+        animate(height, 0, () => {
+          details.open = false;
+          details.removeAttribute("data-closing");
+        });
+      }
+    });
+  });
+
   // Swiper и GLightbox подключаются только на страницах со слайдерами (partials/vendor.html).
   if (window.Swiper) document.querySelectorAll(".js-slider").forEach((el) => {
     const slides = el.querySelectorAll(".swiper-slide");
@@ -108,13 +140,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Цена «700 руб / 10 выстрелов»: если единица перенеслась на вторую строку, слеш не нужен.
-  // Скрываем его через visibility — ширина не меняется, поэтому перенос не «прыгает».
+  // Цена «1000 руб / 10 выстрелов»: если единица не влезла в строку, слеш убираем, а единицу ставим блоком с новой строки.
+  // Сначала снимаем отметку у всех цен, потом меряем все разом — одна перекомпоновка, и сужение/расширение окна работает в обе стороны.
   const fitPrices = () => {
-    document.querySelectorAll(".js-price-unit").forEach((unit) => {
-      const wrapped = unit.offsetTop > unit.previousElementSibling.offsetTop;
-      unit.firstElementChild.toggleAttribute("data-wrapped", wrapped);
-    });
+    const units = [...document.querySelectorAll(".js-price-unit")];
+    units.forEach((unit) => unit.removeAttribute("data-wrapped"));
+    const wrapped = units.map((unit) => unit.offsetTop > unit.previousElementSibling.offsetTop);
+    units.forEach((unit, i) => unit.toggleAttribute("data-wrapped", wrapped[i]));
   };
   let fitFrame;
   const scheduleFit = () => {

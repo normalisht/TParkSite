@@ -53,7 +53,13 @@
         {% endfor %}
       </dl>
       {% endif %}
-      {% if site.founder_text %}<div class="rich-text rich-text-cards mt-8">{{ site.founder_text|safe }}</div>{% endif %}
+      {% if site.founder_text %}
+      {# data-smooth: высоту обёртки текста плавно меняет static/js/site.js; пока идёт сворачивание, у details атрибут data-closing — стрелка поворачивается сразу #}
+      <details class="group mt-8" data-smooth>
+        <summary class="inline-flex min-h-11 cursor-pointer list-none items-center gap-1 font-semibold text-brand-700 hover:text-brand-600 [&::-webkit-details-marker]:hidden">Полная биография<span class="icon h-4 w-4 transition-transform group-open:rotate-180 group-data-closing:rotate-0">{% include "icons/chevron-down.svg" %}</span></summary>
+        <div class="overflow-hidden" data-details-body><div class="rich-text rich-text-cards pt-4">{{ site.founder_text|safe }}</div></div>
+      </details>
+      {% endif %}
     </div>
   </div>
 </section>

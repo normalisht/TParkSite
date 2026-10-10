@@ -104,7 +104,7 @@ def test_uploaded_photo_is_downscaled(make_image, media_root):
     ("link", "label"),
     [
         ("https://reviews.yandex.ru/user/x", "Яндекс Карты"),
-        ("https://vk.com/wall1", "VK"),
+        ("https://vk.com/wall1", "ВКонтакте"),
         ("https://www.example.org/r", "example.org"),
         ("", ""),
     ],
