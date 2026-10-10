@@ -64,3 +64,10 @@ def test_past_event_badge_is_readable(client):
     html = client.get(event.get_absolute_url()).content.decode()
     badge = re.search(r'<span class="([^"]*)">Прошло</span>', html).group(1)
     assert "text-sm" in badge and "text-xs" not in badge
+
+
+def test_max_icon_is_official_mark():
+    """Знак MAX — контур из брендбука max.ru (st.max.ru/brandbook/max-dark.zip), а не самодельный рисунок."""
+    svg = (TEMPLATES / "icons/max.svg").read_text()
+    assert 'viewBox="0 0 100 100"' in svg and svg.count("<path") == 1
+    assert 'd="M50.7571 0.261719C78.2929' in svg
