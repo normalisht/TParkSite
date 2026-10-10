@@ -144,7 +144,11 @@ def event(request, event, seo: dict) -> dict:
             "url": url,
             "description": seo["description"] or None,
             "image": [seo["image"]] if seo["image"] else None,
-            "location": {"@type": "Place", "name": SITE_NAME, "address": postal_address(site)},
+            "location": (
+                {"@type": "Place", "name": event.venue, "address": event.venue}
+                if event.venue
+                else {"@type": "Place", "name": SITE_NAME, "address": postal_address(site)}
+            ),
             "organizer": {"@id": organization_id(request)},
             "offers": price_offer(event.price, url) if event.price else None,
         }

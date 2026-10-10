@@ -57,6 +57,7 @@ class Event(SeoModel):
         "Дата окончания", null=True, blank=True, help_text="Только для многодневных: «с 18 ноября по 17 декабря»."
     )
     start_time = models.TimeField("Время начала", null=True, blank=True)
+    venue = models.CharField("Место проведения", max_length=255, blank=True, help_text="Пусто — в Т-Парке.")
     price = models.CharField(
         "Стоимость", max_length=100, blank=True, help_text="Коротко: «1000 ₽ с участника», «Бесплатно»."
     )

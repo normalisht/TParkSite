@@ -44,6 +44,7 @@ class EventAdmin(SiteModelAdmin):
                     "title",
                     "slug",
                     ("date", "end_date", "start_time"),
+                    "venue",
                     "price",
                     "description",
                     "link",

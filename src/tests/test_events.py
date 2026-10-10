@@ -6,6 +6,7 @@ import pytest
 from django.utils import timezone
 
 from apps.content.models import Event
+from apps.core.models import SiteSettings
 
 pytestmark = pytest.mark.django_db
 
@@ -138,3 +139,27 @@ def test_event_cards_offer_smaller_photo(client, make_image):
     assert len(srcsets) == 2
     assert f"{nearest.card_small.url} 640w, {nearest.card.url} 800w" in srcsets
     assert html.count('sizes="(min-width') == 2
+
+
+def _event_json_ld(client, event):
+    html = client.get(event.get_absolute_url()).content.decode()
+    raw = re.search(r'<script type="application/ld\+json">(.*?)</script>', html, re.DOTALL).group(1)
+    aside = re.search(r"<aside.*?</aside>", html, re.DOTALL).group()
+    return aside, next(node for node in json.loads(raw)["@graph"] if node["@type"] == "Event")
+
+
+def test_event_without_venue_is_in_park(client):
+    SiteSettings.objects.update_or_create(pk=1, defaults={"latitude": "54.5", "longitude": "36.3"})
+    aside, data = _event_json_ld(client, make_event())
+    assert SiteSettings.load().address in aside
+    assert "Маршрут" in aside
+    assert data["location"]["name"] == "Т-Парк"
+
+
+def test_event_with_venue_replaces_park_address_and_route(client):
+    SiteSettings.objects.update_or_create(pk=1, defaults={"latitude": "54.5", "longitude": "36.3"})
+    aside, data = _event_json_ld(client, make_event(venue="Лагерь «Сосны», Калуга"))
+    assert "Лагерь «Сосны», Калуга" in aside
+    assert SiteSettings.load().address not in aside
+    assert "Маршрут" not in aside
+    assert data["location"] == {"@type": "Place", "name": "Лагерь «Сосны», Калуга", "address": "Лагерь «Сосны», Калуга"}
