@@ -95,6 +95,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "apps.core.context_processors.site",
                 "apps.catalog.context_processors.menu",
+                "apps.texts.context_processors.site_texts",
             ],
         },
     },
