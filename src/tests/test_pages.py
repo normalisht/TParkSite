@@ -174,6 +174,24 @@ def test_about_page_sections(client):
     assert '"founder"' in html and "Дмитрий Сергеев" in html
 
 
+def test_about_founder_text_in_details(client):
+    site = SiteSettings.load()
+    site.founder_text = "<ul><li>Педагог-биография</li></ul>"
+    site.save()
+    html = client.get("/about/").content.decode()
+    details = re.search(r"<details\b.*?</details>", html, re.DOTALL)
+    assert details, "биография должна быть под <details>"
+    assert "Педагог-биография" in details.group(0)
+    assert re.search(r"<summary\b[^>]*>.*?Полная биография.*?</summary>", details.group(0), re.DOTALL)
+
+
+def test_about_without_founder_text_has_no_details(client):
+    site = SiteSettings.load()
+    site.founder_text = ""
+    site.save()
+    assert "<details" not in client.get("/about/").content.decode()
+
+
 def test_about_hides_unpublished_safety_page(client):
     site = SiteSettings.load()
     site.safety_page = InfoPage.objects.create(title="Правила", body="<p>x</p>", is_published=False)
