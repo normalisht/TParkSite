@@ -1,5 +1,5 @@
 {% load site_tags %}<footer class="mt-10 bg-navy text-white/80 md:mt-16">
-  <div class="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:grid-cols-2 md:grid-cols-3">
+  <div class="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:grid-cols-2 lg:grid-cols-4">
     <div>
       <p class="text-lg font-bold text-white">Т-Парк</p>
       {% if site.address %}
@@ -14,16 +14,29 @@
         {% if site.max_url %}<a href="{{ site.max_url }}" class="icon icon-fill h-11 w-11 p-1.5 hover:text-brand-300" target="_blank" rel="noopener" aria-label="MAX">{% include "icons/max.svg" %}</a>{% endif %}
       </div>
     </div>
+    {% if footer_categories %}
+    <nav aria-label="Услуги">
+      <p class="text-sm font-bold uppercase tracking-widest text-white/70">Услуги</p>
+      <ul class="mt-1">
+        {% for category in footer_categories %}
+        <li><a href="{{ category.get_absolute_url }}" class="inline-flex min-h-11 items-center hover:text-brand-300">{{ category.name }}</a></li>
+        {% endfor %}
+      </ul>
+    </nav>
+    {% endif %}
     <nav aria-label="Разделы сайта">
       <p class="text-sm font-bold uppercase tracking-widest text-white/70">Разделы</p>
       <div class="mt-1 grid grid-cols-2 gap-x-6 md:grid-cols-1"><a href="{% url 'catalog:home' %}" class="inline-flex min-h-11 items-center hover:text-brand-300">Главная</a>{% include "partials/nav_links.html" with link_class="inline-flex min-h-11 items-center hover:text-brand-300" %}</div>
     </nav>
-    {% if phones %}
+    {% if phones or hours %}
     <div>
-      <p class="text-sm font-bold uppercase tracking-widest text-white/70">Телефоны</p>
+      <p class="text-sm font-bold uppercase tracking-widest text-white/70">Контакты</p>
       <ul class="mt-1">
         {% for phone in phones %}
         <li><a href="{{ phone.tel_url }}" class="flex min-h-11 items-center gap-2 tabular-nums hover:text-brand-300"><span class="icon h-4 w-4">{% include "icons/phone.svg" %}</span>{{ phone.display }}</a></li>
+        {% endfor %}
+        {% for line in hours %}
+        <li class="flex min-h-11 items-center gap-2"><span class="icon h-4 w-4">{% include "icons/clock.svg" %}</span>{{ line }}</li>
         {% endfor %}
       </ul>
     </div>

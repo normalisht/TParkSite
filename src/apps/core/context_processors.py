@@ -2,6 +2,7 @@ from django.conf import settings
 
 from apps.core.images import safe_spec_url
 from apps.core.models import SiteSettings
+from apps.core.opening_hours import human_opening_hours
 from apps.core.seo import SITE_DESCRIPTION, absolute_url, plaintext
 
 
@@ -14,6 +15,8 @@ def site(request):
     return {
         "site": settings_obj,
         "phones": phones,
+        # Часы работы по-русски: для подвала, главной и страницы контактов.
+        "hours": human_opening_hours(settings_obj.opening_hours),
         # Ссылки в подвале: только опубликованные страницы.
         "privacy_page": privacy_page,
         "safety_page": safety_page,

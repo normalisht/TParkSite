@@ -279,3 +279,38 @@ def test_cookie_notice_hidden_while_menu_open():
     """Баннер не закрывает нижние пункты открытого мобильного меню."""
     css = (Path(settings.BASE_DIR) / "tailwind/source.css").read_text()
     assert "html.menu-open .cookie-notice { display: none; }" in css
+
+
+def _footer(html: str) -> str:
+    return html.split("<footer", 1)[1].split("</footer>", 1)[0]
+
+
+def test_footer_lists_published_categories(client):
+    published = Category.objects.create(name="Байдарки", is_published=True)
+    draft = Category.objects.create(name="Черновик", is_published=False)
+    CategoryGroup.objects.create(name="Вода", is_published=True).categories.add(published, draft)
+    footer = _footer(client.get("/").content.decode())
+    assert f'href="{published.get_absolute_url()}"' in footer
+    assert "Байдарки" in footer
+    assert "Черновик" not in footer
+    assert "Услуги" in footer
+
+
+def test_footer_hides_services_column_without_categories(client):
+    assert "Услуги" not in _footer(client.get("/").content.decode())
+
+
+def test_footer_shows_at_most_eight_categories_without_duplicates(client):
+    categories = [Category.objects.create(name=f"Категория {i}", is_published=True) for i in range(10)]
+    CategoryGroup.objects.create(name="Первая").categories.add(*categories[:6])
+    CategoryGroup.objects.create(name="Вторая").categories.add(*categories[4:])
+    footer = _footer(client.get("/").content.decode())
+    assert len(re.findall(r'href="/category/[^"]+"', footer)) == 8
+
+
+def test_footer_shows_opening_hours_on_any_page(client):
+    site = SiteSettings.load()
+    site.opening_hours = "Mo-Su 10:00-18:00"
+    site.save()
+    for url in ("/", "/about/", "/contacts/"):
+        assert "Ежедневно, 10:00–18:00" in _footer(client.get(url).content.decode())

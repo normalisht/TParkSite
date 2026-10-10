@@ -6,7 +6,6 @@ from apps.core import structured_data as ld
 from apps.core.images import safe_spec_url
 from apps.core.maps import route_links
 from apps.core.models import PARK_ADDRESS, SiteSettings
-from apps.core.opening_hours import human_opening_hours
 from apps.core.seo import absolute_url, make_seo, page_seo
 
 HOME_REVIEWS = 8
@@ -24,7 +23,6 @@ def home(request):
             "hero": hero,
             # Без фото в шапке крупнейший элемент первого экрана (LCP) — первая карточка категории.
             "lcp_card": not hero,
-            "hours": human_opening_hours(site.opening_hours),
             "route": route_links(site.latitude, site.longitude),
             "events": list(Event.objects.upcoming()[:HOME_EVENTS]) if site.home_show_events else [],
             "photos": list(GalleryPhoto.objects.all()[:HOME_PHOTOS]),

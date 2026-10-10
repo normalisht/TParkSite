@@ -8,7 +8,6 @@ from apps.core import structured_data as ld
 from apps.core.images import safe_spec_url
 from apps.core.maps import route_links
 from apps.core.models import PARK_ADDRESS, SiteSettings
-from apps.core.opening_hours import human_opening_hours
 from apps.core.seo import absolute_url, make_seo, page_seo
 
 PAST_EVENTS_SHOWN = 6
@@ -105,7 +104,6 @@ def contacts(request):
         request,
         "content/contacts.html",
         {
-            "hours": human_opening_hours(site.opening_hours),
             "route": route_links(site.latitude, site.longitude),
             "seo": page_seo("contacts"),
             "structured_data": [ld.organization(request)],
