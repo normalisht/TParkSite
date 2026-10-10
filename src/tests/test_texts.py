@@ -1,4 +1,8 @@
+import re
+
 import pytest
+from django.contrib import admin
+from django.contrib.auth.models import User
 from django.db import connection
 from django.template import Context, Template, TemplateSyntaxError
 from django.test import RequestFactory
@@ -118,3 +122,55 @@ def test_all_texts_loaded_with_one_query():
     with CaptureQueriesContext(connection) as queries:
         _render('{% text "home.title" %}{% text "home.events_title" %}{% text "home.reviews_title" %}')
     assert len([q for q in queries if "texts_sitetext" in q["sql"]]) == 1
+
+
+def _change_url(key: str) -> str:
+    return reverse("admin:texts_sitetext_change", args=[SiteText.objects.get(key=key).pk])
+
+
+def test_change_form_shows_where_and_default(admin_client):
+    html = admin_client.get(_change_url("service.booking_hint")).content.decode()
+    assert "Страница услуги, под ценой и кнопками связи" in html
+    assert "Бронируйте заранее — в тёплый сезон даты разбирают быстро." in html
+    assert "Пусто — блок на сайте скрыт" in html
+
+
+def test_required_text_cannot_be_emptied(admin_client):
+    response = admin_client.post(_change_url("home.events_title"), {"text": "  "})
+    assert response.status_code == 200
+    assert SiteText.objects.get(key="home.events_title").text == "Ближайшие мероприятия"
+
+
+def test_optional_text_can_be_emptied_and_is_stripped(admin_client):
+    assert admin_client.post(_change_url("service.booking_hint"), {"text": ""}).status_code == 302
+    assert SiteText.objects.get(key="service.booking_hint").text == ""
+    admin_client.post(_change_url("service.booking_hint"), {"text": "  Звоните заранее.\n"})
+    assert SiteText.objects.get(key="service.booking_hint").text == "Звоните заранее."
+
+
+def test_no_add_or_delete(admin_client):
+    model_admin = admin.site._registry[SiteText]
+    request = RequestFactory().get("/")
+    request.user = User.objects.get(is_superuser=True)
+    assert not model_admin.has_add_permission(request)
+    assert not model_admin.has_delete_permission(request)
+
+
+def test_changelist_filters_by_page_and_links_settings(admin_client):
+    html = admin_client.get(reverse("admin:texts_sitetext_changelist") + "?page__exact=gallery").content.decode()
+    assert "Фото скоро появятся." in html and "Отзывов пока нет." not in html
+    assert reverse("admin:core_sitesettings_changelist") in html
+
+
+def test_initial_version_shows_dash_instead_of_none(admin_client):
+    url = reverse("admin:texts_sitetext_history", args=[SiteText.objects.get(key="gallery.empty").pk])
+    html = admin_client.get(url).content.decode()
+    assert "Начальный текст" in html
+    assert not re.search(r">\s*None\s*<", html) and "/user/None/" not in html
+
+
+def test_history_page_is_russian(admin_client):
+    url = reverse("admin:texts_sitetext_history", args=[SiteText.objects.get(key="gallery.empty").pk])
+    html = admin_client.get(url).content.decode()
+    for english in ("Changed by", "Date/time", "Change reason", "Changes"):
+        assert english not in html, english

@@ -11,3 +11,22 @@ msgstr "Основное"
 
 msgid "Filters"
 msgstr "Фильтры"
+
+# unfold/contrib/simple_history — история изменений («Тексты сайта»): строк нет в русских каталогах Unfold и simple-history
+msgid "Changes"
+msgstr "Изменения"
+
+msgid "Field"
+msgstr "Поле"
+
+msgid "Old value"
+msgstr "Было"
+
+msgid "New value"
+msgstr "Стало"
+
+msgid "Choose a date from the list below to revert to a previous version of this object"
+msgstr "Выберите версию в списке ниже, чтобы вернуть её"
+
+msgid "Press the 'Change History' button below to edit the history."
+msgstr "Нажмите кнопку «Изменить запись» ниже, чтобы отредактировать историю."
