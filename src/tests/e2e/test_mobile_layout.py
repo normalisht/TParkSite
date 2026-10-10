@@ -327,11 +327,12 @@ def test_about_biography_opens_and_closes_smoothly(live_server, browser):
 
     opening = _frames(page, summary, body, "height")
     full = opening[-1]
-    assert full > 100 and _passes_through(opening, 0, full), opening
+    # У закрытого <details> Chrome оставляет обёртке полную высоту — без роста «с нуля» она лишь дрожит на субпиксели.
+    assert full > 100 and _passes_through(opening, 0, full) and min(opening) < full / 2, opening
     assert page.evaluate("document.querySelector('details[data-smooth]').open")
 
     closing = _frames(page, summary, body, "height")
-    assert any(0 < value < full for value in closing), closing
+    assert any(0 < value < full / 2 for value in closing), closing
     page.wait_for_function("!document.querySelector('details[data-smooth]').open")
     context.close()
 
@@ -357,4 +358,47 @@ def test_contact_button_icon_morphs(live_server, browser, content):
     assert _passes_through(values, 1, 0), values
     cross = page.locator(".contact-fab button .icon:nth-child(2)")
     assert float(cross.evaluate("(el) => getComputedStyle(el).opacity")) == 1
+    context.close()
+
+
+# Карточки, у которых обводка ring-1 (1 px снаружи блока) срезана ближайшим обрезающим предком.
+# По y проверяем и прокрутку (лента со свайпом по x обрезает и по y), по x — только hidden/clip: ленту листают.
+FIND_CLIPPED_RINGS = """
+(selector) => {
+  const clippedBy = (el, axis) => {
+    for (let p = el.parentElement; p; p = p.parentElement) {
+      const overflow = getComputedStyle(p)[axis];
+      if (overflow === "visible") continue;
+      return axis === "overflowX" && overflow !== "hidden" && overflow !== "clip" ? null : p;
+    }
+    return null;
+  };
+  const found = [];
+  for (const el of document.querySelectorAll(selector)) {
+    const r = el.getBoundingClientRect();
+    const y = clippedBy(el, "overflowY"), x = clippedBy(el, "overflowX");
+    const box = (p) => { const b = p.getBoundingClientRect(); return { top: b.top + p.clientTop, left: b.left + p.clientLeft,
+      bottom: b.top + p.clientTop + p.clientHeight, right: b.left + p.clientLeft + p.clientWidth }; };
+    if (y) { const b = box(y); if (r.top - 1 < b.top || r.bottom + 1 > b.bottom) found.push(`${selector} по вертикали`); }
+    if (x) { const b = box(x); if (r.left - 1 < b.left || r.right + 1 > b.right) found.push(`${selector} по горизонтали`); }
+  }
+  return found;
+}
+"""
+
+
+def test_card_rings_not_clipped(live_server, browser, content):
+    site = SiteSettings.load()
+    site.founder_text = "<ul>" + "<li><p>Педагог, тренер, инструктор по туризму.</p></li>" * 3 + "</ul>"
+    site.save()
+    context = browser.new_context(viewport={"width": 375, "height": 800}, is_mobile=True, has_touch=True)
+    page = context.new_page()
+    page.goto(live_server.url + "/")
+    assert page.evaluate(FIND_CLIPPED_RINGS, "main .card") == []
+
+    page.goto(live_server.url + "/about/")
+    page.wait_for_load_state("networkidle")
+    page.click("details[data-smooth] > summary")
+    page.wait_for_function("!document.querySelector('[data-details-body]').getAnimations().length")
+    assert page.evaluate(FIND_CLIPPED_RINGS, ".rich-text-cards li") == []
     context.close()

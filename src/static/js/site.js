@@ -18,18 +18,23 @@ document.addEventListener("DOMContentLoaded", () => {
     const summary = details.querySelector("summary");
     const body = details.querySelector("[data-details-body]");
     let animation = null;
+    // Обрезка нужна только пока меняется высота: в покое она срезала бы обводку и тень карточек у краёв текста.
     const animate = (from, to, done) => {
       animation?.cancel();
+      body.style.overflow = "hidden";
       animation = body.animate({ height: [`${from}px`, `${to}px`] }, { duration: 300, easing: "ease-out" });
       animation.onfinish = () => {
         animation = null;
+        body.style.overflow = "";
         done?.();
       };
     };
     summary.addEventListener("click", (event) => {
       if (reducedMotion) return;
       event.preventDefault();
-      const height = body.getBoundingClientRect().height;
+      // У закрытого <details> Chrome скрывает содержимое через content-visibility, но размер обёртки остаётся полным —
+      // поэтому раскрытие из закрытого состояния начинаем с нуля, а не с измеренной высоты.
+      const height = details.open ? body.getBoundingClientRect().height : 0;
       if (!details.open || details.hasAttribute("data-closing")) {
         details.removeAttribute("data-closing");
         details.open = true;

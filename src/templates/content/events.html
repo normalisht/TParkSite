@@ -51,7 +51,7 @@
 <section class="mx-auto max-w-6xl px-4 pt-10 md:pt-16">
   <h2 class="mb-4 text-2xl font-bold md:mb-6 md:text-3xl">Предстоящие</h2>
   {# На телефоне — лента со свайпом (следующая карточка выглядывает с края), с sm — сетка. #}
-  <div class="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 lg:grid-cols-3">
+  <div class="scroll-strip sm:grid sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
     {% for event in upcoming %}<article class="{% if upcoming|length > 1 %}w-[82%] shrink-0 snap-start scroll-ml-4 sm:w-auto{% else %}w-full{% endif %}">{% include "content/partials/event_card.html" %}</article>{% endfor %}
   </div>
 </section>
@@ -61,7 +61,7 @@
 <section class="mx-auto max-w-6xl px-4 pt-10 md:pt-16" x-data="{ all: false }">
   <h2 class="mb-4 text-2xl font-bold md:mb-6 md:text-3xl">Прошедшие</h2>
   {# На телефоне лента листается целиком; в сетке (с sm) сверх {{ past_shown }} — по кнопке. #}
-  <div class="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 lg:grid-cols-3">
+  <div class="scroll-strip sm:grid sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
     {% for event in past %}
     <article class="{% if past|length > 1 %}w-[82%] shrink-0 snap-start scroll-ml-4 sm:w-auto{% else %}w-full{% endif %}{% if forloop.counter > past_shown %} sm:hidden{% endif %}"{% if forloop.counter > past_shown %} :class="all && '!block'"{% endif %}>{% include "content/partials/event_card.html" %}</article>
     {% endfor %}
