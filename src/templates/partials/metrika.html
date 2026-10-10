@@ -6,5 +6,17 @@
   k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
   (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
   ym({{ site.yandex_metrika_id }}, "init", {clickmap: true, trackLinks: true, accurateTrackBounce: true, webvisor: true});
+  // Цели: звонок и переходы в мессенджеры (в Метрике — цели типа «JavaScript-событие» с этими идентификаторами).
+  document.addEventListener("click", function (event) {
+    var link = event.target.closest && event.target.closest("a[href]");
+    if (!link) return;
+    var href = link.getAttribute("href");
+    var goal = href.indexOf("tel:") === 0 ? "call"
+      : href.indexOf("wa.me/") !== -1 ? "whatsapp"
+      : href.indexOf("t.me/") !== -1 ? "telegram"
+      : href.indexOf("vk.com/") !== -1 ? "vk"
+      : href.indexOf("max.ru/") !== -1 ? "max" : "";
+    if (goal) ym({{ site.yandex_metrika_id }}, "reachGoal", goal);
+  });
 </script>
 <noscript><div><img src="https://mc.yandex.ru/watch/{{ site.yandex_metrika_id }}" style="position:absolute; left:-9999px;" alt=""></div></noscript>
