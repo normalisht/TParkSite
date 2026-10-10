@@ -1,6 +1,8 @@
 import re
+from pathlib import Path
 
 import pytest
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.db import connection
@@ -9,6 +11,8 @@ from django.test import RequestFactory
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 
+from apps.catalog.models import Service
+from apps.core.models import Phone, SiteSettings
 from apps.texts.context_processors import site_texts
 from apps.texts.models import SiteText
 from apps.texts.registry import BY_KEY, TEXTS, Page, sync_texts
@@ -174,3 +178,35 @@ def test_history_page_is_russian(admin_client):
     html = admin_client.get(url).content.decode()
     for english in ("Changed by", "Date/time", "Change reason", "Changes"):
         assert english not in html, english
+
+
+TEXT_TAG = re.compile(r"""\{%\s*text\s+["']([\w.]+)["']""")
+
+
+def test_registry_matches_templates():
+    used = set()
+    for path in Path(settings.BASE_DIR, "templates").rglob("*.html"):
+        used |= set(TEXT_TAG.findall(path.read_text(encoding="utf-8")))
+    assert used == set(BY_KEY)
+
+
+def _service_page(client) -> str:
+    Phone.objects.create(settings=SiteSettings.load(), number="9029856594")
+    service = Service.objects.create(name="Сплав", price="2000", has_page=True)
+    return client.get(service.get_absolute_url()).content.decode()
+
+
+def test_edited_text_shows_on_site_and_empty_hides_block(client):
+    assert "Бронируйте заранее" in _service_page(client)
+    SiteText.objects.filter(key="service.booking_hint").update(text="Звоните заранее.")
+    html = client.get(Service.objects.get().get_absolute_url()).content.decode()
+    assert "Звоните заранее." in html and "Бронируйте" not in html
+    SiteText.objects.filter(key="service.booking_hint").update(text="")
+    html = client.get(Service.objects.get().get_absolute_url()).content.decode()
+    assert "Звоните заранее." not in html and 'text-sm text-ink/65"></p>' not in html
+
+
+def test_pages_render_defaults_when_table_is_empty(client):
+    SiteText.objects.all().delete()
+    assert "Кажется, вы сошли с тропы" in client.get("/no-such-page/").content.decode()
+    assert "Скоро анонсируем новые мероприятия" in client.get("/events/").content.decode()

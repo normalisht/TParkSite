@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load site_tags site_texts %}
 {# Swiper нужен только карусели отзывов внизу страницы: стили подключаются в body перед ней, чтобы не задерживать первую отрисовку. #}
 {% block vendor_js %}{% if reviews %}{% include "partials/vendor.html" with part="js" swiper=1 %}{% endif %}{% endblock %}
 {% block content %}
@@ -6,7 +7,7 @@
   {% include "partials/hero_decor.html" %}
   <div class="mx-auto grid max-w-6xl items-center gap-8 px-4 py-10 md:py-16 {% if hero %}lg:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] lg:gap-12{% endif %}">
     <div class="min-w-0">
-      <h1 class="page-title md:text-6xl"><span class="whitespace-nowrap">Тренинг-парк</span> Дмитрия Сергеева</h1>
+      <h1 class="page-title md:text-6xl">{% text "home.title" %}</h1>
       {% if site.about_motto %}<p class="mt-5 max-w-2xl border-l-4 border-brand-500 pl-4 text-xl font-medium leading-snug text-navy md:text-2xl">{{ site.about_motto }}</p>{% endif %}
       {% if site.home_intro %}<div class="rich-text mt-5 max-w-3xl text-lg">{{ site.home_intro|safe }}</div>{% endif %}
       <div class="mt-6 flex flex-wrap gap-3 md:mt-8">{% include "partials/contact_links.html" %}</div>
@@ -36,14 +37,14 @@
 </section>
 {% endwith %}
 {% empty %}
-<p class="mx-auto max-w-6xl px-4 py-16 text-ink/65">Скоро здесь появятся наши услуги.</p>
+{% text "home.services_empty" as services_empty %}{% if services_empty %}<p class="mx-auto max-w-6xl px-4 py-16 text-ink/65">{{ services_empty|nobr }}</p>{% endif %}
 {% endfor %}
 {% endwith %}
 
 {% if events %}
 <section class="mx-auto max-w-6xl px-4 pt-10 md:pt-16">
   <div class="mb-4 flex flex-wrap items-end justify-between gap-x-4 gap-y-2 md:mb-6">
-    <h2 class="min-w-0 text-2xl font-bold md:text-3xl">Ближайшие мероприятия</h2>
+    <h2 class="min-w-0 text-2xl font-bold md:text-3xl">{% text "home.events_title" %}</h2>
     <a href="{% url 'content:events' %}" class="inline-flex shrink-0 items-center gap-1 font-semibold text-brand-700 hover:text-brand-600">Все мероприятия<span class="icon h-4 w-4">{% include "icons/chevron-right.svg" %}</span></a>
   </div>
   <div class="scroll-strip sm:grid sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
@@ -55,7 +56,7 @@
 {% if reviews %}
 <section class="mx-auto max-w-6xl px-4 pt-10 md:pt-16">
   <div class="mb-4 flex flex-wrap items-end justify-between gap-x-4 gap-y-2 md:mb-6">
-    <h2 class="min-w-0 text-2xl font-bold md:text-3xl">Отзывы гостей</h2>
+    <h2 class="min-w-0 text-2xl font-bold md:text-3xl">{% text "home.reviews_title" %}</h2>
     <div class="flex flex-wrap justify-end gap-x-5 gap-y-1">
       {% if site.reviews_url %}<a href="{{ site.reviews_url }}" class="hidden items-center gap-1 font-semibold text-brand-700 hover:text-brand-600 sm:inline-flex" target="_blank" rel="noopener">Оставить отзыв<span class="icon h-4 w-4">{% include "icons/external-link.svg" %}</span></a>{% endif %}
       <a href="{% url 'content:reviews' %}" class="inline-flex items-center gap-1 font-semibold text-brand-700 hover:text-brand-600">Все отзывы<span class="icon h-4 w-4">{% include "icons/chevron-right.svg" %}</span></a>
@@ -88,8 +89,8 @@
 <section class="mx-auto grid max-w-6xl gap-6 px-4 pt-10 md:pt-16 {% if phones and site.address %}lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]{% endif %}">
   {% if phones %}
   <div class="rounded-2xl bg-sand-100 px-6 py-8 md:px-10 md:py-12">
-    <h2 class="text-2xl font-bold md:text-3xl">Приезжайте в <span class="whitespace-nowrap">Т-Парк</span></h2>
-    <p class="mt-2 text-ink/75">Расскажем о программах и подберём формат для вас, семьи или команды.</p>
+    <h2 class="text-2xl font-bold md:text-3xl">{% text "home.cta_title" %}</h2>
+    {% text "home.cta_text" as cta_text %}{% if cta_text %}<p class="mt-2 text-ink/75">{{ cta_text|nobr }}</p>{% endif %}
     <div class="mt-6 flex flex-wrap gap-3">{% include "partials/contact_links.html" %}</div>
   </div>
   {% endif %}

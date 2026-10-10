@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load site_tags %}
+{% load site_tags site_texts %}
 {% block og_type %}article{% endblock %}
 {% block content %}
 <section class="page-hero">
@@ -58,7 +58,7 @@
 {% if related %}
 <section class="mx-auto max-w-6xl px-4">
   <div class="mb-4 flex flex-wrap items-end justify-between gap-x-4 gap-y-2 md:mb-6">
-    <h2 class="min-w-0 text-2xl font-bold md:text-3xl">{% if event.is_past %}Ближайшие мероприятия{% else %}Другие мероприятия{% endif %}</h2>
+    <h2 class="min-w-0 text-2xl font-bold md:text-3xl">{% if event.is_past %}{% text "event.upcoming_title" %}{% else %}{% text "event.other_title" %}{% endif %}</h2>
     <a href="{% url 'content:events' %}" class="inline-flex shrink-0 items-center gap-1 font-semibold text-brand-700 hover:text-brand-600">Все мероприятия<span class="icon h-4 w-4">{% include "icons/chevron-right.svg" %}</span></a>
   </div>
   <div class="scroll-strip sm:grid sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">

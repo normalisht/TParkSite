@@ -1,7 +1,7 @@
-{% load site_tags %}
+{% load site_tags site_texts %}
 {# Полоса из нескольких фото галереи со ссылкой на всю галерею («О нас», главная). #}
 <div class="mb-4 flex flex-wrap items-end justify-between gap-x-4 gap-y-2 md:mb-6">
-  <h2 class="min-w-0 text-2xl font-bold md:text-3xl">Как это выглядит</h2>
+  <h2 class="min-w-0 text-2xl font-bold md:text-3xl">{% text "common.photo_strip_title" %}</h2>
   <a href="{% url 'content:gallery' %}" class="inline-flex shrink-0 items-center gap-1 font-semibold text-brand-700 hover:text-brand-600">Вся галерея<span class="icon h-4 w-4">{% include "icons/chevron-right.svg" %}</span></a>
 </div>
 <div class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">

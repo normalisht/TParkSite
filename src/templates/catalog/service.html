@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load site_tags site_texts %}
 {% block vendor_css %}{% include "partials/vendor.html" with part="css" swiper=1 glightbox=1 %}{% endblock %}
 {% block vendor_js %}{% include "partials/vendor.html" with part="js" swiper=1 glightbox=1 %}{% endblock %}
 {% block content %}
@@ -21,7 +22,7 @@
         {% endif %}
         {% if phones %}
         <div class="{% if service.price %}mt-5 {% endif %}flex flex-wrap gap-2 lg:flex-col lg:[&>.btn]:w-full">{% include "partials/contact_links.html" %}</div>
-        <p class="mt-4 text-sm text-ink/65">Бронируйте заранее — в тёплый сезон даты разбирают быстро.</p>
+        {% text "service.booking_hint" as booking_hint %}{% if booking_hint %}<p class="mt-4 text-sm text-ink/65">{{ booking_hint|nobr }}</p>{% endif %}
         {% endif %}
       </div>
     </aside>
