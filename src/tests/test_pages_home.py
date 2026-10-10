@@ -8,7 +8,7 @@ from django.utils import timezone
 
 from apps.catalog.models import Category, CategoryGroup
 from apps.content.models import Event, Review
-from apps.core.models import Phone, SiteSettings
+from apps.core.models import InfoPage, Phone, SiteSettings
 from apps.core.seo import plaintext
 
 pytestmark = pytest.mark.django_db
@@ -230,3 +230,44 @@ def test_category_card_shade_covers_card_on_phone(client):
     group.categories.add(Category.objects.create(name="Дни рождения и выпускные", is_published=True))
     html = client.get("/").content.decode()
     assert re.search(r'<div class="absolute inset-x-0 bottom-0 h-full sm:h-3/4 bg-linear-to-t', html)
+
+
+def _cookie_notice(html: str) -> str:
+    return html.split('aria-label="Уведомление о cookie"', 1)[1].split("</section>", 1)[0]
+
+
+def test_cookie_notice_with_metrika_links_to_privacy(client):
+    site = SiteSettings.load()
+    site.yandex_metrika_id = "12345"
+    site.privacy_page = InfoPage.objects.create(title="Политика конфиденциальности", body="<p>x</p>")
+    site.save()
+    Phone.objects.create(settings=site, number="9029856594")
+    html = client.get("/").content.decode()
+    notice = _cookie_notice(html)
+    assert "Мы используем cookie и Яндекс Метрику" in notice
+    assert f'href="{site.privacy_page.get_absolute_url()}"' in notice
+    assert "Понятно" in notice
+    # Баннер скрыт до инициализации Alpine, а доступ к localStorage защищён от приватного режима.
+    assert "x-cloak" in html.split('aria-label="Уведомление о cookie"', 1)[0].rsplit("<section", 1)[1]
+    assert "cookie-ok" in html and "try" in html
+    assert html.index("Уведомление о cookie") < html.index('class="contact-fab')
+
+
+def test_cookie_notice_without_privacy_page_has_no_link(client):
+    site = SiteSettings.load()
+    site.yandex_metrika_id = "12345"
+    site.save()
+    notice = _cookie_notice(client.get("/").content.decode())
+    assert "<a " not in notice
+    assert "Понятно" in notice
+
+
+def test_no_cookie_notice_without_metrika(client):
+    html = client.get("/").content.decode()
+    assert "Уведомление о cookie" not in html
+    assert "cookie-ok" not in html
+
+
+def test_contact_button_hidden_while_cookie_notice_open():
+    css = (Path(settings.BASE_DIR) / "tailwind/source.css").read_text()
+    assert "html.cookie-open .contact-fab { display: none; }" in css
