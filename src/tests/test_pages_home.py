@@ -212,3 +212,13 @@ def test_contact_links_include_vk_and_max(client):
     assert 'href="https://max.ru/u/tpark"' in _contact_menu(html)
     assert 'href="https://max.ru/u/tpark"' in html.split("<footer", 1)[1]
     assert 'href="https://max.ru/u/tpark"' in client.get("/contacts/").content.decode()
+
+
+def test_home_categories_grid_on_phone(client):
+    group = CategoryGroup.objects.create(name="Групповые приключения")
+    for i in range(6):
+        group.categories.add(Category.objects.create(name=f"Категория {i}", is_published=True))
+    html = client.get("/").content.decode()
+    section = html.split("Групповые приключения</h2>", 1)[1].split("</section>", 1)[0]
+    assert "grid grid-cols-2" in section
+    assert "overflow-x-auto" not in section

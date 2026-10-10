@@ -27,10 +27,10 @@
 {% with count=group.published_categories|length %}
 <section class="mx-auto max-w-6xl px-4 pt-10 md:pt-16">
   <h2 class="mb-4 text-2xl font-bold md:mb-6 md:text-3xl">{{ group.name }}</h2>
-  {# На телефоне — лента со свайпом (следующая карточка выглядывает с края), с sm — сетка; группа из 1–2 категорий — широкими карточками. #}
-  <div class="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 md:gap-6 {% if count > 2 %}lg:grid-cols-3{% endif %}">
+  {# Сетка: на телефоне 2 колонки — все направления группы видны сразу; при нечётном числе первая карточка широкая (без «дыры»). Группа из 1–2 категорий — широкими карточками на ПК. #}
+  <div class="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 {% if count > 2 %}lg:grid-cols-3{% endif %}">
     {% for category in group.published_categories %}
-    <div class="{% if count > 1 %}w-[82%]{% else %}w-full{% endif %} shrink-0 snap-start scroll-ml-4 sm:w-auto">{% if count > 2 %}{% include "catalog/partials/category_card.html" with first_screen=first_screen lcp=lcp_card %}{% else %}{% include "catalog/partials/category_card.html" with wide=True first_screen=first_screen lcp=lcp_card %}{% endif %}</div>
+    <div class="{% if count == 1 %}col-span-2 sm:col-span-1{% elif count|divisibleby:2 is False and forloop.first %}col-span-2 lg:col-span-1{% endif %}">{% if count > 2 %}{% include "catalog/partials/category_card.html" with first_screen=first_screen lcp=lcp_card %}{% else %}{% include "catalog/partials/category_card.html" with wide=True first_screen=first_screen lcp=lcp_card %}{% endif %}</div>
     {% endfor %}
   </div>
 </section>
