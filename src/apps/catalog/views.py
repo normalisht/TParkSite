@@ -76,6 +76,23 @@ def category_detail(request, slug):
     )
 
 
+RELATED_SERVICES = 3
+
+
+def related_services(category, service, limit: int = RELATED_SERVICES) -> list:
+    """Другие услуги категории со своей страницей; варианты с тем же названием (в т. ч. текущей услуги) — один раз."""
+    seen = {service.name.casefold()}
+    result = []
+    for item in category.published_services():
+        name = item.name.casefold()
+        if item.has_page and name not in seen:
+            seen.add(name)
+            result.append(item)
+            if len(result) == limit:
+                break
+    return result
+
+
 def service_detail(request, slug):
     service = get_object_or_404(Service.objects.published().filter(has_page=True), slug=slug)
     photos = list(service.photos.all())
@@ -92,7 +109,7 @@ def service_detail(request, slug):
         (service.name, ""),
     ]
     image = safe_spec_url(photos[0], "slide") if photos else ""
-    related = [s for s in category.published_services() if s.has_page and s.pk != service.pk][:3] if category else []
+    related = related_services(category, service) if category else []
     return render(
         request,
         "catalog/service.html",

@@ -330,3 +330,18 @@ def test_service_card_picture_and_slider_srcset(client, make_image):
     )
     html = client.get(service.get_absolute_url()).content.decode()
     assert 'sizes="(min-width: 1152px) 752px, (min-width: 1024px) calc(100vw - 400px), calc(100vw - 32px)"' in html
+
+
+def test_service_related_skips_same_name_variants(client):
+    category = Category.objects.create(name="Высота", is_published=True)
+    services = [
+        Service.objects.create(name=name, has_page=True)
+        for name in ["Виа-феррата", "виа-феррата", "Скалодром", "Скалодром", "Тарзанка"]
+    ]
+    for order, service in enumerate(services):
+        CategoryService.objects.create(category=category, service=service, order=order)
+    related = client.get(services[0].get_absolute_url()).content.decode().split("Ещё в категории")[1]
+    assert services[1].get_absolute_url() not in related  # тот же аттракцион другим вариантом
+    assert services[2].get_absolute_url() in related
+    assert services[3].get_absolute_url() not in related  # одинаковые названия — одна карточка
+    assert services[4].get_absolute_url() in related
