@@ -39,7 +39,10 @@ def test_category_page_lists_services(client, category):
     assert with_page.get_absolute_url() in html
     # Цена разбита по слешу: перенос только между ценой и единицей.
     assert '<span class="inline-block whitespace-nowrap">2000 руб</span>' in html
-    assert '<span class="data-wrapped:invisible">/ </span>человек</span>' in html
+    assert (
+        '<span class="js-price-unit group/price inline-block data-wrapped:block"><span class="group-data-wrapped/price:hidden">/ </span>человек</span>'
+        in html
+    )
     assert "Весло включено" in html
     assert "Скрытая услуга" not in html
     assert "swiper-slide" in html

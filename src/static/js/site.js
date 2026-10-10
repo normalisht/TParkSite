@@ -108,13 +108,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Цена «700 руб / 10 выстрелов»: если единица перенеслась на вторую строку, слеш не нужен.
-  // Скрываем его через visibility — ширина не меняется, поэтому перенос не «прыгает».
+  // Цена «1000 руб / 10 выстрелов»: если единица не влезла в строку, слеш убираем, а единицу ставим блоком с новой строки.
+  // Сначала снимаем отметку у всех цен, потом меряем все разом — одна перекомпоновка, и сужение/расширение окна работает в обе стороны.
   const fitPrices = () => {
-    document.querySelectorAll(".js-price-unit").forEach((unit) => {
-      const wrapped = unit.offsetTop > unit.previousElementSibling.offsetTop;
-      unit.firstElementChild.toggleAttribute("data-wrapped", wrapped);
-    });
+    const units = [...document.querySelectorAll(".js-price-unit")];
+    units.forEach((unit) => unit.removeAttribute("data-wrapped"));
+    const wrapped = units.map((unit) => unit.offsetTop > unit.previousElementSibling.offsetTop);
+    units.forEach((unit, i) => unit.toggleAttribute("data-wrapped", wrapped[i]));
   };
   let fitFrame;
   const scheduleFit = () => {
