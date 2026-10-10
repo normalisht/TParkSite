@@ -222,3 +222,11 @@ def test_home_categories_grid_on_phone(client):
     section = html.split("Групповые приключения</h2>", 1)[1].split("</section>", 1)[0]
     assert "grid grid-cols-2" in section
     assert "overflow-x-auto" not in section
+
+
+def test_category_card_shade_covers_card_on_phone(client):
+    """На телефоне подпись бывает в три строки и начинается почти у верха — затемнение на всю высоту, с sm — на 3/4."""
+    group = CategoryGroup.objects.create(name="Группа")
+    group.categories.add(Category.objects.create(name="Дни рождения и выпускные", is_published=True))
+    html = client.get("/").content.decode()
+    assert re.search(r'<div class="absolute inset-x-0 bottom-0 h-full sm:h-3/4 bg-linear-to-t', html)

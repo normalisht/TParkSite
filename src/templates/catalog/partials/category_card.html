@@ -6,9 +6,9 @@
   {% else %}
   <img src="{% static 'img/logo.png' %}" alt="" class="absolute inset-0 m-auto w-1/2 opacity-30">
   {% endif %}{% endwith %}
-  <div class="absolute inset-x-0 bottom-0 h-3/4 bg-linear-to-t from-black/75 via-black/30 to-transparent"></div>
+  <div class="absolute inset-x-0 bottom-0 h-full sm:h-3/4 bg-linear-to-t from-black/75 via-black/30 to-transparent"></div>
   <div class="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-3 sm:p-5">
-    <h3 class="text-base leading-snug font-semibold text-white [text-wrap:balance] sm:text-xl">{{ category.name }}</h3>
+    <h3 class="text-[0.9375rem] leading-snug font-semibold text-white [text-wrap:balance] sm:text-xl">{{ category.name }}</h3>
     <span class="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/20 text-white ring-1 ring-white/40 backdrop-blur transition group-hover:bg-brand-500 group-hover:text-ink group-hover:ring-brand-500 sm:flex"><span class="icon h-5 w-5">{% include "icons/chevron-right.svg" %}</span></span>
   </div>
 </a>
