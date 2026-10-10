@@ -45,7 +45,7 @@ def founder(request, site: SiteSettings) -> dict | None:
 
 
 def organization(request, *, with_founder: bool = False) -> dict:
-    """Т-Парк как местная организация: адрес, телефоны, координаты, ссылки на VK и Яндекс Карты."""
+    """Т-Парк как местная организация: адрес, телефоны, координаты, ссылки на ВКонтакте и Яндекс Карты."""
     site = SiteSettings.load()
     data = {
         "@type": "LocalBusiness",

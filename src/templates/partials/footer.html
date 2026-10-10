@@ -10,7 +10,7 @@
       <div class="mt-4 -ml-1.5 flex gap-2">
         {% if whatsapp_phone %}<a href="{{ whatsapp_phone|whatsapp_url:contact_topic }}" class="icon icon-fill h-11 w-11 p-1.5 hover:text-brand-300" target="_blank" rel="noopener" aria-label="WhatsApp">{% include "icons/whatsapp.svg" %}</a>{% endif %}
         {% if telegram_phone %}<a href="{{ telegram_phone.telegram_url }}" class="icon icon-fill h-11 w-11 p-1.5 hover:text-brand-300" target="_blank" rel="noopener" aria-label="Telegram">{% include "icons/telegram.svg" %}</a>{% endif %}
-        {% if site.vk_url %}<a href="{{ site.vk_url }}" class="icon icon-fill h-11 w-11 p-1.5 hover:text-brand-300" target="_blank" rel="noopener" aria-label="VK">{% include "icons/vk.svg" %}</a>{% endif %}
+        {% if site.vk_url %}<a href="{{ site.vk_url }}" class="icon icon-fill h-11 w-11 p-1.5 hover:text-brand-300" target="_blank" rel="noopener" aria-label="ВКонтакте">{% include "icons/vk.svg" %}</a>{% endif %}
         {% if site.max_url %}<a href="{{ site.max_url }}" class="icon icon-fill h-11 w-11 p-1.5 hover:text-brand-300" target="_blank" rel="noopener" aria-label="MAX">{% include "icons/max.svg" %}</a>{% endif %}
       </div>
     </div>

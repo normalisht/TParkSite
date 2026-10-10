@@ -71,3 +71,22 @@ def test_max_icon_is_official_mark():
     svg = (TEMPLATES / "icons/max.svg").read_text()
     assert 'viewBox="0 0 100 100"' in svg and svg.count("<path") == 1
     assert 'd="M50.7571 0.261719C78.2929' in svg
+
+
+def test_vk_is_called_vkontakte_everywhere():
+    """В текстах сайта и админки соцсеть называется «ВКонтакте», а не «VK»."""
+    offenders = [
+        f"{path.relative_to(TEMPLATES)}: {line.strip()}"
+        for path in TEMPLATES.rglob("*")
+        if path.suffix in {".html", ".svg"}
+        for line in path.read_text().splitlines()
+        if re.search(r"\bVK\b", line)
+    ]
+    assert offenders == []
+
+
+def test_vk_labels_in_models():
+    from apps.core.models import SiteSettings
+
+    assert SiteSettings._meta.get_field("vk_url").verbose_name == "ВКонтакте"
+    assert "VK" not in SiteSettings._meta.get_field("og_image").help_text

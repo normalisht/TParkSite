@@ -61,7 +61,7 @@ class SiteSettings(models.Model):
         blank=True,
         help_text="В Яндекс Картах: «Поделиться» → «Встроить карту» → скопируйте код и вставьте сюда целиком.",
     )
-    vk_url = models.URLField("VK", max_length=500, blank=True)
+    vk_url = models.URLField("ВКонтакте", max_length=500, blank=True)
     max_url = models.URLField(
         "MAX", max_length=500, blank=True, help_text="Ссылка на профиль или канал в MAX. Пусто — кнопки нет."
     )
@@ -150,7 +150,7 @@ class SiteSettings(models.Model):
         "Картинка для соцсетей",
         "seo",
         size=(2400, 1260),
-        help_text="Показывается в превью ссылки в VK, Telegram и мессенджерах, если у страницы нет своего фото. "
+        help_text="Показывается в превью ссылки во ВКонтакте, Telegram и мессенджерах, если у страницы нет своего фото. "
         "Лучше горизонтальная, 1200×630.",
     )
     og_card = image_spec("og_image", 1200, 630)

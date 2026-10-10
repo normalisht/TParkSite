@@ -135,7 +135,7 @@ class Event(SeoModel):
         return f"Через {_days(days)}" if days <= 30 else ""
 
 
-REVIEW_SOURCES = {"yandex.": "Яндекс Карты", "vk.com": "VK", "2gis.": "2ГИС", "google.": "Google"}
+REVIEW_SOURCES = {"yandex.": "Яндекс Карты", "vk.com": "ВКонтакте", "2gis.": "2ГИС", "google.": "Google"}
 
 
 class Review(models.Model):
@@ -165,7 +165,7 @@ class Review(models.Model):
 
     @property
     def source_label(self) -> str:
-        """Откуда отзыв: «Яндекс Карты», «VK»… — по адресу ссылки; без ссылки — пусто."""
+        """Откуда отзыв: «Яндекс Карты», «ВКонтакте»… — по адресу ссылки; без ссылки — пусто."""
         host = (urlsplit(self.link).hostname or "").removeprefix("www.")
         return next((label for key, label in REVIEW_SOURCES.items() if key in host), host)
 
