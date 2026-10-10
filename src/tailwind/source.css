@@ -60,6 +60,8 @@
   button:not(:disabled), [role="button"]:not([aria-disabled="true"]) { cursor: pointer; }
   /* Заметный фокус с клавиатуры в цвет бренда; у .card-link своё кольцо (утилиты перебивают base). */
   :focus-visible { outline: 3px solid var(--color-brand-500); outline-offset: 2px; }
+  /* Слово длиннее строки («командообразования» на 320 px) переносится, а не срезается краем карточки или шапки. */
+  h1, h2, h3 { overflow-wrap: anywhere; }
 }
 
 /* Место под полосу прокрутки всегда зарезервировано — короткие и длинные страницы не сдвигаются по горизонтали */

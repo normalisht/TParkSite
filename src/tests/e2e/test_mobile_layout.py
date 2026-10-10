@@ -42,6 +42,22 @@ FIND_OVERFLOW = """
 """
 
 
+# Текст, срезанный краем блока: длинное слово не влезает в ширину, а предок с overflow: hidden прячет хвост.
+# FIND_OVERFLOW такое не видит — обрезанный контейнер для него «норма».
+FIND_CLIPPED_TEXT = """
+() => {
+  const found = [];
+  for (const el of document.body.querySelectorAll("h1, h2, h3, p, a, li, span")) {
+    if (el.clientWidth <= 1 || getComputedStyle(el).display === "inline") continue;
+    if (getComputedStyle(el).overflowX !== "visible") continue;
+    const hasText = [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());
+    if (hasText && el.scrollWidth > el.clientWidth + 1) found.push(`${el.tagName.toLowerCase()} «${el.textContent.trim().slice(0, 40)}» +${el.scrollWidth - el.clientWidth}px`);
+  }
+  return found;
+}
+"""
+
+
 @pytest.fixture(scope="session", autouse=True)
 def allow_orm_next_to_playwright():
     """Playwright держит в потоке теста event loop — без этого ORM (в т. ч. в сессионных фикстурах БД) падает
@@ -74,7 +90,9 @@ def content():
         name="Виа-феррата", price="1000", price_unit="10 выстрелов", has_page=True, description="<p>Текст</p>"
     )
     other = Service.objects.create(name="Скалодром", price="500", price_unit="человек", has_page=True)
-    for order, item in enumerate([service, other]):
+    # Длинное слово в заголовке страницы и в карточке «Ещё в категории».
+    long = Service.objects.create(name="Тренинг командообразования «Веревочный курс»", price="3500", has_page=True)
+    for order, item in enumerate([service, other, long]):
         CategoryService.objects.create(category=category, service=item, order=order)
     today = timezone.localdate()
     events = [
@@ -86,7 +104,7 @@ def content():
         link="https://yandex.ru/maps/org/t_park/1234567890/reviews/",
         date=today,
     )
-    return {"category": category, "service": service, "event": events[0]}
+    return {"category": category, "service": service, "long_service": long, "event": events[0]}
 
 
 @pytest.mark.parametrize("width", WIDTHS)
@@ -98,6 +116,7 @@ def test_no_horizontal_overflow(live_server, browser, content, width):
         "/events/",
         content["category"].get_absolute_url(),
         content["service"].get_absolute_url(),
+        content["long_service"].get_absolute_url(),
         content["event"].get_absolute_url(),
     ]
     context = browser.new_context(
@@ -108,7 +127,7 @@ def test_no_horizontal_overflow(live_server, browser, content, width):
     for url in pages:
         page.goto(live_server.url + url)
         page.wait_for_load_state("networkidle")
-        if found := page.evaluate(FIND_OVERFLOW):
+        if found := page.evaluate(FIND_OVERFLOW) + page.evaluate(FIND_CLIPPED_TEXT):
             problems[url] = found
     context.close()
     report = "\n".join(f"{url}: {item}" for url, items in problems.items() for item in items)
