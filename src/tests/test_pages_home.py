@@ -173,14 +173,23 @@ def _header(html: str) -> str:
     return html.split("<header", 1)[1].split("</header>", 1)[0]
 
 
-def test_header_shows_phone_on_desktop(client):
+def test_header_contact_dropdown_on_desktop(client):
     site = SiteSettings.load()
     Phone.objects.create(settings=site, number="9029856594", is_whatsapp=True)
     header = _header(client.get("/").content.decode())
-    assert 'href="tel:+79029856594"' in header
-    assert "+7 (902) 985-65-94" in header
-    assert "https://wa.me/79029856594" in header
+    wrapper = re.search(
+        r'<div x-data="hoverMenu"[^>]*class="([^"]*)"[^>]*>\s*<button[^>]*aria-controls="header-contact-menu"', header
+    )
+    assert wrapper and "hidden" in wrapper.group(1).split() and "lg:block" in wrapper.group(1)
+    menu = header.split('id="header-contact-menu"', 1)[1].split("</div>", 1)[0]
+    assert 'href="tel:+79029856594"' in menu and "+7 (902) 985-65-94" in menu
+    assert "https://wa.me/79029856594" in menu
+    assert ">Написать<" not in header
     assert "Тренинг-парк Дмитрия Сергеева" not in header
+
+
+def test_header_has_no_contact_dropdown_without_phones(client):
+    assert 'id="header-contact-menu"' not in _header(client.get("/").content.decode())
 
 
 def test_header_services_dropdown_lists_published_categories(client):

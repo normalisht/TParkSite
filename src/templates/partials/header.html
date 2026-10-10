@@ -45,9 +45,22 @@
     </nav>
 
     {% if phones %}
-    <div class="hidden shrink-0 items-center gap-3 lg:flex">
-      <a href="{{ phones.0.tel_url }}" class="inline-flex items-center gap-2 whitespace-nowrap text-sm font-semibold tabular-nums hover:text-brand-700"><span class="icon h-4 w-4 text-navy">{% include "icons/phone.svg" %}</span>{{ phones.0.display }}</a>
-      {% if whatsapp_phone %}<a href="{{ whatsapp_phone|whatsapp_url:contact_topic }}" class="btn btn-primary py-2" target="_blank" rel="noopener">Написать</a>{% endif %}
+    {# «Связаться» на ПК — те же кнопки, что у плавающей кнопки на телефоне (partials/contact_links.html); выезжают при наведении (hoverMenu), на тач-экранах — по касанию #}
+    <div x-data="hoverMenu" @mouseenter="enter()" @mouseleave="leave()"
+         @keydown.escape.window="if (expanded) { close(); $refs.trigger.focus() }"
+         @click.outside="close()"
+         @focusout="if ($event.relatedTarget && !$el.contains($event.relatedTarget)) close()"
+         class="relative hidden shrink-0 lg:block">
+      <button type="button" x-ref="trigger" @click="toggle()" aria-controls="header-contact-menu" :aria-expanded="expanded" class="btn btn-primary py-2">
+        <span class="icon h-4 w-4" aria-hidden="true">{% include "icons/phone.svg" %}</span>Связаться
+      </button>
+      {# pt-3 — прозрачный «мостик» от кнопки к списку: мышь не покидает меню; w-max — список шире кнопки, номер не переносится #}
+      <div id="header-contact-menu" x-show="expanded" x-cloak
+           x-transition:enter="transition duration-150 ease-out" x-transition:enter-start="-translate-y-2 opacity-0" x-transition:enter-end="translate-y-0 opacity-100"
+           x-transition:leave="transition duration-100 ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+           class="absolute right-0 top-full z-50 flex w-max flex-col items-end gap-2 pt-3">
+        {% include "partials/contact_links.html" %}
+      </div>
     </div>
     {% endif %}
 

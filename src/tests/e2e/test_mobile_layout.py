@@ -239,3 +239,51 @@ def test_services_menu_toggles_by_tap_on_touch(live_server, browser, content):
     trigger.tap()
     menu.wait_for(state="hidden")
     context.close()
+
+
+def _gap_point(trigger, target):
+    """Точка в зазоре под кнопкой, над первым пунктом списка — там, где мышь пересекает пустое место."""
+    t, p = trigger.bounding_box(), target.bounding_box()
+    return t["x"] + t["width"] / 2, (t["y"] + t["height"] + p["y"]) / 2
+
+
+def test_header_contacts_slide_out_on_hover(live_server, browser, content):
+    context = browser.new_context(viewport={"width": 1280, "height": 800})
+    page = context.new_page()
+    page.goto(live_server.url + "/")
+    page.wait_for_load_state("networkidle")
+    menu = page.locator("#header-contact-menu")
+    trigger = page.locator("header").get_by_role("button", name="Связаться")
+    assert page.locator(".contact-fab").is_hidden()  # плавающая кнопка на ПК не дублирует шапку
+
+    trigger.hover()
+    menu.wait_for(state="visible")
+    phone = menu.get_by_role("link", name="+7 (902) 985-65-94")
+    assert phone.is_visible()
+    # Список шире кнопки «Связаться»: номер не переносится на вторую строку
+    assert phone.bounding_box()["height"] <= menu.get_by_role("link", name="WhatsApp").bounding_box()["height"] + 1
+    page.mouse.move(*_gap_point(trigger, menu.get_by_role("link").first))
+    page.wait_for_timeout(400)
+    assert menu.is_visible(), "список закрылся, пока мышь шла к нему"
+
+    trigger.click()
+    page.wait_for_timeout(100)
+    assert menu.is_visible()
+
+    page.mouse.move(5, 700)
+    menu.wait_for(state="hidden")
+    context.close()
+
+
+def test_header_contacts_toggle_by_tap_on_touch(live_server, browser, content):
+    context = browser.new_context(viewport={"width": 1280, "height": 800}, is_mobile=True, has_touch=True)
+    page = context.new_page()
+    page.goto(live_server.url + "/")
+    page.wait_for_load_state("networkidle")
+    menu = page.locator("#header-contact-menu")
+    trigger = page.locator("header").get_by_role("button", name="Связаться")
+    trigger.tap()
+    menu.wait_for(state="visible")
+    trigger.tap()
+    menu.wait_for(state="hidden")
+    context.close()
