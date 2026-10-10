@@ -1,4 +1,6 @@
-# Локальный запуск: docker compose -f compose.dev.yaml up --build → http://localhost:8000
+# Локальный запуск: docker compose -f compose.dev.yaml up --build --renew-anon-volumes → http://localhost:8000
+# (или make dev). --renew-anon-volumes обязателен: .venv образа лежит в анонимном томе (ниже), а compose
+# при пересоздании контейнера оставляет старый том — без флага новые зависимости не появятся.
 # Код из src/ примонтирован в контейнер: runserver перезапускается при правках, Tailwind пересобирается.
 # Продакшен — compose.yaml.
 services:
