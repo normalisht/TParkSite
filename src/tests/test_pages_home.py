@@ -200,13 +200,21 @@ def test_header_services_dropdown_lists_published_categories(client):
     assert "max-w-[min(48rem,calc(100%-2rem))]" in panel_tag
 
 
-def test_header_services_dropdown_ignores_focusout_without_target(client):
-    """Клик по пустому месту панели даёт focusout с relatedTarget = null: он не должен закрывать меню."""
+def test_hover_menu_script_loads_before_alpine(client):
+    html = client.get("/").content.decode()
+    assert html.index("js/hover_menu.js") < html.index("vendor/alpine.min.js")
+
+
+def test_header_services_dropdown_opens_on_hover(client):
     CategoryGroup.objects.create(name="Активный отдых").categories.add(
         Category.objects.create(name="Байдарки", is_published=True)
     )
     header = _header(client.get("/").content.decode())
-    assert '@focusout="if ($event.relatedTarget && !$el.contains($event.relatedTarget)) services = false"' in header
+    wrapper = re.search(r'<div x-data="hoverMenu"[^>]*>', header).group(0)
+    assert '@mouseenter="enter()"' in wrapper and '@mouseleave="leave()"' in wrapper
+    # Клик по пустому месту панели даёт focusout с relatedTarget = null: он не должен закрывать меню.
+    assert '@focusout="if ($event.relatedTarget && !$el.contains($event.relatedTarget)) close()"' in wrapper
+    assert re.search(r'<button type="button"[^>]*@click="toggle\(\)"[^>]*aria-controls="services-menu"', header)
 
 
 def test_header_services_is_plain_link_without_groups(client):

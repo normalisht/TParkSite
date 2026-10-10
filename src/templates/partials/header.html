@@ -11,17 +11,18 @@
 
     <nav class="hidden items-center gap-6 text-sm font-medium md:flex">
       {% if menu_groups %}
-      {# Выпадающее меню «Услуги»: открывается по клику, закрывается по Escape, клику снаружи и уходу фокуса на другой элемент (focusout без relatedTarget — клик по пустому месту панели — не закрывает); панель привязана к шапке, а не к кнопке — на 768 px иначе вылезла бы за край #}
-      <div x-data="{ services: false }"
-           @keydown.escape.window="if (services) { services = false; $refs.trigger.focus() }"
-           @click.outside="services = false"
-           @focusout="if ($event.relatedTarget && !$el.contains($event.relatedTarget)) services = false">
-        <button type="button" x-ref="trigger" class="inline-flex items-center gap-1 hover:text-brand-600" @click="services = !services" :aria-expanded="services" aria-controls="services-menu">
+      {# Выпадающее меню «Услуги» (hoverMenu, static/js/hover_menu.js): наведение или клик; закрывается по Escape, клику снаружи и уходу фокуса (focusout без relatedTarget — клик по пустому месту панели — не закрывает); панель привязана к шапке, а не к кнопке — на 768 px иначе вылезла бы за край #}
+      <div x-data="hoverMenu" @mouseenter="enter()" @mouseleave="leave()"
+           @keydown.escape.window="if (expanded) { close(); $refs.trigger.focus() }"
+           @click.outside="close()"
+           @focusout="if ($event.relatedTarget && !$el.contains($event.relatedTarget)) close()">
+        <button type="button" x-ref="trigger" class="inline-flex items-center gap-1 hover:text-brand-600" @click="toggle()" aria-controls="services-menu" :aria-expanded="expanded">
           Услуги
-          <span class="icon h-4 w-4 transition-transform" :class="services && 'rotate-180'">{% include "icons/chevron-down.svg" %}</span>
+          <span class="icon h-4 w-4 transition-transform" :class="expanded && 'rotate-180'">{% include "icons/chevron-down.svg" %}</span>
         </button>
-        <div id="services-menu" x-show="services" x-cloak
-             class="card absolute inset-x-4 top-full z-50 mx-auto mt-2 w-max max-w-[min(48rem,calc(100%-2rem))] p-6 shadow-lg">
+        {# before: — прозрачный «мостик» над панелью: мышь идёт от кнопки к панели, не покидая меню #}
+        <div id="services-menu" x-show="expanded" x-cloak
+             class="card absolute inset-x-4 top-full z-50 mx-auto mt-2 w-max max-w-[min(48rem,calc(100%-2rem))] p-6 shadow-lg before:absolute before:inset-x-0 before:-top-6 before:h-6">
           <div class="flex flex-wrap gap-x-10 gap-y-6">
             {% for group in menu_groups %}
             <div>

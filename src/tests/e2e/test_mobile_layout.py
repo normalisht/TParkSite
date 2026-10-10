@@ -198,3 +198,44 @@ def test_services_menu_survives_click_on_empty_space(live_server, browser, conte
     page.mouse.click(5, 400)
     menu.wait_for(state="hidden")
     context.close()
+
+
+def test_services_menu_opens_on_hover(live_server, browser, content):
+    context = browser.new_context(viewport={"width": 1280, "height": 800})
+    page = context.new_page()
+    page.goto(live_server.url + "/")
+    page.wait_for_load_state("networkidle")
+    menu = page.locator("#services-menu")
+    trigger = page.get_by_role("button", name="Услуги")
+
+    trigger.hover()
+    menu.wait_for(state="visible")
+    # Панель центрирована в шапке, а не под кнопкой: мышь идёт к ней по диагонали через пустую шапку.
+    # Путь в 8 шагов занимает меньше задержки закрытия (200 мс) — панель должна дождаться мыши.
+    link = menu.get_by_role("link").first.bounding_box()
+    page.mouse.move(link["x"] + 5, link["y"] + link["height"] / 2, steps=8)
+    page.wait_for_timeout(400)
+    assert menu.is_visible(), "панель закрылась, пока мышь шла к ней"
+
+    trigger.click()  # меню открыто наведением — клик его не закрывает
+    page.wait_for_timeout(100)
+    assert menu.is_visible()
+
+    page.mouse.move(5, 700)
+    menu.wait_for(state="hidden")
+    context.close()
+
+
+def test_services_menu_toggles_by_tap_on_touch(live_server, browser, content):
+    """На планшете наведения нет: меню открывается и закрывается касанием."""
+    context = browser.new_context(viewport={"width": 1024, "height": 768}, is_mobile=True, has_touch=True)
+    page = context.new_page()
+    page.goto(live_server.url + "/")
+    page.wait_for_load_state("networkidle")
+    menu = page.locator("#services-menu")
+    trigger = page.get_by_role("button", name="Услуги")
+    trigger.tap()
+    menu.wait_for(state="visible")
+    trigger.tap()
+    menu.wait_for(state="hidden")
+    context.close()
