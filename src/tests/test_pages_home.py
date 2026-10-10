@@ -56,7 +56,7 @@ def test_home_hero_hours_and_route(client):
     html = client.get("/").content.decode()
     assert "Ежедневно, 10:00–18:00" in html
     assert "Как добраться" in html and "rtext=~54.900000,36.600000" in html
-    assert "Приезжайте в Т-Парк" in html
+    assert 'Приезжайте в <span class="whitespace-nowrap">Т-Парк</span>' in html
 
 
 def test_home_hides_unpublished_group(client):
