@@ -21,9 +21,9 @@
     </div>
     {% endif %}
 
-    <button type="button" class="icon h-8 w-8 md:hidden" @click="open = !open" :aria-expanded="open" :aria-label="open ? 'Закрыть меню' : 'Меню'">
+    <button type="button" class="-mr-2 flex h-11 w-11 items-center justify-center md:hidden" @click="open = !open" :aria-expanded="open" :aria-label="open ? 'Закрыть меню' : 'Меню'">
       {# Три полоски плавно складываются в крестик — стили .burger в tailwind/source.css #}
-      <svg class="burger" :class="open && 'is-open'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+      <svg class="burger h-7 w-7" :class="open && 'is-open'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
         <path d="M4 5h16" /><path d="M4 12h16" /><path d="M4 19h16" />
       </svg>
     </button>

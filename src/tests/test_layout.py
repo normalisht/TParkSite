@@ -35,3 +35,32 @@ def test_skip_link_and_reduced_motion(client):
 def test_slider_uses_brand_colors():
     css = (Path(settings.BASE_DIR) / "tailwind/source.css").read_text()
     assert "--swiper-theme-color: var(--color-brand-500)" in css
+
+
+@pytest.mark.django_db
+def test_touch_targets_are_large_enough(client):
+    from apps.core.models import Phone, SiteSettings
+
+    site = SiteSettings.load()
+    site.vk_url = "https://vk.com/tpark"
+    site.save()
+    Phone.objects.create(settings=site, number="9029856594", is_whatsapp=True)
+    html = client.get("/").content.decode()
+    header = html.split("<header", 1)[1].split("</header>", 1)[0]
+    assert re.search(r'<button type="button" class="[^"]*\bh-11 w-11\b[^"]*md:hidden"', header)  # бургер
+    footer = html.split("<footer", 1)[1]
+    assert footer.count("h-11 w-11") == 2  # иконки WhatsApp и VK
+    assert "h-8 w-8" not in footer
+    assert re.search(r'<a href="tel:\+79029856594" class="[^"]*\bmin-h-11\b', footer)
+
+
+@pytest.mark.django_db
+def test_past_event_badge_is_readable(client):
+    from datetime import date
+
+    from apps.content.models import Event
+
+    event = Event.objects.create(title="Сплав", date=date(2020, 5, 1), show_after_date=True)
+    html = client.get(event.get_absolute_url()).content.decode()
+    badge = re.search(r'<span class="([^"]*)">Прошло</span>', html).group(1)
+    assert "text-sm" in badge and "text-xs" not in badge
