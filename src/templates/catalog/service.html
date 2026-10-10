@@ -26,7 +26,7 @@
       </div>
     </aside>
     <div class="min-w-0 lg:order-1">
-      {% if photos %}{% include "catalog/partials/slider.html" with alt=service.name %}{% endif %}
+      {% if photos %}{% include "catalog/partials/slider.html" with alt=service.name sizes="(min-width: 1152px) 752px, (min-width: 1024px) calc(100vw - 400px), calc(100vw - 32px)" %}{% endif %}
       <div class="rich-text {% if photos %}mt-8{% endif %}">{{ service.description|safe }}</div>
     </div>
   </div>

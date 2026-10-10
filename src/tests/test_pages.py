@@ -312,3 +312,21 @@ def test_server_error_page_renders_without_context():
     content = render_to_string("500.html")
     assert "Что-то пошло не так" in content
     assert "error-tree-fallen" in content
+
+
+def test_service_card_picture_and_slider_srcset(client, make_image):
+    category = Category.objects.create(name="Сплавы", is_published=True)
+    service = Service.objects.create(name="Сплав", has_page=True)
+    ServicePhoto.objects.create(service=service, image=make_image(size=(1600, 900)))
+    CategoryPhoto.objects.create(category=category, image=make_image(size=(1600, 900)))
+    CategoryService.objects.create(category=category, service=service)
+    html = client.get(category.get_absolute_url()).content.decode()
+    card = html.split("Услуги и цены</h2>")[1]
+    # Телефон — квадрат row (336×336), с sm — card 640×480.
+    assert '<picture><source media="(min-width: 640px)" srcset="' in card
+    slider = html.split("js-slider")[1]
+    assert re.search(
+        r'srcset="[^"]+ 800w, [^"]+ 1600w" sizes="\(min-width: 1152px\) 1120px, calc\(100vw - 32px\)"', slider
+    )
+    html = client.get(service.get_absolute_url()).content.decode()
+    assert 'sizes="(min-width: 1152px) 752px, (min-width: 1024px) calc(100vw - 400px), calc(100vw - 32px)"' in html

@@ -70,6 +70,7 @@ class CategoryPhoto(OrderedModel):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="photos")
     image = photo_field("Фото", "catalog/categories", blank=False)
     slide = image_spec("image", 1600, 900, crop=False)
+    slide_small = image_spec("image", 800, 450, crop=False)  # слайдер на телефоне: srcset со slide
     thumb = image_spec("image", 320, 240)
 
     class Meta(OrderedModel.Meta):
@@ -142,8 +143,10 @@ class ServicePhoto(OrderedModel):
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name="photos")
     image = photo_field("Фото", "catalog/services", blank=False)
     slide = image_spec("image", 1600, 900, crop=False)
+    slide_small = image_spec("image", 800, 450, crop=False)  # слайдер на телефоне: srcset со slide
     thumb = image_spec("image", 320, 240)
     card = image_spec("image", 640, 480)
+    row = image_spec("image", 336, 336)  # квадрат в строке услуги на телефоне (112 px × 3)
 
     class Meta(OrderedModel.Meta):
         verbose_name = "Фото услуги"

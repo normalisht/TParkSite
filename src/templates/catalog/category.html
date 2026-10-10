@@ -38,7 +38,7 @@
 {% if photos %}
 <section class="mx-auto max-w-6xl px-4 pt-10 md:pt-16">
   <h2 class="mb-4 text-2xl font-bold md:mb-6 md:text-3xl">Фотографии</h2>
-  {% include "catalog/partials/slider.html" with alt=category.name %}
+  {% include "catalog/partials/slider.html" with alt=category.name sizes="(min-width: 1152px) 1120px, calc(100vw - 32px)" %}
 </section>
 {% endif %}
 
