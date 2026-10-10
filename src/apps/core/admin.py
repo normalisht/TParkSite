@@ -88,7 +88,7 @@ class SiteSettingsAdmin(SiteModelAdmin):
     # Unfold ставит URL-полям <input type="url">: браузер не пропустит вставленный код <iframe>.
     formfield_overrides = {MapEmbedURLField: {"widget": UnfoldAdminTextareaWidget(attrs={"rows": 3})}}
     fieldsets = (
-        ("Контакты", {"classes": ["tab"], "fields": ["address", "map_embed_url", "vk_url", "reviews_url"]}),
+        ("Контакты", {"classes": ["tab"], "fields": ["address", "map_embed_url", "vk_url", "max_url", "reviews_url"]}),
         ("Главная", {"classes": ["tab"], "fields": ["home_intro", "home_show_events"]}),
         ("Тексты", {"classes": ["tab"], "fields": ["events_intro", "contacts_text"]}),
         (

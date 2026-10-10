@@ -192,3 +192,23 @@ def test_contact_button_yields_to_menu_and_footer(client):
     assert "toggle('menu-open', open)" in html
     # Подвал не прячется под кнопкой: снизу место под неё, на ПК — обычный отступ.
     assert "pb-20 lg:pb-5" in html.split("<footer", 1)[1]
+
+
+def _contact_menu(html: str) -> str:
+    return html.split('id="contact-menu"', 1)[1].split("</div>", 1)[0]
+
+
+def test_contact_links_include_vk_and_max(client):
+    site = SiteSettings.load()
+    site.vk_url = "https://vk.com/tpark"
+    site.save()
+    Phone.objects.create(settings=site, number="9029856594")
+    menu = _contact_menu(client.get("/").content.decode())
+    assert 'href="https://vk.com/tpark"' in menu
+    assert "MAX" not in menu  # ссылка не указана — кнопки нет
+    site.max_url = "https://max.ru/u/tpark"
+    site.save()
+    html = client.get("/").content.decode()
+    assert 'href="https://max.ru/u/tpark"' in _contact_menu(html)
+    assert 'href="https://max.ru/u/tpark"' in html.split("<footer", 1)[1]
+    assert 'href="https://max.ru/u/tpark"' in client.get("/contacts/").content.decode()

@@ -62,6 +62,9 @@ class SiteSettings(models.Model):
         help_text="В Яндекс Картах: «Поделиться» → «Встроить карту» → скопируйте код и вставьте сюда целиком.",
     )
     vk_url = models.URLField("VK", max_length=500, blank=True)
+    max_url = models.URLField(
+        "MAX", max_length=500, blank=True, help_text="Ссылка на профиль или канал в MAX. Пусто — кнопки нет."
+    )
     reviews_url = models.URLField(
         "Отзывы на Яндекс Картах",
         max_length=500,
