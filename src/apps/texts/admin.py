@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib import admin
+from django.core.exceptions import PermissionDenied
 from simple_history.admin import SimpleHistoryAdmin
 
 from apps.core.admin_utils import SiteModelAdmin
@@ -51,6 +52,12 @@ class SiteTextAdmin(SimpleHistoryAdmin, SiteModelAdmin):
         text.widget.attrs["rows"] = 3
         text.help_text = "Обязательный текст." if item is None or item.required else "Пусто — блок на сайте скрыт."
         return form
+
+    def history_form_view(self, request, object_id, version_id, extra_context=None):
+        # simple-history сохраняет «Восстановить» при праве на просмотр истории — без права на изменение не даём.
+        if request.method == "POST" and not self.has_change_permission(request):
+            raise PermissionDenied
+        return super().history_form_view(request, object_id, version_id, extra_context)
 
     def has_add_permission(self, request):
         return False

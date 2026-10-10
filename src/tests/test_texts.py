@@ -219,3 +219,17 @@ def test_settings_tabs_link_to_texts(admin_client):
         assert f"{texts_url}?page__exact={page}" in html, page
     assert "Мероприятия и контакты" in html
     assert "Форматы и цифры основателя" in html
+
+
+def test_view_only_user_cannot_revert_version(client):
+    from django.contrib.auth.models import Permission
+
+    viewer = User.objects.create_user("viewer", password="x", is_staff=True)
+    viewer.user_permissions.add(Permission.objects.get(codename="view_sitetext"))
+    client.force_login(viewer)
+    obj = SiteText.objects.get(key="service.booking_hint")
+    url = reverse("admin:texts_sitetext_simple_history", args=[obj.pk, obj.history.earliest("history_date").history_id])
+    assert client.get(url).status_code == 200
+    assert client.post(url, {"text": "Взлом"}).status_code == 403
+    obj.refresh_from_db()
+    assert obj.text == BY_KEY["service.booking_hint"].default
