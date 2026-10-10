@@ -107,7 +107,6 @@ def gallery(request):
     context = {
         "photos": photos,
         "page_size": GALLERY_PAGE,
-        "first_batch": min(GALLERY_PAGE, len(photos) - GALLERY_PAGE),  # размер следующей порции на кнопке
         "seo": page_seo("gallery"),
     }
     return render(request, "content/gallery.html", context)

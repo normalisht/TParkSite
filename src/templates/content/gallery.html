@@ -14,7 +14,7 @@
 <div class="mx-auto max-w-6xl px-4 pt-10 md:pt-12">
   {% if photos %}
   {# Все ссылки остаются в HTML (просмотр листает всю галерею); после первой порции — hidden, браузер не грузит их lazy-превью. #}
-  <div x-data="{ shown: {{ page_size }} }">
+  <div x-data="{ shown: {{ page_size }}, total: {{ photos|length }} }">
   <div class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
     {% for photo in photos %}{% with url=photo|spec_url:"thumb" %}{% if url %}
     <a href="{{ photo.image.url }}" class="glightbox group block aspect-square overflow-hidden rounded-xl bg-sand-200" data-gallery="gallery"{% if forloop.counter > page_size %} hidden :hidden="shown <= {{ forloop.counter0 }}"{% endif %} {% if photo.caption %}data-title="{{ photo.caption }}"{% endif %}>
@@ -23,9 +23,19 @@
     {% endif %}{% endwith %}{% endfor %}
   </div>
   {% if photos|length > page_size %}
-  <div class="mt-8 text-center" x-show="shown < {{ photos|length }}">
-    <button type="button" class="btn btn-ghost" @click="const from = shown; shown += {{ page_size }}; $nextTick(() => $root.querySelectorAll('a.glightbox')[from]?.focus())">Показать ещё <span x-text="Math.min({{ page_size }}, {{ photos|length }} - shown)">{{ first_batch }}</span></button>
-  </div>
+  {% comment %}
+    Догрузка при прокрутке: невидимая метка под сеткой за 800 px до экрана открывает следующую порцию.
+    После каждой порции наблюдение перезапускается — на высоком экране метка остаётся в зоне видимости,
+    и без перезапуска новых событий не было бы. Когда показано всё, наблюдение снимается.
+  {% endcomment %}
+  <div data-gallery-more class="h-px" aria-hidden="true"
+       x-init="const io = new IntersectionObserver(([entry]) => {
+                 if (!entry.isIntersecting) return;
+                 shown += {{ page_size }};
+                 io.unobserve($el);
+                 if (shown < total) $nextTick(() => io.observe($el));
+               }, { rootMargin: '0px 0px 800px 0px' });
+               io.observe($el)"></div>
   {% endif %}
   </div>
   {% else %}

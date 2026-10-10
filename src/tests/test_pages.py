@@ -320,21 +320,23 @@ def _gallery_anchors(html):
     return re.findall(r'<a href="[^"]*" class="glightbox[^>]*>', html)
 
 
-def test_gallery_shows_first_page_and_load_more_button(client, make_image):
+def test_gallery_shows_first_page_and_autoloads_rest(client, make_image):
     _make_gallery(make_image, 30)
     html = client.get("/gallery/").content.decode()
     anchors = _gallery_anchors(html)
     assert len(anchors) == 30  # просмотр листает всю галерею
     assert [" hidden" in a for a in anchors] == [False] * 24 + [True] * 6
-    assert re.search(r"Показать ещё <span[^>]*>6</span>", html) and 'x-data="{ shown: 24 }"' in html
+    assert 'x-data="{ shown: 24, total: 30 }"' in html
+    assert "data-gallery-more" in html and "IntersectionObserver" in html
+    assert "Показать ещё" not in html
 
 
-def test_gallery_without_load_more_when_one_page(client, make_image):
+def test_gallery_without_autoload_when_one_page(client, make_image):
     _make_gallery(make_image, 20)
     html = client.get("/gallery/").content.decode()
     anchors = _gallery_anchors(html)
     assert len(anchors) == 20 and not any(" hidden" in a for a in anchors)
-    assert "Показать ещё" not in html
+    assert "data-gallery-more" not in html
 
 
 def test_info_page(client):

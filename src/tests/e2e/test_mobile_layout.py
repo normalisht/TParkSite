@@ -134,25 +134,37 @@ def test_no_horizontal_overflow(live_server, browser, content, width):
     assert not problems, f"За правым краем экрана {width} px:\n{report}"
 
 
-def test_gallery_load_more(live_server, browser, make_image):
-    """Кнопка «Показать ещё» открывает следующую порцию, переводит фокус на её первое фото и пропадает в конце."""
+def _gallery(make_image, count):
     first = GalleryPhoto.objects.create(image=make_image())
-    GalleryPhoto.objects.bulk_create([GalleryPhoto(image=first.image.name) for _ in range(29)])
+    GalleryPhoto.objects.bulk_create([GalleryPhoto(image=first.image.name) for _ in range(count - 1)])
+
+
+VISIBLE_PHOTOS = "document.querySelectorAll('a.glightbox:not([hidden])').length"
+
+
+def test_gallery_autoloads_on_scroll(live_server, browser, make_image):
+    """Следующая порция открывается сама, когда низ сетки подходит к экрану; кнопки нет."""
+    _gallery(make_image, 60)
     context = browser.new_context(viewport={"width": 375, "height": 800}, device_scale_factor=3, is_mobile=True)
     page = context.new_page()
     page.goto(live_server.url + "/gallery/")
     page.wait_for_load_state("networkidle")
-    links = page.locator("a.glightbox")
+    assert page.locator("a.glightbox").count() == 60 and page.evaluate(VISIBLE_PHOTOS) == 24
+    assert page.get_by_role("button", name="Показать ещё").count() == 0
+    page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+    page.wait_for_function(f"{VISIBLE_PHOTOS} === 48")
+    page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+    page.wait_for_function(f"{VISIBLE_PHOTOS} === 60")
+    context.close()
 
-    def visible():
-        return sum(links.nth(i).is_visible() for i in range(links.count()))
 
-    assert links.count() == 30 and visible() == 24
-    button = page.get_by_role("button", name="Показать ещё")
-    assert button.inner_text().split() == ["Показать", "ещё", "6"]
-    button.click()
-    assert visible() == 30 and not button.is_visible()
-    assert page.evaluate("document.activeElement === document.querySelectorAll('a.glightbox')[24]")
+def test_gallery_fills_tall_screen(live_server, browser, make_image):
+    """На высоком экране метка догрузки после порции остаётся видимой — галерея догружается дальше без прокрутки."""
+    _gallery(make_image, 72)
+    context = browser.new_context(viewport={"width": 1280, "height": 4000})
+    page = context.new_page()
+    page.goto(live_server.url + "/gallery/")
+    page.wait_for_function(f"{VISIBLE_PHOTOS} === 72")
     context.close()
 
 
