@@ -18,4 +18,6 @@ def site(request):
         # Адрес страницы без параметров (utm и т. п.): канонический для поисковиков.
         "canonical_url": request.build_absolute_uri(request.path),
         "metrika_enabled": bool(settings_obj.yandex_metrika_id) and not settings.DEBUG,
+        # Тема первого сообщения в WhatsApp; страницы услуг, категорий и мероприятий задают свою.
+        "contact_topic": "",
     }

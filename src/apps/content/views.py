@@ -47,6 +47,7 @@ def event_detail(request, slug):
         "content/event.html",
         {
             "event": event,
+            "contact_topic": "" if event.is_past else event.title,
             "related": list(Event.objects.upcoming().exclude(pk=event.pk)[:RELATED_EVENTS]),
             "route": route_links(site.latitude, site.longitude),
             "seo": seo,

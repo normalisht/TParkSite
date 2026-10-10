@@ -345,3 +345,29 @@ def test_service_related_skips_same_name_variants(client):
     assert services[2].get_absolute_url() in related
     assert services[3].get_absolute_url() not in related  # одинаковые названия — одна карточка
     assert services[4].get_absolute_url() in related
+
+
+def test_whatsapp_prefilled_with_service_name(client):
+    Phone.objects.create(settings=SiteSettings.load(), number="9029856594", is_whatsapp=True)
+    service = Service.objects.create(name="Виа-феррата", has_page=True)
+    html = client.get(service.get_absolute_url()).content.decode()
+    hello = "%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5"  # «Здравствуйте»
+    topic = "%C2%AB%D0%92%D0%B8%D0%B0-%D1%84%D0%B5%D1%80%D1%80%D0%B0%D1%82%D0%B0%C2%BB"  # «Виа-феррата»
+    links = re.findall(r'href="(https://wa\.me/[^"]*)"', html)
+    assert links and all(link.startswith(f"https://wa.me/79029856594?text={hello}") for link in links)
+    assert all(topic in link for link in links)
+    # На страницах без темы — ссылка без текста.
+    assert set(re.findall(r'href="(https://wa\.me/[^"]*)"', client.get("/contacts/").content.decode())) == {
+        "https://wa.me/79029856594"
+    }
+
+
+def test_whatsapp_topic_on_category_and_upcoming_event_only(client):
+    Phone.objects.create(settings=SiteSettings.load(), number="9029856594", is_whatsapp=True)
+    category = Category.objects.create(name="Сплавы", is_published=True)
+    assert "?text=" in client.get(category.get_absolute_url()).content.decode()
+    today = timezone.localdate()
+    upcoming = Event.objects.create(title="Сплав", date=today + timedelta(days=3))
+    past = Event.objects.create(title="Поход", date=today - timedelta(days=3), show_after_date=True)
+    assert "?text=" in client.get(upcoming.get_absolute_url()).content.decode()
+    assert "?text=" not in client.get(past.get_absolute_url()).content.decode()

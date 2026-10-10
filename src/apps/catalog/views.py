@@ -53,6 +53,8 @@ def category_detail(request, slug):
             "category": category,
             "photos": photos,
             "services": services,
+            # Тема первого сообщения в WhatsApp (фильтр whatsapp_url).
+            "contact_topic": category.name,
             # Услуги со своей страницей — карточками, остальные — компактным списком.
             "service_cards": [s for s in services if s.has_page],
             "service_rows": [s for s in services if not s.has_page],
@@ -115,6 +117,7 @@ def service_detail(request, slug):
         "catalog/service.html",
         {
             "service": service,
+            "contact_topic": service.name,
             "photos": photos,
             "category": category,
             "related": related,
