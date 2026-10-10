@@ -21,7 +21,7 @@
           <span class="icon h-4 w-4 transition-transform" :class="services && 'rotate-180'">{% include "icons/chevron-down.svg" %}</span>
         </button>
         <div id="services-menu" x-show="services" x-cloak
-             class="card absolute inset-x-4 top-full z-50 mx-auto mt-2 w-max max-w-3xl p-6 shadow-lg">
+             class="card absolute inset-x-4 top-full z-50 mx-auto mt-2 w-max max-w-[min(48rem,calc(100%-2rem))] p-6 shadow-lg">
           <div class="flex flex-wrap gap-x-10 gap-y-6">
             {% for group in menu_groups %}
             <div>

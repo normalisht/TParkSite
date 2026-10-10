@@ -195,6 +195,9 @@ def test_header_services_dropdown_lists_published_categories(client):
     assert f'href="{visible.get_absolute_url()}"' in panel
     assert "Черновик" not in panel and hidden.get_absolute_url() not in panel
     assert "Все услуги" in panel
+    # Ширина панели ограничена шириной шапки: иначе на 768 px длинные списки вылезут за край и обрежутся.
+    panel_tag = header.split('id="services-menu"', 1)[1].split(">", 1)[0]
+    assert "max-w-[min(48rem,calc(100%-2rem))]" in panel_tag
 
 
 def test_header_services_is_plain_link_without_groups(client):
