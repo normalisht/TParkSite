@@ -101,3 +101,16 @@ def test_html_cleanup_trims_empty_edge_paragraphs(legacy):
     )
     legacy.run()
     assert SiteSettings.load().founder_text == "<p>Текст</p>\n\n<p>&nbsp;</p>\n\n<p>Ещё</p>"
+
+
+def test_import_keeps_privacy_page(legacy):
+    """Миграция уже создала политику; импорт кладёт инфо-страницы с исходными id — конфликта нет, политика остаётся выбранной."""
+    from apps.core.privacy_defaults import PRIVACY_SLUG, ensure_privacy_page
+
+    taken_id = ensure_privacy_page(InfoPage, SiteSettings).id
+    legacy.insert("text", id=taken_id, title=None, text="<p><strong>Правила</strong></p>", status=1)
+    legacy.run()
+    assert InfoPage.objects.get(id=taken_id).title == "Правила"
+    privacy = InfoPage.objects.get(slug=PRIVACY_SLUG)
+    assert not privacy.is_published
+    assert SiteSettings.load().privacy_page == privacy
