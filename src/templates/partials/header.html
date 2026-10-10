@@ -22,6 +22,8 @@
         </button>
         {# before: — прозрачный «мостик» над панелью: мышь идёт от кнопки к панели, не покидая меню #}
         <div id="services-menu" x-show="expanded" x-cloak
+             x-transition:enter="transition duration-150 ease-out" x-transition:enter-start="-translate-y-1 opacity-0" x-transition:enter-end="translate-y-0 opacity-100"
+             x-transition:leave="transition duration-100 ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
              class="card absolute inset-x-4 top-full z-50 mx-auto mt-2 w-max max-w-[min(48rem,calc(100%-2rem))] p-6 shadow-lg before:absolute before:inset-x-0 before:-top-6 before:h-6">
           <div class="flex flex-wrap gap-x-10 gap-y-6">
             {% for group in menu_groups %}

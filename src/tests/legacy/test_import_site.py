@@ -114,3 +114,14 @@ def test_import_keeps_privacy_page(legacy):
     privacy = InfoPage.objects.get(slug=PRIVACY_SLUG)
     assert not privacy.is_published
     assert SiteSettings.load().privacy_page == privacy
+
+
+def test_founder_text_without_repeated_heading(legacy):
+    """В старой «Философии» имя и подзаголовок основателя повторяли то, что «О нас» и так выводит над биографией."""
+    add_texts(
+        legacy,
+        filosofi="<p><strong>Дмитрий Сергеев</strong></p><p>Этот человек придумал и создал Т-парк:</p><ul><li>Педагог</li></ul>",
+    )
+    legacy.run()
+    founder_text = SiteSettings.load().founder_text
+    assert founder_text.startswith("<ul>") and "Дмитрий Сергеев" not in founder_text

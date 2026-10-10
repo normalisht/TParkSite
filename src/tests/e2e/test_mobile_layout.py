@@ -287,3 +287,74 @@ def test_header_contacts_toggle_by_tap_on_touch(live_server, browser, content):
     trigger.tap()
     menu.wait_for(state="hidden")
     context.close()
+
+
+# Покадровая запись свойства после клика: по промежуточным значениям видно, что смена плавная, а не мгновенная.
+RECORD_FRAMES = """
+async ([trigger, target, prop]) => {
+  const el = document.querySelector(target);
+  const values = [];
+  document.querySelector(trigger).click();
+  const start = performance.now();
+  while (performance.now() - start < 600) {
+    await new Promise((done) => requestAnimationFrame(done));
+    if (getComputedStyle(el).display === "none") continue;
+    values.push(prop === "height" ? el.getBoundingClientRect().height : parseFloat(getComputedStyle(el)[prop]));
+  }
+  return values;
+}
+"""
+
+
+def _frames(page, trigger, target, prop):
+    return page.evaluate(RECORD_FRAMES, [trigger, target, prop])
+
+
+def _passes_through(values, start, end):
+    low, high = sorted((start, end))
+    return any(low < value < high for value in values) and values[-1] == end
+
+
+def test_about_biography_opens_and_closes_smoothly(live_server, browser):
+    site = SiteSettings.load()
+    site.founder_text = "<ul>" + "<li><p>Педагог, тренер, инструктор по туризму.</p></li>" * 8 + "</ul>"
+    site.save()
+    context = browser.new_context(viewport={"width": 375, "height": 800}, is_mobile=True, has_touch=True)
+    page = context.new_page()
+    page.goto(live_server.url + "/about/")
+    page.wait_for_load_state("networkidle")
+    summary, body = "details[data-smooth] > summary", "[data-details-body]"
+
+    opening = _frames(page, summary, body, "height")
+    full = opening[-1]
+    assert full > 100 and _passes_through(opening, 0, full), opening
+    assert page.evaluate("document.querySelector('details[data-smooth]').open")
+
+    closing = _frames(page, summary, body, "height")
+    assert any(0 < value < full for value in closing), closing
+    page.wait_for_function("!document.querySelector('details[data-smooth]').open")
+    context.close()
+
+
+def test_services_panel_fades_in(live_server, browser, content):
+    context = browser.new_context(viewport={"width": 1280, "height": 800})
+    page = context.new_page()
+    page.goto(live_server.url + "/")
+    page.wait_for_load_state("networkidle")
+    values = _frames(page, "button[aria-controls='services-menu']", "#services-menu", "opacity")
+    assert _passes_through(values, 0, 1), values
+    context.close()
+
+
+def test_contact_button_icon_morphs(live_server, browser, content):
+    context = browser.new_context(viewport={"width": 375, "height": 800}, is_mobile=True, has_touch=True)
+    page = context.new_page()
+    page.goto(live_server.url + "/")
+    page.wait_for_load_state("networkidle")
+    page.evaluate("try { localStorage.setItem('cookie-ok', '1') } catch (e) {}")
+    phone = ".contact-fab button .icon:nth-child(1)"
+    values = _frames(page, ".contact-fab button", phone, "opacity")
+    assert _passes_through(values, 1, 0), values
+    cross = page.locator(".contact-fab button .icon:nth-child(2)")
+    assert float(cross.evaluate("(el) => getComputedStyle(el).opacity")) == 1
+    context.close()

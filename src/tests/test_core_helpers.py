@@ -126,3 +126,24 @@ def test_nobr_keeps_brand_on_one_line():
 
 def test_nobr_escapes_html():
     assert nobr("<b>Т-Парк</b>") == '&lt;b&gt;<span class="whitespace-nowrap">Т-Парк</span>&lt;/b&gt;'
+
+
+FOUNDER_NAME, FOUNDER_LEAD = "Дмитрий Сергеев", "Этот человек придумал и создал Т-Парк"
+
+
+def test_strip_founder_heading_removes_repeated_name_and_lead():
+    from apps.core.about_defaults import strip_founder_heading
+
+    text = (
+        "<p><strong>Дмитрий Сергеев</strong></p>\n\n<p>Этот человек придумал и создал Т-парк:</p>\n\n"
+        "<ul><li><p>Педагог</p></li></ul>"
+    )
+    assert strip_founder_heading(text, FOUNDER_NAME, FOUNDER_LEAD) == "<ul><li><p>Педагог</p></li></ul>"
+
+
+def test_strip_founder_heading_keeps_other_text():
+    from apps.core.about_defaults import strip_founder_heading
+
+    text = "<p>Дмитрий Сергеев родился в Калуге.</p>\n\n<p>Этот человек придумал и создал Т-Парк:</p>"
+    assert strip_founder_heading(text, FOUNDER_NAME, FOUNDER_LEAD) == text
+    assert strip_founder_heading("", FOUNDER_NAME, FOUNDER_LEAD) == ""

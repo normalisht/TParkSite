@@ -216,6 +216,9 @@ def test_about_founder_text_in_details(client):
     assert details, "биография должна быть под <details>"
     assert "Педагог-биография" in details.group(0)
     assert re.search(r"<summary\b[^>]*>.*?Полная биография.*?</summary>", details.group(0), re.DOTALL)
+    # Раскрытие анимирует site.js (data-smooth): высота обёртки текста, без JS — обычный <details>.
+    assert re.match(r"<details[^>]*\bdata-smooth\b", details.group(0))
+    assert re.search(r'<div class="overflow-hidden" data-details-body>', details.group(0))
 
 
 def test_about_without_founder_text_has_no_details(client):

@@ -12,6 +12,38 @@ document.addEventListener("DOMContentLoaded", () => {
   const USER_PAUSE = 20_000; // после ручной прокрутки — пауза 20 секунд
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // Плавное раскрытие <details data-smooth>: анимируется высота обёртки [data-details-body]; без JS и при
+  // «уменьшить движение» — обычный <details>. Сворачивание до конца анимации помечено атрибутом data-closing.
+  document.querySelectorAll("details[data-smooth]").forEach((details) => {
+    const summary = details.querySelector("summary");
+    const body = details.querySelector("[data-details-body]");
+    let animation = null;
+    const animate = (from, to, done) => {
+      animation?.cancel();
+      animation = body.animate({ height: [`${from}px`, `${to}px`] }, { duration: 300, easing: "ease-out" });
+      animation.onfinish = () => {
+        animation = null;
+        done?.();
+      };
+    };
+    summary.addEventListener("click", (event) => {
+      if (reducedMotion) return;
+      event.preventDefault();
+      const height = body.getBoundingClientRect().height;
+      if (!details.open || details.hasAttribute("data-closing")) {
+        details.removeAttribute("data-closing");
+        details.open = true;
+        animate(height, body.scrollHeight);
+      } else {
+        details.setAttribute("data-closing", "");
+        animate(height, 0, () => {
+          details.open = false;
+          details.removeAttribute("data-closing");
+        });
+      }
+    });
+  });
+
   // Swiper и GLightbox подключаются только на страницах со слайдерами (partials/vendor.html).
   if (window.Swiper) document.querySelectorAll(".js-slider").forEach((el) => {
     const slides = el.querySelectorAll(".swiper-slide");

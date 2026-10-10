@@ -7,10 +7,12 @@
        class="mb-3 flex flex-col items-end gap-2">
     {% include "partials/contact_links.html" %}
   </div>
-  <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="contact-menu" class="btn btn-primary shadow-lg">
-    {# Иконки одного размера: при переключении ширина кнопки не меняется. #}
-    <span x-show="!open" class="icon h-5 w-5" aria-hidden="true">{% include "icons/phone.svg" %}</span>
-    <span x-show="open" x-cloak class="icon h-5 w-5" aria-hidden="true">{% include "icons/x.svg" %}</span>
+  <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="contact-menu" class="group btn btn-primary shadow-lg">
+    {# Трубка и крестик лежат друг на друге и плавно сменяют друг друга по aria-expanded кнопки; ширина кнопки не меняется. #}
+    <span class="grid h-5 w-5">
+      <span class="icon col-start-1 row-start-1 h-5 w-5 transition duration-200 motion-reduce:transition-none group-aria-expanded:rotate-90 group-aria-expanded:scale-50 group-aria-expanded:opacity-0" aria-hidden="true">{% include "icons/phone.svg" %}</span>
+      <span class="icon col-start-1 row-start-1 h-5 w-5 -rotate-90 scale-50 opacity-0 transition duration-200 motion-reduce:transition-none group-aria-expanded:rotate-0 group-aria-expanded:scale-100 group-aria-expanded:opacity-100" aria-hidden="true">{% include "icons/x.svg" %}</span>
+    </span>
     <span>Связаться</span><span x-show="open" x-cloak class="sr-only">— закрыть</span>
   </button>
 </div>

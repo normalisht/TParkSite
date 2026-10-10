@@ -119,3 +119,12 @@ def test_ensure_privacy_page_keeps_existing_choice():
     assert InfoPage.objects.filter(slug=PRIVACY_SLUG).count() == 1
     site.refresh_from_db()
     assert site.privacy_page == own
+
+
+def test_founder_text_migration_drops_repeated_heading():
+    site = SiteSettings.load()
+    site.founder_text = "<p><strong>Дмитрий Сергеев</strong></p>\n\n<p>Этот человек придумал и создал Т-парк:</p>\n\n<ul><li>Педагог</li></ul>"
+    site.save()
+    importlib.import_module("apps.core.migrations.0015_founder_text_heading").forwards(django_apps, None)
+    site.refresh_from_db()
+    assert site.founder_text == "<ul><li>Педагог</li></ul>"

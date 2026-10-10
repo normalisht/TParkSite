@@ -363,3 +363,26 @@ def test_footer_shows_opening_hours_on_any_page(client):
     site.save()
     for url in ("/", "/about/", "/contacts/"):
         assert "Ежедневно, 10:00–18:00" in _footer(client.get(url).content.decode())
+
+
+def test_header_services_panel_is_animated(client):
+    CategoryGroup.objects.create(name="Активный отдых").categories.add(
+        Category.objects.create(name="Байдарки", is_published=True)
+    )
+    panel_tag = _header(client.get("/").content.decode()).split('id="services-menu"', 1)[1].split(">", 1)[0]
+    assert 'x-transition:enter="transition duration-150 ease-out"' in panel_tag
+    assert 'x-transition:leave="transition duration-100 ease-in"' in panel_tag
+
+
+def test_contact_button_icons_morph(client):
+    """Трубка и крестик лежат друг на друге и меняются плавно (по aria-expanded кнопки), а не через x-show."""
+    Phone.objects.create(settings=SiteSettings.load(), number="9029856594")
+    fab = client.get("/").content.decode().split('class="contact-fab', 1)[1].split("</button>", 1)[0]
+    button = re.search(r'<button type="button"[^>]*class="([^"]*)"', fab).group(1)
+    assert "group" in button.split()
+    icons = re.findall(r'<span class="(icon [^"]*)" aria-hidden="true">', fab)
+    assert len(icons) == 2
+    phone, cross = icons
+    assert "group-aria-expanded:opacity-0" in phone and "group-aria-expanded:opacity-100" in cross
+    assert all("transition" in icon and "motion-reduce:transition-none" in icon for icon in icons)
+    assert 'x-show="!open"' not in fab
