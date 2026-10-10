@@ -183,6 +183,26 @@ def test_header_shows_phone_on_desktop(client):
     assert "Тренинг-парк Дмитрия Сергеева" not in header
 
 
+def test_header_services_dropdown_lists_published_categories(client):
+    group = CategoryGroup.objects.create(name="Активный отдых")
+    visible = Category.objects.create(name="Байдарки", is_published=True)
+    hidden = Category.objects.create(name="Черновик", is_published=False)
+    group.categories.add(visible, hidden)
+    header = _header(client.get("/").content.decode())
+    assert re.search(r'<button type="button"[^>]*aria-controls="services-menu"', header)
+    panel = header.split('id="services-menu"', 1)[1].split("</nav>", 1)[0]
+    assert "Активный отдых" in panel
+    assert f'href="{visible.get_absolute_url()}"' in panel
+    assert "Черновик" not in panel and hidden.get_absolute_url() not in panel
+    assert "Все услуги" in panel
+
+
+def test_header_services_is_plain_link_without_groups(client):
+    header = _header(client.get("/").content.decode())
+    assert 'aria-controls="services-menu"' not in header and 'id="services-menu"' not in header
+    assert re.search(r'<a href="/"[^>]*>Услуги</a>', header)
+
+
 def test_contact_button_yields_to_menu_and_footer(client):
     Phone.objects.create(settings=SiteSettings.load(), number="9029856594")
     html = client.get("/").content.decode()

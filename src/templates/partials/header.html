@@ -10,7 +10,36 @@
     </a>
 
     <nav class="hidden items-center gap-6 text-sm font-medium md:flex">
+      {% if menu_groups %}
+      {# Выпадающее меню «Услуги»: открывается по клику, закрывается по Escape, клику снаружи и уходу фокуса; панель привязана к шапке, а не к кнопке — на 768 px иначе вылезла бы за край #}
+      <div x-data="{ services: false }"
+           @keydown.escape.window="if (services) { services = false; $refs.trigger.focus() }"
+           @click.outside="services = false"
+           @focusout="if (!$el.contains($event.relatedTarget)) services = false">
+        <button type="button" x-ref="trigger" class="inline-flex items-center gap-1 hover:text-brand-600" @click="services = !services" :aria-expanded="services" aria-controls="services-menu">
+          Услуги
+          <span class="icon h-4 w-4 transition-transform" :class="services && 'rotate-180'">{% include "icons/chevron-down.svg" %}</span>
+        </button>
+        <div id="services-menu" x-show="services" x-cloak
+             class="card absolute inset-x-4 top-full z-50 mx-auto mt-2 w-max max-w-3xl p-6 shadow-lg">
+          <div class="flex flex-wrap gap-x-10 gap-y-6">
+            {% for group in menu_groups %}
+            <div>
+              <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-ink/65">{{ group.name }}</p>
+              <ul class="space-y-2">
+                {% for category in group.published_categories %}
+                <li><a class="hover:text-brand-600" href="{{ category.get_absolute_url }}">{{ category.name }}</a></li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endfor %}
+          </div>
+          <a href="{% url 'catalog:home' %}" class="mt-5 block border-t border-ink/5 pt-4 font-semibold text-brand-700 hover:text-brand-600">Все услуги</a>
+        </div>
+      </div>
+      {% else %}
       <a href="{% url 'catalog:home' %}" class="hover:text-brand-600">Услуги</a>
+      {% endif %}
       {% include "partials/nav_links.html" with link_class="hover:text-brand-600" %}
     </nav>
 
