@@ -6,7 +6,7 @@ MANAGE := cd $(SRC) && uv run manage.py
 DEV_COMPOSE := docker compose -f compose.dev.yaml
 
 .DEFAULT_GOAL := help
-.PHONY: help install env migrate run superuser shell test lint format check pre-commit \
+.PHONY: help install env migrate run superuser shell test lint format check e2e pre-commit \
 	messages tailwind collectstatic import-legacy \
 	dev dev-down dev-logs dev-superuser \
 	build up down restart logs prod-superuser backup
@@ -45,6 +45,9 @@ format: ## Автоисправление и форматирование ruff
 	cd $(SRC) && uv run ruff check --fix . && uv run ruff format .
 
 check: lint test ## Линтер + тесты
+
+e2e: ## Браузерные тесты вёрстки (один раз: cd src && uv sync --group e2e && uv run --group e2e playwright install chromium)
+	cd $(SRC) && uv run manage.py tailwind build && uv run --group e2e pytest tests/e2e -m e2e $(ARGS)
 
 pre-commit: ## Все pre-commit-хуки по всем файлам
 	uv run --project $(SRC) pre-commit run --all-files
