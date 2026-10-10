@@ -200,6 +200,15 @@ def test_header_services_dropdown_lists_published_categories(client):
     assert "max-w-[min(48rem,calc(100%-2rem))]" in panel_tag
 
 
+def test_header_services_dropdown_ignores_focusout_without_target(client):
+    """Клик по пустому месту панели даёт focusout с relatedTarget = null: он не должен закрывать меню."""
+    CategoryGroup.objects.create(name="Активный отдых").categories.add(
+        Category.objects.create(name="Байдарки", is_published=True)
+    )
+    header = _header(client.get("/").content.decode())
+    assert '@focusout="if ($event.relatedTarget && !$el.contains($event.relatedTarget)) services = false"' in header
+
+
 def test_header_services_is_plain_link_without_groups(client):
     header = _header(client.get("/").content.decode())
     assert 'aria-controls="services-menu"' not in header and 'id="services-menu"' not in header

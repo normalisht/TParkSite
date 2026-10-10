@@ -11,11 +11,11 @@
 
     <nav class="hidden items-center gap-6 text-sm font-medium md:flex">
       {% if menu_groups %}
-      {# Выпадающее меню «Услуги»: открывается по клику, закрывается по Escape, клику снаружи и уходу фокуса; панель привязана к шапке, а не к кнопке — на 768 px иначе вылезла бы за край #}
+      {# Выпадающее меню «Услуги»: открывается по клику, закрывается по Escape, клику снаружи и уходу фокуса на другой элемент (focusout без relatedTarget — клик по пустому месту панели — не закрывает); панель привязана к шапке, а не к кнопке — на 768 px иначе вылезла бы за край #}
       <div x-data="{ services: false }"
            @keydown.escape.window="if (services) { services = false; $refs.trigger.focus() }"
            @click.outside="services = false"
-           @focusout="if (!$el.contains($event.relatedTarget)) services = false">
+           @focusout="if ($event.relatedTarget && !$el.contains($event.relatedTarget)) services = false">
         <button type="button" x-ref="trigger" class="inline-flex items-center gap-1 hover:text-brand-600" @click="services = !services" :aria-expanded="services" aria-controls="services-menu">
           Услуги
           <span class="icon h-4 w-4 transition-transform" :class="services && 'rotate-180'">{% include "icons/chevron-down.svg" %}</span>

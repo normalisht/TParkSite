@@ -154,3 +154,35 @@ def test_gallery_load_more(live_server, browser, make_image):
     assert visible() == 30 and not button.is_visible()
     assert page.evaluate("document.activeElement === document.querySelectorAll('a.glightbox')[24]")
     context.close()
+
+
+def test_services_menu_survives_click_on_empty_space(live_server, browser, content):
+    """Клик по подписи группы внутри панели (focusout без relatedTarget) не закрывает меню; Tab за пределы и клик снаружи — закрывают."""
+    context = browser.new_context(viewport={"width": 1280, "height": 800})
+    page = context.new_page()
+    page.goto(live_server.url + "/")
+    page.wait_for_load_state("networkidle")
+    menu = page.locator("#services-menu")
+    trigger = page.get_by_role("button", name="Услуги")
+
+    def settle():
+        # Alpine обновляет x-show в микрозадаче: ждём пару кадров, иначе проверка «ещё виден» ничего не докажет.
+        page.evaluate("() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))")
+
+    trigger.click()
+    menu.wait_for(state="visible")
+
+    menu.get_by_role("link").first.focus()
+    menu.get_by_text("Групповые приключения").click()
+    settle()
+    assert menu.is_visible()
+
+    menu.get_by_role("link", name="Все услуги").focus()
+    page.keyboard.press("Tab")
+    menu.wait_for(state="hidden")
+
+    trigger.click()
+    menu.wait_for(state="visible")
+    page.mouse.click(5, 400)
+    menu.wait_for(state="hidden")
+    context.close()
