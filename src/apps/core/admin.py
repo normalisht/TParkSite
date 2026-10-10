@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.forms.models import BaseInlineFormSet, ModelForm
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils.text import format_lazy
 from unfold.admin import TabularInline
 from unfold.forms import AdminPasswordChangeForm, UserChangeForm, UserCreationForm
 from unfold.widgets import UnfoldAdminTextareaWidget
@@ -13,6 +14,8 @@ from unfold.widgets import UnfoldAdminTextareaWidget
 from apps.core.admin_utils import SEO_FIELDSET, SiteModelAdmin, copy_url_button, seo_help
 from apps.core.maps import MapEmbedURLField
 from apps.core.models import FounderFact, InfoPage, ParkFormat, Phone, SiteSettings
+from apps.texts.hints import texts_hint
+from apps.texts.registry import Page
 
 MESSENGER_FLAGS = (("is_whatsapp", "WhatsApp"), ("is_telegram", "Telegram"))
 
@@ -89,13 +92,27 @@ class SiteSettingsAdmin(SiteModelAdmin):
     formfield_overrides = {MapEmbedURLField: {"widget": UnfoldAdminTextareaWidget(attrs={"rows": 3})}}
     fieldsets = (
         ("Контакты", {"classes": ["tab"], "fields": ["address", "map_embed_url", "vk_url", "max_url", "reviews_url"]}),
-        ("Главная", {"classes": ["tab"], "fields": ["home_intro", "home_show_events"]}),
-        ("Тексты", {"classes": ["tab"], "fields": ["events_intro", "contacts_text"]}),
+        (
+            "Главная",
+            {"classes": ["tab"], "description": texts_hint(Page.HOME), "fields": ["home_intro", "home_show_events"]},
+        ),
+        (
+            "Мероприятия и контакты",
+            {
+                "classes": ["tab"],
+                "description": texts_hint(Page.EVENTS, Page.CONTACTS),
+                "fields": ["events_intro", "contacts_text"],
+            },
+        ),
         (
             "О нас",
             {
                 "classes": ["tab"],
-                "description": "Форматы и цифры основателя — на вкладках «Форматы (О нас)» и «Основатель в цифрах (О нас)».",
+                "description": format_lazy(
+                    "{} {}",
+                    "Форматы и цифры основателя — на вкладках «Форматы (О нас)» и «Основатель в цифрах (О нас)».",
+                    texts_hint(Page.ABOUT),
+                ),
                 "fields": [
                     "about_motto",
                     "about_photo",

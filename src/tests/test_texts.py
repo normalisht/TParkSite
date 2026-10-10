@@ -210,3 +210,12 @@ def test_pages_render_defaults_when_table_is_empty(client):
     SiteText.objects.all().delete()
     assert "Кажется, вы сошли с тропы" in client.get("/no-such-page/").content.decode()
     assert "Скоро анонсируем новые мероприятия" in client.get("/events/").content.decode()
+
+
+def test_settings_tabs_link_to_texts(admin_client):
+    html = admin_client.get(reverse("admin:core_sitesettings_change", args=[1])).content.decode()
+    texts_url = reverse("admin:texts_sitetext_changelist")
+    for page in ("home", "events", "contacts", "about"):
+        assert f"{texts_url}?page__exact={page}" in html, page
+    assert "Мероприятия и контакты" in html
+    assert "Форматы и цифры основателя" in html
