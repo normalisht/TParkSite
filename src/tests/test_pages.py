@@ -75,9 +75,9 @@ def test_category_page_prices_anchor(client, category):
     service = Service.objects.create(name="Однодневный сплав", price="2000", has_page=True)
     CategoryService.objects.create(category=category, service=service)
     html = client.get(category.get_absolute_url()).content.decode()
-    # Секция цен — цель якоря (с отступом под липкую шапку), в шапке на телефоне — кнопка «К ценам».
+    # Секция цен — цель якоря (с отступом под липкую шапку); кнопки «К ценам» в шапке нет.
     assert re.search(r'<section id="prices" class="[^"]*scroll-mt-20', html)
-    assert re.search(r'<a href="#prices" class="[^"]*lg:hidden[^"]*">К ценам</a>', html)
+    assert "К ценам" not in html
 
 
 def test_category_page_without_services_has_no_prices_anchor(client, category):

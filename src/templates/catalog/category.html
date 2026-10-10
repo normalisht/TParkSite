@@ -10,7 +10,6 @@
       {% include "partials/breadcrumbs.html" %}
       <h1 class="page-title">{{ category.name }}</h1>
       {% if category.description %}<div class="rich-text mt-5 max-w-3xl">{{ category.description|safe }}</div>{% endif %}
-      {% if services %}<a href="#prices" class="btn btn-ghost mt-6 lg:hidden">К ценам</a>{% endif %}
     </div>
     {% if hero %}
     <a href="{{ hero_full }}" class="glightbox block cursor-zoom-in" data-gallery="category"><img src="{{ hero }}" alt="{{ category.name }}" class="aspect-[16/9] w-full lg:aspect-[3/2] rounded-2xl object-cover shadow-lg" fetchpriority="high"></a>
