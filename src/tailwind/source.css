@@ -58,6 +58,8 @@
 /* Tailwind 4 сбрасывает курсор у кнопок на стрелку — возвращаем «руку», чтобы было видно, что это кнопка. */
 @layer base {
   button:not(:disabled), [role="button"]:not([aria-disabled="true"]) { cursor: pointer; }
+  /* Заметный фокус с клавиатуры в цвет бренда; у .card-link своё кольцо (утилиты перебивают base). */
+  :focus-visible { outline: 3px solid var(--color-brand-500); outline-offset: 2px; }
 }
 
 /* Место под полосу прокрутки всегда зарезервировано — короткие и длинные страницы не сдвигаются по горизонтали */
@@ -85,6 +87,21 @@ html.menu-open .contact-fab { display: none; }
   .glightbox-clean .gnext { right: 8px; }
   .glightbox-clean .gprev svg,
   .glightbox-clean .gnext svg { width: 20px; }
+}
+
+/* Слайдер фото: точки в цвет бренда, стрелки на тёмной подложке — видны и на светлых фото. Без слоя: иначе vendored-CSS перебьёт. */
+.js-slider {
+  --swiper-theme-color: var(--color-brand-500);
+  --swiper-pagination-bullet-inactive-color: #fff;
+  --swiper-pagination-bullet-inactive-opacity: 0.7;
+  --swiper-navigation-size: 40px;
+  --swiper-navigation-color: #fff;
+}
+.js-slider .swiper-button-prev,
+.js-slider .swiper-button-next {
+  padding: 11px;
+  border-radius: 9999px;
+  background-color: rgb(0 0 0 / 0.4);
 }
 
 /* В слое components, иначе стили без слоя перебивают утилиты Tailwind (md:hidden и т. п.) */
