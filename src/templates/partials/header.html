@@ -1,6 +1,6 @@
 {% load static %}
 <header x-data="{ open: false }"
-        x-effect="document.documentElement.classList.toggle('overflow-hidden', open)"
+        x-effect="document.documentElement.classList.toggle('overflow-hidden', open); document.documentElement.classList.toggle('menu-open', open)"
         @keydown.escape.window="open = false"
         @resize.window="if (window.innerWidth >= 768) open = false"
         class="sticky top-0 z-40 overflow-x-clip border-b border-ink/5 bg-white/90 backdrop-blur">
@@ -14,7 +14,12 @@
       {% include "partials/nav_links.html" with link_class="hover:text-brand-600" %}
     </nav>
 
-    <p class="hidden shrink-0 whitespace-nowrap text-sm font-semibold text-navy lg:block">Тренинг-парк Дмитрия Сергеева</p>
+    {% if phones %}
+    <div class="hidden shrink-0 items-center gap-3 lg:flex">
+      <a href="{{ phones.0.tel_url }}" class="inline-flex items-center gap-2 whitespace-nowrap text-sm font-semibold tabular-nums hover:text-brand-700"><span class="icon h-4 w-4 text-navy">{% include "icons/phone.svg" %}</span>{{ phones.0.display }}</a>
+      {% if whatsapp_phone %}<a href="{{ whatsapp_phone.whatsapp_url }}" class="btn btn-primary py-2" target="_blank" rel="noopener">Написать</a>{% endif %}
+    </div>
+    {% endif %}
 
     <button type="button" class="icon h-8 w-8 md:hidden" @click="open = !open" :aria-expanded="open" :aria-label="open ? 'Закрыть меню' : 'Меню'">
       {# Три полоски плавно складываются в крестик — стили .burger в tailwind/source.css #}

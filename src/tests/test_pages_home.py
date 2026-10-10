@@ -167,3 +167,28 @@ def test_header_logo_is_lightweight(client):
     assert re.search(r'<img src="/static/img/logo-header\.png" alt="Т-Парк" width="122" height="40"', html)
     logo = Path(settings.BASE_DIR) / "static/img/logo-header.png"
     assert logo.stat().st_size < 8 * 1024
+
+
+def _header(html: str) -> str:
+    return html.split("<header", 1)[1].split("</header>", 1)[0]
+
+
+def test_header_shows_phone_on_desktop(client):
+    site = SiteSettings.load()
+    Phone.objects.create(settings=site, number="9029856594", is_whatsapp=True)
+    header = _header(client.get("/").content.decode())
+    assert 'href="tel:+79029856594"' in header
+    assert "+7 (902) 985-65-94" in header
+    assert "https://wa.me/79029856594" in header
+    assert "Тренинг-парк Дмитрия Сергеева" not in header
+
+
+def test_contact_button_yields_to_menu_and_footer(client):
+    Phone.objects.create(settings=SiteSettings.load(), number="9029856594")
+    html = client.get("/").content.decode()
+    fab = re.search(r'<div [^>]*class="(contact-fab [^"]*)"', html).group(1)
+    assert "lg:hidden" in fab and "md:hidden" not in fab
+    # Меню помечает <html> классом menu-open — по нему кнопка прячется (tailwind/source.css).
+    assert "toggle('menu-open', open)" in html
+    # Подвал не прячется под кнопкой: снизу место под неё, на ПК — обычный отступ.
+    assert "pb-20 lg:pb-5" in html.split("<footer", 1)[1]

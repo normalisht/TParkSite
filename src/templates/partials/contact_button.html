@@ -1,6 +1,6 @@
 {% if phones %}
 {# items-end: кнопка прижата к правому краю и не сдвигается, когда раскрывается более широкий список ссылок. #}
-<div x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false" class="fixed bottom-4 right-4 z-50 flex flex-col items-end md:hidden">
+<div x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false" class="contact-fab fixed bottom-4 right-4 z-50 flex flex-col items-end lg:hidden">
   <div id="contact-menu" x-show="open" x-cloak
        x-transition:enter="transition duration-150 ease-out" x-transition:enter-start="translate-y-2 opacity-0" x-transition:enter-end="translate-y-0 opacity-100"
        x-transition:leave="transition duration-100 ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
