@@ -3,6 +3,8 @@ from django.core.management import CommandError, call_command
 
 from apps.catalog.models import Category
 from apps.core.models import InfoPage, Phone, SiteSettings
+from apps.texts.models import SiteText
+from apps.texts.registry import TEXTS
 
 pytestmark = pytest.mark.django_db(transaction=True)
 
@@ -125,3 +127,10 @@ def test_founder_text_without_repeated_heading(legacy):
     legacy.run()
     founder_text = SiteSettings.load().founder_text
     assert founder_text.startswith("<ul>") and "Дмитрий Сергеев" not in founder_text
+
+
+def test_import_creates_missing_site_texts(legacy):
+    SiteText.objects.all().delete()
+    legacy.run()
+    assert SiteText.objects.count() == len(TEXTS)
+    assert SiteText.history.filter(history_type="+").count() == len(TEXTS)
