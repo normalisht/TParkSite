@@ -82,7 +82,6 @@ def content():
     return {"category": category, "service": service, "event": events[0]}
 
 
-@pytest.mark.xfail(strict=True, reason="Переполнение на телефоне — исправляется в задачах 1.2–1.3")
 @pytest.mark.parametrize("width", WIDTHS)
 def test_no_horizontal_overflow(live_server, browser, content, width):
     pages = [

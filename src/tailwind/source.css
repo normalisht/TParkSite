@@ -63,6 +63,9 @@
 /* Место под полосу прокрутки всегда зарезервировано — короткие и длинные страницы не сдвигаются по горизонтали */
 html { scrollbar-gutter: stable; }
 
+/* Подстраховка от горизонтальной прокрутки на телефоне. clip, а не hidden: не создаёт контейнер прокрутки и не ломает sticky. */
+body { overflow-x: clip; }
+
 /* GLightbox на телефоне прячет стрелки (только свайп) — возвращаем их по бокам. Без слоя: иначе vendored-CSS перебьёт. */
 @media (max-width: 768px) {
   .glightbox-clean .gprev,
@@ -119,7 +122,8 @@ html { scrollbar-gutter: stable; }
     mask-image: linear-gradient(to bottom, #000 65%, transparent);
   }
 
-  .rich-text { @apply leading-relaxed text-ink/85; }
+  /* anywhere: длинный URL в тексте переносится, а не распирает карточку или колонку сетки. */
+  .rich-text { @apply leading-relaxed text-ink/85; overflow-wrap: anywhere; }
   .rich-text > * + * { @apply mt-3; }
   .rich-text h2 { @apply mt-6 text-xl font-bold text-ink; }
   .rich-text h3 { @apply mt-4 text-lg font-semibold text-ink; }

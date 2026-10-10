@@ -42,8 +42,8 @@
 
 {% if events %}
 <section class="mx-auto max-w-6xl px-4 pt-10 md:pt-16">
-  <div class="mb-4 flex items-end justify-between gap-4 md:mb-6">
-    <h2 class="text-2xl font-bold md:text-3xl">Ближайшие мероприятия</h2>
+  <div class="mb-4 flex flex-wrap items-end justify-between gap-x-4 gap-y-2 md:mb-6">
+    <h2 class="min-w-0 text-2xl font-bold md:text-3xl">Ближайшие мероприятия</h2>
     <a href="{% url 'content:events' %}" class="inline-flex shrink-0 items-center gap-1 font-semibold text-brand-700 hover:text-brand-600">Все мероприятия<span class="icon h-4 w-4">{% include "icons/chevron-right.svg" %}</span></a>
   </div>
   <div class="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 lg:grid-cols-3">
@@ -54,9 +54,9 @@
 
 {% if reviews %}
 <section class="mx-auto max-w-6xl px-4 pt-10 md:pt-16">
-  <div class="mb-4 flex items-end justify-between gap-4 md:mb-6">
-    <h2 class="text-2xl font-bold md:text-3xl">Отзывы гостей</h2>
-    <div class="flex shrink-0 flex-wrap justify-end gap-x-5 gap-y-1">
+  <div class="mb-4 flex flex-wrap items-end justify-between gap-x-4 gap-y-2 md:mb-6">
+    <h2 class="min-w-0 text-2xl font-bold md:text-3xl">Отзывы гостей</h2>
+    <div class="flex flex-wrap justify-end gap-x-5 gap-y-1">
       {% if site.reviews_url %}<a href="{{ site.reviews_url }}" class="hidden items-center gap-1 font-semibold text-brand-700 hover:text-brand-600 sm:inline-flex" target="_blank" rel="noopener">Оставить отзыв<span class="icon h-4 w-4">{% include "icons/external-link.svg" %}</span></a>{% endif %}
       <a href="{% url 'content:reviews' %}" class="inline-flex items-center gap-1 font-semibold text-brand-700 hover:text-brand-600">Все отзывы<span class="icon h-4 w-4">{% include "icons/chevron-right.svg" %}</span></a>
     </div>

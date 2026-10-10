@@ -55,14 +55,14 @@
     <div class="rounded-2xl bg-pine-50 p-6">
       {% if site.address %}
       <p class="field-label">Адрес</p>
-      <div class="mt-1 flex items-start gap-3">
+      <div class="mt-1 flex flex-col items-start gap-3 sm:flex-row">
         <p class="flex min-w-0 flex-1 gap-2 text-lg font-semibold"><span class="icon mt-1 h-5 w-5 text-pine-700">{% include "icons/map-pin.svg" %}</span>{{ site.address }}</p>
         {% include "partials/copy_button.html" with value=site.address %}
       </div>
       {% endif %}
       {% if route %}
       <p class="field-label mt-5">Координаты для навигатора</p>
-      <div class="mt-1 flex items-center gap-3">
+      <div class="mt-1 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
         <p class="min-w-0 flex-1 font-mono text-lg">{{ route.coordinates }}</p>
         {% include "partials/copy_button.html" with value=route.coordinates %}
       </div>
