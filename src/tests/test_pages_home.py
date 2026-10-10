@@ -251,6 +251,8 @@ def test_cookie_notice_with_metrika_links_to_privacy(client):
     assert "x-cloak" in html.split('aria-label="Уведомление о cookie"', 1)[0].rsplit("<section", 1)[1]
     assert "cookie-ok" in html and "try" in html
     assert html.index("Уведомление о cookie") < html.index('class="contact-fab')
+    # Класс нужен правилу в tailwind/source.css: баннер прячется, пока открыто мобильное меню.
+    assert 'class="cookie-notice fixed ' in html
 
 
 def test_cookie_notice_without_privacy_page_has_no_link(client):
@@ -271,3 +273,9 @@ def test_no_cookie_notice_without_metrika(client):
 def test_contact_button_hidden_while_cookie_notice_open():
     css = (Path(settings.BASE_DIR) / "tailwind/source.css").read_text()
     assert "html.cookie-open .contact-fab { display: none; }" in css
+
+
+def test_cookie_notice_hidden_while_menu_open():
+    """Баннер не закрывает нижние пункты открытого мобильного меню."""
+    css = (Path(settings.BASE_DIR) / "tailwind/source.css").read_text()
+    assert "html.menu-open .cookie-notice { display: none; }" in css

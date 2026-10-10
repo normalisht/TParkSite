@@ -73,6 +73,8 @@ body { overflow-x: clip; }
 /* Открыто мобильное меню (класс на <html> ставит partials/header.html) — плавающая «Связаться» не закрывает его пункты.
    Без слоя: утилита flex из слоя utilities иначе победит. */
 html.menu-open .contact-fab { display: none; }
+/* Баннер cookie (z-[55]) иначе закрывает нижние пункты открытого меню; без слоя — утилита fixed/z не должна его вернуть. */
+html.menu-open .cookie-notice { display: none; }
 
 /* Открыто уведомление о cookie (класс на <html> ставит partials/cookie_notice.html) — оно занимает низ экрана на всю ширину,
    плавающая «Связаться» его не перекрывает. Без слоя — по той же причине, что и menu-open. */
