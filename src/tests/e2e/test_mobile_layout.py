@@ -4,7 +4,6 @@
 В обычном `pytest` не участвует (маркер e2e исключён в addopts).
 """
 
-import os
 from datetime import timedelta
 from pathlib import Path
 
@@ -17,9 +16,6 @@ pytest.importorskip("playwright")
 from apps.catalog.models import Category, CategoryGroup, CategoryService, Service
 from apps.content.models import Event, Review
 from apps.core.models import Phone, SiteSettings
-
-# Playwright держит в потоке теста event loop — без этого ORM в фикстурах падает с SynchronousOnlyOperation.
-os.environ.setdefault("DJANGO_ALLOW_ASYNC_UNSAFE", "true")
 
 pytestmark = [pytest.mark.e2e, pytest.mark.django_db(transaction=True)]
 
@@ -44,6 +40,17 @@ FIND_OVERFLOW = """
   return found;
 }
 """
+
+
+@pytest.fixture(scope="session", autouse=True)
+def allow_orm_next_to_playwright():
+    """Playwright держит в потоке теста event loop — без этого ORM (в т. ч. в сессионных фикстурах БД) падает
+    с SynchronousOnlyOperation. Фикстура создаётся, только когда e2e-тесты выбраны, и снимает переменную после них:
+    на уровне модуля она отключила бы проверку для всего прогона pytest.
+    """
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setenv("DJANGO_ALLOW_ASYNC_UNSAFE", "true")
+        yield
 
 
 @pytest.fixture(autouse=True)

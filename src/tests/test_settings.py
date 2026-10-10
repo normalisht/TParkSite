@@ -43,3 +43,8 @@ def test_production_security_flags():
 def test_sqlite_options():
     result = _settings_probe({"DEBUG": "1"}, "s.DATABASES['default']['OPTIONS']['transaction_mode']")
     assert result.stdout.strip() == "IMMEDIATE"
+
+
+def test_async_safety_not_disabled_for_regular_tests():
+    """e2e-модуль (Playwright) отключает проверку async-safety Django только на время своих тестов, а не всей сессии."""
+    assert "DJANGO_ALLOW_ASYNC_UNSAFE" not in os.environ
