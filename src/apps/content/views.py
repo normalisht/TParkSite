@@ -12,6 +12,7 @@ from apps.core.seo import absolute_url, make_seo, page_seo
 
 PAST_EVENTS_SHOWN = 6
 RELATED_EVENTS = 3
+GALLERY_PAGE = 24
 
 
 def events(request):
@@ -95,7 +96,14 @@ def reviews(request):
 
 
 def gallery(request):
-    return render(request, "content/gallery.html", {"photos": GalleryPhoto.objects.all(), "seo": page_seo("gallery")})
+    photos = list(GalleryPhoto.objects.all())
+    context = {
+        "photos": photos,
+        "page_size": GALLERY_PAGE,
+        "first_batch": min(GALLERY_PAGE, len(photos) - GALLERY_PAGE),  # размер следующей порции на кнопке
+        "seo": page_seo("gallery"),
+    }
+    return render(request, "content/gallery.html", context)
 
 
 def contacts(request):

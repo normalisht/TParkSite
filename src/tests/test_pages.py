@@ -260,6 +260,32 @@ def test_gallery_page(client, make_image):
     assert "glightbox" in html and "Закат" in html
 
 
+def _make_gallery(make_image, count):
+    first = GalleryPhoto.objects.create(image=make_image())
+    GalleryPhoto.objects.bulk_create([GalleryPhoto(image=first.image.name) for _ in range(count - 1)])
+
+
+def _gallery_anchors(html):
+    return re.findall(r'<a href="[^"]*" class="glightbox[^>]*>', html)
+
+
+def test_gallery_shows_first_page_and_load_more_button(client, make_image):
+    _make_gallery(make_image, 30)
+    html = client.get("/gallery/").content.decode()
+    anchors = _gallery_anchors(html)
+    assert len(anchors) == 30  # просмотр листает всю галерею
+    assert [" hidden" in a for a in anchors] == [False] * 24 + [True] * 6
+    assert re.search(r"Показать ещё <span[^>]*>6</span>", html) and 'x-data="{ shown: 24 }"' in html
+
+
+def test_gallery_without_load_more_when_one_page(client, make_image):
+    _make_gallery(make_image, 20)
+    html = client.get("/gallery/").content.decode()
+    anchors = _gallery_anchors(html)
+    assert len(anchors) == 20 and not any(" hidden" in a for a in anchors)
+    assert "Показать ещё" not in html
+
+
 def test_info_page(client):
     page = InfoPage.objects.create(title="Правила", body="<p>Текст правил</p>")
     assert "Текст правил" in client.get(page.get_absolute_url()).content.decode()

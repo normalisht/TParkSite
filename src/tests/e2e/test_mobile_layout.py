@@ -14,7 +14,7 @@ from django.utils import timezone
 pytest.importorskip("playwright")
 
 from apps.catalog.models import Category, CategoryGroup, CategoryService, Service
-from apps.content.models import Event, Review
+from apps.content.models import Event, GalleryPhoto, Review
 from apps.core.models import Phone, SiteSettings
 
 pytestmark = [pytest.mark.e2e, pytest.mark.django_db(transaction=True)]
@@ -132,3 +132,25 @@ def test_no_horizontal_overflow(live_server, browser, content, width):
     context.close()
     report = "\n".join(f"{url}: {item}" for url, items in problems.items() for item in items)
     assert not problems, f"За правым краем экрана {width} px:\n{report}"
+
+
+def test_gallery_load_more(live_server, browser, make_image):
+    """Кнопка «Показать ещё» открывает следующую порцию, переводит фокус на её первое фото и пропадает в конце."""
+    first = GalleryPhoto.objects.create(image=make_image())
+    GalleryPhoto.objects.bulk_create([GalleryPhoto(image=first.image.name) for _ in range(29)])
+    context = browser.new_context(viewport={"width": 375, "height": 800}, device_scale_factor=3, is_mobile=True)
+    page = context.new_page()
+    page.goto(live_server.url + "/gallery/")
+    page.wait_for_load_state("networkidle")
+    links = page.locator("a.glightbox")
+
+    def visible():
+        return sum(links.nth(i).is_visible() for i in range(links.count()))
+
+    assert links.count() == 30 and visible() == 24
+    button = page.get_by_role("button", name="Показать ещё")
+    assert button.inner_text().split() == ["Показать", "ещё", "6"]
+    button.click()
+    assert visible() == 30 and not button.is_visible()
+    assert page.evaluate("document.activeElement === document.querySelectorAll('a.glightbox')[24]")
+    context.close()
