@@ -93,7 +93,7 @@ def test_category_related_is_strip_on_phone(client, category):
     html = client.get(category.get_absolute_url()).content.decode()
     related = html.split("Другие категории</h2>")[1].split("</section>")[0]
     # На телефоне — горизонтальная лента, с sm — сетка; карточка в обёртке заданной ширины.
-    assert "overflow-x-auto" in related and "snap-x" in related and "sm:grid-cols-2" in related
+    assert "scroll-strip" in related and "sm:grid-cols-2" in related
     assert re.search(
         r'<div class="w-\[44%\] [^"]*sm:w-auto">\s*<a href="' + re.escape(neighbour.get_absolute_url()), related
     )
@@ -218,7 +218,7 @@ def test_about_founder_text_in_details(client):
     assert re.search(r"<summary\b[^>]*>.*?Полная биография.*?</summary>", details.group(0), re.DOTALL)
     # Раскрытие анимирует site.js (data-smooth): высота обёртки текста, без JS — обычный <details>.
     assert re.match(r"<details[^>]*\bdata-smooth\b", details.group(0))
-    assert re.search(r'<div class="overflow-hidden" data-details-body>', details.group(0))
+    assert "<div data-details-body>" in details.group(0)
 
 
 def test_about_without_founder_text_has_no_details(client):

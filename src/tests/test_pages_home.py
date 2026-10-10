@@ -270,7 +270,7 @@ def test_home_categories_grid_on_phone(client):
     html = client.get("/").content.decode()
     section = html.split("Групповые приключения</h2>", 1)[1].split("</section>", 1)[0]
     assert "grid grid-cols-2" in section
-    assert "overflow-x-auto" not in section
+    assert "scroll-strip" not in section and "overflow-x-auto" not in section
 
 
 def test_category_card_shade_covers_card_on_phone(client):
