@@ -71,6 +71,39 @@ def test_category_page_cta_and_related(client, category, make_image):
     assert "Ещё услуги" not in html
 
 
+def test_category_page_prices_anchor(client, category):
+    service = Service.objects.create(name="Однодневный сплав", price="2000", has_page=True)
+    CategoryService.objects.create(category=category, service=service)
+    html = client.get(category.get_absolute_url()).content.decode()
+    # Секция цен — цель якоря (с отступом под липкую шапку), в шапке на телефоне — кнопка «К ценам».
+    assert re.search(r'<section id="prices" class="[^"]*scroll-mt-20', html)
+    assert re.search(r'<a href="#prices" class="[^"]*lg:hidden[^"]*">К ценам</a>', html)
+
+
+def test_category_page_without_services_has_no_prices_anchor(client, category):
+    html = client.get(category.get_absolute_url()).content.decode()
+    assert 'id="prices"' not in html
+    assert 'href="#prices"' not in html
+
+
+def test_category_related_is_strip_on_phone(client, category):
+    group = CategoryGroup.objects.create(name="Активный отдых")
+    neighbour = Category.objects.create(name="Походы", is_published=True)
+    group.categories.add(category, neighbour)
+    html = client.get(category.get_absolute_url()).content.decode()
+    related = html.split("Другие категории</h2>")[1].split("</section>")[0]
+    # На телефоне — горизонтальная лента, с sm — сетка; карточка в обёртке заданной ширины.
+    assert "overflow-x-auto" in related and "snap-x" in related and "sm:grid-cols-2" in related
+    assert re.search(
+        r'<div class="w-\[44%\] [^"]*sm:w-auto">\s*<a href="' + re.escape(neighbour.get_absolute_url()), related
+    )
+
+
+def test_category_hero_photo_is_wide_on_phone(client, category):
+    html = client.get(category.get_absolute_url()).content.decode()
+    assert "aspect-[16/9]" in html and "lg:aspect-[3/2]" in html
+
+
 def test_category_hero_opens_full_photo(client, make_image):
     category = Category.objects.create(name="Сплавы", is_published=True)
     photo = CategoryPhoto.objects.create(category=category, image=make_image(), order=0)
