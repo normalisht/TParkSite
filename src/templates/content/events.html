@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static site_tags %}
+{% load static site_tags site_texts %}
 {% block content %}
 <section class="page-hero">
   {% include "partials/hero_decor.html" %}
@@ -36,8 +36,9 @@
     {% endwith %}
     {% else %}
     <div class="card mt-8 p-6 md:mt-10 md:p-8">
-      <p class="text-xl font-bold">Скоро анонсируем новые мероприятия</p>
-      <p class="mt-2 text-ink/75">{% if site.vk_url %}Анонсы первыми появляются в нашей группе ВКонтакте. {% endif %}А программу для своей компании можно заказать в любое время.</p>
+      <p class="text-xl font-bold">{% text "events.empty_title" %}</p>
+      {% text "events.empty_vk_text" as empty_vk %}{% text "events.empty_text" as empty_text %}
+      {% if site.vk_url and empty_vk or empty_text %}<p class="mt-2 text-ink/75">{% if site.vk_url and empty_vk %}{{ empty_vk|nobr }} {% endif %}{{ empty_text|nobr }}</p>{% endif %}
       <div class="mt-5 flex flex-wrap gap-3">
         {% if site.vk_url %}<a href="{{ site.vk_url }}" class="btn btn-ghost" target="_blank" rel="noopener"><span class="icon icon-fill h-5 w-5 text-[#0077FF]">{% include "icons/vk.svg" %}</span>Группа ВКонтакте</a>{% endif %}
         {% include "partials/contact_links.html" %}
@@ -49,7 +50,7 @@
 
 {% if upcoming %}
 <section class="mx-auto max-w-6xl px-4 pt-10 md:pt-16">
-  <h2 class="mb-4 text-2xl font-bold md:mb-6 md:text-3xl">Предстоящие</h2>
+  <h2 class="mb-4 text-2xl font-bold md:mb-6 md:text-3xl">{% text "events.upcoming_title" %}</h2>
   {# На телефоне — лента со свайпом (следующая карточка выглядывает с края), с sm — сетка. #}
   <div class="scroll-strip sm:grid sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
     {% for event in upcoming %}<article class="{% if upcoming|length > 1 %}w-[82%] shrink-0 snap-start scroll-ml-4 sm:w-auto{% else %}w-full{% endif %}">{% include "content/partials/event_card.html" %}</article>{% endfor %}
@@ -59,7 +60,7 @@
 
 {% if past %}
 <section class="mx-auto max-w-6xl px-4 pt-10 md:pt-16" x-data="{ all: false }">
-  <h2 class="mb-4 text-2xl font-bold md:mb-6 md:text-3xl">Прошедшие</h2>
+  <h2 class="mb-4 text-2xl font-bold md:mb-6 md:text-3xl">{% text "events.past_title" %}</h2>
   {# На телефоне лента листается целиком; в сетке (с sm) сверх {{ past_shown }} — по кнопке. #}
   <div class="scroll-strip sm:grid sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
     {% for event in past %}
@@ -73,6 +74,6 @@
 {% endif %}
 
 <div class="pt-10 md:pt-16">
-  {% include "partials/cta_card.html" with title="Своё событие в Т-Парке" text="Корпоратив, день рождения, выпускной или выезд класса — придумаем программу и всё организуем." %}
+  {% text "events.cta_title" as cta_title %}{% text "events.cta_text" as cta_text %}{% include "partials/cta_card.html" with title=cta_title text=cta_text %}
 </div>
 {% endblock %}

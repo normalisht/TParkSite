@@ -6,6 +6,7 @@ dependencies = [
     "django>=6.1.2,<6.2",
     "django-imagekit>=6.1.1",
     "django-prose-editor>=0.27.3",
+    "django-simple-history>=3.13",
     "django-tailwind-cli>=4.8.1",
     "django-unfold>=0.108.0",
     "gunicorn>=26.2.0",
@@ -32,7 +33,12 @@ pythonpath = ["."]
 testpaths = ["tests"]
 addopts = "-q -m 'not e2e'"
 markers = ["e2e: браузерные тесты вёрстки (make e2e)"]
-filterwarnings = ["ignore:No directory at:UserWarning", "ignore:Overriding get_action_choices"]
+filterwarnings = [
+    "ignore:No directory at:UserWarning",
+    "ignore:Overriding get_action_choices",
+    # django-simple-history 3.13 вызывает select_related() без аргументов (устареет в Django 2028)
+    "ignore:Calling select_related\\(\\) with no arguments:PendingDeprecationWarning:simple_history",
+]
 
 [tool.ruff]
 target-version = "py314"

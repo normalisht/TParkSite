@@ -32,3 +32,12 @@ def test_scripts_use_renamed_service():
         text = path.read_text(encoding="utf-8")
         assert not re.search(r"compose (exec|run|cp)( -T| --rm)* web\b", text), path
         assert not re.search(r"(?<![\w-])web:/data", text), path
+
+
+def test_dev_compose_renews_venv_volume():
+    # В compose.dev.yaml .venv образа держится в анонимном томе, а compose при пересоздании контейнера
+    # оставляет старый том: без --renew-anon-volumes новые зависимости из пересобранного образа не видны.
+    for path in [ROOT / "Makefile", ROOT / "compose.dev.yaml", ROOT / "README.md", ROOT / "CLAUDE.md"]:
+        for line in path.read_text(encoding="utf-8").splitlines():
+            if re.search(r"(compose -f compose\.dev\.yaml|DEV_COMPOSE\)) up\b", line):
+                assert "--renew-anon-volumes" in line, f"{path.name}: {line.strip()}"

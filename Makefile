@@ -68,7 +68,7 @@ import-legacy: ## Импорт со старого сайта: make import-legac
 ## --- Локально в Docker ---
 
 dev: ## Поднять dev-контейнер (http://localhost:8000, hot reload)
-	$(DEV_COMPOSE) up --build
+	$(DEV_COMPOSE) up --build --renew-anon-volumes
 
 dev-down: ## Остановить dev-контейнер
 	$(DEV_COMPOSE) down

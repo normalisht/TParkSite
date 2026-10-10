@@ -49,6 +49,7 @@ CANONICAL_HOST = os.environ.get("CANONICAL_HOST", "").strip().lower()
 
 INSTALLED_APPS = [
     "unfold",
+    "unfold.contrib.simple_history",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -59,9 +60,11 @@ INSTALLED_APPS = [
     "django_prose_editor",
     "imagekit",
     "django_tailwind_cli",
+    "simple_history",
     "apps.core",
     "apps.catalog",
     "apps.content",
+    "apps.texts",
 ]
 
 MIDDLEWARE = [
@@ -72,6 +75,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "simple_history.middleware.HistoryRequestMiddleware",  # автор правки в истории текстов
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -91,6 +95,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "apps.core.context_processors.site",
                 "apps.catalog.context_processors.menu",
+                "apps.texts.context_processors.site_texts",
             ],
         },
     },
@@ -225,6 +230,7 @@ UNFOLD = {
                 "separator": True,
                 "items": [
                     _nav("Настройки сайта", "settings", "admin:core_sitesettings_changelist"),
+                    _nav("Тексты сайта", "text_fields", "admin:texts_sitetext_changelist"),
                     _nav("Инфо-страницы", "description", "admin:core_infopage_changelist"),
                 ],
             },

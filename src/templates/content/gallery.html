@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load site_tags %}
+{% load site_tags site_texts %}
 {% block vendor_css %}{% include "partials/vendor.html" with part="css" glightbox=1 %}{% endblock %}
 {% block vendor_js %}{% include "partials/vendor.html" with part="js" glightbox=1 %}{% endblock %}
 {% block content %}
@@ -7,7 +7,7 @@
   {% include "partials/hero_decor.html" %}
   <div class="mx-auto max-w-6xl px-4 py-10 md:py-14">
     <h1 class="page-title">Галерея</h1>
-    <p class="page-lead">Фото из жизни парка{% if photos %} · <span class="font-semibold text-brand-700">{{ photos|length|ru_plural:"фотография,фотографии,фотографий" }}</span>{% endif %}</p>
+    <p class="page-lead">{% text "gallery.lead" %}{% if photos %} · <span class="font-semibold text-brand-700">{{ photos|length|ru_plural:"фотография,фотографии,фотографий" }}</span>{% endif %}</p>
   </div>
 </section>
 
@@ -39,7 +39,7 @@
   {% endif %}
   </div>
   {% else %}
-  <p class="text-ink/65">Фото скоро появятся.</p>
+  <p class="text-ink/65">{% text "gallery.empty" %}</p>
   {% endif %}
 </div>
 {% endblock %}

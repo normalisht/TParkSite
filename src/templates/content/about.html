@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load site_tags %}
+{% load site_tags site_texts %}
 {% block content %}
 {% with hero=site|spec_url:"about_card" founder_photo=site|spec_url:"founder_card" %}
 
@@ -18,7 +18,7 @@
 <section class="mx-auto max-w-6xl px-4 py-10 md:py-16">
   {% if site.about_text %}<div class="rich-text max-w-3xl text-lg">{{ site.about_text|safe }}</div>{% endif %}
   {% if formats %}
-  <h2 class="mb-6 mt-12 text-2xl font-bold md:text-3xl">Приключение и тренинг в одном событии</h2>
+  <h2 class="mb-6 mt-12 text-2xl font-bold md:text-3xl">{% text "about.formats_title" %}</h2>
   <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
     {% for format in formats %}
     {% with link=format.url %}
@@ -40,7 +40,7 @@
   <div class="mx-auto grid max-w-6xl gap-8 px-4 py-10 md:py-16 {% if founder_photo %}lg:grid-cols-[minmax(0,20rem)_1fr] lg:gap-12{% endif %}">
     {% if founder_photo %}<img src="{{ founder_photo }}" alt="{{ site.founder_name }}" width="600" height="750" loading="lazy" class="aspect-[4/5] w-full max-w-sm rounded-2xl object-cover shadow-lg">{% endif %}
     <div class="min-w-0">
-      <h2 class="eyebrow">Основатель</h2>
+      <h2 class="eyebrow">{% text "about.founder_eyebrow" %}</h2>
       {% if site.founder_name %}<p class="mt-3 text-3xl font-bold md:text-4xl">{{ site.founder_name }}</p>{% endif %}
       {% if site.founder_lead %}<p class="mt-2 text-lg text-ink/75">{{ site.founder_lead }}</p>{% endif %}
       {% if facts %}
@@ -67,13 +67,13 @@
 
 {% if site.nearby_text or site.address or safety_page %}
 <section class="mx-auto grid max-w-6xl gap-6 px-4 py-10 md:py-16 lg:grid-cols-3">
-  {% if site.nearby_text %}<div class="rounded-2xl bg-sand-100 p-6 lg:col-span-2"><h2 class="mb-3 text-2xl font-bold">Что рядом</h2><div class="rich-text">{{ site.nearby_text|safe }}</div></div>{% endif %}
+  {% if site.nearby_text %}<div class="rounded-2xl bg-sand-100 p-6 lg:col-span-2"><h2 class="mb-3 text-2xl font-bold">{% text "about.nearby_title" %}</h2><div class="rich-text">{{ site.nearby_text|safe }}</div></div>{% endif %}
   <div class="space-y-6">
     {% include "partials/find_us_card.html" with compact=True %}
     {% if safety_page %}
     <a href="{{ safety_page.get_absolute_url }}" class="block rounded-2xl bg-brand-50 p-6 ring-1 ring-brand-300 transition hover:-translate-y-1 hover:shadow-lg">
-      <p class="text-xl font-bold">Правила безопасности</p>
-      <p class="mt-1 text-sm text-ink/75">Что важно знать перед приездом в парк</p>
+      <p class="text-xl font-bold">{% text "about.safety_title" %}</p>
+      {% text "about.safety_text" as safety_text %}{% if safety_text %}<p class="mt-1 text-sm text-ink/75">{{ safety_text|nobr }}</p>{% endif %}
     </a>
     {% endif %}
   </div>
@@ -88,7 +88,7 @@
 
 {% if partners %}
 <section class="mx-auto max-w-6xl px-4 pb-10 md:pb-16">
-  <h2 class="mb-6 text-2xl font-bold md:text-3xl">Партнёры</h2>
+  <h2 class="mb-6 text-2xl font-bold md:text-3xl">{% text "about.partners_title" %}</h2>
   <div class="grid grid-cols-2 items-center gap-4 sm:grid-cols-3 md:gap-6 lg:grid-cols-4">
     {% for partner in partners %}
     {% with url=partner|spec_url:"logo_small" %}
@@ -102,7 +102,7 @@
 </section>
 {% endif %}
 
-{% include "partials/cta_card.html" with title="Приезжайте в Т-Парк" text="Расскажем о программах и подберём формат для вас, семьи или команды." %}
+{% text "about.cta_title" as cta_title %}{% text "about.cta_text" as cta_text %}{% include "partials/cta_card.html" with title=cta_title text=cta_text %}
 
 {% endwith %}
 {% endblock %}
