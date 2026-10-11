@@ -7,10 +7,10 @@
   <button type="button" x-show="long" @click="open = !open" class="-mb-2 cursor-pointer self-start py-2 text-sm font-semibold text-brand-700 underline-offset-2 hover:text-brand-600 hover:underline"
           x-text="open ? 'Свернуть' : 'Читать полностью'">Читать полностью</button>
   <footer class="mt-auto flex items-center gap-3 pt-5">
-    {% with url=review|spec_url:"avatar" %}
-    {% if url %}<img src="{{ url }}" alt="" width="160" height="160" loading="lazy" class="h-11 w-11 shrink-0 rounded-full object-cover">
+    {% picture review "avatar" alt="" width=160 height=160 loading="lazy" class="h-11 w-11 shrink-0 rounded-full object-cover" as avatar %}
+    {% if avatar %}{{ avatar }}
     {% else %}<span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-(--rv-avatar-bg) text-(--rv-avatar-fg)"><span class="icon h-5 w-5">{% include "icons/user.svg" %}</span></span>
-    {% endif %}{% endwith %}
+    {% endif %}
     <div class="min-w-0">
       <p class="font-semibold">Гость Т-Парка</p>{# имя автора на сайт не выводим #}
       {% if review.link or review.date %}

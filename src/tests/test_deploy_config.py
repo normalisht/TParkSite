@@ -41,3 +41,9 @@ def test_dev_compose_renews_venv_volume():
         for line in path.read_text(encoding="utf-8").splitlines():
             if re.search(r"(compose -f compose\.dev\.yaml|DEV_COMPOSE\)) up\b", line):
                 assert "--renew-anon-volumes" in line, f"{path.name}: {line.strip()}"
+
+
+def test_entrypoint_prunes_thumbnails_after_generating_in_background():
+    # Сначала досоздать миниатюры, потом удалить ненужные — в фоне, чтобы сайт стартовал сразу.
+    script = (ROOT / "docker/entrypoint.sh").read_text(encoding="utf-8")
+    assert re.search(r"\(.*generateimages && .*prune_image_cache\) &", script)

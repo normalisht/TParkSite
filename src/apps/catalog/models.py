@@ -1,7 +1,7 @@
 from django.db import models
 from django.urls import reverse
 
-from apps.core.fields import HtmlField, image_spec, photo_field
+from apps.core.fields import HtmlField, full_spec, image_spec, image_specs, og_spec, photo_field
 from apps.core.models import OrderedModel, PublishedQuerySet, SeoModel
 from apps.core.slugs import unique_slug
 
@@ -26,7 +26,11 @@ class Category(SeoModel, OrderedModel):
     slug = models.SlugField("Адрес страницы", max_length=255, unique=True, blank=True)
     description = HtmlField("Описание")
     preview = photo_field("Превью для главной", "catalog/previews", size=(1080, 720))
-    preview_card = image_spec("preview", 640, 427)
+    preview_card, preview_card_avif = image_specs("preview", 640, 427)
+    preview_large, preview_large_avif = image_specs(
+        "preview", 1080, 720
+    )  # шапка страницы категории: srcset с preview_card
+    og = og_spec("preview")
     is_published = models.BooleanField("Опубликовано", default=False)
 
     objects = PublishedQuerySet.as_manager()
@@ -69,9 +73,12 @@ class Category(SeoModel, OrderedModel):
 class CategoryPhoto(OrderedModel):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="photos")
     image = photo_field("Фото", "catalog/categories", blank=False)
-    slide = image_spec("image", 1600, 900, crop=False)
-    slide_small = image_spec("image", 800, 450, crop=False)  # слайдер на телефоне: srcset со slide
+    # Слайдер — рамка 16:9 с object-cover: режем так же на сервере, чтобы ширины в srcset были настоящими.
+    slide, slide_avif = image_specs("image", 1600, 900)
+    slide_small, slide_small_avif = image_specs("image", 800, 450)  # слайдер на телефоне: srcset со slide
     thumb = image_spec("image", 320, 240)
+    full = full_spec("image")
+    og = og_spec("image")
 
     class Meta(OrderedModel.Meta):
         verbose_name = "Фото категории"
@@ -142,11 +149,14 @@ class CategoryService(OrderedModel):
 class ServicePhoto(OrderedModel):
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name="photos")
     image = photo_field("Фото", "catalog/services", blank=False)
-    slide = image_spec("image", 1600, 900, crop=False)
-    slide_small = image_spec("image", 800, 450, crop=False)  # слайдер на телефоне: srcset со slide
+    # Слайдер — рамка 16:9 с object-cover: режем так же на сервере, чтобы ширины в srcset были настоящими.
+    slide, slide_avif = image_specs("image", 1600, 900)
+    slide_small, slide_small_avif = image_specs("image", 800, 450)  # слайдер на телефоне: srcset со slide
     thumb = image_spec("image", 320, 240)
-    card = image_spec("image", 640, 480)
-    row = image_spec("image", 336, 336)  # квадрат в строке услуги на телефоне (112 px × 3)
+    full = full_spec("image")
+    og = og_spec("image")
+    card, card_avif = image_specs("image", 640, 480)
+    row, row_avif = image_specs("image", 336, 336)  # квадрат в строке услуги на телефоне (112 px × 3)
 
     class Meta(OrderedModel.Meta):
         verbose_name = "Фото услуги"

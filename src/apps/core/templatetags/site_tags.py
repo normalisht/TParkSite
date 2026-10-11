@@ -6,7 +6,8 @@ from django import template
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 
-from apps.core.images import safe_spec_url
+from apps.core.images import lightbox_url as _lightbox_url
+from apps.core.images import picture_html, safe_spec_url
 from apps.core.seo import plaintext as _plaintext
 
 register = template.Library()
@@ -15,6 +16,17 @@ register = template.Library()
 @register.filter
 def spec_url(obj, spec_name: str) -> str:
     return safe_spec_url(obj, spec_name)
+
+
+@register.simple_tag
+def picture(obj, srcset: str, **kwargs) -> str:
+    """`{% picture photo "card_small 640w, card 800w" sizes="…" alt="" class="…" %}` — см. picture_html."""
+    return picture_html(obj, srcset, **kwargs)
+
+
+@register.filter
+def lightbox_url(photo) -> str:
+    return _lightbox_url(photo)
 
 
 @register.filter

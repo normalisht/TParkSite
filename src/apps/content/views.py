@@ -43,7 +43,7 @@ def event_detail(request, slug):
     seo = make_seo(
         event.title,
         event.description,
-        absolute_url(request, safe_spec_url(event, "card")),
+        absolute_url(request, safe_spec_url(event, "og")),
         obj=event,
         default_description=default_description,
     )
@@ -74,7 +74,7 @@ GALLERY_STRIP_SIZE = 6
 def about(request):
     site = SiteSettings.load()
     seo = page_seo("about")
-    seo["image"] = absolute_url(request, safe_spec_url(site, "about_card"))
+    seo["image"] = absolute_url(request, safe_spec_url(site, "about_og"))
     return render(
         request,
         "content/about.html",

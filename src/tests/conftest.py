@@ -12,6 +12,12 @@ def media_root(settings, tmp_path):
     return settings.MEDIA_ROOT
 
 
+@pytest.fixture(autouse=True)
+def no_background_thumbnails(monkeypatch):
+    """Миниатюры после сохранения создаются в фоновом потоке; в тестах — нет (по требованию тест подменяет сам)."""
+    monkeypatch.setattr("apps.core.images.run_in_background", lambda fn: None)
+
+
 @pytest.fixture
 def make_image():
     def _make(name: str = "photo.jpg", size=(64, 48), fmt: str = "JPEG") -> SimpleUploadedFile:

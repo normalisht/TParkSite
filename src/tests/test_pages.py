@@ -47,7 +47,7 @@ def test_category_page_lists_services(client, category):
     assert "Скрытая услуга" not in html
     assert "swiper-slide" in html
     # Полноэкранный просмотр открывает оригинал фото.
-    assert f'data-full="{category.photos.get().image.url}"' in html
+    assert f'data-full="{category.photos.get().full.url}"' in html
     # Услуга со страницей — карточкой, без страницы — в списке «Ещё услуги».
     cards, rows = html.split("Услуги и цены</h2>")[1].split("Ещё услуги")
     assert "Однодневный сплав" in cards and "Аренда байдарки" not in cards
@@ -110,14 +110,22 @@ def test_category_hero_opens_full_photo(client, make_image):
     second = CategoryPhoto.objects.create(category=category, image=make_image("second.jpg"), order=1)
     html = client.get(category.get_absolute_url()).content.decode()
     # Шапка — первое фото, остальные листаются следом; первое не дублируется.
-    assert html.count(f'href="{photo.image.url}" class="glightbox') == 1
-    assert f'<a href="{second.image.url}" class="glightbox" data-gallery="category" hidden>' in html
+    assert html.count(f'href="{photo.full.url}" class="glightbox') == 1
+    assert f'<a href="{second.full.url}" class="glightbox" data-gallery="category" hidden>' in html
 
     category.preview = make_image("preview.jpg")
     category.save()
     html = client.get(category.get_absolute_url()).content.decode()
     assert f'<a href="{category.preview.url}" class="glightbox block cursor-zoom-in" data-gallery="category">' in html
-    assert f'<a href="{photo.image.url}" class="glightbox" data-gallery="category" hidden>' in html
+    assert f'<a href="{photo.full.url}" class="glightbox" data-gallery="category" hidden>' in html
+
+
+def test_category_hero_srcset_up_to_1080(client, make_image):
+    category = Category.objects.create(name="Сплавы", is_published=True, preview=make_image(size=(1080, 720)))
+    html = client.get(category.get_absolute_url()).content.decode()
+    hero = html.split('data-gallery="category">')[1].split("</a>")[0]
+    assert re.search(r'srcset="[^"]+\.avif 640w, [^"]+\.avif 1080w" sizes="\(min-width: 1152px\) 536px', hero)
+    assert 'fetchpriority="high"' in hero and 'width="1080" height="720"' in hero
 
 
 def test_category_page_without_services(client):
@@ -314,6 +322,25 @@ def test_gallery_page(client, make_image):
     assert "glightbox" in html and "Закат" in html
 
 
+def test_gallery_thumbs_avif_srcset_and_light_lightbox(client, make_image):
+    photo = GalleryPhoto.objects.create(image=make_image(), caption='Закат "у реки"')
+    html = client.get("/gallery/").content.decode()
+    assert f'<a href="{photo.full.url}" class="glightbox' in html
+    assert re.search(
+        r'<source type="image/avif" srcset="[^"]+\.avif 400w, [^"]+\.avif 600w" sizes="\(min-width: 1152px\) 271px',
+        html,
+    )
+    assert 'alt="Закат &quot;у реки&quot;"' in html
+
+
+def test_category_page_survives_missing_photo_file(client, category, media_root):
+    photo = category.photos.get()
+    (media_root / photo.image.name).unlink()
+    response = client.get(category.get_absolute_url())
+    assert response.status_code == 200
+    assert 'src=""' not in response.content.decode()
+
+
 def _make_gallery(make_image, count):
     first = GalleryPhoto.objects.create(image=make_image())
     GalleryPhoto.objects.bulk_create([GalleryPhoto(image=first.image.name) for _ in range(count - 1)])
@@ -445,11 +472,11 @@ def test_service_card_picture_and_slider_srcset(client, make_image):
     html = client.get(category.get_absolute_url()).content.decode()
     card = html.split("Услуги и цены</h2>")[1]
     # Телефон — квадрат row (336×336), с sm — card 640×480.
-    assert '<picture><source media="(min-width: 640px)" srcset="' in card
+    assert '<picture><source media="(min-width: 640px)" type="image/avif" srcset="' in card
     slider = html.split("js-slider")[1]
-    assert re.search(
-        r'srcset="[^"]+ 800w, [^"]+ 1600w" sizes="\(min-width: 1152px\) 1120px, calc\(100vw - 32px\)"', slider
-    )
+    sizes = r'sizes="\(min-width: 1152px\) 1120px, calc\(100vw - 32px\)"'
+    assert re.search(r'<source type="image/avif" srcset="[^"]+\.avif 800w, [^"]+\.avif 1600w" ' + sizes, slider)
+    assert re.search(r'<img src="[^"]+\.webp" srcset="[^"]+\.webp 800w, [^"]+\.webp 1600w" ' + sizes, slider)
     html = client.get(service.get_absolute_url()).content.decode()
     assert 'sizes="(min-width: 1152px) 752px, (min-width: 1024px) calc(100vw - 400px), calc(100vw - 32px)"' in html
 

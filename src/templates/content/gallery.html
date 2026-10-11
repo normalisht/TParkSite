@@ -16,11 +16,12 @@
   {# Все ссылки остаются в HTML (просмотр листает всю галерею); после первой порции — hidden, браузер не грузит их lazy-превью. #}
   <div x-data="{ shown: {{ page_size }}, total: {{ photos|length }} }">
   <div class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
-    {% for photo in photos %}{% with url=photo|spec_url:"thumb" %}{% if url %}
-    <a href="{{ photo.image.url }}" class="glightbox group block aspect-square overflow-hidden rounded-xl bg-sand-200" data-gallery="gallery"{% if forloop.counter > page_size %} hidden :hidden="shown <= {{ forloop.counter0 }}"{% endif %} {% if photo.caption %}data-title="{{ photo.caption }}"{% endif %}>
-      <img src="{{ url }}" alt="{% if photo.caption %}{{ photo.caption }}{% else %}Т-Парк, Калужская область — фото {{ forloop.counter }}{% endif %}" width="600" height="600" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+    {% for photo in photos %}{% with n=forloop.counter|stringformat:"s" %}{% with fallback="Т-Парк, Калужская область — фото "|add:n %}
+    {% picture photo "thumb_small 400w, thumb 600w" sizes="(min-width: 1152px) 271px, (min-width: 1024px) calc((100vw - 68px) / 4), (min-width: 768px) calc((100vw - 56px) / 3), calc((100vw - 44px) / 2)" alt=photo.caption|default:fallback width=600 height=600 loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105" as image %}{% if image %}
+    <a href="{{ photo|lightbox_url }}" class="glightbox group block aspect-square overflow-hidden rounded-xl bg-sand-200" data-gallery="gallery"{% if forloop.counter > page_size %} hidden :hidden="shown <= {{ forloop.counter0 }}"{% endif %} {% if photo.caption %}data-title="{{ photo.caption }}"{% endif %}>
+      {{ image }}
     </a>
-    {% endif %}{% endwith %}{% endfor %}
+    {% endif %}{% endwith %}{% endwith %}{% endfor %}
   </div>
   {% if photos|length > page_size %}
   {% comment %}

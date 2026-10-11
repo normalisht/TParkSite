@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% load site_tags site_texts %}
 {% block content %}
-{% with hero=site|spec_url:"about_card" founder_photo=site|spec_url:"founder_card" %}
+{% picture site "about_card" alt="Т-Парк" width=960 height=720 fetchpriority="high" class="aspect-[4/3] w-full rounded-2xl object-cover shadow-lg" as hero %}
+{% picture site "founder_card" alt=site.founder_name width=600 height=750 loading="lazy" class="aspect-[4/5] w-full max-w-sm rounded-2xl object-cover shadow-lg" as founder_photo %}
 
 <section class="page-hero">
   {% include "partials/hero_decor.html" %}
@@ -10,7 +11,7 @@
       <h1 class="page-title">О нас</h1>
       {% if site.about_motto %}<p class="mt-5 max-w-2xl border-l-4 border-brand-500 pl-4 text-xl font-medium leading-snug text-navy md:text-2xl">{{ site.about_motto }}</p>{% endif %}
     </div>
-    {% if hero %}<img src="{{ hero }}" alt="Т-Парк" width="960" height="720" class="aspect-[4/3] w-full rounded-2xl object-cover shadow-lg" fetchpriority="high">{% endif %}
+    {% if hero %}{{ hero }}{% endif %}
   </div>
 </section>
 
@@ -38,7 +39,7 @@
 {% if site.founder_name or site.founder_text or facts %}
 <section class="bg-sand-100">
   <div class="mx-auto grid max-w-6xl gap-8 px-4 py-10 md:py-16 {% if founder_photo %}lg:grid-cols-[minmax(0,20rem)_1fr] lg:gap-12{% endif %}">
-    {% if founder_photo %}<img src="{{ founder_photo }}" alt="{{ site.founder_name }}" width="600" height="750" loading="lazy" class="aspect-[4/5] w-full max-w-sm rounded-2xl object-cover shadow-lg">{% endif %}
+    {% if founder_photo %}{{ founder_photo }}{% endif %}
     <div class="min-w-0">
       <h2 class="eyebrow">{% text "about.founder_eyebrow" %}</h2>
       {% if site.founder_name %}<p class="mt-3 text-3xl font-bold md:text-4xl">{{ site.founder_name }}</p>{% endif %}
@@ -91,12 +92,11 @@
   <h2 class="mb-6 text-2xl font-bold md:text-3xl">{% text "about.partners_title" %}</h2>
   <div class="grid grid-cols-2 items-center gap-4 sm:grid-cols-3 md:gap-6 lg:grid-cols-4">
     {% for partner in partners %}
-    {% with url=partner|spec_url:"logo_small" %}
+    {% picture partner "logo_small" alt=partner.name|default:"Партнёр" loading="lazy" class="h-auto w-full" as logo %}
     {# Картинки партнёров — баннеры с текстом: показываем целиком, в своих пропорциях, без обрезки. #}
     <a {% if partner.link %}href="{{ partner.link }}" target="_blank" rel="noopener"{% endif %} class="block overflow-hidden rounded-2xl transition{% if partner.link %} hover:-translate-y-1 hover:shadow-lg{% endif %}">
-      {% if url %}<img src="{{ url }}" alt="{% firstof partner.name 'Партнёр' %}" loading="lazy" class="h-auto w-full">{% else %}<span class="flex aspect-square items-center justify-center bg-sand-100 p-4 text-center font-semibold">{{ partner.name }}</span>{% endif %}
+      {% if logo %}{{ logo }}{% else %}<span class="flex aspect-square items-center justify-center bg-sand-100 p-4 text-center font-semibold">{{ partner.name }}</span>{% endif %}
     </a>
-    {% endwith %}
     {% endfor %}
   </div>
 </section>
@@ -104,5 +104,4 @@
 
 {% text "about.cta_title" as cta_title %}{% text "about.cta_text" as cta_text %}{% include "partials/cta_card.html" with title=cta_title text=cta_text %}
 
-{% endwith %}
 {% endblock %}

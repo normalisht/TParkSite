@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.urls import reverse
 
 from apps.core import about_defaults
-from apps.core.fields import HtmlField, image_spec, photo_field
+from apps.core.fields import HtmlField, image_specs, og_spec, photo_field
 from apps.core.maps import MapEmbedURLField
 from apps.core.slugs import unique_slug
 
@@ -89,14 +89,15 @@ class SiteSettings(models.Model):
         help_text="Одна фраза крупным шрифтом в начале страницы.",
     )
     about_photo = photo_field("Фото в шапке", "about", help_text="Лучше горизонтальное: парк, лес, река, люди.")
-    about_card = image_spec("about_photo", 960, 720)
+    about_card, about_card_avif = image_specs("about_photo", 960, 720)
+    about_og = og_spec("about_photo")
     about_text = HtmlField("О нас")
     founder_name = models.CharField("Основатель: имя", max_length=128, blank=True, default=about_defaults.FOUNDER_NAME)
     founder_lead = models.CharField(
         "Основатель: подзаголовок", max_length=255, blank=True, default=about_defaults.FOUNDER_LEAD
     )
     founder_photo = photo_field("Основатель: фото", "about", help_text="Портрет, лучше вертикальный.")
-    founder_card = image_spec("founder_photo", 600, 750)
+    founder_card, founder_card_avif = image_specs("founder_photo", 600, 750)
     founder_text = HtmlField("Основатель: о нём", help_text="Регалии и роли — удобнее списком.")
     nearby_text = HtmlField("Что рядом")
     safety_page = models.ForeignKey(
@@ -153,7 +154,7 @@ class SiteSettings(models.Model):
         help_text="Показывается в превью ссылки во ВКонтакте, Telegram и мессенджерах, если у страницы нет своего фото. "
         "Лучше горизонтальная, 1200×630.",
     )
-    og_card = image_spec("og_image", 1200, 630)
+    og_card = og_spec("og_image")
     seo_home_title, seo_home_description = _seo_pair("Главная")
     seo_events_title, seo_events_description = _seo_pair("Мероприятия")
     seo_about_title, seo_about_description = _seo_pair("О нас")
