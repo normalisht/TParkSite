@@ -54,8 +54,8 @@
         </template>
         <div x-show="!map" class="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-pine-50 p-6 text-center">
           <span class="icon h-10 w-10 text-pine-700">{% include "icons/map-pin.svg" %}</span>
-          <p class="max-w-xs text-ink/75">{{ site.address }}</p>
-          <button type="button" class="btn btn-primary" x-cloak @click="map = true">Показать карту</button>
+          {% if site.address %}<p class="max-w-xs text-ink/75" aria-hidden="true">{{ site.address }}</p>{% endif %}
+          <button type="button" class="btn btn-primary" x-cloak @click="map = true; $nextTick(() => $root.querySelector('iframe')?.focus())">Показать карту</button>
           <noscript><a href="{% firstof site.yandex_maps_url site.map_embed_url %}" class="btn btn-primary" target="_blank" rel="noopener">Открыть на Яндекс Картах</a></noscript>
         </div>
       </div>

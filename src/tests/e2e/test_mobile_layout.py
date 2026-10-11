@@ -414,5 +414,9 @@ def map_settings():
 def test_contacts_map_appears_after_click(live_server, page, map_settings):
     page.goto(f"{live_server.url}/contacts/")
     assert page.locator("iframe").count() == 0
-    page.get_by_role("button", name="Показать карту").click()
+    button = page.get_by_role("button", name="Показать карту")
+    button.click()
     page.wait_for_selector("iframe[title='Т-Парк на Яндекс Картах']", state="attached")
+    assert button.is_hidden()
+    # Кнопка скрылась вместе с заглушкой — фокус не должен падать на <body>.
+    page.wait_for_function("document.activeElement.tagName === 'IFRAME'")
