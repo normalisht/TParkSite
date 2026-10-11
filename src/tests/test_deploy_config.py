@@ -163,3 +163,22 @@ def test_ci_runs_linters_tests_and_image_build():
     workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
     for command in ("ruff check", "ruff format --check", "pytest", "docker build"):
         assert command in workflow, command
+
+
+def _service_block(path: Path, name: str) -> str:
+    text = path.read_text(encoding="utf-8")
+    return text.split(f"\n  {name}:\n", 1)[1].split("\n  tpark-", 1)[0].split("\nvolumes:", 1)[0]
+
+
+def test_web_container_is_hardened():
+    for name in ("compose.yaml", "compose.nginx.yaml"):
+        block = _service_block(ROOT / name, "tpark-web")
+        for line in ("read_only: true", "- /tmp", "cap_drop: [ALL]", "no-new-privileges:true"):
+            assert line in block, (name, line)
+
+
+def test_nginx_containers_have_healthchecks():
+    assert "healthcheck:" in _service_block(ROOT / "compose.yaml", "tpark-media")
+    assert "healthcheck:" in _service_block(ROOT / "compose.nginx.yaml", "tpark-nginx")
+    assert "location = /healthz" in (ROOT / "docker/nginx-media.conf").read_text(encoding="utf-8")
+    assert "location = /healthz" in (ROOT / "docker/nginx.conf.template").read_text(encoding="utf-8")

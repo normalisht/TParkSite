@@ -47,7 +47,16 @@ http {
     server {
         listen 80 default_server;
         listen [::]:80 default_server;
-        return 444;
+
+        # Healthcheck контейнера ходит на 127.0.0.1 и попадает именно сюда.
+        location = /healthz {
+            access_log off;
+            return 200 "ok\n";
+        }
+
+        location / {
+            return 444;
+        }
     }
 
     server {
