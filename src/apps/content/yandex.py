@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from html import escape
 from urllib.parse import parse_qs, urlsplit
-from urllib.request import Request, urlopen
+from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 from django.utils import timezone
 
@@ -22,10 +22,36 @@ USER_AGENT = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130 Safari/537.36"
 )
 _DATA_START = re.compile(r"window\.__PRELOADED_DATA\s*=\s*")
+MAX_PAGE_BYTES = 5 * 1024 * 1024  # страница отзывов — сотни килобайт; больше — не то, что ждём
 
 
 class ReviewFetchError(Exception):
     """Текст исключения показывается в админке."""
+
+
+def is_yandex_url(url: str) -> bool:
+    parts = urlsplit(url)
+    host = parts.hostname or ""
+    return parts.scheme == "https" and (host == "yandex.ru" or host.endswith(".yandex.ru"))
+
+
+class YandexOnlyRedirects(HTTPRedirectHandler):
+    """Редиректы (капча, смена адреса) — только внутри yandex.ru: запрос идёт с сервера по ссылке из админки."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        if not is_yandex_url(newurl):
+            raise ReviewFetchError("Яндекс перенаправил на другой сайт — заполните отзыв вручную.")
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
+_opener = build_opener(YandexOnlyRedirects)
+
+
+def read_limited(response, limit: int = MAX_PAGE_BYTES) -> bytes:
+    data = response.read(limit + 1)
+    if len(data) > limit:
+        raise ReviewFetchError("Страница Яндекса слишком большая — заполните отзыв вручную.")
+    return data
 
 
 @dataclass(frozen=True)
@@ -48,8 +74,8 @@ def fetch_review(url: str) -> YandexReview:
     key = review_key(url)
     request = Request(url.strip(), headers={"User-Agent": USER_AGENT, "Accept-Language": "ru"})
     try:
-        with urlopen(request, timeout=TIMEOUT) as response:
-            page = response.read().decode("utf-8", "replace")
+        with _opener.open(request, timeout=TIMEOUT) as response:
+            page = read_limited(response).decode("utf-8", "replace")
     except OSError as exc:
         raise ReviewFetchError("Яндекс не ответил — попробуйте позже или заполните отзыв вручную.") from exc
     return parse_review(page, key)
