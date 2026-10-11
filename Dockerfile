@@ -33,4 +33,5 @@ RUN SECRET_KEY=build-only python manage.py tailwind build \
 USER app
 EXPOSE 8000
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--access-logfile", "-", "--no-control-socket"]
+# --timeout 120: загрузка фото пачкой пережимает их прямо в запросе (у nginx proxy_read_timeout тоже 120 с).
+CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--timeout", "120", "--access-logfile", "-", "--no-control-socket"]

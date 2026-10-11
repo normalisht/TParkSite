@@ -7,6 +7,14 @@
 #   DB_DIR (по умолчанию ./data/db)       — в нём db.sqlite3; каталог целиком, т. к. SQLite пишет рядом журнал;
 #   MEDIA_DIR (по умолчанию ./data/media) — содержимое MEDIA_ROOT (папки как в src/media).
 # Владелец обоих каталогов — uid 1000 (пользователь app в образе): sudo chown -R 1000:1000 data
+
+# Логи контейнеров: не больше 5 файлов по 10 МБ, иначе access-логи забьют диск, и SQLite перестанет писать.
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
 services:
   tpark-web:
     build: .
@@ -16,6 +24,9 @@ services:
     volumes:
       - ${DB_DIR:-./data/db}:/data/db
       - ${MEDIA_DIR:-./data/media}:/data/media
+    # Пережатие фото держит их в памяти; без лимита OOM-killer может положить весь сервер.
+    mem_limit: ${WEB_MEM_LIMIT:-1g}
+    logging: *logging
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz/', timeout=5)"]
       interval: 30s
@@ -29,6 +40,7 @@ services:
     depends_on:
       tpark-web:
         condition: service_healthy
+    logging: *logging
     environment:
       # Подставляются в docker/nginx.conf.template (envsubst образа nginx); шаблон — целый nginx.conf.
       NGINX_ENVSUBST_OUTPUT_DIR: /etc/nginx

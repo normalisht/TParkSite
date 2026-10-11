@@ -104,3 +104,37 @@ def test_nginx_sets_real_ip_for_every_location():
     assert "proxy_set_header X-Real-IP $remote_addr;" in server_level
     for location in re.findall(r"location[^{]*\{([^}]*)\}", https):
         assert "proxy_set_header" not in location
+
+
+def _services(path: Path) -> list[str]:
+    text = path.read_text(encoding="utf-8")
+    block = text.split("\nservices:", 1)[1].split("\nvolumes:", 1)[0]
+    return re.findall(r"^  ([\w-]+):\s*$", block, flags=re.MULTILINE)
+
+
+def test_compose_rotates_logs_for_every_service():
+    for name in ("compose.yaml", "compose.nginx.yaml"):
+        path = ROOT / name
+        text = path.read_text(encoding="utf-8")
+        assert re.search(r'max-size: "10m"', text), name
+        assert text.count("logging: *logging") == len(_services(path)), name
+
+
+def test_web_has_memory_limit():
+    for name in ("compose.yaml", "compose.nginx.yaml"):
+        assert "mem_limit: ${WEB_MEM_LIMIT:-1g}" in (ROOT / name).read_text(encoding="utf-8"), name
+
+
+def test_gunicorn_timeout_covers_bulk_upload():
+    # Пачка фото пережимается прямо в запросе; 30 с по умолчанию мало, у nginx — 120 с.
+    dockerfile = (ROOT / "Dockerfile").read_text(encoding="utf-8")
+    assert '"--timeout", "120"' in dockerfile
+
+
+def test_env_example_starts_with_short_hsts():
+    values = dict(
+        line.split("=", 1)
+        for line in (ROOT / ".env.example").read_text(encoding="utf-8").splitlines()
+        if line and not line.startswith("#")
+    )
+    assert values["HSTS_SECONDS"] == "86400"
