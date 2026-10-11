@@ -385,3 +385,30 @@ def test_photo_fields_explain_cropping():
     for model in (CategoryPhoto, ServicePhoto):
         assert "16:9" in model._meta.get_field("image").help_text
     assert "карточке" in Service._meta.get_field("short_description").help_text
+
+
+ENGLISH_LEFTOVERS = [
+    "Are you sure",
+    "related items will be deleted",
+    "This item will be deleted",
+    "Click to cancel",
+    "Select action",
+    "Available shortcuts",
+    "Toggle dark/light mode",
+    "object (",
+]
+
+
+def test_delete_confirmation_and_forms_are_russian(admin_client):
+    group = CategoryGroup.objects.create(name="Активный отдых")
+    category = Category.objects.create(name="Парк")
+    group.categories.add(category)
+    pages = [
+        reverse("admin:catalog_category_delete", args=[category.pk]),
+        reverse("admin:catalog_category_change", args=[category.pk]),
+        reverse("admin:catalog_category_changelist"),
+    ]
+    for url in pages:
+        html = admin_client.get(url).content.decode()
+        for phrase in ENGLISH_LEFTOVERS:
+            assert phrase not in html, (url, phrase)

@@ -30,3 +30,59 @@ msgstr "Выберите версию в списке ниже, чтобы ве�
 
 msgid "Press the 'Change History' button below to edit the history."
 msgstr "Нажмите кнопку «Изменить запись» ниже, чтобы отредактировать историю."
+
+# unfold/templates/admin/delete_confirmation.html — прямые кавычки вместо “…” у Django
+#, python-format
+msgid "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? All of the following related items will be deleted:"
+msgstr "Удалить %(object_name)s «%(escaped_object)s»? Вместе с ним будут удалены:"
+
+#, python-format
+msgid "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:"
+msgstr "Удаление %(object_name)s «%(escaped_object)s» затронет связанные объекты, но у вас нет прав удалять объекты этих типов:"
+
+#, python-format
+msgid "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the following protected related objects:"
+msgstr "Чтобы удалить %(object_name)s «%(escaped_object)s», сначала нужно удалить защищённые связанные объекты:"
+
+# Инлайны, списки, горячие клавиши, тема
+msgid "This item will be deleted."
+msgstr "Эта запись будет удалена."
+
+msgid "Click to cancel"
+msgstr "Нажмите, чтобы отменить"
+
+msgid "Select action"
+msgstr "Выберите действие"
+
+msgid "Select action to run"
+msgstr "Выберите действие"
+
+msgid "Select value"
+msgstr "Выберите значение"
+
+msgid "Available shortcuts"
+msgstr "Горячие клавиши"
+
+msgid "Global shortcuts"
+msgstr "Общие"
+
+msgid "Changelist shortcuts"
+msgstr "В списке"
+
+msgid "Command tool shortcuts"
+msgstr "В поиске команд"
+
+msgid "Open shortcuts list"
+msgstr "Список горячих клавиш"
+
+msgid "Toggle dark/light mode"
+msgstr "Светлая или тёмная тема"
+
+msgid "Light"
+msgstr "Светлая"
+
+msgid "Dark"
+msgstr "Тёмная"
+
+msgid "System"
+msgstr "Как в системе"

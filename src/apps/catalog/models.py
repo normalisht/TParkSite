@@ -199,3 +199,10 @@ class ServicePhoto(OrderedModel):
 
     def __str__(self):
         return f"Фото #{self.pk}"
+
+
+# Связь «группа меню — категория» (авто-модель M2M): на странице удаления в админке вместо
+# «Связь categorygroup-category: CategoryGroup_categories object (13)».
+_GroupLink = CategoryGroup.categories.through
+_GroupLink._meta.verbose_name = "место в группе меню"
+_GroupLink.__str__ = lambda link: f"«{link.category}» в группе «{link.categorygroup}»"
