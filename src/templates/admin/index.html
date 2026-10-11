@@ -1,0 +1,17 @@
+{% extends 'admin/base.html' %}
+{% comment %}
+  Копия unfold/templates/admin/index.html + инструкция для администратора (admin/dashboard_help.html).
+  Сверять с оригиналом при обновлении Unfold.
+{% endcomment %}
+{% load i18n %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block branding %}
+    {% include "unfold/helpers/site_branding.html" %}
+{% endblock %}
+
+{% block content %}
+    {% include "admin/dashboard_help.html" %}
+    {% include "unfold/helpers/dashboard_default.html" %}
+{% endblock %}

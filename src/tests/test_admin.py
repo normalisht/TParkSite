@@ -6,7 +6,7 @@ from django.contrib import admin
 from django.urls import reverse
 
 from apps.catalog.admin import ServiceAdmin
-from apps.catalog.models import Category, CategoryGroup, CategoryPhoto, CategoryService, Service
+from apps.catalog.models import Category, CategoryGroup, CategoryPhoto, CategoryService, Service, ServicePhoto
 from apps.content.models import GalleryPhoto
 from apps.core.models import InfoPage, Phone, SiteSettings
 
@@ -372,3 +372,16 @@ def test_delete_warns_only_about_services_left_without_category(admin_client):
     assert "Без категории останутся" in html
     assert "Зиплайн" in html.split("Без категории останутся", 1)[1].split("<", 1)[0]
     assert "Каяк" not in html.split("Без категории останутся", 1)[1].split("<", 1)[0]
+
+
+def test_admin_index_has_instructions(admin_client):
+    html = admin_client.get(reverse("admin:index")).content.decode()
+    for heading in ("Как добавить услугу", "Как показать категорию в меню", "Фото", "Адрес страницы"):
+        assert heading in html
+
+
+def test_photo_fields_explain_cropping():
+    assert "3:2" in Category._meta.get_field("preview").help_text
+    for model in (CategoryPhoto, ServicePhoto):
+        assert "16:9" in model._meta.get_field("image").help_text
+    assert "карточке" in Service._meta.get_field("short_description").help_text

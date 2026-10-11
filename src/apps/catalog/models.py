@@ -7,6 +7,9 @@ from apps.core.models import OrderedModel, PublishedQuerySet, SeoModel
 from apps.core.redirects import remember_slug_change
 from apps.core.slugs import SLUG_HELP, unique_slug
 
+PREVIEW_HELP = "Карточка на главной и шапка страницы категории: кадр обрезается до 3:2, главное — ближе к центру."
+SLIDE_HELP = "Слайдер: кадр обрезается до 16:9 (как экран телевизора) — людей снимайте с запасом сверху и снизу."
+
 
 class CategoryGroup(OrderedModel):
     name = models.CharField("Название", max_length=128)
@@ -27,7 +30,7 @@ class Category(SeoModel, OrderedModel):
     name = models.CharField("Название", max_length=128)
     slug = models.SlugField("Адрес страницы", max_length=255, unique=True, blank=True, help_text=SLUG_HELP)
     description = HtmlField("Описание")
-    preview = photo_field("Превью для главной", "catalog/previews", size=(1080, 720))
+    preview = photo_field("Превью для главной", "catalog/previews", size=(1080, 720), help_text=PREVIEW_HELP)
     preview_card, preview_card_avif = image_specs("preview", 640, 427)
     preview_large, preview_large_avif = image_specs(
         "preview", 1080, 720
@@ -82,7 +85,7 @@ class Category(SeoModel, OrderedModel):
 
 class CategoryPhoto(OrderedModel):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="photos")
-    image = photo_field("Фото", "catalog/categories", blank=False)
+    image = photo_field("Фото", "catalog/categories", blank=False, help_text=SLIDE_HELP)
     # Слайдер — рамка 16:9 с object-cover: режем так же на сервере, чтобы ширины в srcset были настоящими.
     slide, slide_avif = image_specs("image", 1600, 900)
     slide_small, slide_small_avif = image_specs("image", 800, 450)  # слайдер на телефоне: srcset со slide
@@ -101,8 +104,16 @@ class CategoryPhoto(OrderedModel):
 class Service(SeoModel):
     name = models.CharField("Название", max_length=128)
     slug = models.SlugField("Адрес страницы", max_length=255, unique=True, blank=True, help_text=SLUG_HELP)
-    short_description = HtmlField("Краткое описание")
-    description = HtmlField("Полное описание")
+    short_description = HtmlField(
+        "Краткое описание",
+        help_text=(
+            "1–2 предложения. Видно в карточке на странице категории; у услуги без отдельной страницы "
+            "раскрывается в списке. Если SEO-описание пустое — начало этого текста идёт в поисковики."
+        ),
+    )
+    description = HtmlField(
+        "Полное описание", help_text="Текст отдельной страницы услуги (нужна галочка «Отдельная страница»)."
+    )
     price = models.CharField(
         "Цена",
         max_length=32,
@@ -172,7 +183,7 @@ class CategoryService(OrderedModel):
 
 class ServicePhoto(OrderedModel):
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name="photos")
-    image = photo_field("Фото", "catalog/services", blank=False)
+    image = photo_field("Фото", "catalog/services", blank=False, help_text=SLIDE_HELP)
     # Слайдер — рамка 16:9 с object-cover: режем так же на сервере, чтобы ширины в srcset были настоящими.
     slide, slide_avif = image_specs("image", 1600, 900)
     slide_small, slide_small_avif = image_specs("image", 800, 450)  # слайдер на телефоне: srcset со slide
