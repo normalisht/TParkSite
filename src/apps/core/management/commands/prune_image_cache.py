@@ -41,6 +41,11 @@ class Command(BaseCommand):
             self.stdout.write("Папки миниатюр нет — удалять нечего.")
             return
         keep = expected_cache_files()
+        if not keep:
+            # Пустая база при непустой папке миниатюр — скорее всего, контейнер стартовал не с той базой:
+            # без этой проверки команда удалила бы все миниатюры.
+            self.stdout.write("В базе нет ни одного фото — миниатюры не трогаю (проверьте, та ли база подключена).")
+            return
         cutoff = time.time() - min_age * 60
         count = size = 0
         for path in sorted(p for p in cache_dir.rglob("*") if p.is_file()):

@@ -213,3 +213,42 @@ def test_thumbnail_written_atomically_and_readable_by_nginx(make_image, media_ro
     path = media_root / photo.thumb.url.removeprefix("/media/")
     assert path.stat().st_mode & 0o777 == 0o644  # nginx в соседнем контейнере читает под своим пользователем
     assert not list(path.parent.glob(".*"))  # временных файлов не осталось
+
+
+def _thumb_paths(photo, media_root, names=("thumb", "thumb_avif", "thumb_small", "full")):
+    return [media_root / getattr(photo, name).url.removeprefix("/media/") for name in names]  # url создаёт файлы
+
+
+def test_thumbnails_removed_with_photo_after_commit(make_image, media_root, django_capture_on_commit_callbacks):
+    photo = GalleryPhoto.objects.create(image=make_image())
+    paths = _thumb_paths(photo, media_root)
+    folder = paths[0].parent
+    with django_capture_on_commit_callbacks(execute=False) as callbacks:
+        photo.delete()
+    assert all(p.exists() for p in paths)  # до коммита — на месте: откат не должен терять файлы
+    for callback in callbacks:
+        callback()
+    assert not any(p.exists() for p in paths)
+    assert not folder.exists()  # папка миниатюр этого фото тоже
+
+
+def test_thumbnails_of_replaced_photo_removed(make_image, media_root, django_capture_on_commit_callbacks):
+    photo = GalleryPhoto.objects.create(image=make_image())
+    old_paths = _thumb_paths(photo, media_root)
+    with django_capture_on_commit_callbacks(execute=True):
+        photo.image = make_image("new.jpg")
+        photo.save()
+    photo = GalleryPhoto.objects.get(pk=photo.pk)
+    assert not any(p.exists() for p in old_paths)
+    assert all(p.exists() for p in _thumb_paths(photo, media_root))
+
+
+def test_prune_refuses_to_wipe_cache_when_database_has_no_photos(make_image, media_root):
+    # Контейнер стартовал не с той базой (пустой) — не удаляем все миниатюры.
+    stale = media_root / "CACHE/images/gallery/old/stale.webp"
+    stale.parent.mkdir(parents=True)
+    stale.write_bytes(b"x")
+    two_hours_ago = time.time() - 2 * 3600
+    os.utime(stale, (two_hours_ago, two_hours_ago))
+    call_command("prune_image_cache")
+    assert stale.exists()
