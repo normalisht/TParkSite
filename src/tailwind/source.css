@@ -148,11 +148,19 @@ html.cookie-open .contact-fab { display: none; }
      обрезку и по y, поэтому py-2/-my-2 — запас под обводку, тень и кольцо фокуса карточек, не меняющий раскладку. */
   .scroll-strip { @apply no-scrollbar -mx-4 -my-2 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 py-2 sm:mx-0 sm:my-0 sm:overflow-visible sm:px-0 sm:py-0; }
 
-  /* Длинный отзыв свёрнут до ~8 строк с плавным затуханием; «Читать полностью» снимает класс (Alpine). */
+  /* Длинный отзыв свёрнут до ~8 строк с плавным затуханием; «Читать полностью» снимает класс, высоту анимирует
+     компонент reviewCard (static/js/review_card.js), затухание — переход --review-fade (100% — затухания нет). */
+  .review-text {
+    mask-image: linear-gradient(to bottom, #000 var(--review-fade), transparent);
+    transition: --review-fade 300ms ease-out;
+  }
   .review-text.is-clamped {
+    --review-fade: 65%;
     max-height: 13rem;
     overflow: hidden;
-    mask-image: linear-gradient(to bottom, #000 65%, transparent);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .review-text { transition: none; }
   }
 
   /* anywhere: длинный URL в тексте переносится, а не распирает карточку или колонку сетки. */
@@ -175,6 +183,13 @@ html.cookie-open .contact-fab { display: none; }
 @utility no-scrollbar {
   scrollbar-width: none;
   &::-webkit-scrollbar { display: none; }
+}
+
+/* Граница затухания низа отзыва (.review-text): зарегистрирована, чтобы переход анимировал её вместе с высотой. */
+@property --review-fade {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
 }
 
 @utility review-tone-warm {

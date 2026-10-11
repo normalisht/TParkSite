@@ -299,6 +299,14 @@ def test_review_signed_as_guest(client):
         assert "Гость Т-Парка" in client.get(url).content.decode()
 
 
+def test_review_card_uses_animated_component(client):
+    Review.objects.create(text="<p>Отзыв</p>")
+    html = client.get("/reviews/").content.decode()
+    assert 'x-data="reviewCard"' in html and '@click="toggle()"' in html and ':aria-expanded="open"' in html
+    head = html.split("</head>")[0]
+    assert head.index("js/review_card") < head.index("vendor/alpine")  # компонент регистрируется до старта Alpine
+
+
 def test_review_card_links_to_source_when_link_set(client):
     Review.objects.create(text="<p>a</p>", link="https://reviews.yandex.ru/u/1", date=date(2022, 7, 20))
     Review.objects.create(text="<p>b</p>")
