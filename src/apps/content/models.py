@@ -10,7 +10,7 @@ from django.utils.formats import date_format
 from django.utils.html import strip_tags
 from django.utils.text import Truncator
 
-from apps.core.fields import HtmlField, image_spec, photo_field
+from apps.core.fields import HtmlField, full_spec, image_spec, image_specs, og_spec, photo_field
 from apps.core.models import OrderedModel, PublishedQuerySet, SeoModel
 from apps.core.slugs import unique_slug
 
@@ -65,8 +65,9 @@ class Event(SeoModel):
     link = models.URLField("Ссылка", max_length=500, blank=True, help_text="Соцсеть или сайт мероприятия.")
     show_after_date = models.BooleanField("Показывать после даты", default=False)
     image = photo_field("Фото", "events")
-    card = image_spec("image", 800, 600)
-    card_small = image_spec("image", 640, 480)  # карточки в сетке и на телефоне: srcset с card
+    card, card_avif = image_specs("image", 800, 600)
+    card_small, card_small_avif = image_specs("image", 640, 480)  # карточки в сетке и на телефоне: srcset с card
+    og = og_spec("image")
 
     objects = EventQuerySet.as_manager()
 
@@ -148,7 +149,7 @@ class Review(models.Model):
     )
     date = models.DateField("Дата отзыва", null=True, blank=True)
     photo = photo_field("Фото", "reviews")
-    avatar = image_spec("photo", 160, 160)
+    avatar, avatar_avif = image_specs("photo", 160, 160)
     is_published = models.BooleanField("Опубликовано", default=True)
 
     objects = PublishedQuerySet.as_manager()
@@ -187,7 +188,9 @@ class Partner(OrderedModel):
 class GalleryPhoto(OrderedModel):
     image = photo_field("Фото", "gallery", blank=False)
     caption = models.CharField("Подпись", max_length=255, blank=True)
-    thumb = image_spec("image", 600, 600)
+    thumb, thumb_avif = image_specs("image", 600, 600)
+    thumb_small, thumb_small_avif = image_specs("image", 400, 400)  # сетка на телефоне: srcset с thumb
+    full = full_spec("image")
 
     class Meta(OrderedModel.Meta):
         verbose_name = "Фото галереи"

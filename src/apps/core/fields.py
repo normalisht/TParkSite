@@ -84,6 +84,36 @@ def photo_field(verbose_name: str, prefix: str, *, size=(1920, 1080), fmt="JPEG"
     )
 
 
-def image_spec(source: str, width: int, height: int, *, crop: bool = True) -> ImageSpecField:
+WEBP_OPTIONS = {"quality": 80}
+# AVIF q55 при speed=6 почти вдвое легче WebP q80 при том же виде и кодируется так же быстро
+# (speed=4 — в 5–6 раз дольше при выигрыше в пару килобайт). Замеры — docs/superpowers/plans/2026-10-11-image-delivery.md.
+AVIF_OPTIONS = {"quality": 55, "speed": 6}
+
+
+def image_spec(source: str, width: int, height: int, *, crop: bool = True, fmt: str = "WEBP") -> ImageSpecField:
     processor = ResizeToFill(width, height) if crop else ResizeToFit(width, height, upscale=False)
-    return ImageSpecField(source=source, processors=[processor], format="WEBP", options={"quality": 80})
+    options = AVIF_OPTIONS if fmt == "AVIF" else WEBP_OPTIONS
+    return ImageSpecField(source=source, processors=[processor], format=fmt, options=options)
+
+
+def image_specs(source: str, width: int, height: int, *, crop: bool = True) -> tuple[ImageSpecField, ImageSpecField]:
+    """Миниатюра в WebP и её AVIF-двойник: `card, card_avif = image_specs(...)`.
+
+    `{% picture %}` находит двойник по суффиксу `_avif` и отдаёт его через `<source type="image/avif">`.
+    """
+    return image_spec(source, width, height, crop=crop), image_spec(source, width, height, crop=crop, fmt="AVIF")
+
+
+def full_spec(source: str) -> ImageSpecField:
+    """Фото во весь экран (GLightbox): WebP на четверть легче JPEG-оригинала; AVIF лайтбокс выбрать не умеет."""
+    return image_spec(source, 1920, 1080, crop=False)
+
+
+def og_spec(source: str) -> ImageSpecField:
+    """Картинка для соцсетей (og:image) — JPEG 1200×630: WebP и AVIF понимают не все соцсети и мессенджеры."""
+    return ImageSpecField(
+        source=source,
+        processors=[ResizeToFill(1200, 630)],
+        format="JPEG",
+        options={"quality": 82, "progressive": True},
+    )
