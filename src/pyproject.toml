@@ -4,6 +4,7 @@ version = "0.1.0"
 requires-python = ">=3.14"
 dependencies = [
     "django>=6.1.2,<6.2",
+    "django-axes[ipware]>=8.3.1",
     "django-imagekit>=6.1.1",
     "django-prose-editor>=0.27.3",
     "django-simple-history>=3.13",

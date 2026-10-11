@@ -9,6 +9,10 @@ Django-проект — в [src/](src/), в корне — инфраструк�
 1. В корне репозитория: `cp .env.example .env`, заполнить `SECRET_KEY`, `ALLOWED_HOSTS`, `CSRF_TRUSTED_ORIGINS`, `PROXY_NETWORK`, `DEBUG=0`.
 2. `docker compose up -d --build`, затем `docker compose exec tpark-web python manage.py createsuperuser`.
 3. В reverse-proxy: `/media/` → `http://tpark-media:80`, остальное → `http://tpark-web:8000`, передавать заголовок `X-Forwarded-Proto`.
+
+   Требования к общему прокси: передавать `X-Real-IP $remote_addr` (перезаписывая заголовок клиента) и `X-Forwarded-Proto`, сжимать HTML (`gzip on`). Без `X-Real-IP` защита от подбора пароля блокирует логин для всех, кто входит через этот прокси.
+
+   Если администратор заблокирован после 5 неудачных попыток входа (30 минут): `docker compose exec tpark-web python manage.py axes_reset`.
 4. Перенос данных: `docker compose run --rm -v /путь/к/старым/данным:/legacy tpark-web python manage.py import_legacy --db /legacy/T_Park.db --images /legacy/images --price-csv /legacy/price.csv` (повторный прогон — с `--flush`).
 5. Бэкап по cron: `scripts/backup.sh` (хранит последние `BACKUP_KEEP` копий, по умолчанию 14).
 6. Миниатюры фото создаются в фоне сразу после загрузки фото, а при старте контейнера — недостающие (`generateimages`), после чего ненужные удаляются (`prune_image_cache`: миниатюры старых размеров и качества; файлы моложе часа не трогает, при пустой базе не делает ничего). Миниатюры удалённых и заменённых фото удаляются сразу. Если поменялись размеры или качество миниатюр (`src/apps/core/fields.py`, модели), первые минуты после деплоя, пока идёт генерация, часть фото показывается без AVIF или оригиналом: один запрос пережимает миниатюры не дольше 2 секунд (`REQUEST_GENERATION_BUDGET` в `src/apps/core/images.py`), остальное досоздают фон и следующие запросы. Папку `media/CACHE` вручную целиком не удалять: до перезапуска сайт будет отдавать битые картинки; посмотреть, что удалит очистка, — `docker compose exec tpark-web python manage.py prune_image_cache --dry-run`.

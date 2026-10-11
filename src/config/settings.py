@@ -2,6 +2,7 @@
 (локально — из файла .env в корне репозитория)."""
 
 import os
+from datetime import timedelta
 from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
@@ -52,6 +53,7 @@ INSTALLED_APPS = [
     "unfold.contrib.simple_history",
     "django.contrib.admin",
     "django.contrib.auth",
+    "axes",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
@@ -78,6 +80,8 @@ MIDDLEWARE = [
     "simple_history.middleware.HistoryRequestMiddleware",  # автор правки в истории текстов
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # Блокировка подбора пароля к админке; должен быть последним (документация django-axes).
+    "axes.middleware.AxesMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -121,6 +125,20 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
+
+AUTHENTICATION_BACKENDS = [
+    "axes.backends.AxesStandaloneBackend",  # первым: отказывает заблокированным до проверки пароля
+    "django.contrib.auth.backends.ModelBackend",
+]
+# 5 неудачных попыток — пара «логин + IP» заблокирована на 30 минут. Не весь IP: за общим прокси без X-Real-IP
+# все запросы с одного адреса, и блокировка IP закрыла бы админку всем. Разблокировать: manage.py axes_reset.
+AXES_FAILURE_LIMIT = 5
+AXES_COOLOFF_TIME = timedelta(minutes=30)
+AXES_LOCKOUT_PARAMETERS = [["username", "ip_address"]]
+AXES_RESET_ON_SUCCESS = True
+# IP клиента — из X-Real-IP: наш nginx перезаписывает его адресом соединения, клиент подделать не может.
+# Без прокси (runserver) заголовка нет — берётся REMOTE_ADDR.
+AXES_IPWARE_META_PRECEDENCE_ORDER = ["HTTP_X_REAL_IP", "REMOTE_ADDR"]
 
 LANGUAGE_CODE = "ru"
 TIME_ZONE = "Europe/Moscow"

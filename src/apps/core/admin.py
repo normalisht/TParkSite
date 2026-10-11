@@ -1,3 +1,4 @@
+from axes.models import AccessAttempt, AccessFailureLog, AccessLog
 from django.contrib import admin
 from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
@@ -200,6 +201,9 @@ class InfoPageAdmin(SiteModelAdmin):
 
 admin.site.unregister(User)
 admin.site.unregister(Group)
+# Админки django-axes — на голом ModelAdmin, без Unfold и без предупреждения о несохранённом; блокировки снимает manage.py axes_reset.
+for axes_model in (AccessAttempt, AccessFailureLog, AccessLog):
+    admin.site.unregister(axes_model)
 
 
 @admin.register(User)
