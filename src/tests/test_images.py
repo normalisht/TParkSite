@@ -4,6 +4,7 @@ from PIL import Image
 
 from apps.catalog.models import Category, CategoryPhoto
 from apps.content.models import GalleryPhoto
+from apps.core import images
 from apps.core.images import lightbox_url, picture_html
 from apps.core.models import SiteSettings
 
@@ -122,3 +123,20 @@ def test_picture_tag_as_variable():
 def test_lightbox_url_prefers_full_spec(make_image):
     photo = GalleryPhoto.objects.create(image=make_image())
     assert lightbox_url(photo) == photo.full.url and photo.full.url.endswith(".webp")
+
+
+def test_thumbnails_generated_after_commit(monkeypatch, django_capture_on_commit_callbacks, make_image):
+    monkeypatch.setattr(images, "run_in_background", lambda fn: fn())
+    with django_capture_on_commit_callbacks(execute=True):
+        photo = GalleryPhoto.objects.create(image=make_image())
+    storage = photo.image.storage
+    assert all(
+        storage.exists(getattr(photo, name).name) for name in ("thumb", "thumb_avif", "thumb_small_avif", "full")
+    )
+
+
+def test_missing_thumbnail_still_generated_on_view(make_image):
+    photo = GalleryPhoto.objects.create(image=make_image())  # on_commit в тесте не выполняется
+    storage = photo.image.storage
+    assert not storage.exists(photo.thumb_avif.name)
+    assert photo.thumb_avif.url and storage.exists(photo.thumb_avif.name)

@@ -1,7 +1,11 @@
 import logging
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
 
+from django.db import transaction
 from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
+from imagekit.cachefiles.strategies import JustInTime
 
 logger = logging.getLogger(__name__)
 
@@ -96,3 +100,29 @@ def picture_html(obj, srcset: str, *, sizes: str = "", wide: str = "", media: st
     img_attrs |= {k: v for k, v in attrs.items() if k == "alt" or v != ""}
     img = _tag("img", **img_attrs)
     return mark_safe(f"<picture>{''.join(sources)}{img}</picture>") if sources else img
+
+
+_executor: ThreadPoolExecutor | None = None
+
+
+def run_in_background(fn) -> None:
+    """Один фоновый поток на процесс: пережатие не отнимает все ядра у запросов."""
+    global _executor
+    if _executor is None:
+        _executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="thumbnails")
+    _executor.submit(fn)
+
+
+def _generate(file) -> None:
+    try:
+        file.generate()
+    except Exception:
+        logger.warning("Не удалось создать миниатюру %s", file.name, exc_info=True)
+
+
+class GenerateAfterCommit(JustInTime):
+    """Как JustInTime (недостающая миниатюра создаётся при показе), но после сохранения фото все его миниатюры
+    сразу создаются в фоне: первый посетитель не ждёт пережатия, а загрузка пачкой не упирается в таймаут gunicorn."""
+
+    def on_source_saved(self, file):
+        transaction.on_commit(lambda: run_in_background(partial(_generate, file)))

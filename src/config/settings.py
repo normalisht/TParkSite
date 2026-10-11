@@ -133,6 +133,8 @@ STATIC_ROOT = Path(os.environ.get("STATIC_ROOT", BASE_DIR / "staticfiles"))
 STATICFILES_DIRS = [BASE_DIR / "static"]
 MEDIA_URL = "/media/"
 MEDIA_ROOT = Path(os.environ.get("MEDIA_ROOT", BASE_DIR / "media"))
+# Миниатюры: недостающие создаются при показе, после сохранения фото — сразу в фоне (apps.core.images).
+IMAGEKIT_DEFAULT_CACHEFILE_STRATEGY = "apps.core.images.GenerateAfterCommit"
 
 TAILWIND_CLI_SRC_CSS = "tailwind/source.css"
 TAILWIND_CLI_DIST_CSS = "css/tailwind.css"
