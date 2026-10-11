@@ -1,0 +1,32 @@
+# Проверки на каждый push в main и pull request: линтер, тесты, сборка продакшен-образа.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src
+    env:
+      SECRET_KEY: ci-only
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: src/uv.lock
+      - run: uv sync --frozen
+      - run: uv run ruff check . && uv run ruff format --check .
+      - run: uv run manage.py tailwind build
+      - run: uv run pytest -q --cov=apps --cov-report=term-missing:skip-covered
+
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: docker build -t tpark-web:ci .

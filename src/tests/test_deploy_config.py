@@ -157,3 +157,9 @@ def test_backup_rotation_touches_only_dated_folders():
     script = (ROOT / "scripts" / "backup.sh").read_text(encoding="utf-8")
     assert "ls -1dt backups/20*/" in script
     assert "backups/*/" not in script
+
+
+def test_ci_runs_linters_tests_and_image_build():
+    workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    for command in ("ruff check", "ruff format --check", "pytest", "docker build"):
+        assert command in workflow, command
