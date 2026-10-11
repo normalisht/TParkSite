@@ -395,6 +395,13 @@ ENGLISH_LEFTOVERS = [
     "Select action",
     "Available shortcuts",
     "Toggle dark/light mode",
+    "Open command tool",
+    "Toggle sidebar",
+    "Toggle filter",
+    "Create new record",
+    "Open selection",
+    "Navigate",
+    "categorygroup-category",
     "object (",
 ]
 
@@ -412,3 +419,8 @@ def test_delete_confirmation_and_forms_are_russian(admin_client):
         html = admin_client.get(url).content.decode()
         for phrase in ENGLISH_LEFTOVERS:
             assert phrase not in html, (url, phrase)
+        # «Select» — отдельное слово в подсказке командного поиска (в других местах встречается как часть фраз)
+        assert not re.search(r">\s*Select\s*<", html), url
+    html = admin_client.get(pages[0]).content.decode()
+    assert "в группе «Активный отдых»" in html
+    assert "Вместе с ним будут удалены" in html

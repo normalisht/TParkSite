@@ -205,4 +205,5 @@ class ServicePhoto(OrderedModel):
 # «Связь categorygroup-category: CategoryGroup_categories object (13)».
 _GroupLink = CategoryGroup.categories.through
 _GroupLink._meta.verbose_name = "место в группе меню"
+_GroupLink._meta.verbose_name_plural = "места в группах меню"
 _GroupLink.__str__ = lambda link: f"«{link.category}» в группе «{link.categorygroup}»"

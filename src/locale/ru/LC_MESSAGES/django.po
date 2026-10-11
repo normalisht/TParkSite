@@ -86,3 +86,28 @@ msgstr "Тёмная"
 
 msgid "System"
 msgstr "Как в системе"
+
+# unfold/templates/unfold/helpers/shortcuts.html и command_help.html
+msgid "Open command tool"
+msgstr "Открыть поиск команд"
+
+msgid "Toggle sidebar"
+msgstr "Показать или скрыть меню"
+
+msgid "Toggle filter"
+msgstr "Показать или скрыть фильтры"
+
+msgid "Create new record"
+msgstr "Создать запись"
+
+msgid "Navigate"
+msgstr "Перемещение"
+
+msgid "Select"
+msgstr "Выбрать"
+
+msgid "Open selection"
+msgstr "Открыть выбранное"
+
+msgid "Open selection in new tab"
+msgstr "Открыть выбранное в новой вкладке"
