@@ -44,8 +44,25 @@ class ServiceCategoryInline(TabularInline):
     verbose_name_plural = "Категории"
 
 
-class CategoryAdminForm(forms.ModelForm):
+class BulkPhotosForm(forms.ModelForm):
+    """Поле «Загрузить фото пачкой»; фото добавляет `BulkPhotosAdminMixin.save_related`."""
+
     bulk_photos = MultipleImageField(label="Загрузить фото пачкой")
+
+
+class BulkPhotosAdminMixin:
+    """После сохранения формы добавляет фото из `bulk_photos` в конец (`photo_model` с FK `photo_owner`)."""
+
+    photo_model: type
+    photo_owner: str
+
+    def save_related(self, request, form, formsets, change):
+        super().save_related(request, form, formsets, change)
+        photos = form.cleaned_data.get("bulk_photos") or []  # в форме списка (list_editable) этого поля нет
+        append_images(self.photo_model, photos, **{self.photo_owner: form.instance})
+
+
+class CategoryAdminForm(BulkPhotosForm):
     menu_groups = forms.ModelMultipleChoiceField(
         CategoryGroup.objects.order_by("order", "id"),
         required=False,
@@ -64,9 +81,7 @@ class CategoryAdminForm(forms.ModelForm):
             self.fields["menu_groups"].initial = list(self.instance.groups.all())
 
 
-class ServiceAdminForm(forms.ModelForm):
-    bulk_photos = MultipleImageField(label="Загрузить фото пачкой")
-
+class ServiceAdminForm(BulkPhotosForm):
     class Meta:
         model = Service
         fields = "__all__"
@@ -84,8 +99,10 @@ class CategoryGroupAdmin(SiteModelAdmin):
 
 
 @admin.register(Category)
-class CategoryAdmin(SiteModelAdmin):
+class CategoryAdmin(BulkPhotosAdminMixin, SiteModelAdmin):
     form = CategoryAdminForm
+    photo_model = CategoryPhoto
+    photo_owner = "category"
     list_display = ["name", "menu_groups_display", "services_count", "is_published"]
     list_editable = ["is_published"]
     ordering = ["order", "id"]
@@ -126,7 +143,6 @@ class CategoryAdmin(SiteModelAdmin):
         super().save_related(request, form, formsets, change)
         if "menu_groups" in form.cleaned_data:  # в форме списка (list_editable) этого поля нет
             form.instance.groups.set(form.cleaned_data["menu_groups"])
-        append_images(CategoryPhoto, form.cleaned_data.get("bulk_photos") or [], category=form.instance)
 
     def delete_view(self, request, object_id, extra_context=None):
         category = self.get_object(request, object_id)
@@ -160,8 +176,10 @@ class ServicePlacementFilter(admin.SimpleListFilter):
 
 
 @admin.register(Service)
-class ServiceAdmin(SiteModelAdmin):
+class ServiceAdmin(BulkPhotosAdminMixin, SiteModelAdmin):
     form = ServiceAdminForm
+    photo_model = ServicePhoto
+    photo_owner = "service"
     list_display = ["name", "price_display", "categories", "is_published", "has_page"]
     list_editable = ["is_published"]
     list_filter = [ServicePlacementFilter, "is_published", "has_page", "category_links__category"]
@@ -197,7 +215,3 @@ class ServiceAdmin(SiteModelAdmin):
     @admin.display(description="Цена")
     def price_display(self, obj):
         return obj.price_display or "—"
-
-    def save_related(self, request, form, formsets, change):
-        super().save_related(request, form, formsets, change)
-        append_images(ServicePhoto, form.cleaned_data.get("bulk_photos") or [], service=form.instance)

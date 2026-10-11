@@ -36,7 +36,11 @@ class Category(SeoModel, OrderedModel):
         "preview", 1080, 720
     )  # шапка страницы категории: srcset с preview_card
     og = og_spec("preview")
-    is_published = models.BooleanField("Опубликовано", default=False)
+    is_published = models.BooleanField(
+        "Опубликовано",
+        default=False,
+        help_text="Новая категория — черновик: опубликуйте, когда добавите услуги и фото.",
+    )
 
     objects = PublishedQuerySet.as_manager()
 
@@ -121,7 +125,9 @@ class Service(SeoModel):
         help_text="Число («1500», «от 3500») — на сайте с «₽». Или текстом: «договорная».",
     )
     price_unit = models.CharField("За что", max_length=128, blank=True, help_text="Например: час, сутки, человек.")
-    is_published = models.BooleanField("Опубликовано", default=True)
+    is_published = models.BooleanField(
+        "Опубликовано", default=True, help_text="На сайте услуга видна только внутри опубликованной категории."
+    )
     has_page = models.BooleanField(
         "Отдельная страница", default=False, help_text="Карточка в категории ведёт на страницу услуги."
     )

@@ -117,6 +117,32 @@ def test_bulk_upload_appends_photos_to_category(admin_client, make_image):
     assert list(category.photos.values_list("order", flat=True)) == [7, 8, 9]
 
 
+def test_bulk_upload_appends_photos_to_service(admin_client, make_image):
+    service = Service.objects.create(name="Баня")
+    ServicePhoto.objects.create(service=service, image=make_image(), order=3)
+    data = {
+        "name": service.name,
+        "slug": service.slug,
+        "short_description": "",
+        "description": "",
+        "price_unit": "",
+        "is_published": "on",
+        "order": "0",
+        "photos-TOTAL_FORMS": "0",
+        "photos-INITIAL_FORMS": "0",
+        "photos-MIN_NUM_FORMS": "0",
+        "photos-MAX_NUM_FORMS": "1000",
+        "category_links-TOTAL_FORMS": "0",
+        "category_links-INITIAL_FORMS": "0",
+        "category_links-MIN_NUM_FORMS": "0",
+        "category_links-MAX_NUM_FORMS": "1000",
+        "bulk_photos": [make_image("a.jpg"), make_image("b.png", fmt="PNG")],
+    }
+    response = admin_client.post(reverse("admin:catalog_service_change", args=[service.pk]), data)
+    assert response.status_code == 302, response.content.decode()[:2000]
+    assert list(service.photos.values_list("order", flat=True)) == [3, 4, 5]
+
+
 def test_bulk_upload_rejects_whole_batch_on_bad_file(admin_client, make_image):
     category = Category.objects.create(name="Сплавы")
     url = reverse("admin:catalog_category_change", args=[category.pk])
