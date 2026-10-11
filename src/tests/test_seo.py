@@ -15,9 +15,10 @@ OG_JPEG = re.compile(r'property="og:image" content="http://testserver/media/CACH
 
 
 def test_sitemap_lists_only_public_pages(client):
-    Category.objects.create(name="Открытая", is_published=True)
+    open_category = Category.objects.create(name="Открытая", is_published=True)
     Category.objects.create(name="Закрытая", is_published=False)
-    Service.objects.create(name="Со страницей", has_page=True)
+    with_page = Service.objects.create(name="Со страницей", has_page=True)
+    CategoryService.objects.create(category=open_category, service=with_page)
     Service.objects.create(name="Без страницы")
     InfoPage.objects.create(title="Правила")
     xml = client.get("/sitemap.xml").content.decode()
@@ -35,6 +36,29 @@ def test_robots(client):
     body = response.content.decode()
     assert "Disallow: /admin/" in body
     assert "Sitemap: http://testserver/sitemap.xml" in body
+
+
+def test_sitemap_skips_services_hidden_from_navigation(client):
+    shown = Category.objects.create(name="Видна", is_published=True)
+    hidden = Category.objects.create(name="Скрыта", is_published=False)
+    in_menu = Service.objects.create(name="Зиплайн", has_page=True)
+    CategoryService.objects.create(category=shown, service=in_menu)
+    CategoryService.objects.create(category=hidden, service=in_menu)  # в двух категориях — один раз в sitemap
+    only_hidden = Service.objects.create(name="Каяк", has_page=True)
+    CategoryService.objects.create(category=hidden, service=only_hidden)
+    Service.objects.create(name="Батут", has_page=True)  # без категории
+    xml = client.get("/sitemap.xml").content.decode()
+    assert xml.count("/service/ziplain/") == 1
+    assert "/service/kaiak/" not in xml
+    assert "/service/batut/" not in xml
+
+
+def test_robots_cleans_yandex_and_tracking_params(client):
+    clean = next(
+        line for line in client.get("/robots.txt").content.decode().splitlines() if line.startswith("Clean-param:")
+    )
+    for param in ("ysclid", "_openstat", "utm_referrer", "from", "utm_source", "yclid"):
+        assert param in clean.removeprefix("Clean-param: ").split("&"), param
 
 
 def test_category_meta(client, make_image):

@@ -7,7 +7,20 @@ from apps.core import structured_data as ld
 from apps.core.models import InfoPage
 from apps.core.seo import make_seo
 
-TRACKING_PARAMS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "yclid", "gclid", "fbclid"]
+TRACKING_PARAMS = [
+    "utm_source",
+    "utm_medium",
+    "utm_campaign",
+    "utm_content",
+    "utm_term",
+    "utm_referrer",
+    "yclid",
+    "ysclid",  # Яндекс сам добавляет его к переходам из выдачи
+    "_openstat",
+    "from",
+    "gclid",
+    "fbclid",
+]
 
 
 def healthz(request):
