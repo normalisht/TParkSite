@@ -49,3 +49,8 @@ def test_category_service_unique():
 
 def test_category_defaults_hidden():
     assert Category.objects.create(name="Новая").is_published is False
+
+
+def test_service_str_shows_price_to_tell_duplicates_apart():
+    assert str(Service(name="Фрироуп", price="900", price_unit="час")).replace("\u00a0", " ") == "Фрироуп — 900 ₽ / час"
+    assert str(Service(name="Фрироуп")) == "Фрироуп"

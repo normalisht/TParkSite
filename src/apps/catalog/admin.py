@@ -94,12 +94,30 @@ class CategoryAdmin(SiteModelAdmin):
         append_images(CategoryPhoto, form.cleaned_data.get("bulk_photos") or [], category=form.instance)
 
 
+class ServicePlacementFilter(admin.SimpleListFilter):
+    title = "Видна на сайте"
+    parameter_name = "placement"
+
+    def lookups(self, request, model_admin):
+        return [
+            ("none", "Без категории"),
+            ("hidden", "Нет в меню (без опубликованной категории)"),
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value() == "none":
+            return queryset.filter(category_links__isnull=True)
+        if self.value() == "hidden":
+            return queryset.exclude(category_links__category__is_published=True)
+        return queryset
+
+
 @admin.register(Service)
 class ServiceAdmin(SiteModelAdmin):
     form = ServiceAdminForm
-    list_display = ["name", "price_display", "is_published", "has_page"]
+    list_display = ["name", "price_display", "categories", "is_published", "has_page"]
     list_editable = ["is_published"]
-    list_filter = ["is_published", "has_page", "category_links__category"]
+    list_filter = [ServicePlacementFilter, "is_published", "has_page", "category_links__category"]
     search_fields = ["name"]
     prepopulated_fields = {"slug": ("name",)}
     inlines = [ServicePhotoInline, ServiceCategoryInline]
@@ -121,6 +139,13 @@ class ServiceAdmin(SiteModelAdmin):
         ("Загрузка фото", {"classes": ["tab"], "fields": ["bulk_photos"]}),
         SEO_FIELDSET,
     )
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related("category_links__category")
+
+    @admin.display(description="Категории")
+    def categories(self, obj):
+        return ", ".join(link.category.name for link in obj.category_links.all()) or "—"
 
     @admin.display(description="Цена")
     def price_display(self, obj):

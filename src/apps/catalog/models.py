@@ -114,7 +114,8 @@ class Service(SeoModel):
         ordering = ["name"]
 
     def __str__(self):
-        return self.name
+        # С ценой: в автодополнении админки варианты одной услуги («Фрироуп» на час и на день) различимы.
+        return f"{self.name} — {self.price_display}" if self.price_display else self.name
 
     def save(self, *args, **kwargs):
         if not self.slug:
