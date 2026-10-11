@@ -350,6 +350,26 @@ def test_category_form_sets_menu_groups(admin_client):
     assert list(category.groups.all()) == [active]
 
 
+def test_category_changelist_save_keeps_menu_groups(admin_client):
+    group = CategoryGroup.objects.create(name="Активный отдых")
+    category = Category.objects.create(name="Парк", is_published=True, order=1)
+    group.categories.add(category)
+    response = admin_client.post(
+        reverse("admin:catalog_category_changelist"),
+        {
+            "form-TOTAL_FORMS": "1",
+            "form-INITIAL_FORMS": "1",
+            "form-0-id": str(category.pk),
+            "form-0-order": "5",
+            "_save": "Сохранить",
+        },
+    )
+    assert response.status_code == 302
+    category.refresh_from_db()
+    assert category.is_published is False
+    assert list(category.groups.all()) == [group]
+
+
 def test_category_changelist_shows_groups_and_service_count(admin_client):
     group = CategoryGroup.objects.create(name="Активный отдых")
     category = Category.objects.create(name="Парк")
@@ -381,7 +401,7 @@ def test_admin_index_has_instructions(admin_client):
 
 
 def test_photo_fields_explain_cropping():
-    assert "3:2" in Category._meta.get_field("preview").help_text
+    assert "по-разному" in Category._meta.get_field("preview").help_text
     for model in (CategoryPhoto, ServicePhoto):
         assert "16:9" in model._meta.get_field("image").help_text
     assert "карточке" in Service._meta.get_field("short_description").help_text
@@ -423,4 +443,5 @@ def test_delete_confirmation_and_forms_are_russian(admin_client):
         assert not re.search(r">\s*Select\s*<", html), url
     html = admin_client.get(pages[0]).content.decode()
     assert "в группе «Активный отдых»" in html
-    assert "Вместе с ним будут удалены" in html
+    assert "Удалить: категория «Парк»" not in html
+    assert "Вместе с этим будут удалены" in html

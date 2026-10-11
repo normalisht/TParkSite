@@ -78,6 +78,15 @@ def test_flush_replaces_content(legacy):
     assert list(Category.objects.values_list("name", flat=True)) == ["Новая"]
 
 
+def test_flush_clears_redirects(legacy):
+    from apps.core.models import Redirect
+
+    Redirect.objects.create(old_path="/category/old/", new_path="/category/new/")
+    legacy.insert("category", id=1, name="Новая", status=1, number=0)
+    legacy.run(flush=True)
+    assert not Redirect.objects.exists()
+
+
 def test_failed_import_rolls_back_db_and_files(legacy, monkeypatch, media_root, make_image):
     from apps.content.models import GalleryPhoto as Photo
 

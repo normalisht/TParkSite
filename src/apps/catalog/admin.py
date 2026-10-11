@@ -124,7 +124,8 @@ class CategoryAdmin(SiteModelAdmin):
 
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)
-        form.instance.groups.set(form.cleaned_data["menu_groups"])
+        if "menu_groups" in form.cleaned_data:  # в форме списка (list_editable) этого поля нет
+            form.instance.groups.set(form.cleaned_data["menu_groups"])
         append_images(CategoryPhoto, form.cleaned_data.get("bulk_photos") or [], category=form.instance)
 
     def delete_view(self, request, object_id, extra_context=None):

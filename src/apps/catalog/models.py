@@ -7,7 +7,7 @@ from apps.core.models import OrderedModel, PublishedQuerySet, SeoModel
 from apps.core.redirects import remember_slug_change
 from apps.core.slugs import SLUG_HELP, unique_slug
 
-PREVIEW_HELP = "Карточка на главной и шапка страницы категории: кадр обрезается до 3:2, главное — ближе к центру."
+PREVIEW_HELP = "Карточка на главной и шапка страницы категории: кадр обрезается по-разному (4:3, 16:9, 3:2) — главное держите в центре."
 SLIDE_HELP = "Слайдер: кадр обрезается до 16:9 (как экран телевизора) — людей снимайте с запасом сверху и снизу."
 
 

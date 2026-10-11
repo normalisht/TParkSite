@@ -322,7 +322,7 @@ class InfoPage(SeoModel):
         return reverse("core:info", args=[self.slug])
 
 
-SITE_PATH_RE = re.compile(r"^/(?![/\\])[^\s\\]*$")
+SITE_PATH_RE = re.compile(r"^/(?![/\\])[^\s\\]*\Z")
 
 
 def is_site_path(value: str) -> bool:

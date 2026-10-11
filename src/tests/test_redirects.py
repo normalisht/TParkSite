@@ -87,7 +87,9 @@ def test_new_path_must_be_site_relative(new_path):
     assert "new_path" in error.value.message_dict
 
 
-@pytest.mark.parametrize("old_path", ["category/old/", "//evil.example/", "/category/old/?a=1", "/category/old/#x"])
+@pytest.mark.parametrize(
+    "old_path", ["category/old/", "//evil.example/", "/category/old/?a=1", "/category/old/#x", "/category/old/\n"]
+)
 def test_old_path_must_be_site_relative_without_query(old_path):
     with pytest.raises(ValidationError) as error:
         Redirect(old_path=old_path, new_path="/category/new/").full_clean()
