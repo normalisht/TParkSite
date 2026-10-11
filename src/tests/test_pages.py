@@ -419,6 +419,41 @@ def test_contacts_page_embeds_yandex_map_only_when_set(client):
     assert 'src="https://yandex.ru/map-widget/v1/?um=constructor%3Aabc&amp;source=constructor"' in html
 
 
+MAP_URL = "https://yandex.ru/map-widget/v1/org/t_park/17031236197/"
+
+
+def _set_map(url: str, yandex_maps_url: str = "") -> None:
+    site = SiteSettings.load()
+    site.map_embed_url, site.yandex_maps_url = url, yandex_maps_url
+    site.save()
+
+
+@pytest.mark.django_db
+def test_contacts_map_loads_on_click(client):
+    _set_map(MAP_URL)
+    html = client.get("/contacts/").content.decode()
+    assert "Показать карту" in html
+    template_at = html.index('<template x-if="map">')
+    assert html.index("<iframe") > template_at  # iframe только внутри <template>: до клика браузер его не грузит
+    assert html.count("<iframe") == 1
+
+
+@pytest.mark.django_db
+def test_contacts_map_has_no_js_fallback(client):
+    _set_map(MAP_URL, "https://yandex.ru/maps/org/t_park/17031236197/")
+    html = client.get("/contacts/").content.decode()
+    noscript = html.split("<noscript>", 1)[1].split("</noscript>", 1)[0]
+    assert 'href="https://yandex.ru/maps/org/t_park/17031236197/"' in noscript
+
+
+@pytest.mark.django_db
+def test_contacts_without_map(client):
+    _set_map("")
+    html = client.get("/contacts/").content.decode()
+    assert "Показать карту" not in html and "<iframe" not in html
+    assert "md:max-w-xl" in html
+
+
 def test_reviews_page_header_cta_and_tones(client):
     site = SiteSettings.load()
     for i in range(3):

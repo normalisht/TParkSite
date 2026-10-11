@@ -43,8 +43,22 @@
       </div>
 
       {% if site.map_embed_url %}
-      <iframe src="{{ site.map_embed_url }}" title="Т-Парк на Яндекс Картах" loading="lazy" allowfullscreen
-              class="card block h-96 w-full lg:h-full lg:min-h-[28rem]"></iframe>
+      {% comment %}
+        Карта по кнопке: iframe Яндекса тяжёлый, ставит сторонние cookie и до загрузки показывает пустой белый блок.
+        Без JS — ссылка на карточку в Яндекс Картах.
+      {% endcomment %}
+      <div x-data="{ map: false }" class="card relative h-96 w-full overflow-hidden lg:h-full lg:min-h-[28rem]">
+        <template x-if="map">
+          <iframe src="{{ site.map_embed_url }}" title="Т-Парк на Яндекс Картах" allowfullscreen
+                  class="absolute inset-0 h-full w-full"></iframe>
+        </template>
+        <div x-show="!map" class="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-pine-50 p-6 text-center">
+          <span class="icon h-10 w-10 text-pine-700">{% include "icons/map-pin.svg" %}</span>
+          <p class="max-w-xs text-ink/75">{{ site.address }}</p>
+          <button type="button" class="btn btn-primary" x-cloak @click="map = true">Показать карту</button>
+          <noscript><a href="{% firstof site.yandex_maps_url site.map_embed_url %}" class="btn btn-primary" target="_blank" rel="noopener">Открыть на Яндекс Картах</a></noscript>
+        </div>
+      </div>
       {% endif %}
     </div>
   </div>
