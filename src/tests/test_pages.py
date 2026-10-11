@@ -574,6 +574,48 @@ def test_service_related_skips_same_name_variants(client):
     assert services[4].get_absolute_url() in related
 
 
+def _category_with_services(count):
+    category = Category.objects.create(name="Высота", is_published=True)
+    services = [Service.objects.create(name=f"Услуга {i}", has_page=True) for i in range(count)]
+    for order, service in enumerate(services):
+        CategoryService.objects.create(category=category, service=service, order=order)
+    return services
+
+
+def _related_urls(html):
+    return re.findall(r'<a href="(/service/[^"]+)" class="card', html.split("Ещё в категории")[1])
+
+
+def test_related_services_rotate_daily(client, monkeypatch):
+    services = _category_with_services(8)
+    current = services[0]
+    urls_in_order = [s.get_absolute_url() for s in services]
+    seen = set()
+    for shift in range(20):
+        day = date(2026, 10, 1) + timedelta(days=shift)
+        monkeypatch.setattr("django.utils.timezone.localdate", lambda day=day: day)
+        urls = _related_urls(client.get(current.get_absolute_url()).content.decode())
+        assert len(urls) == 3
+        assert current.get_absolute_url() not in urls
+        positions = [urls_in_order.index(url) for url in urls]
+        assert positions == sorted(positions)  # порядок — как в категории
+        seen.update(urls)
+    assert seen == set(urls_in_order[1:])  # ссылки получают все, не только первые три
+
+
+def test_related_services_differ_between_services(client, monkeypatch):
+    services = _category_with_services(8)
+    monkeypatch.setattr("django.utils.timezone.localdate", lambda: date(2026, 10, 11))
+    shown = [frozenset(_related_urls(client.get(s.get_absolute_url()).content.decode())) for s in services[4:]]
+    assert len(set(shown)) > 1  # без ротации все четыре показывают первые три услуги
+
+
+def test_related_services_stable_within_day(client):
+    services = _category_with_services(8)
+    first = client.get(services[0].get_absolute_url())
+    assert client.get(services[0].get_absolute_url(), HTTP_IF_NONE_MATCH=first["ETag"]).status_code == 304
+
+
 def test_whatsapp_prefilled_with_service_name(client):
     Phone.objects.create(settings=SiteSettings.load(), number="9029856594", is_whatsapp=True)
     service = Service.objects.create(name="Виа-феррата", has_page=True)

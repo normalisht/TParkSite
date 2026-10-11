@@ -6,6 +6,7 @@ from apps.core import structured_data as ld
 from apps.core.images import lightbox_url, safe_spec_url
 from apps.core.maps import route_links
 from apps.core.models import PARK_ADDRESS, SiteSettings
+from apps.core.rotation import daily_pick
 from apps.core.seo import absolute_url, make_seo, page_seo
 
 HOME_REVIEWS = 8
@@ -81,17 +82,17 @@ RELATED_SERVICES = 3
 
 
 def related_services(category, service, limit: int = RELATED_SERVICES) -> list:
-    """Другие услуги категории со своей страницей; варианты с тем же названием (в т. ч. текущей услуги) — один раз."""
+    """Другие услуги категории со своей страницей: у каждой услуги свой набор, меняется раз в сутки — иначе ссылки
+    получали бы только первые услуги категории. Варианты с тем же названием (в т. ч. текущей услуги) — один раз.
+    """
     seen = {service.name.casefold()}
-    result = []
+    candidates = []
     for item in category.published_services():
         name = item.name.casefold()
         if item.has_page and name not in seen:
             seen.add(name)
-            result.append(item)
-            if len(result) == limit:
-                break
-    return result
+            candidates.append(item)
+    return daily_pick(candidates, limit, key=f"service:{service.pk}")
 
 
 def service_detail(request, slug):
