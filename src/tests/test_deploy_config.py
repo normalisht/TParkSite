@@ -54,6 +54,15 @@ def test_dockerignore_excludes_legacy_data():
     lines = (ROOT / ".dockerignore").read_text(encoding="utf-8").splitlines()
     assert "src/old_migrate" in lines
     assert "src/*.csv" in lines
+    # Отчёты покрытия (pytest --cov) лежат в src/ рабочей копии и в образ не нужны.
+    assert "src/.coverage*" in lines
+    assert "src/htmlcov" in lines
+
+
+def test_gitignore_excludes_coverage_reports():
+    lines = (ROOT / ".gitignore").read_text(encoding="utf-8").splitlines()
+    assert "/src/.coverage*" in lines
+    assert "/src/htmlcov/" in lines
 
 
 NGINX = (ROOT / "docker/nginx.conf.template").read_text(encoding="utf-8")
@@ -161,8 +170,12 @@ def test_backup_rotation_touches_only_dated_folders():
 
 def test_ci_runs_linters_tests_and_image_build():
     workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
-    for command in ("ruff check", "ruff format --check", "pytest", "docker build"):
+    for command in ("ruff check", "ruff format --check", "makemigrations --check", "pytest", "docker build"):
         assert command in workflow, command
+    # Минимальные права токена, отмена устаревших прогонов и потолок по времени.
+    assert re.search(r"^permissions:\n  contents: read$", workflow, re.MULTILINE)
+    assert "cancel-in-progress: true" in workflow
+    assert workflow.count("timeout-minutes:") == 2  # test и image
 
 
 def _service_block(path: Path, name: str) -> str:
@@ -194,6 +207,8 @@ def test_upload_temp_dir_is_on_db_volume_and_created_at_start():
     assert "/data/media" not in match.group(1)
     entrypoint = (ROOT / "docker/entrypoint.sh").read_text(encoding="utf-8")
     assert 'mkdir -p "$FILE_UPLOAD_TEMP_DIR"' in entrypoint
+    # Оборванные загрузки оставляют файлы: старше часа удаляем при старте (и не падаем под set -e, если удалять нечего).
+    assert re.search(r'find "\$FILE_UPLOAD_TEMP_DIR" -type f -mmin \+60 -delete', entrypoint)
 
 
 def test_python_does_not_write_bytecode_into_read_only_image():

@@ -6,9 +6,18 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
+# Новый пуш в ту же ветку отменяет ещё идущий прогон.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: src
@@ -23,10 +32,12 @@ jobs:
       - run: uv sync --frozen
       - run: uv run ruff check . && uv run ruff format --check .
       - run: uv run manage.py tailwind build
+      - run: uv run manage.py makemigrations --check --dry-run
       - run: uv run pytest -q --cov=apps --cov-report=term-missing:skip-covered
 
   image:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v5
       - run: docker build -t tpark-web:ci .
