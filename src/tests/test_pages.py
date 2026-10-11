@@ -110,14 +110,22 @@ def test_category_hero_opens_full_photo(client, make_image):
     second = CategoryPhoto.objects.create(category=category, image=make_image("second.jpg"), order=1)
     html = client.get(category.get_absolute_url()).content.decode()
     # Шапка — первое фото, остальные листаются следом; первое не дублируется.
-    assert html.count(f'href="{photo.image.url}" class="glightbox') == 1
-    assert f'<a href="{second.image.url}" class="glightbox" data-gallery="category" hidden>' in html
+    assert html.count(f'href="{photo.full.url}" class="glightbox') == 1
+    assert f'<a href="{second.full.url}" class="glightbox" data-gallery="category" hidden>' in html
 
     category.preview = make_image("preview.jpg")
     category.save()
     html = client.get(category.get_absolute_url()).content.decode()
     assert f'<a href="{category.preview.url}" class="glightbox block cursor-zoom-in" data-gallery="category">' in html
-    assert f'<a href="{photo.image.url}" class="glightbox" data-gallery="category" hidden>' in html
+    assert f'<a href="{photo.full.url}" class="glightbox" data-gallery="category" hidden>' in html
+
+
+def test_category_hero_srcset_up_to_1080(client, make_image):
+    category = Category.objects.create(name="Сплавы", is_published=True, preview=make_image(size=(1080, 720)))
+    html = client.get(category.get_absolute_url()).content.decode()
+    hero = html.split('data-gallery="category">')[1].split("</a>")[0]
+    assert re.search(r'srcset="[^"]+\.avif 640w, [^"]+\.avif 1080w" sizes="\(min-width: 1152px\) 536px', hero)
+    assert 'fetchpriority="high"' in hero and 'width="1080" height="720"' in hero
 
 
 def test_category_page_without_services(client):

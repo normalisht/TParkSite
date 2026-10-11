@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404, render
 from apps.catalog.models import Category, Service
 from apps.content.models import Event, GalleryPhoto, Review
 from apps.core import structured_data as ld
-from apps.core.images import safe_spec_url
+from apps.core.images import lightbox_url, safe_spec_url
 from apps.core.maps import route_links
 from apps.core.models import PARK_ADDRESS, SiteSettings
 from apps.core.seo import absolute_url, make_seo, page_seo
@@ -37,12 +37,13 @@ def category_detail(request, slug):
     category = get_object_or_404(Category.objects.published(), slug=slug)
     photos = list(category.photos.all())
     services = category.published_services()
-    image = safe_spec_url(category, "preview_card")
-    # Полноразмерное фото для просмотра на весь экран при нажатии на картинку в шапке.
-    image_full = category.preview.url if image else ""
-    if not image and photos:
-        image = safe_spec_url(photos[0], "slide")
-        image_full = photos[0].image.url if image else ""
+    # Шапка: превью категории, без него — первое фото. Полноразмерное — для просмотра на весь экран.
+    if safe_spec_url(category, "preview_card"):
+        hero, hero_srcset, hero_full = category, "preview_card 640w, preview_large 1080w", category.preview.url
+    elif photos and safe_spec_url(photos[0], "slide"):
+        hero, hero_srcset, hero_full = photos[0], "slide_small 800w, slide 1600w", lightbox_url(photos[0])
+    else:
+        hero, hero_srcset, hero_full = None, "", ""
     crumbs = [ld.home_crumb(), (category.name, "")]
     return render(
         request,
@@ -56,14 +57,15 @@ def category_detail(request, slug):
             # Услуги со своей страницей — карточками, остальные — компактным списком.
             "service_cards": [s for s in services if s.has_page],
             "service_rows": [s for s in services if not s.has_page],
-            "hero": image,
-            "hero_full": image_full,
+            "hero": hero,
+            "hero_srcset": hero_srcset,
+            "hero_full": hero_full,
             "related": category.related_categories(),
             "breadcrumbs": crumbs,
             "seo": make_seo(
                 category.name,
                 category.description,
-                absolute_url(request, image),
+                absolute_url(request, safe_spec_url(hero, "og")),
                 obj=category,
                 default_description=f"{category.name} в Т-Парке: услуги и цены. {PARK_ADDRESS}.",
             ),

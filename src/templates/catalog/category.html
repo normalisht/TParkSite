@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load site_texts %}
+{% load site_tags site_texts %}
 {% block vendor_css %}{% include "partials/vendor.html" with part="css" swiper=1 glightbox=1 %}{% endblock %}
 {% block vendor_js %}{% include "partials/vendor.html" with part="js" swiper=1 glightbox=1 %}{% endblock %}
 {% block content %}
@@ -12,9 +12,9 @@
       {% if category.description %}<div class="rich-text mt-5 max-w-3xl">{{ category.description|safe }}</div>{% endif %}
     </div>
     {% if hero %}
-    <a href="{{ hero_full }}" class="glightbox block cursor-zoom-in" data-gallery="category"><img src="{{ hero }}" alt="{{ category.name }}" class="aspect-[16/9] w-full lg:aspect-[3/2] rounded-2xl object-cover shadow-lg" fetchpriority="high"></a>
+    <a href="{{ hero_full }}" class="glightbox block cursor-zoom-in" data-gallery="category">{% picture hero hero_srcset sizes="(min-width: 1152px) 536px, (min-width: 1024px) calc(50vw - 40px), calc(100vw - 32px)" alt=category.name width=1080 height=720 fetchpriority="high" class="aspect-[16/9] w-full lg:aspect-[3/2] rounded-2xl object-cover shadow-lg" %}</a>
     {# Остальные фото категории — чтобы из шапки их можно было пролистать на весь экран. #}
-    {% for photo in photos %}{% if photo.image.url != hero_full %}<a href="{{ photo.image.url }}" class="glightbox" data-gallery="category" hidden></a>{% endif %}{% endfor %}
+    {% for photo in photos %}{% with full=photo|lightbox_url %}{% if full and full != hero_full %}<a href="{{ full }}" class="glightbox" data-gallery="category" hidden></a>{% endif %}{% endwith %}{% endfor %}
     {% endif %}
   </div>
 </section>
