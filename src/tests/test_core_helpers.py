@@ -1,4 +1,5 @@
 import io
+from datetime import date, timedelta
 from decimal import Decimal
 
 import pytest
@@ -10,6 +11,7 @@ from apps.core.fields import UploadTo, sanitize_html, validate_image_upload
 from apps.core.images import safe_spec_url
 from apps.core.maps import route_links
 from apps.core.opening_hours import human_opening_hours, opening_hours_spec
+from apps.core.rotation import daily_pick
 from apps.core.slugs import slugify_ru
 from apps.core.templatetags.site_tags import nobr
 
@@ -190,3 +192,42 @@ def test_opening_hours_spec_invalid_is_empty():
 def test_opening_hours_spec_pads_hours_to_two_digits():
     spec = opening_hours_spec("Mo-Fr 9:00-18:00")[0]
     assert (spec["opens"], spec["closes"]) == ("09:00", "18:00")
+
+
+DAY = date(2026, 10, 11)
+
+
+def test_daily_pick_stable_for_day_and_key():
+    items = list(range(20))
+    assert daily_pick(items, 6, "home", DAY) == daily_pick(items, 6, "home", DAY)
+    assert len(daily_pick(items, 6, "home", DAY)) == 6
+
+
+def test_daily_pick_keeps_original_order():
+    items = list(range(20))
+    picked = daily_pick(items, 6, "home", DAY)
+    assert picked == sorted(picked)
+
+
+def test_daily_pick_returns_all_when_short():
+    assert daily_pick([3, 1, 2], 6, "home", DAY) == [3, 1, 2]
+    assert daily_pick([], 6, "home", DAY) == []
+
+
+def test_daily_pick_rotates_over_days():
+    items = list(range(20))
+    seen = set()
+    for shift in range(30):
+        seen.update(daily_pick(items, 6, "home", DAY + timedelta(days=shift)))
+    assert seen == set(items)  # за месяц показан каждый
+
+
+def test_daily_pick_differs_between_keys():
+    items = list(range(20))
+    days = [DAY + timedelta(days=shift) for shift in range(5)]
+    assert any(daily_pick(items, 6, "home", day) != daily_pick(items, 6, "about", day) for day in days)
+
+
+def test_daily_pick_defaults_to_local_date(monkeypatch):
+    monkeypatch.setattr("django.utils.timezone.localdate", lambda: DAY)
+    assert daily_pick(list(range(20)), 6, "home") == daily_pick(list(range(20)), 6, "home", DAY)

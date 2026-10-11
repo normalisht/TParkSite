@@ -299,6 +299,14 @@ def test_review_signed_as_guest(client):
         assert "Гость Т-Парка" in client.get(url).content.decode()
 
 
+def test_review_card_uses_animated_component(client):
+    Review.objects.create(text="<p>Отзыв</p>")
+    html = client.get("/reviews/").content.decode()
+    assert 'x-data="reviewCard"' in html and '@click="toggle()"' in html and ':aria-expanded="open"' in html
+    head = html.split("</head>")[0]
+    assert head.index("js/review_card") < head.index("vendor/alpine")  # компонент регистрируется до старта Alpine
+
+
 def test_review_card_links_to_source_when_link_set(client):
     Review.objects.create(text="<p>a</p>", link="https://reviews.yandex.ru/u/1", date=date(2022, 7, 20))
     Review.objects.create(text="<p>b</p>")
@@ -314,6 +322,47 @@ def test_reviews_page_photo_strip(client, make_image):
     GalleryPhoto.objects.create(image=make_image(), caption="Закат")
     html = client.get("/reviews/").content.decode()
     assert "Как это выглядит" in html and 'alt="Закат"' in html
+
+
+def _strip_gallery(make_image, count):
+    """count фото с подписями «Фото 0…»: по alt видно, какие попали в полосу."""
+    first = GalleryPhoto.objects.create(image=make_image(), caption="Фото 0")
+    GalleryPhoto.objects.bulk_create(
+        [GalleryPhoto(image=first.image.name, caption=f"Фото {i}", order=i) for i in range(1, count)]
+    )
+
+
+def _strip_alts(html):
+    strip = html.split("Как это выглядит")[1].split("</section>")[0]
+    return re.findall(r'alt="(Фото \d+)"', strip)
+
+
+@pytest.mark.parametrize("url", ["/", "/about/", "/reviews/"])
+def test_photo_strip_rotates_daily(client, make_image, monkeypatch, url):
+    _strip_gallery(make_image, 15)
+    seen = set()
+    for shift in range(10):
+        day = date(2026, 10, 1) + timedelta(days=shift)
+        monkeypatch.setattr("django.utils.timezone.localdate", lambda day=day: day)
+        alts = _strip_alts(client.get(url).content.decode())
+        assert len(alts) == GalleryPhoto.STRIP_SIZE
+        assert alts == sorted(alts, key=lambda alt: int(alt.split()[1]))  # порядок — как в галерее
+        seen.update(alts)
+    assert len(seen) > GalleryPhoto.STRIP_SIZE  # не всегда первые шесть
+
+
+def test_photo_strip_differs_between_pages(client, make_image, monkeypatch):
+    _strip_gallery(make_image, 15)
+    monkeypatch.setattr("django.utils.timezone.localdate", lambda: date(2026, 10, 11))
+    home, about = (_strip_alts(client.get(url).content.decode()) for url in ("/", "/about/"))
+    assert home != about
+
+
+def test_photo_strip_stable_within_day_keeps_304(client, make_image):
+    _strip_gallery(make_image, 15)
+    first = client.get("/")
+    assert first.has_header("ETag")
+    assert client.get("/", HTTP_IF_NONE_MATCH=first["ETag"]).status_code == 304
 
 
 def test_gallery_page(client, make_image):
@@ -531,6 +580,48 @@ def test_service_related_skips_same_name_variants(client):
     assert services[2].get_absolute_url() in related
     assert services[3].get_absolute_url() not in related  # одинаковые названия — одна карточка
     assert services[4].get_absolute_url() in related
+
+
+def _category_with_services(count):
+    category = Category.objects.create(name="Высота", is_published=True)
+    services = [Service.objects.create(name=f"Услуга {i}", has_page=True) for i in range(count)]
+    for order, service in enumerate(services):
+        CategoryService.objects.create(category=category, service=service, order=order)
+    return services
+
+
+def _related_urls(html):
+    return re.findall(r'<a href="(/service/[^"]+)" class="card', html.split("Ещё в категории")[1])
+
+
+def test_related_services_rotate_daily(client, monkeypatch):
+    services = _category_with_services(8)
+    current = services[0]
+    urls_in_order = [s.get_absolute_url() for s in services]
+    seen = set()
+    for shift in range(20):
+        day = date(2026, 10, 1) + timedelta(days=shift)
+        monkeypatch.setattr("django.utils.timezone.localdate", lambda day=day: day)
+        urls = _related_urls(client.get(current.get_absolute_url()).content.decode())
+        assert len(urls) == 3
+        assert current.get_absolute_url() not in urls
+        positions = [urls_in_order.index(url) for url in urls]
+        assert positions == sorted(positions)  # порядок — как в категории
+        seen.update(urls)
+    assert seen == set(urls_in_order[1:])  # ссылки получают все, не только первые три
+
+
+def test_related_services_differ_between_services(client, monkeypatch):
+    services = _category_with_services(8)
+    monkeypatch.setattr("django.utils.timezone.localdate", lambda: date(2026, 10, 11))
+    shown = [frozenset(_related_urls(client.get(s.get_absolute_url()).content.decode())) for s in services[4:]]
+    assert len(set(shown)) > 1  # без ротации все четыре показывают первые три услуги
+
+
+def test_related_services_stable_within_day(client):
+    services = _category_with_services(8)
+    first = client.get(services[0].get_absolute_url())
+    assert client.get(services[0].get_absolute_url(), HTTP_IF_NONE_MATCH=first["ETag"]).status_code == 304
 
 
 def test_whatsapp_prefilled_with_service_name(client):
