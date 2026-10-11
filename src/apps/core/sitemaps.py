@@ -3,7 +3,7 @@ from django.urls import reverse
 
 from apps.catalog.models import Category, Service
 from apps.content.models import Event
-from apps.core.models import InfoPage
+from apps.core.models import InfoPage, SiteSettings
 
 
 class StaticSitemap(Sitemap):
@@ -19,6 +19,10 @@ class StaticSitemap(Sitemap):
 
     def location(self, item):
         return reverse(item)
+
+    def lastmod(self, item):
+        # Тексты и SEO статических страниц хранятся в настройках сайта.
+        return SiteSettings.load().updated_at
 
 
 class ModelSitemap(Sitemap):

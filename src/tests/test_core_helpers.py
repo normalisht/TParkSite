@@ -9,7 +9,7 @@ from PIL import Image
 from apps.core.fields import UploadTo, sanitize_html, validate_image_upload
 from apps.core.images import safe_spec_url
 from apps.core.maps import route_links
-from apps.core.opening_hours import human_opening_hours
+from apps.core.opening_hours import human_opening_hours, opening_hours_spec
 from apps.core.slugs import slugify_ru
 from apps.core.templatetags.site_tags import nobr
 
@@ -162,3 +162,26 @@ def test_strip_founder_heading_keeps_other_text():
     text = "<p>Дмитрий Сергеев родился в Калуге.</p>\n\n<p>Этот человек придумал и создал Т-Парк:</p>"
     assert strip_founder_heading(text, FOUNDER_NAME, FOUNDER_LEAD) == text
     assert strip_founder_heading("", FOUNDER_NAME, FOUNDER_LEAD) == ""
+
+
+def test_opening_hours_spec():
+    assert opening_hours_spec("Mo-Fr 10:00-18:00; Sa,Su 11:00-16:00") == [
+        {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": [f"https://schema.org/{d}" for d in ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")],
+            "opens": "10:00",
+            "closes": "18:00",
+        },
+        {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["https://schema.org/Saturday", "https://schema.org/Sunday"],
+            "opens": "11:00",
+            "closes": "16:00",
+        },
+    ]
+    assert len(opening_hours_spec("Mo-Su 10:00-18:00")[0]["dayOfWeek"]) == 7
+
+
+def test_opening_hours_spec_invalid_is_empty():
+    assert opening_hours_spec("Пн-Пт 10-18") == []
+    assert opening_hours_spec("") == []

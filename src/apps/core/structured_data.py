@@ -11,6 +11,7 @@ from django.urls import reverse
 
 from apps.core.images import safe_spec_url
 from apps.core.models import SiteSettings
+from apps.core.opening_hours import opening_hours_spec
 from apps.core.seo import plaintext
 
 SITE_NAME = "Т-Парк"
@@ -48,7 +49,7 @@ def organization(request, *, with_founder: bool = False) -> dict:
     """Т-Парк как местная организация: адрес, телефоны, координаты, ссылки на ВКонтакте и Яндекс Карты."""
     site = SiteSettings.for_request(request)
     data = {
-        "@type": "LocalBusiness",
+        "@type": ["LocalBusiness", "SportsActivityLocation"],
         "@id": organization_id(request),
         "name": SITE_NAME,
         "alternateName": ALTERNATE_NAME,
@@ -58,7 +59,7 @@ def organization(request, *, with_founder: bool = False) -> dict:
         "description": plaintext(site.home_intro) or None,
         "telephone": [phone.tel_url.removeprefix("tel:") for phone in site.phones.all()] or None,
         "image": request.build_absolute_uri(url) if (url := safe_spec_url(site, "og_card")) else None,
-        "openingHours": site.opening_hours or None,
+        "openingHoursSpecification": opening_hours_spec(site.opening_hours) or None,
         "priceRange": site.price_range or None,
         "sameAs": [url for url in (site.vk_url, site.yandex_maps_url) if url] or None,
         "founder": founder(request, site) if with_founder else None,
@@ -126,7 +127,13 @@ def price_offer(text: str, url: str) -> dict | None:
         amount = re.sub(r"\D", "", match.group())
     else:
         return None
-    return {"@type": "Offer", "price": amount, "priceCurrency": "RUB", "url": url}
+    return {
+        "@type": "Offer",
+        "price": amount,
+        "priceCurrency": "RUB",
+        "url": url,
+        "availability": "https://schema.org/InStock",
+    }
 
 
 def event(request, event, seo: dict) -> dict:
@@ -150,9 +157,24 @@ def event(request, event, seo: dict) -> dict:
                 else {"@type": "Place", "name": SITE_NAME, "address": postal_address(site)}
             ),
             "organizer": {"@id": organization_id(request)},
+            "performer": {"@id": organization_id(request)},
             "offers": price_offer(event.price, url) if event.price else None,
         }
     )
+
+
+def event_list(request, events) -> dict | None:
+    """Предстоящие мероприятия страницы «Мероприятия» — `ItemList` со ссылками на страницы событий."""
+    if not events:
+        return None
+    return {
+        "@type": "ItemList",
+        "name": "Мероприятия Т-Парка",
+        "itemListElement": [
+            {"@type": "ListItem", "position": position, "url": request.build_absolute_uri(event.get_absolute_url())}
+            for position, event in enumerate(events, start=1)
+        ],
+    }
 
 
 def _compact(data: dict) -> dict:

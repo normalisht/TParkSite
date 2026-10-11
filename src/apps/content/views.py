@@ -27,6 +27,7 @@ def events(request):
             "past": list(Event.objects.published().past_visible(today)),
             "past_shown": PAST_EVENTS_SHOWN,
             "seo": page_seo("events"),
+            "structured_data": [n for n in (ld.organization(request), ld.event_list(request, upcoming)) if n],
         },
     )
 

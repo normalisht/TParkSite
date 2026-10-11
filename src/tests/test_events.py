@@ -54,7 +54,10 @@ def test_event_page_json_ld(client):
     event = make_event(description="<p>Описание</p>")
     html = client.get(event.get_absolute_url()).content.decode()
     raw = re.search(r'<script type="application/ld\+json">(.*?)</script>', html, re.DOTALL).group(1)
-    nodes = {node["@type"]: node for node in json.loads(raw)["@graph"]}
+    nodes = {
+        (node["@type"][0] if isinstance(node["@type"], list) else node["@type"]): node
+        for node in json.loads(raw)["@graph"]
+    }
     data = nodes["Event"]
     assert data["name"] == "Слёт"
     assert data["startDate"] == data["endDate"] == event.date.isoformat()
@@ -73,7 +76,13 @@ def test_event_page_json_ld_time_period_and_offer(client):
     data = next(node for node in json.loads(raw)["@graph"] if node["@type"] == "Event")
     assert data["startDate"] == f"{event.date.isoformat()}T18:00:00+03:00"
     assert data["endDate"] == event.end_date.isoformat()
-    assert data["offers"] == {"@type": "Offer", "price": "1500", "priceCurrency": "RUB", "url": data["url"]}
+    assert data["offers"] == {
+        "@type": "Offer",
+        "price": "1500",
+        "priceCurrency": "RUB",
+        "url": data["url"],
+        "availability": "https://schema.org/InStock",
+    }
 
 
 def test_event_page_booking_card(client):
@@ -204,3 +213,27 @@ def test_event_default_description_uses_venue_instead_of_park(client):
     assert "ТИЦ Обнинска" in description
     assert "в Т-Парке" not in description
     assert PARK_ADDRESS not in description
+
+
+def _graph(html):
+    raw = re.search(r'<script type="application/ld\+json">(.*?)</script>', html, re.DOTALL).group(1)
+    return json.loads(raw)["@graph"]
+
+
+def test_event_ld_has_performer_and_availability(client):
+    event = make_event(price="1000 ₽")
+    node = next(n for n in _graph(client.get(event.get_absolute_url()).content.decode()) if n["@type"] == "Event")
+    assert node["performer"] == node["organizer"]
+    assert node["offers"]["availability"] == "https://schema.org/InStock"
+
+
+def test_events_page_lists_upcoming_in_item_list(client):
+    first, second = make_event("Первое", days=2), make_event("Второе", days=9)
+    graph = _graph(client.get("/events/").content.decode())
+    items = next(n for n in graph if n["@type"] == "ItemList")["itemListElement"]
+    assert [i["url"] for i in items] == [f"http://testserver{e.get_absolute_url()}" for e in (first, second)]
+
+
+def test_events_page_without_events_has_no_item_list(client):
+    html = client.get("/events/").content.decode()
+    assert '"ItemList"' not in html

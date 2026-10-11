@@ -57,6 +57,7 @@ def _seo_pair(page: str):
 
 
 class SiteSettings(models.Model):
+    updated_at = models.DateTimeField("Изменено", auto_now=True)
     address = models.CharField("Адрес", max_length=255, blank=True, default=PARK_ADDRESS)
     map_embed_url = MapEmbedURLField(
         "Яндекс Карта на странице контактов",

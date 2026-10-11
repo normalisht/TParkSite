@@ -91,7 +91,10 @@ def test_favicon_redirects_to_static(client):
 
 def ld_nodes(html: str) -> dict:
     raw = re.search(r'<script type="application/ld\+json">(.*?)</script>', html, re.DOTALL).group(1)
-    return {node["@type"]: node for node in json.loads(raw)["@graph"]}
+    return {
+        (node["@type"][0] if isinstance(node["@type"], list) else node["@type"]): node
+        for node in json.loads(raw)["@graph"]
+    }
 
 
 def test_custom_seo_fields_win(client):
@@ -310,3 +313,25 @@ def test_metrika_tracks_contact_clicks(client, settings):
     assert 'ym(counterId, "reachGoal", goal)' in script
     for goal in ("call", "whatsapp", "telegram", "vk", "max"):
         assert f'"{goal}"' in script
+
+
+def _graph(html: str) -> list[dict]:
+    raw = re.search(r'<script type="application/ld\+json">(.*?)</script>', html, re.DOTALL).group(1)
+    return json.loads(raw)["@graph"]
+
+
+def test_organization_type_and_hours(client):
+    site = SiteSettings.load()
+    site.opening_hours = "Mo-Su 10:00-18:00"
+    site.save()
+    org = next(n for n in _graph(client.get("/").content.decode()) if n.get("@id", "").endswith("#organization"))
+    assert org["@type"] == ["LocalBusiness", "SportsActivityLocation"]
+    assert org["openingHoursSpecification"][0]["opens"] == "10:00"
+    assert "openingHours" not in org
+
+
+def test_static_pages_have_lastmod(client):
+    SiteSettings.load().save()
+    xml = client.get("/sitemap.xml").content.decode()
+    contacts = xml.split("/contacts/</loc>", 1)[1].split("</url>", 1)[0]
+    assert "<lastmod>" in contacts
