@@ -194,6 +194,15 @@ class SiteSettings(models.Model):
         obj, _ = cls.objects.get_or_create(pk=1)
         return obj
 
+    @classmethod
+    def for_request(cls, request) -> SiteSettings:
+        """Настройки один раз на запрос (контекст-процессоры, JSON-LD); без запроса — как `load()`."""
+        if request is None:
+            return cls.load()
+        from apps.core.request_cache import cached_on_request
+
+        return cached_on_request(request, "site_settings", cls.load)
+
 
 class Phone(models.Model):
     settings = models.ForeignKey(SiteSettings, on_delete=models.CASCADE, related_name="phones")

@@ -46,7 +46,7 @@ def founder(request, site: SiteSettings) -> dict | None:
 
 def organization(request, *, with_founder: bool = False) -> dict:
     """Т-Парк как местная организация: адрес, телефоны, координаты, ссылки на ВКонтакте и Яндекс Карты."""
-    site = SiteSettings.load()
+    site = SiteSettings.for_request(request)
     data = {
         "@type": "LocalBusiness",
         "@id": organization_id(request),
@@ -90,7 +90,7 @@ def service(request, service) -> dict:
         "url": request.build_absolute_uri(service.get_absolute_url()) if service.has_page else None,
         "description": plaintext(service.seo_description or service.short_description or service.description) or None,
         "provider": {"@id": organization_id(request)},
-        "areaServed": SiteSettings.load().address_region or None,
+        "areaServed": SiteSettings.for_request(request).address_region or None,
     }
     # Цена бывает текстом («договорная») — в разметку попадает только число.
     price = service.price.replace(" ", "")
@@ -130,7 +130,7 @@ def price_offer(text: str, url: str) -> dict | None:
 
 
 def event(request, event, seo: dict) -> dict:
-    site = SiteSettings.load()
+    site = SiteSettings.for_request(request)
     url = request.build_absolute_uri(event.get_absolute_url())
     starts_at = event.starts_at
     return _compact(
