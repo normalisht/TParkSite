@@ -50,7 +50,7 @@
   <div class="scroll-strip sm:grid sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
     {% for category in related %}
     <div class="w-[44%] shrink-0 snap-start scroll-ml-4 sm:w-auto">
-      {% include "catalog/partials/category_card.html" %}
+      {% include "catalog/partials/category_card.html" with sizes="(min-width: 1152px) 268px, (min-width: 1024px) calc((100vw - 80px) / 4), (min-width: 640px) calc(50vw - 24px), 44vw" %}
     </div>
     {% endfor %}
   </div>

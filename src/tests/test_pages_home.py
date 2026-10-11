@@ -116,6 +116,8 @@ def test_home_first_screen_cards_load_eagerly(client, make_image):
     assert len(imgs) == 5
     assert ['loading="lazy"' in tag for tag in imgs] == [False, False, False, True, True]
     assert ['fetchpriority="high"' in tag for tag in imgs] == [True, False, False, False, False]
+    assert ['decoding="async"' in tag for tag in imgs] == [False, True, True, False, False]
+    assert all(re.search(r'srcset="[^"]+ 640w, [^"]+ 1080w"', tag) for tag in imgs)
 
 
 def test_home_cards_lazy_when_hero_photo_set(client, make_image):

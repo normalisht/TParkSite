@@ -18,7 +18,7 @@
       </ul>
       {% endif %}
     </div>
-    {% if hero %}<img src="{{ hero }}" alt="Т-Парк" width="960" height="720" class="aspect-[4/3] w-full rounded-2xl object-cover shadow-lg" fetchpriority="high">{% endif %}
+    {% if hero %}{% picture site "about_card" alt="Т-Парк" width=960 height=720 fetchpriority="high" class="aspect-[4/3] w-full rounded-2xl object-cover shadow-lg" %}{% endif %}
   </div>
 </section>
 
@@ -31,7 +31,7 @@
   {# Сетка: на телефоне 2 колонки — все направления группы видны сразу; при нечётном числе первая карточка широкая (без «дыры»). Группа из 1–2 категорий — широкими карточками на ПК. #}
   <div class="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 {% if count > 2 %}lg:grid-cols-3{% endif %}">
     {% for category in group.published_categories %}
-    <div class="{% if count == 1 %}col-span-2 sm:col-span-1{% elif count|divisibleby:2 is False and forloop.first %}col-span-2 lg:col-span-1{% endif %}">{% if count > 2 %}{% include "catalog/partials/category_card.html" with first_screen=first_screen lcp=lcp_card %}{% else %}{% include "catalog/partials/category_card.html" with wide=True first_screen=first_screen lcp=lcp_card %}{% endif %}</div>
+    <div class="{% if count == 1 %}col-span-2 sm:col-span-1{% elif count|divisibleby:2 is False and forloop.first %}col-span-2 lg:col-span-1{% endif %}">{% if count > 2 %}{% include "catalog/partials/category_card.html" with first_screen=first_screen lcp=lcp_card sizes="(min-width: 1152px) 357px, (min-width: 1024px) calc((100vw - 80px) / 3), (min-width: 640px) calc(50vw - 28px), calc(50vw - 22px)" %}{% else %}{% include "catalog/partials/category_card.html" with wide=True first_screen=first_screen lcp=lcp_card sizes="(min-width: 1152px) 548px, (min-width: 640px) calc(50vw - 28px), calc(50vw - 22px)" %}{% endif %}</div>
     {% endfor %}
   </div>
 </section>

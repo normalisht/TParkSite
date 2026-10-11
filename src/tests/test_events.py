@@ -135,10 +135,12 @@ def test_event_cards_offer_smaller_photo(client, make_image):
     nearest = make_event("Ближайшее событие", days=2, image=make_image())
     make_event("Следующее", days=9, image=make_image())
     html = client.get("/events/").content.decode()
-    srcsets = re.findall(r'srcset="([^"]+)"', html)
-    assert len(srcsets) == 2
-    assert f"{nearest.card_small.url} 640w, {nearest.card.url} 800w" in srcsets
-    assert html.count('sizes="(min-width') == 2
+    img_srcsets = re.findall(r'<img src="[^"]+" srcset="([^"]+)"', html)
+    avif_srcsets = re.findall(r'<source type="image/avif" srcset="([^"]+)"', html)
+    assert len(img_srcsets) == len(avif_srcsets) == 2
+    assert f"{nearest.card_small.url} 640w, {nearest.card.url} 800w" in img_srcsets
+    assert f"{nearest.card_small_avif.url} 640w, {nearest.card_avif.url} 800w" in avif_srcsets
+    assert html.count('sizes="(min-width') == 4
 
 
 def _event_json_ld(client, event):

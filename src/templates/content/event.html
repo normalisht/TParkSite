@@ -47,9 +47,7 @@
       </div>
     </aside>
     <div class="min-w-0 lg:order-1">
-      {% with url=event|spec_url:"card" %}{% if url %}
-      <img src="{{ url }}" alt="{{ event.title }}" width="800" height="600" fetchpriority="high" class="aspect-[4/3] w-full rounded-2xl object-cover">
-      {% endif %}{% endwith %}
+      {% picture event "card_small 640w, card 800w" sizes="(min-width: 1152px) 752px, (min-width: 1024px) calc(100vw - 400px), calc(100vw - 32px)" alt=event.title width=800 height=600 fetchpriority="high" class="aspect-[4/3] w-full rounded-2xl object-cover" %}
       {% if event.description %}<div class="rich-text mt-8">{{ event.description|safe }}</div>{% endif %}
     </div>
   </div>
