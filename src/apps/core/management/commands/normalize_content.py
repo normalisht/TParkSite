@@ -27,6 +27,8 @@ FIELDS = {
     },
     Category: {"name": fix_name, "description": fix_text},
     CategoryGroup: {"name": fix_name},
+    # Event.price — свободный текст, выводится как есть, поэтому «₽» правит fix_text;
+    # Service.price — число, «₽» добавляет шаблон (fix_price).
     Event: {"title": fix_name, "description": fix_text, "price": fix_text},
     InfoPage: {"title": fix_name, "body": fix_text},
     Review: {"text": fix_text},

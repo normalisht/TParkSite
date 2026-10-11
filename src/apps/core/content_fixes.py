@@ -21,24 +21,49 @@ NAME_FIXES = {
 }
 UNIT_FIXES = {"человек": "участник", "чел": "участник", "чел.": "участник", "в день": "день"}
 
+_LETTER = "А-Яа-яЁёA-Za-z"
+_TYPO_RES = [
+    (re.compile(rf"(?<![{_LETTER}]){re.escape(wrong)}(?![{_LETTER}])"), right) for wrong, right in TYPOS.items()
+]  # слово целиком: «рекрасное место» не находится внутри верного «Прекрасное место»
 _BRAND = re.compile(r"Т-парк")  # кириллические Т и п
 _YO = re.compile(r"([Вв])еревочн")
-_RUB = re.compile(r"(\d)\s*(?:руб(?:лей|ля|ль)?\.?|р\.?)(?![а-яёА-ЯЁ])")
-_WATTS = re.compile(r"(\d)\s*w\b")
+_GAP = r"(?P<gap>(?:\s|&nbsp;|\u00a0)*)"  # пробел между числом и единицей (nh3 отдаёт неразрывный как &nbsp;)
+_RUB = re.compile(
+    rf"(?P<num>\d){_GAP}(?:руб(?:лей|ля|ль)?|р)"
+    # «р.»/«руб.» в конце фразы точку теряют, на границе предложений («300 руб. Дети…») — нет;
+    # «р-н», «р.п.», «р/с» и прочее с продолжением — не рубли
+    r"(?:\.(?![-/\w]|\s+[А-ЯЁ])|(?![-/\w.])|(?=\.\s+[А-ЯЁ]))"
+)
+_WATTS = re.compile(rf"(?P<num>\d){_GAP}w(?![-/\w])")
 _MINUTES = re.compile(r"(\d+)\s*минут[аы]?(?![а-яё])")
 _STRAIGHT_QUOTES = re.compile(r'"([^"]*)"')
 _PRICE_CURRENCY = re.compile(r"(?<=\d)\s*(?:руб(?:лей|ля|ль)?\.?|р\.?|₽)\s*$")
-_DIGIT_SPACES = re.compile(r"(?<=\d)[\s ]+(?=\d)")
+_DIGIT_SPACES = re.compile(r"(?<=\d)[\s ]+(?=\d)")
+_TAGS = re.compile(r"(<[^>]*>)")
+
+
+def _unit(symbol: str):
+    def replace(match: re.Match) -> str:
+        gap = match["gap"]
+        return f"{match['num']}{gap if ('nbsp' in gap or chr(160) in gap) else ' '}{symbol}"
+
+    return replace
+
+
+def _fix_plain(value: str) -> str:
+    for pattern, right in _TYPO_RES:
+        value = pattern.sub(right, value)
+    value = _BRAND.sub("Т-Парк", value)
+    value = _YO.sub(r"\1ерёвочн", value)
+    value = _WATTS.sub(_unit("Вт"), value)
+    return _RUB.sub(_unit("₽"), value)
 
 
 def fix_text(value: str) -> str:
-    """Любой текст, в том числе HTML: опечатки, бренд, «ё» в «верёвочный», «Вт», «₽»."""
-    for wrong, right in TYPOS.items():
-        value = value.replace(wrong, right)
-    value = _BRAND.sub("Т-Парк", value)
-    value = _YO.sub(r"\1ерёвочн", value)
-    value = _WATTS.sub(r"\1 Вт", value)
-    return _RUB.sub(r"\1 ₽", value)
+    """Любой текст, в том числе HTML: опечатки, бренд, «ё» в «верёвочный», «Вт», «₽» — только вне тегов (не в атрибутах)."""
+    return "".join(
+        part if part.startswith("<") and part.endswith(">") else _fix_plain(part) for part in _TAGS.split(value)
+    )
 
 
 def fix_name(value: str) -> str:

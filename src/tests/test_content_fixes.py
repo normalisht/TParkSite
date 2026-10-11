@@ -2,8 +2,9 @@ import pytest
 from django.core.management import call_command
 
 from apps.catalog.models import Service
-from apps.content.models import GalleryPhoto
+from apps.content.models import GalleryPhoto, Review
 from apps.core.content_fixes import (
+    TYPOS,
     describe_change,
     fix_caption,
     fix_name,
@@ -32,6 +33,46 @@ from apps.core.content_fixes import (
 )
 def test_fix_text(before, after):
     assert fix_text(before) == after
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "Прекрасное место",
+        "прекрасное место",
+        '<a href="/img/100w">фото</a>',
+        '<img src="/media/5 р.jpg" alt="10 руб">',
+        "10 р-н города",
+        "5 р.п. Кутепово",
+        "100 w-образный",
+        "Оплата 100 ₽",
+    ],
+)
+def test_fix_text_leaves_correct_text_and_attributes(text):
+    assert fix_text(text) == text
+
+
+@pytest.mark.parametrize(("typo", "right"), list(TYPOS.items()))
+def test_typo_fixes_are_idempotent(typo, right):
+    fixed = fix_text(f"Начало {typo} конец")
+    assert fixed == f"Начало {right} конец"
+    assert fix_text(fixed) == fixed
+
+
+@pytest.mark.parametrize(
+    ("before", "after"),
+    [
+        ("<p>100&nbsp;руб</p>", "<p>100&nbsp;₽</p>"),
+        ("<p>100\u00a0р.</p>", "<p>100\u00a0₽</p>"),
+        ("<p>Мощность 100&nbsp;w</p>", "<p>Мощность 100&nbsp;Вт</p>"),
+        ("Оплата 300 руб. Дети бесплатно", "Оплата 300 ₽. Дети бесплатно"),
+        ("Оплата 300 р. Дети бесплатно", "Оплата 300 ₽. Дети бесплатно"),
+        ('<a href="/a/100w">100 руб</a>', '<a href="/a/100w">100 ₽</a>'),
+    ],
+)
+def test_fix_text_html_nbsp_and_sentence_boundary(before, after):
+    assert fix_text(before) == after
+    assert fix_text(after) == after
 
 
 def test_fix_text_keeps_latin_formats():
@@ -92,7 +133,10 @@ def test_command_dry_run_changes_nothing(capsys):
 def test_command_applies_and_is_idempotent(capsys, make_image):
     service = Service.objects.create(name="Сплав*", price="15 000", price_unit="человек")
     photo = GalleryPhoto.objects.create(image=make_image(), caption="123")
+    review = Review.objects.create(text="<p>Прекрасное место, рекрасное место, 300 руб. Спасибо</p>")
     call_command("normalize_content", "--apply")
+    review.refresh_from_db()
+    assert review.text == "<p>Прекрасное место, Прекрасное место, 300 ₽. Спасибо</p>"
     service.refresh_from_db()
     photo.refresh_from_db()
     assert (service.name, service.price, service.price_unit) == ("Сплав", "15000", "участник")
