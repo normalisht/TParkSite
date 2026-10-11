@@ -71,6 +71,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    # ETag для HTML: повторный заход на неизменённую страницу — 304 без тела.
+    "django.middleware.http.ConditionalGetMiddleware",
     "apps.core.middleware.CanonicalHostMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",

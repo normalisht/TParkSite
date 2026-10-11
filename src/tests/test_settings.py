@@ -68,3 +68,20 @@ def test_hsts_default_is_one_day():
     # Смотрим исходник: в окружении разработчика HSTS_SECONDS может прийти из .env и перекрыть значение по умолчанию.
     source = (ROOT / "config" / "settings.py").read_text(encoding="utf-8")
     assert 'os.environ.get("HSTS_SECONDS", "86400")' in source
+
+
+@pytest.mark.django_db
+def test_html_pages_support_conditional_get(client):
+    first = client.get("/contacts/")
+    assert first.has_header("ETag")
+    assert client.get("/contacts/", HTTP_IF_NONE_MATCH=first["ETag"]).status_code == 304
+
+
+@pytest.mark.django_db
+def test_admin_login_still_works_with_conditional_get(client, django_user_model):
+    django_user_model.objects.create_superuser("boss", password="right-pass-123")
+    first = client.get("/admin/login/")
+    response = client.post(
+        "/admin/login/", {"username": "boss", "password": "right-pass-123"}, HTTP_IF_NONE_MATCH=first.get("ETag", "")
+    )
+    assert response.status_code == 302
