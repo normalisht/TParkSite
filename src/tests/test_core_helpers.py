@@ -1,8 +1,10 @@
+import io
 from decimal import Decimal
 
 import pytest
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
+from PIL import Image
 
 from apps.core.fields import UploadTo, sanitize_html, validate_image_upload
 from apps.core.images import safe_spec_url
@@ -66,6 +68,19 @@ def test_validate_skips_already_stored_file():
         size = 10**9
 
     validate_image_upload(Stored())
+
+
+def test_upload_rejects_decompression_bomb():
+    # 8000×7000 = 56 Мп: PNG весит килобайты, а распакованный займёт сотни мегабайт при пережатии.
+    buffer = io.BytesIO()
+    Image.new("1", (8000, 7000)).save(buffer, "PNG")
+    upload = SimpleUploadedFile("big.png", buffer.getvalue(), content_type="image/png")
+    with pytest.raises(ValidationError, match="50 мегапикселей"):
+        validate_image_upload(upload)
+
+
+def test_upload_accepts_normal_photo(make_image):
+    validate_image_upload(make_image(size=(4000, 3000)))
 
 
 def test_safe_spec_url_swallows_errors():
