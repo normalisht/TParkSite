@@ -25,6 +25,18 @@ def picture(obj, srcset: str, **kwargs) -> str:
 
 
 @register.filter
+def lazy_after(counter, eager: int) -> str:
+    """`loading` для N-го фото списка: первые `eager` — сразу (первый экран), остальные — лениво."""
+    return "" if int(counter) <= int(eager) else "lazy"
+
+
+@register.filter
+def eager_first(is_first, below_fold) -> bool:
+    """Первое фото слайдера грузится сразу и с высоким приоритетом — если сам слайдер на первом экране."""
+    return bool(is_first) and not below_fold
+
+
+@register.filter
 def lightbox_url(photo) -> str:
     return _lightbox_url(photo)
 

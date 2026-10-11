@@ -1,4 +1,5 @@
 import os
+import re
 import time
 
 import pytest
@@ -6,7 +7,7 @@ from django.core.management import call_command
 from django.template import Context, Template
 from PIL import Image
 
-from apps.catalog.models import Category, CategoryPhoto
+from apps.catalog.models import Category, CategoryPhoto, Service, ServicePhoto
 from apps.content.models import GalleryPhoto
 from apps.core import images
 from apps.core.images import lightbox_url, picture_html
@@ -270,3 +271,44 @@ def test_request_does_not_generate_thumbnails_beyond_its_time_budget(client, mon
     monkeypatch.setattr(images, "REQUEST_GENERATION_BUDGET", 5)
     html = client.get("/gallery/").content.decode()  # следующий запрос досоздаёт в пределах бюджета
     assert photo.thumb.storage.exists(photo.thumb.name) and ".avif" in html
+
+
+def _imgs(html: str, path_part: str) -> list[str]:
+    return [tag for tag in re.findall(r"<img [^>]*>", html) if path_part in tag]
+
+
+def test_gallery_first_row_loads_eagerly(client, make_image):
+    for i in range(6):
+        GalleryPhoto.objects.create(image=make_image(f"{i}.jpg"))
+    imgs = _imgs(client.get("/gallery/").content.decode(), "/gallery/")
+    assert len(imgs) == 6
+    assert 'fetchpriority="high"' in imgs[0]
+    assert all('loading="lazy"' not in tag for tag in imgs[:4])
+    assert all('loading="lazy"' in tag for tag in imgs[4:])
+    assert sum('fetchpriority="high"' in tag for tag in imgs) == 1
+
+
+def test_gallery_short_list(client, make_image):
+    for i in range(2):
+        GalleryPhoto.objects.create(image=make_image(f"{i}.jpg"))
+    imgs = _imgs(client.get("/gallery/").content.decode(), "/gallery/")
+    assert [('fetchpriority="high"' in t, 'loading="lazy"' in t) for t in imgs] == [(True, False), (False, False)]
+
+
+def test_category_has_single_high_priority_photo(client, make_image):
+    category = Category.objects.create(name="Парк", is_published=True, preview=make_image("preview.jpg"))
+    for i in range(3):
+        CategoryPhoto.objects.create(category=category, image=make_image(f"{i}.jpg"))
+    html = client.get(category.get_absolute_url()).content.decode()
+    assert html.count('fetchpriority="high"') == 1
+    slides = _imgs(html, "/catalog/categories/")
+    assert slides and all('loading="lazy"' in tag for tag in slides)
+
+
+def test_service_slider_first_photo_stays_eager(client, make_image):
+    service = Service.objects.create(name="Троллей", has_page=True)
+    for i in range(2):
+        ServicePhoto.objects.create(service=service, image=make_image(f"{i}.jpg"))
+    slides = _imgs(client.get(service.get_absolute_url()).content.decode(), "/catalog/services/")
+    assert 'fetchpriority="high"' in slides[0] and 'loading="lazy"' not in slides[0]
+    assert 'loading="lazy"' in slides[1]
