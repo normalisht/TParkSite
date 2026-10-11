@@ -105,8 +105,16 @@ def image_specs(source: str, width: int, height: int, *, crop: bool = True) -> t
 
 
 def full_spec(source: str) -> ImageSpecField:
-    """Фото во весь экран (GLightbox): WebP на четверть легче JPEG-оригинала; AVIF лайтбокс выбрать не умеет."""
-    return image_spec(source, 1920, 1080, crop=False)
+    """Фото во весь экран (GLightbox): WebP на четверть легче JPEG-оригинала; AVIF лайтбокс выбрать не умеет.
+
+    q75 + method=6, а не q80: оригиналы уже сжаты JPEG, и при q80 каждое шестое фото выходило тяжелее оригинала.
+    """
+    return ImageSpecField(
+        source=source,
+        processors=[ResizeToFit(1920, 1080, upscale=False)],
+        format="WEBP",
+        options={"quality": 75, "method": 6},
+    )
 
 
 def og_spec(source: str) -> ImageSpecField:

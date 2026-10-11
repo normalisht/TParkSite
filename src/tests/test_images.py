@@ -163,3 +163,9 @@ def test_prune_image_cache(make_image, media_root):
 
     call_command("prune_image_cache")
     assert not stale.exists() and fresh.exists() and kept.exists()
+
+
+def test_lightbox_webp_is_lighter_than_jpeg_originals(make_image):
+    # Оригиналы галереи уже сжаты JPEG: при WebP q80 каждое шестое фото выходило тяжелее оригинала, q75 + method=6 — ни одно.
+    photo = GalleryPhoto.objects.create(image=make_image())
+    assert photo.full.generator.options == {"quality": 75, "method": 6}
