@@ -34,11 +34,11 @@ def test_category_page_lists_services(client, category):
     hidden = Service.objects.create(name="Скрытая услуга", is_published=False)
     for order, service in enumerate([with_page, inline, hidden]):
         CategoryService.objects.create(category=category, service=service, order=order)
-    html = client.get(category.get_absolute_url()).content.decode()
+    html = client.get(category.get_absolute_url()).content.decode().replace("\u00a0", " ")
     assert "Описание сплавов" in html
     assert with_page.get_absolute_url() in html
     # Цена разбита по слешу: перенос только между ценой и единицей.
-    assert '<span class="inline-block whitespace-nowrap">2000 руб</span>' in html
+    assert '<span class="inline-block whitespace-nowrap">2000 ₽</span>' in html
     assert (
         '<span class="js-price-unit group/price inline-block data-wrapped:block"><span class="group-data-wrapped/price:hidden">/ </span>человек</span>'
         in html

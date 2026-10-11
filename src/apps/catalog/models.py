@@ -1,6 +1,7 @@
 from django.db import models
 from django.urls import reverse
 
+from apps.catalog.prices import format_price
 from apps.core.fields import HtmlField, full_spec, image_spec, image_specs, og_spec, photo_field
 from apps.core.models import OrderedModel, PublishedQuerySet, SeoModel
 from apps.core.slugs import unique_slug
@@ -93,7 +94,12 @@ class Service(SeoModel):
     slug = models.SlugField("Адрес страницы", max_length=255, unique=True, blank=True)
     short_description = HtmlField("Краткое описание")
     description = HtmlField("Полное описание")
-    price = models.CharField("Цена", max_length=32, blank=True, help_text="Например: 1500 или «договорная».")
+    price = models.CharField(
+        "Цена",
+        max_length=32,
+        blank=True,
+        help_text="Число («1500», «от 3500») — на сайте с «₽». Или текстом: «договорная».",
+    )
     price_unit = models.CharField("За что", max_length=128, blank=True, help_text="Например: час, сутки, человек.")
     is_published = models.BooleanField("Опубликовано", default=True)
     has_page = models.BooleanField(
@@ -119,10 +125,16 @@ class Service(SeoModel):
         return reverse("catalog:service", args=[self.slug])
 
     @property
+    def price_amount(self) -> str:
+        """Цена без единицы: «₽» только у числа, «договорная» — как есть."""
+        return format_price(self.price)
+
+    @property
     def price_display(self) -> str:
         if not self.price:
             return ""
-        return f"{self.price} руб / {self.price_unit}" if self.price_unit else f"{self.price} руб"
+        amount = self.price_amount
+        return f"{amount} / {self.price_unit}" if self.price_unit else amount
 
     @property
     def cover(self) -> ServicePhoto | None:
