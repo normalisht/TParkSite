@@ -14,3 +14,7 @@ src/static/css/tailwind.css
 **/__pycache__
 **/.pytest_cache
 **/.ruff_cache
+
+# Данные старого сайта и выгрузки импорта (в рабочей копии; в git их нет)
+src/old_migrate
+src/*.csv

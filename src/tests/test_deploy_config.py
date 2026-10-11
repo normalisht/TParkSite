@@ -47,3 +47,10 @@ def test_entrypoint_prunes_thumbnails_after_generating_in_background():
     # Сначала досоздать миниатюры, потом удалить ненужные — в фоне, чтобы сайт стартовал сразу.
     script = (ROOT / "docker/entrypoint.sh").read_text(encoding="utf-8")
     assert re.search(r"\(.*generateimages && .*prune_image_cache\) &", script)
+
+
+def test_dockerignore_excludes_legacy_data():
+    # Старая база с паролями и выгрузки импорта лежат в src/ рабочей копии, а образ собирается из src/.
+    lines = (ROOT / ".dockerignore").read_text(encoding="utf-8").splitlines()
+    assert "src/old_migrate" in lines
+    assert "src/*.csv" in lines

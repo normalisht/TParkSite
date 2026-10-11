@@ -134,3 +134,10 @@ def test_import_creates_missing_site_texts(legacy):
     legacy.run()
     assert SiteText.objects.count() == len(TEXTS)
     assert SiteText.history.filter(history_type="+").count() == len(TEXTS)
+
+
+def test_import_legacy_does_not_write_price_csv_by_default():
+    from apps.core.management.commands.import_legacy import Command
+
+    options = Command().create_parser("manage.py", "import_legacy").parse_args(["--db", "x.db", "--images", "img"])
+    assert options.price_csv is None
