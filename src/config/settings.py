@@ -8,6 +8,7 @@ from pathlib import Path
 from django.core.exceptions import ImproperlyConfigured
 from django.templatetags.static import static
 from django.urls import reverse_lazy
+from django.utils.csp import CSP
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -71,6 +72,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "django.middleware.csp.ContentSecurityPolicyMiddleware",
+    "apps.core.middleware.PermissionsPolicyMiddleware",
     # ETag для HTML: повторный заход на неизменённую страницу — 304 без тела.
     "django.middleware.http.ConditionalGetMiddleware",
     "apps.core.middleware.CanonicalHostMiddleware",
@@ -180,6 +183,25 @@ if not DEBUG:
     SECURE_SSL_HOST = CANONICAL_HOST or None
     SECURE_REDIRECT_EXEMPT = [r"^healthz/$"]
     SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# CSP пока только отчётом (Report-Only): нарушения видны в консоли браузера, ничего не блокируется.
+# Inline-скриптов нет (Метрика — static/js/metrika.js), поэтому без nonce: nonce сделал бы каждую страницу
+# уникальной и сломал бы ETag/304. JSON-LD (type="application/ld+json") — блок данных, CSP его не касается.
+# Alpine (стандартная сборка) вычисляет выражения через new Function — нужен 'unsafe-eval'; уйти от него можно
+# только на CSP-сборку Alpine (отдельная задача). Метрика: tag.js и Вебвизор — с mc.yandex.ru/.com.
+YANDEX_METRIKA = ["https://mc.yandex.ru", "https://mc.yandex.com"]
+SECURE_CSP_REPORT_ONLY = {
+    "default-src": [CSP.SELF],
+    "script-src": [CSP.SELF, CSP.UNSAFE_EVAL, *YANDEX_METRIKA],
+    "style-src": [CSP.SELF, CSP.UNSAFE_INLINE],
+    "img-src": [CSP.SELF, "data:", *YANDEX_METRIKA],
+    "connect-src": [CSP.SELF, *YANDEX_METRIKA, "wss://mc.yandex.com", "wss://mc.yandex.ru"],
+    "frame-src": ["https://yandex.ru", *YANDEX_METRIKA],
+    "font-src": [CSP.SELF],
+    "frame-ancestors": [CSP.NONE],
+    "base-uri": [CSP.SELF],
+    "form-action": [CSP.SELF],
+}
 
 LOGGING = {
     "version": 1,

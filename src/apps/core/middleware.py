@@ -36,3 +36,20 @@ class RedirectFallbackMiddleware:
         query = request.META.get("QUERY_STRING", "")
         separator = "&" if "?" in target else "?"
         return HttpResponsePermanentRedirect(f"{target}{separator}{query}" if query else target)
+
+
+class PermissionsPolicyMiddleware:
+    """Запрещает странице и встроенным фреймам камеру, микрофон, платежи и USB — сайту они не нужны.
+
+    Геолокацию не трогаем: «Моё местоположение» в карте Яндекса.
+    """
+
+    POLICY = "camera=(), microphone=(), payment=(), usb=()"
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        response.setdefault("Permissions-Policy", self.POLICY)
+        return response

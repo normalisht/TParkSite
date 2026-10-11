@@ -1,4 +1,5 @@
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -88,3 +89,51 @@ def test_admin_login_still_works_with_conditional_get(client, django_user_model)
         "/admin/login/", {"username": "boss", "password": "right-pass-123"}, HTTP_IF_NONE_MATCH=first.get("ETag", "")
     )
     assert response.status_code == 302
+
+
+def _enable_metrika(settings):
+    from apps.core.models import SiteSettings
+
+    settings.DEBUG = False
+    site = SiteSettings.load()
+    site.yandex_metrika_id = "12345"
+    site.save()
+
+
+@pytest.mark.django_db
+def test_csp_report_only_header(client):
+    header = client.get("/").headers["Content-Security-Policy-Report-Only"]
+    assert "default-src 'self'" in header
+    assert "https://mc.yandex.ru" in header
+    assert "frame-src" in header and "https://yandex.ru" in header
+    assert "'nonce-" not in header  # nonce сделал бы каждую страницу уникальной и убил 304
+
+
+@pytest.mark.django_db
+def test_permissions_policy_header(client):
+    assert "camera=()" in client.get("/").headers["Permissions-Policy"]
+
+
+@pytest.mark.django_db
+def test_no_inline_scripts(client, settings):
+    _enable_metrika(settings)
+    html = client.get("/").content.decode()
+    tags = re.findall(r"<script\b[^>]*>", html)
+    assert tags
+    for tag in tags:
+        assert re.search(r"\bsrc=", tag) or 'type="application/ld+json"' in tag, tag
+    assert re.search(r'<script[^>]*src="[^"]*js/metrika[^"]*\.js"[^>]*data-counter-id="12345"', html)
+
+
+@pytest.mark.django_db
+def test_page_with_metrika_keeps_stable_etag(client, settings):
+    _enable_metrika(settings)
+    first = client.get("/")
+    second = client.get("/")
+    assert first.has_header("ETag")
+    assert first["ETag"] == second["ETag"]
+
+
+def test_500_page_has_no_inline_handlers():
+    html = (ROOT / "templates" / "500.html").read_text(encoding="utf-8")
+    assert "onclick=" not in html

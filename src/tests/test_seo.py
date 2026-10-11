@@ -1,6 +1,7 @@
 import json
 import re
 from datetime import timedelta
+from pathlib import Path
 
 import pytest
 from django.utils import timezone
@@ -229,7 +230,7 @@ def test_metrika_and_verification(client, settings):
     site.google_verification = "g-456"
     site.save()
     html = client.get("/").content.decode()
-    assert 'ym(12345678, "init"' in html
+    assert 'data-counter-id="12345678"' in html
     assert '<meta name="yandex-verification" content="abc123">' in html
     assert '<meta name="google-site-verification" content="g-456">' in html
     settings.DEBUG = True
@@ -304,6 +305,8 @@ def test_metrika_tracks_contact_clicks(client, settings):
     site.yandex_metrika_id = "12345"
     site.save()
     html = client.get("/").content.decode()
-    assert 'ym(12345, "reachGoal", goal)' in html
+    assert 'js/metrika.js"' in html and 'data-counter-id="12345"' in html
+    script = (Path(__file__).resolve().parents[1] / "static" / "js" / "metrika.js").read_text(encoding="utf-8")
+    assert 'ym(counterId, "reachGoal", goal)' in script
     for goal in ("call", "whatsapp", "telegram", "vk", "max"):
-        assert f'"{goal}"' in html
+        assert f'"{goal}"' in script
