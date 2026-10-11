@@ -19,7 +19,8 @@ class MultipleImageField(forms.ImageField):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("required", False)
         kwargs.setdefault(
-            "help_text", "Можно выбрать несколько файлов: jpg, png или webp, до 20 МБ. Фото добавятся в конец списка."
+            "help_text",
+            "Можно выбрать несколько файлов: jpg, png или webp, до 20 МБ и 50 мегапикселей. Фото добавятся в конец списка.",
         )
         super().__init__(*args, **kwargs)
         self.widget.attrs.setdefault("accept", "image/jpeg,image/png,image/webp")

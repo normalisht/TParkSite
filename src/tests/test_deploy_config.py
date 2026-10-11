@@ -145,4 +145,15 @@ def test_make_up_backs_up_only_running_site():
     makefile = (ROOT / "Makefile").read_text(encoding="utf-8")
     recipe = makefile.split("\nup:", 1)[1].split("\n\n", 1)[0]
     assert "docker compose ps -q tpark-web" in recipe
-    assert recipe.index("scripts/backup.sh") < recipe.index("docker compose up -d --build")
+    # Сначала сборка (долгая), потом бэкап — иначе правки, сделанные за время сборки, в бэкап не попадут; потом запуск.
+    assert (
+        recipe.index("docker compose build") < recipe.index("scripts/backup.sh") < recipe.index("docker compose up -d")
+    )
+    assert "up -d --build" not in recipe
+
+
+def test_backup_rotation_touches_only_dated_folders():
+    # Папки вроде backups/legacy-source/ ротация удалять не должна: только backups/YYYY-MM-DD_HHMM.
+    script = (ROOT / "scripts" / "backup.sh").read_text(encoding="utf-8")
+    assert "ls -1dt backups/20*/" in script
+    assert "backups/*/" not in script

@@ -48,3 +48,23 @@ def test_sqlite_options():
 def test_async_safety_not_disabled_for_regular_tests():
     """e2e-модуль (Playwright) отключает проверку async-safety Django только на время своих тестов, а не всей сессии."""
     assert "DJANGO_ALLOW_ASYNC_UNSAFE" not in os.environ
+
+
+def test_ssl_redirect_goes_to_canonical_host_in_one_hop():
+    # http://www.… с редиректом средствами Django должен вести сразу на https://<главный домен>, а не на https://www.…
+    result = _settings_probe({"DEBUG": "0", "SECRET_KEY": "x", "CANONICAL_HOST": "t-camp.ru"}, "s.SECURE_SSL_HOST")
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.strip() == "t-camp.ru"
+    result = _settings_probe({"DEBUG": "0", "SECRET_KEY": "x", "CANONICAL_HOST": ""}, "s.SECURE_SSL_HOST")
+    assert result.stdout.strip() == "None"
+
+
+def test_axes_admin_is_disabled_in_settings():
+    result = _settings_probe({"DEBUG": "1"}, "s.AXES_ENABLE_ADMIN")
+    assert result.stdout.strip() == "False"
+
+
+def test_hsts_default_is_one_day():
+    # Смотрим исходник: в окружении разработчика HSTS_SECONDS может прийти из .env и перекрыть значение по умолчанию.
+    source = (ROOT / "config" / "settings.py").read_text(encoding="utf-8")
+    assert 'os.environ.get("HSTS_SECONDS", "86400")' in source

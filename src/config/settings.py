@@ -136,6 +136,8 @@ AXES_FAILURE_LIMIT = 5
 AXES_COOLOFF_TIME = timedelta(minutes=30)
 AXES_LOCKOUT_PARAMETERS = [["username", "ip_address"]]
 AXES_RESET_ON_SUCCESS = True
+# Их ModelAdmin — не SiteModelAdmin (без Unfold и предупреждения о несохранённом); блокировки снимает manage.py axes_reset.
+AXES_ENABLE_ADMIN = False
 # IP клиента — из X-Real-IP: наш nginx перезаписывает его адресом соединения, клиент подделать не может.
 # Без прокси (runserver) заголовка нет — берётся REMOTE_ADDR.
 AXES_IPWARE_META_PRECEDENCE_ORDER = ["HTTP_X_REAL_IP", "REMOTE_ADDR"]
@@ -167,9 +169,12 @@ if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    SECURE_HSTS_SECONDS = int(os.environ.get("HSTS_SECONDS", "31536000"))
+    # По умолчанию сутки: на старте ошибка с сертификатом не «запомнится» браузерами надолго; после стабильной недели — 31536000 (год).
+    SECURE_HSTS_SECONDS = int(os.environ.get("HSTS_SECONDS", "86400"))
     # http → https силами Django; включать, только если прокси передаёт X-Forwarded-Proto (иначе — петля редиректов).
     SECURE_SSL_REDIRECT = env_bool("SECURE_SSL_REDIRECT")
+    # Редирект http → https ведёт сразу на главный домен (http://www… → https://t-camp.ru одним переходом, без лишнего www).
+    SECURE_SSL_HOST = CANONICAL_HOST or None
     SECURE_REDIRECT_EXEMPT = [r"^healthz/$"]
     SECURE_CONTENT_TYPE_NOSNIFF = True
 
