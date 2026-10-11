@@ -81,6 +81,9 @@ def test_html_pages_support_conditional_get(client):
 def test_admin_login_still_works_with_conditional_get(client, django_user_model):
     django_user_model.objects.create_superuser("boss", password="right-pass-123")
     first = client.get("/admin/login/")
+    assert not first.has_header("ETag")
+    again = client.get("/admin/login/", HTTP_IF_NONE_MATCH='"anything"')
+    assert again.status_code == 200
     response = client.post(
         "/admin/login/", {"username": "boss", "password": "right-pass-123"}, HTTP_IF_NONE_MATCH=first.get("ETag", "")
     )

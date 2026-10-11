@@ -442,8 +442,10 @@ def test_contacts_map_loads_on_click(client):
 def test_contacts_map_has_no_js_fallback(client):
     _set_map(MAP_URL, "https://yandex.ru/maps/org/t_park/17031236197/")
     html = client.get("/contacts/").content.decode()
-    noscript = html.split("<noscript>", 1)[1].split("</noscript>", 1)[0]
-    assert 'href="https://yandex.ru/maps/org/t_park/17031236197/"' in noscript
+    assert "<noscript>" not in html
+    link = html.split("Открыть в Яндекс Картах", 1)[0].rsplit("<a ", 1)[1]
+    assert 'href="https://yandex.ru/maps/org/t_park/17031236197/"' in link
+    assert "btn-ghost" in link and 'rel="noopener"' in link
 
 
 @pytest.mark.django_db

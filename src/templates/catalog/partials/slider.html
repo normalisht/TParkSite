@@ -1,5 +1,6 @@
 {% load site_tags %}
 {# below_fold=1 — слайдер ниже первого экрана (категория): все фото лениво, без высокого приоритета. #}
+{# Аргументы фильтров разрешаются строго: без значения по умолчанию страница услуги падает. #}
 {% firstof below_fold "" as below_fold %}
 {% if photos %}
 <div class="swiper js-slider overflow-hidden rounded-2xl bg-sand-200">

@@ -45,7 +45,7 @@
       {% if site.map_embed_url %}
       {% comment %}
         Карта по кнопке: iframe Яндекса тяжёлый, ставит сторонние cookie и до загрузки показывает пустой белый блок.
-        Без JS — ссылка на карточку в Яндекс Картах.
+        Ссылка на карточку в Яндекс Картах видна всегда: без JS или пока Alpine не запустился кнопка бесполезна.
       {% endcomment %}
       <div x-data="{ map: false }" class="card relative h-96 w-full overflow-hidden lg:h-full lg:min-h-[28rem]">
         <template x-if="map">
@@ -56,7 +56,7 @@
           <span class="icon h-10 w-10 text-pine-700">{% include "icons/map-pin.svg" %}</span>
           {% if site.address %}<p class="max-w-xs text-ink/75" aria-hidden="true">{{ site.address }}</p>{% endif %}
           <button type="button" class="btn btn-primary" x-cloak @click="map = true; $nextTick(() => $root.querySelector('iframe')?.focus())">Показать карту</button>
-          <noscript><a href="{% firstof site.yandex_maps_url site.map_embed_url %}" class="btn btn-primary" target="_blank" rel="noopener">Открыть на Яндекс Картах</a></noscript>
+          <a href="{% firstof site.yandex_maps_url site.map_embed_url %}" class="btn btn-ghost" target="_blank" rel="noopener">Открыть в Яндекс Картах<span class="icon h-4 w-4">{% include "icons/external-link.svg" %}</span></a>
         </div>
       </div>
       {% endif %}
