@@ -166,9 +166,10 @@ def test_prune_image_cache(make_image, media_root):
 
 
 def test_lightbox_webp_is_lighter_than_jpeg_originals(make_image):
-    # Оригиналы галереи уже сжаты JPEG: при WebP q80 каждое шестое фото выходило тяжелее оригинала, q75 + method=6 — ни одно.
+    # Оригиналы галереи уже сжаты JPEG: при WebP q80 каждое шестое фото выходило тяжелее оригинала, при q75 — ни одно.
+    # method=6 не нужен: вдвое дольше кодирует (дольше прогрев после деплоя) ради 3 % размера.
     photo = GalleryPhoto.objects.create(image=make_image())
-    assert photo.full.generator.options == {"quality": 75, "method": 6}
+    assert photo.full.generator.options == {"quality": 75}
 
 
 def test_failed_thumbnail_is_not_remembered_as_ready(make_image, media_root):
@@ -252,3 +253,20 @@ def test_prune_refuses_to_wipe_cache_when_database_has_no_photos(make_image, med
     os.utime(stale, (two_hours_ago, two_hours_ago))
     call_command("prune_image_cache")
     assert stale.exists()
+
+
+def test_request_does_not_generate_thumbnails_beyond_its_time_budget(client, monkeypatch, make_image):
+    # Прод, 11.10.2026: после смены спек галерея пыталась пережать ~900 миниатюр в одном запросе,
+    # gunicorn убил воркер по таймауту (30 с) → 500. Запрос тратит на генерацию не больше бюджета, остальное — потом.
+    monkeypatch.setattr(images, "REQUEST_GENERATION_BUDGET", 0, raising=False)
+    photo = GalleryPhoto.objects.create(image=make_image())
+    response = client.get("/gallery/")
+    assert response.status_code == 200
+    assert not photo.thumb.storage.exists(photo.thumb.name)  # не пережимали в запросе
+    html = response.content.decode()
+    assert f'src="{photo.image.url}"' in html  # пока миниатюры нет — оригинал, фото не пропадает из галереи
+    assert ".avif" not in html
+
+    monkeypatch.setattr(images, "REQUEST_GENERATION_BUDGET", 5)
+    html = client.get("/gallery/").content.decode()  # следующий запрос досоздаёт в пределах бюджета
+    assert photo.thumb.storage.exists(photo.thumb.name) and ".avif" in html

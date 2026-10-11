@@ -2,6 +2,8 @@ import logging
 import os
 import shutil
 import tempfile
+import threading
+import time
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from pathlib import Path
@@ -20,14 +22,34 @@ AVIF_SUFFIX = "_avif"
 # Без кодировщика AVIF (другая сборка Pillow) <source type="image/avif"> не выводим: миниатюры не создадутся.
 AVIF_SUPPORTED = features.check("avif")
 
+# Сколько секунд один запрос может пережимать недостающие миниатюры. Остальные создадут фоновый generateimages
+# и следующие запросы: иначе после смены спек галерея (сотни фото × 5 спек) упирается в таймаут gunicorn (30 с) → 500.
+REQUEST_GENERATION_BUDGET = 2
+_request = threading.local()
+
+
+class GenerationDeferred(Exception):
+    """Миниатюру не создали: запрос исчерпал время на генерацию."""
+
+
+def start_request_budget(**kwargs) -> None:
+    """request_started: отсчёт бюджета генерации для этого запроса (в фоновых потоках и командах — без ограничения)."""
+    _request.deadline = time.monotonic() + REQUEST_GENERATION_BUDGET
+
+
+def end_request_budget(**kwargs) -> None:
+    _request.deadline = None
+
 
 def safe_spec_url(obj, spec_name: str) -> str:
-    """URL миниатюры imagekit или пустая строка, если объекта или исходника нет либо он битый."""
+    """URL миниатюры imagekit или пустая строка, если объекта или исходника нет, он битый или миниатюра ещё не создана."""
     if obj is None:
         return ""
     try:
         spec = getattr(obj, spec_name)
         return spec.url if spec else ""
+    except GenerationDeferred:
+        return ""
     except Exception:
         logger.warning("Не удалось получить %s для %r", spec_name, obj, exc_info=True)
         return ""
@@ -64,6 +86,16 @@ def _candidates(obj, entries, suffix: str = "") -> list[tuple[str, str]]:
     return found
 
 
+def _source_url(obj, spec_name: str) -> str:
+    """URL исходного фото спеки, если файл на месте."""
+    field = getattr(type(obj), spec_name, None)
+    source = getattr(obj, getattr(field, "source", None) or "", None)
+    try:
+        return source.url if source and source.storage.exists(source.name) else ""
+    except ValueError, OSError:
+        return ""
+
+
 def _srcset(candidates) -> str:
     return ", ".join(f"{url} {descriptor}".rstrip() for url, descriptor in candidates)
 
@@ -94,7 +126,9 @@ def picture_html(obj, srcset: str, *, sizes: str = "", wide: str = "", media: st
     entries = _entries(srcset)
     webp = _candidates(obj, entries)
     if not webp:
-        return ""
+        # Миниатюры ещё нет (запрос исчерпал время на генерацию) — оригинал, чтобы фото не пропадало со страницы.
+        source = _source_url(obj, entries[-1][0])
+        return _tag("img", src=source, **{k: v for k, v in attrs.items() if k == "alt" or v != ""}) if source else ""
     multi = any(descriptor for _, descriptor in entries)
     sources = []
     if wide:
@@ -172,6 +206,9 @@ class AtomicBackend(Simple):
         if state == CacheFileState.GENERATING and self._exists(file):
             self.set_state(file, CacheFileState.EXISTS)
             return
+        deadline = getattr(_request, "deadline", None)
+        if deadline is not None and time.monotonic() > deadline:
+            raise GenerationDeferred(file.name)
         self.set_state(file, CacheFileState.GENERATING)
         try:
             _save_atomically(file)
