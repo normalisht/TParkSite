@@ -6,7 +6,7 @@ from django.urls import reverse
 from apps.core import about_defaults
 from apps.core.fields import HtmlField, image_specs, og_spec, photo_field
 from apps.core.maps import MapEmbedURLField
-from apps.core.slugs import unique_slug
+from apps.core.slugs import SLUG_HELP, unique_slug
 
 
 class OrderedModel(models.Model):
@@ -292,7 +292,7 @@ class FounderFact(models.Model):
 
 class InfoPage(SeoModel):
     title = models.CharField("Заголовок", max_length=255)
-    slug = models.SlugField("Адрес страницы", max_length=255, unique=True, blank=True)
+    slug = models.SlugField("Адрес страницы", max_length=255, unique=True, blank=True, help_text=SLUG_HELP)
     body = HtmlField("Текст")
     is_published = models.BooleanField("Опубликовано", default=True)
 
@@ -309,7 +309,28 @@ class InfoPage(SeoModel):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = unique_slug(self, self.title)
+        from apps.core.redirects import remember_slug_change
+
+        remember_slug_change(self)
         super().save(*args, **kwargs)
 
     def get_absolute_url(self) -> str:
         return reverse("core:info", args=[self.slug])
+
+
+class Redirect(models.Model):
+    """301 со старого адреса страницы на новый. Создаётся сам при смене slug (`apps.core.redirects`), можно и вручную."""
+
+    old_path = models.CharField(
+        "Старый адрес", max_length=255, unique=True, help_text="Путь от корня сайта: /category/shkola-2026/"
+    )
+    new_path = models.CharField("Новый адрес", max_length=255, help_text="Путь от корня сайта: /category/shkola/")
+    created_at = models.DateTimeField("Создан", auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Редирект"
+        verbose_name_plural = "Редиректы"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.old_path} → {self.new_path}"

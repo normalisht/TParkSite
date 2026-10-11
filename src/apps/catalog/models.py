@@ -4,7 +4,8 @@ from django.urls import reverse
 from apps.catalog.prices import format_price
 from apps.core.fields import HtmlField, full_spec, image_spec, image_specs, og_spec, photo_field
 from apps.core.models import OrderedModel, PublishedQuerySet, SeoModel
-from apps.core.slugs import unique_slug
+from apps.core.redirects import remember_slug_change
+from apps.core.slugs import SLUG_HELP, unique_slug
 
 
 class CategoryGroup(OrderedModel):
@@ -24,7 +25,7 @@ class CategoryGroup(OrderedModel):
 
 class Category(SeoModel, OrderedModel):
     name = models.CharField("Название", max_length=128)
-    slug = models.SlugField("Адрес страницы", max_length=255, unique=True, blank=True)
+    slug = models.SlugField("Адрес страницы", max_length=255, unique=True, blank=True, help_text=SLUG_HELP)
     description = HtmlField("Описание")
     preview = photo_field("Превью для главной", "catalog/previews", size=(1080, 720))
     preview_card, preview_card_avif = image_specs("preview", 640, 427)
@@ -46,6 +47,7 @@ class Category(SeoModel, OrderedModel):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = unique_slug(self, self.name)
+        remember_slug_change(self)
         super().save(*args, **kwargs)
 
     def get_absolute_url(self) -> str:
@@ -91,7 +93,7 @@ class CategoryPhoto(OrderedModel):
 
 class Service(SeoModel):
     name = models.CharField("Название", max_length=128)
-    slug = models.SlugField("Адрес страницы", max_length=255, unique=True, blank=True)
+    slug = models.SlugField("Адрес страницы", max_length=255, unique=True, blank=True, help_text=SLUG_HELP)
     short_description = HtmlField("Краткое описание")
     description = HtmlField("Полное описание")
     price = models.CharField(
@@ -120,6 +122,7 @@ class Service(SeoModel):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = unique_slug(self, self.name)
+        remember_slug_change(self)
         super().save(*args, **kwargs)
 
     def get_absolute_url(self) -> str:

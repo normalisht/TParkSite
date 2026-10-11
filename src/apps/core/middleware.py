@@ -16,3 +16,22 @@ class CanonicalHostMiddleware:
         if host and request.get_host().lower() == f"www.{host}":
             return HttpResponsePermanentRedirect(f"https://{host}{request.get_full_path()}")
         return self.get_response(request)
+
+
+class RedirectFallbackMiddleware:
+    """404 по адресу из «Редиректов» (страницу переименовали) — 301 на новый адрес с теми же параметрами (utm и т. п.)."""
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        if response.status_code != 404:
+            return response
+        from apps.core.models import Redirect
+
+        target = Redirect.objects.filter(old_path=request.path).values_list("new_path", flat=True).first()
+        if not target:
+            return response
+        query = request.META.get("QUERY_STRING", "")
+        return HttpResponsePermanentRedirect(f"{target}?{query}" if query else target)

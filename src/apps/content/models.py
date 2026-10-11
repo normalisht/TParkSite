@@ -12,6 +12,7 @@ from django.utils.text import Truncator
 
 from apps.core.fields import HtmlField, full_spec, image_spec, image_specs, og_spec, photo_field
 from apps.core.models import OrderedModel, PublishedQuerySet, SeoModel
+from apps.core.redirects import remember_slug_change
 from apps.core.slugs import unique_slug
 
 
@@ -50,7 +51,14 @@ def _days(n: int) -> str:
 class Event(SeoModel):
     title = models.CharField("Заголовок", max_length=128)
     slug = models.SlugField(
-        "Адрес страницы", max_length=255, unique=True, blank=True, help_text="Пусто — из заголовка и года."
+        "Адрес страницы",
+        max_length=255,
+        unique=True,
+        blank=True,
+        help_text=(
+            "Пусто — из заголовка и года. Если поменять, со старого адреса будет автоматический редирект "
+            "(раздел «Редиректы»), но лучше не менять адрес страниц, которые уже в поиске."
+        ),
     )
     date = models.DateField("Дата")
     end_date = models.DateField(
@@ -88,6 +96,7 @@ class Event(SeoModel):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = unique_slug(self, f"{self.title} {self.date:%Y}")
+        remember_slug_change(self)
         super().save(*args, **kwargs)
 
     def get_absolute_url(self) -> str:

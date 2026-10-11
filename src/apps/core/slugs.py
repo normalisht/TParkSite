@@ -15,3 +15,9 @@ def unique_slug(instance, value: str, field: str = "slug") -> str:
         candidate = f"{base}-{counter}"
         counter += 1
     return candidate
+
+
+SLUG_HELP = (
+    "Часть адреса страницы. Пусто — из названия. Если поменять, со старого адреса будет автоматический редирект "
+    "(раздел «Редиректы»), но лучше не менять адрес страниц, которые уже в поиске."
+)

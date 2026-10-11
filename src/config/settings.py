@@ -75,6 +75,7 @@ MIDDLEWARE = [
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
+    "apps.core.middleware.RedirectFallbackMiddleware",  # 404 по старому адресу переименованной страницы → 301
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",  # автор правки в истории текстов
@@ -258,6 +259,7 @@ UNFOLD = {
                     _nav("Настройки сайта", "settings", "admin:core_sitesettings_changelist"),
                     _nav("Тексты сайта", "text_fields", "admin:texts_sitetext_changelist"),
                     _nav("Инфо-страницы", "description", "admin:core_infopage_changelist"),
+                    _nav("Редиректы", "alt_route", "admin:core_redirect_changelist"),
                 ],
             },
             {
