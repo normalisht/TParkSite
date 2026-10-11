@@ -111,3 +111,12 @@ msgstr "Открыть выбранное"
 
 msgid "Open selection in new tab"
 msgstr "Открыть выбранное в новой вкладке"
+
+msgid "No results found"
+msgstr "Результаты не найдены"
+
+msgid "This page yielded into no results. Create a new item or reset your filters."
+msgstr "На этой странице нет результатов. Создайте новый элемент или сбросьте фильтры."
+
+msgid "Type to search"
+msgstr "Введите текст для поиска"
