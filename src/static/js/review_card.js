@@ -12,14 +12,16 @@ document.addEventListener("alpine:init", () => {
     init() {
       this.$nextTick(() => (this.long = this.$refs.text.scrollHeight > this.$refs.text.clientHeight + 4));
     },
-    async toggle() {
+    toggle() {
       const text = this.$refs.text;
       // Посреди анимации это текущая (анимированная) высота — повторный клик разворачивает без скачка.
       const from = text.getBoundingClientRect().height;
       this.animation?.cancel();
       this.animation = null;
       this.open = !this.open;
-      await this.$nextTick(); // класс is-clamped снят или возвращён — можно мерить конечную высоту
+      // Класс меняем сразу, не дожидаясь :class (Alpine обновит его позже, тем же значением): мерить конечную высоту
+      // и запускать анимацию нужно в этой же задаче, иначе браузер успевает нарисовать кадр с конечной высотой.
+      text.classList.toggle("is-clamped", this.long && !this.open);
       text.style.overflow = "";
       if (reducedMotion.matches) return;
       const to = this.open ? text.scrollHeight : text.getBoundingClientRect().height;

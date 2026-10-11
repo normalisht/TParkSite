@@ -1,5 +1,7 @@
 """Плавное раскрытие длинного отзыва в настоящем браузере (make e2e)."""
 
+from itertools import pairwise
+
 import pytest
 
 pytest.importorskip("playwright")
@@ -9,7 +11,20 @@ from apps.content.models import Review
 pytestmark = [pytest.mark.e2e, pytest.mark.django_db(transaction=True)]
 
 LONG = "<p>" + "Очень понравилось, обязательно приедем ещё. " * 60 + "</p>"
-ANIMATING = "[...document.querySelectorAll('.review-text')].some((el) => el.getAnimations().length)"
+# Только анимация высоты: переход маски (--review-fade) — CSSTransition, он не доказывает, что высота меняется плавно.
+ANIMATING = (
+    "[...document.querySelectorAll('.review-text')]"
+    ".some((el) => el.getAnimations().some((a) => !(a instanceof CSSTransition)))"
+)
+# Высота текста в каждом кадре — скачок к конечной высоте до старта анимации виден только так.
+RECORD_HEIGHTS = """
+() => {
+  const el = document.querySelector('.review-text');
+  window.heights = [];
+  const tick = () => { window.heights.push(Math.round(el.getBoundingClientRect().height)); requestAnimationFrame(tick); };
+  requestAnimationFrame(tick);
+}
+"""
 
 
 def _open(browser, live_server, **context):
@@ -21,6 +36,16 @@ def _open(browser, live_server, **context):
 
 def _height(page):
     return page.locator(".review-text").bounding_box()["height"]
+
+
+def _heights(page):
+    """Высоты по кадрам; одинаковые подряд схлопнуты."""
+    heights = page.evaluate("window.heights")
+    return [h for i, h in enumerate(heights) if i == 0 or h != heights[i - 1]]
+
+
+def _monotonic(values, rising):
+    return all((b > a) if rising else (b < a) for a, b in pairwise(values))
 
 
 def test_long_review_expands_and_collapses_smoothly(live_server, browser):
@@ -38,15 +63,35 @@ def test_long_review_expands_and_collapses_smoothly(live_server, browser):
     assert _height(page) == pytest.approx(collapsed, abs=1)
 
 
+def test_review_height_never_jumps(live_server, browser):
+    """Настоящий клик мышью: ни одного кадра с конечной (или прежней) высотой до или посреди анимации."""
+    Review.objects.create(text=LONG)
+    page = _open(browser, live_server)
+    button = page.locator(".review-text + button")
+    for rising in (True, False):
+        page.evaluate(RECORD_HEIGHTS)
+        button.click(force=True)  # force: не ждать «стабильности» кнопки, она едет вместе с текстом
+        page.wait_for_timeout(50)
+        page.wait_for_function(f"!({ANIMATING})")
+        heights = _heights(page)
+        assert len(heights) > 3 and _monotonic(heights, rising), heights
+
+
 def test_review_double_click_mid_animation(live_server, browser):
     Review.objects.create(text=LONG)
     page = _open(browser, live_server)
     collapsed = _height(page)
     button = page.locator(".review-text + button")
-    button.click()
-    page.wait_for_timeout(100)
-    button.click()  # передумали посреди раскрытия
+    page.evaluate(RECORD_HEIGHTS)
+    button.click(force=True)
+    page.wait_for_timeout(120)
+    assert page.evaluate(ANIMATING)  # второй клик — действительно посреди раскрытия
+    button.click(force=True)  # передумали
+    page.wait_for_timeout(50)
     page.wait_for_function(f"!({ANIMATING})")
+    heights = _heights(page)
+    peak = heights.index(max(heights))
+    assert _monotonic(heights[: peak + 1], True) and _monotonic(heights[peak:], False), heights  # без скачков
     assert _height(page) == pytest.approx(collapsed, abs=1)
     assert button.inner_text() == "Читать полностью"
 
