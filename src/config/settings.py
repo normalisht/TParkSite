@@ -10,6 +10,8 @@ from django.templatetags.static import static
 from django.urls import reverse_lazy
 from django.utils.csp import CSP
 
+from apps.core.map_hosts import WIDGET_HOSTS
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -199,7 +201,7 @@ SECURE_CSP_REPORT_ONLY = {
     "style-src": [CSP.SELF, CSP.UNSAFE_INLINE],
     "img-src": [CSP.SELF, "data:", *YANDEX_METRIKA],
     "connect-src": [CSP.SELF, *YANDEX_METRIKA, "wss://mc.yandex.com", "wss://mc.yandex.ru"],
-    "frame-src": ["https://yandex.ru", *YANDEX_METRIKA],
+    "frame-src": [*(f"https://{host}" for host in sorted(WIDGET_HOSTS)), *YANDEX_METRIKA],
     "font-src": [CSP.SELF],
     "frame-ancestors": [CSP.NONE],
     "base-uri": [CSP.SELF],

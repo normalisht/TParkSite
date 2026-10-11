@@ -54,6 +54,11 @@ def _expand(spec: str) -> list[str]:
     return days
 
 
+def _hhmm(value: str) -> str:
+    """«9:00» → «09:00»: schema.org ждёт время ровно в формате ЧЧ:ММ."""
+    return value.zfill(5)
+
+
 def opening_hours_spec(value: str) -> list[dict]:
     """`OpeningHoursSpecification` для JSON-LD; если хоть одно правило не разобрать — пустой список."""
     specs = []
@@ -65,8 +70,8 @@ def opening_hours_spec(value: str) -> list[dict]:
             {
                 "@type": "OpeningHoursSpecification",
                 "dayOfWeek": [f"https://schema.org/{SCHEMA_DAYS[d]}" for d in _expand(match["days"])],
-                "opens": match["start"],
-                "closes": match["end"],
+                "opens": _hhmm(match["start"]),
+                "closes": _hhmm(match["end"]),
             }
         )
     return specs

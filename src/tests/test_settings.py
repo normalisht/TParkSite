@@ -109,6 +109,17 @@ def test_csp_report_only_header(client):
     assert "'nonce-" not in header  # nonce сделал бы каждую страницу уникальной и убил 304
 
 
+def test_csp_frame_src_allows_every_map_widget_host():
+    # Карта в iframe берётся с хостов, которые разрешает валидатор поля, — CSP должен пускать их все.
+    from django.conf import settings
+
+    from apps.core.map_hosts import WIDGET_HOSTS
+
+    frame_src = settings.SECURE_CSP_REPORT_ONLY["frame-src"]
+    for host in WIDGET_HOSTS:
+        assert f"https://{host}" in frame_src, host
+
+
 @pytest.mark.django_db
 def test_permissions_policy_header(client):
     assert "camera=()" in client.get("/").headers["Permissions-Policy"]

@@ -185,3 +185,8 @@ def test_opening_hours_spec():
 def test_opening_hours_spec_invalid_is_empty():
     assert opening_hours_spec("Пн-Пт 10-18") == []
     assert opening_hours_spec("") == []
+
+
+def test_opening_hours_spec_pads_hours_to_two_digits():
+    spec = opening_hours_spec("Mo-Fr 9:00-18:00")[0]
+    assert (spec["opens"], spec["closes"]) == ("09:00", "18:00")

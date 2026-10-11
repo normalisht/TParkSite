@@ -119,21 +119,20 @@ def service_list(request, category, services) -> dict:
     }
 
 
-def price_offer(text: str, url: str) -> dict | None:
-    """Цена из свободного текста («1000 ₽ с участника», «Бесплатно») — `Offer`; без числа — None."""
+def price_offer(text: str, url: str, available: bool = True) -> dict | None:
+    """Цена из свободного текста («1000 ₽ с участника», «Бесплатно») — `Offer`; без числа — None.
+
+    У прошедшего события `available=False`: предложение остаётся (цена видна), но «в наличии» не заявляем."""
     if "бесплатн" in text.lower():
         amount = "0"
     elif match := re.search(r"\d[\d\s\u00a0]*", text):
         amount = re.sub(r"\D", "", match.group())
     else:
         return None
-    return {
-        "@type": "Offer",
-        "price": amount,
-        "priceCurrency": "RUB",
-        "url": url,
-        "availability": "https://schema.org/InStock",
-    }
+    offer = {"@type": "Offer", "price": amount, "priceCurrency": "RUB", "url": url}
+    if available:
+        offer["availability"] = "https://schema.org/InStock"
+    return offer
 
 
 def event(request, event, seo: dict) -> dict:
@@ -158,7 +157,7 @@ def event(request, event, seo: dict) -> dict:
             ),
             "organizer": {"@id": organization_id(request)},
             "performer": {"@id": organization_id(request)},
-            "offers": price_offer(event.price, url) if event.price else None,
+            "offers": price_offer(event.price, url, available=not event.is_past) if event.price else None,
         }
     )
 

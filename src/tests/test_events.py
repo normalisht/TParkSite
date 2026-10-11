@@ -237,3 +237,11 @@ def test_events_page_lists_upcoming_in_item_list(client):
 def test_events_page_without_events_has_no_item_list(client):
     html = client.get("/events/").content.decode()
     assert '"ItemList"' not in html
+
+
+def test_past_event_offer_has_no_availability(client):
+    event = make_event(days=-30, price="500", show_after_date=True, is_published=True)
+    html = client.get(event.get_absolute_url()).content.decode()
+    node = next(n for n in _graph(html) if n["@type"] == "Event")
+    assert node["offers"]["price"] == "500"
+    assert "availability" not in node["offers"]

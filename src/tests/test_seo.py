@@ -335,3 +335,56 @@ def test_static_pages_have_lastmod(client):
     xml = client.get("/sitemap.xml").content.decode()
     contacts = xml.split("/contacts/</loc>", 1)[1].split("</url>", 1)[0]
     assert "<lastmod>" in contacts
+
+
+def _static_lastmod(client, path: str) -> str | None:
+    xml = client.get("/sitemap.xml").content.decode()
+    block = xml.split(f"{path}</loc>", 1)[1].split("</url>", 1)[0]
+    return block.split("<lastmod>", 1)[1].split("</lastmod>", 1)[0] if "<lastmod>" in block else None
+
+
+def _set_updated(model, pk, day: str):
+    model.objects.filter(pk=pk).update(updated_at=f"{day}T12:00:00+00:00")
+
+
+def test_static_sitemap_lastmod_follows_the_content_of_each_page(client):
+    site = SiteSettings.load()
+    _set_updated(SiteSettings, site.pk, "2020-01-01")
+    category = Category.objects.create(name="Сплавы", is_published=True)
+    _set_updated(Category, category.pk, "2023-03-03")
+    event = Event.objects.create(title="Фест", date=timezone.localdate() + timedelta(days=5), is_published=True)
+    _set_updated(Event, event.pk, "2024-04-04")
+    Review.objects.create(text="<p>Хорошо</p>")
+    assert _static_lastmod(client, "/contacts/") == "2020-01-01"
+    assert _static_lastmod(client, "/about/") == "2020-01-01"
+    assert _static_lastmod(client, "/events/") == "2024-04-04"
+    assert _static_lastmod(client, "http://testserver/") == "2024-04-04"
+    # У отзывов и галереи нет собственной даты изменения — надёжного lastmod нет, лучше его не отдавать.
+    assert _static_lastmod(client, "/reviews/") is None
+    assert _static_lastmod(client, "/gallery/") is None
+
+
+def test_home_lastmod_uses_newest_category_when_it_is_newer(client):
+    site = SiteSettings.load()
+    _set_updated(SiteSettings, site.pk, "2020-01-01")
+    category = Category.objects.create(name="Сплавы", is_published=True)
+    _set_updated(Category, category.pk, "2023-03-03")
+    hidden = Category.objects.create(name="Черновик", is_published=False)
+    _set_updated(Category, hidden.pk, "2025-05-05")
+    assert _static_lastmod(client, "http://testserver/") == "2023-03-03"
+
+
+def test_static_sitemap_loads_site_settings_once(rf):
+    from django.contrib.sites.requests import RequestSite
+    from django.db import connection
+    from django.test.utils import CaptureQueriesContext
+
+    from apps.core.sitemaps import StaticSitemap
+
+    SiteSettings.load()
+    sitemap = StaticSitemap()
+    with CaptureQueriesContext(connection) as ctx:
+        sitemap.get_latest_lastmod()
+        assert len(sitemap.get_urls(site=RequestSite(rf.get("/")))) == 6
+    # lastmod зовётся на каждую страницу и дважды (Last-Modified и запись), а настройки нужны один раз.
+    assert sum('"core_sitesettings"' in q["sql"] for q in ctx.captured_queries) == 1
