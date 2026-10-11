@@ -138,3 +138,11 @@ def test_env_example_starts_with_short_hsts():
         if line and not line.startswith("#")
     )
     assert values["HSTS_SECONDS"] == "86400"
+
+
+def test_make_up_backs_up_only_running_site():
+    # Миграции идут при старте контейнера (entrypoint), поэтому перед пересборкой — бэкап; при первом запуске — пропуск.
+    makefile = (ROOT / "Makefile").read_text(encoding="utf-8")
+    recipe = makefile.split("\nup:", 1)[1].split("\n\n", 1)[0]
+    assert "docker compose ps -q tpark-web" in recipe
+    assert recipe.index("scripts/backup.sh") < recipe.index("docker compose up -d --build")

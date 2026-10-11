@@ -84,7 +84,8 @@ dev-superuser: ## Создать администратора в dev-конте�
 build: ## Собрать продакшен-образ
 	docker compose build
 
-up: ## Собрать и запустить продакшен в фоне
+up: ## Бэкап (если сайт уже запущен), затем сборка и запуск продакшена в фоне
+	@if [ -n "$$(docker compose ps -q tpark-web 2>/dev/null)" ]; then ./scripts/backup.sh; else echo "Сайт не запущен — бэкап пропущен"; fi
 	docker compose up -d --build
 
 down: ## Остановить продакшен

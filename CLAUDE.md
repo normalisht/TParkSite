@@ -35,7 +35,7 @@ uv run manage.py import_legacy --db ../old_version/T_Park.db --images <папк�
 uv run --project src pre-commit run --all-files   # ruff в pre-commit закреплён той же версией, что в src/uv.lock; docs/ и old_version/ исключены
 docker compose -f compose.dev.yaml up --build --renew-anon-volumes  # локально в Docker: http://localhost:8000, DEBUG=1, src/ примонтирован (hot reload + Tailwind watch); -V — .venv из нового образа
 docker compose -f compose.dev.yaml exec tpark-dev python manage.py createsuperuser
-docker compose up -d --build                      # продакшен (корневой .env из .env.example, нужна внешняя сеть PROXY_NETWORK)
+docker compose up -d --build                      # продакшен (корневой .env из .env.example, нужна внешняя сеть PROXY_NETWORK); обновление — `make up` (сначала бэкап)
 docker compose -f compose.nginx.yaml up -d --build # продакшен без общего прокси: свой nginx на 80/443, сам выпускает сертификат Let's Encrypt (README)
 ```
 
