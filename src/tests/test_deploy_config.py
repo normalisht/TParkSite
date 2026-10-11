@@ -54,3 +54,53 @@ def test_dockerignore_excludes_legacy_data():
     lines = (ROOT / ".dockerignore").read_text(encoding="utf-8").splitlines()
     assert "src/old_migrate" in lines
     assert "src/*.csv" in lines
+
+
+NGINX = (ROOT / "docker/nginx.conf.template").read_text(encoding="utf-8")
+
+
+def _server_blocks(conf: str) -> list[str]:
+    """Тексты блоков server { … } верхнего уровня внутри http (вложенные location — внутри)."""
+    blocks, depth, start = [], 0, None
+    for match in re.finditer(r"server\s*\{|\{|\}", conf):
+        token = match.group()
+        if token.startswith("server") and depth == 1:
+            start = match.start()
+        if token.endswith("{"):
+            depth += 1
+        else:
+            depth -= 1
+            if depth == 1 and start is not None:
+                blocks.append(conf[start : match.end()])
+                start = None
+    return blocks
+
+
+def test_nginx_rejects_unknown_hosts():
+    blocks = _server_blocks(NGINX)
+    assert any("listen 80 default_server;" in b and "return 444;" in b for b in blocks)
+    assert any("listen 443 ssl default_server;" in b and "ssl_reject_handshake on;" in b for b in blocks)
+
+
+def test_nginx_http_redirects_straight_to_canonical_host():
+    # http://www… → https://t-camp.ru одним редиректом, а не через www и middleware.
+    assert "return 301 https://${CANONICAL_HOST}$request_uri;" in NGINX
+    assert "https://$host$request_uri" not in NGINX
+    compose = (ROOT / "compose.nginx.yaml").read_text(encoding="utf-8")
+    assert "CANONICAL_HOST: ${CANONICAL_HOST:-t-camp.ru}" in compose
+
+
+def test_nginx_limits_admin_login():
+    assert re.search(r"limit_req_zone \$binary_remote_addr zone=admin_login:\d+m rate=\d+r/m;", NGINX)
+    block = NGINX.split("location = /admin/login/", 1)[1].split("}", 1)[0]
+    assert "limit_req zone=admin_login" in block
+    assert "proxy_pass http://tpark_web;" in block
+
+
+def test_nginx_sets_real_ip_for_every_location():
+    # Заголовки прокси — на уровне server: location без своих proxy_set_header их наследует.
+    https = next(b for b in _server_blocks(NGINX) if "acme_certificate" in b)
+    server_level = re.sub(r"location[^{]*\{[^}]*\}", "", https)
+    assert "proxy_set_header X-Real-IP $remote_addr;" in server_level
+    for location in re.findall(r"location[^{]*\{([^}]*)\}", https):
+        assert "proxy_set_header" not in location
