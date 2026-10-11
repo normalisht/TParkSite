@@ -51,7 +51,7 @@ class InfoPageSitemap(ModelSitemap):
 
 class EventSitemap(ModelSitemap):
     def items(self):
-        return Event.objects.visible().order_by("-date", "-id")
+        return Event.objects.published().visible().order_by("-date", "-id")
 
 
 SITEMAPS = {

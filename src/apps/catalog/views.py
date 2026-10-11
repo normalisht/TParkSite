@@ -24,7 +24,7 @@ def home(request):
             # Без фото в шапке крупнейший элемент первого экрана (LCP) — первая карточка категории.
             "lcp_card": not hero,
             "route": route_links(site.latitude, site.longitude),
-            "events": list(Event.objects.upcoming()[:HOME_EVENTS]) if site.home_show_events else [],
+            "events": list(Event.objects.published().upcoming()[:HOME_EVENTS]) if site.home_show_events else [],
             "photos": list(GalleryPhoto.objects.all()[:HOME_PHOTOS]),
             "reviews": list(Review.objects.published()[:HOME_REVIEWS]),
             "seo": page_seo("home"),

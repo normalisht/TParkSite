@@ -21,7 +21,7 @@ def _not_over(today) -> Q:
     return Q(date__gte=today) | Q(end_date__gte=today)
 
 
-class EventQuerySet(models.QuerySet):
+class EventQuerySet(PublishedQuerySet):
     def upcoming(self, today=None):
         """Предстоящие и идущие сейчас — по дате начала."""
         today = today or timezone.localdate()
@@ -71,7 +71,14 @@ class Event(SeoModel):
     )
     description = HtmlField("Описание")
     link = models.URLField("Ссылка", max_length=500, blank=True, help_text="Соцсеть или сайт мероприятия.")
-    show_after_date = models.BooleanField("Показывать после даты", default=False)
+    show_after_date = models.BooleanField(
+        "Показывать после даты",
+        default=False,
+        help_text="Оставить в списке «Прошедшие» и в поиске. Без галочки прошедшее открывается только по прямой ссылке.",
+    )
+    is_published = models.BooleanField(
+        "Опубликовано", default=True, help_text="Снимите, чтобы подготовить мероприятие заранее: на сайте его не будет."
+    )
     image = photo_field("Фото", "events")
     card, card_avif = image_specs("image", 800, 600)
     card_small, card_small_avif = image_specs("image", 640, 480)  # карточки в сетке и на телефоне: srcset с card

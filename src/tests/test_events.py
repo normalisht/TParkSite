@@ -109,9 +109,30 @@ def test_events_list_sections(client):
     assert html.count(":class=\"all && '!block'\"") == 2
 
 
-def test_hidden_past_event_is_404(client):
-    event = make_event(days=-5)
-    assert client.get(event.get_absolute_url()).status_code == 404
+def test_past_event_without_flag_opens_by_link_but_is_not_indexed(client):
+    event = make_event("Прошлый слёт", days=-5)
+    response = client.get(event.get_absolute_url())
+    assert response.status_code == 200
+    assert '<meta name="robots" content="noindex">' in response.content.decode()
+    assert event.get_absolute_url() not in client.get("/sitemap.xml").content.decode()
+    assert "Прошлый слёт" not in client.get("/events/").content.decode()
+
+
+def test_visible_events_are_indexed(client):
+    for event in (make_event(days=3), make_event("Архив", days=-5, show_after_date=True)):
+        assert 'name="robots"' not in client.get(event.get_absolute_url()).content.decode()
+
+
+def test_draft_event_is_hidden_everywhere(client):
+    site = SiteSettings.load()
+    site.home_show_events = True
+    site.save()
+    make_event("Опубликованное", days=2)
+    draft = make_event("Черновик", days=3, is_published=False)
+    assert client.get(draft.get_absolute_url()).status_code == 404
+    for url in ("/", "/events/", "/sitemap.xml"):
+        html = client.get(url).content.decode()
+        assert "Черновик" not in html and draft.slug not in html, url
 
 
 def test_events_list_links_to_detail(client):

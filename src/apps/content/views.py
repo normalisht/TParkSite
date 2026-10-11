@@ -17,14 +17,14 @@ GALLERY_PAGE = 24
 
 def events(request):
     today = timezone.localdate()
-    upcoming = list(Event.objects.upcoming(today))
+    upcoming = list(Event.objects.published().upcoming(today))
     return render(
         request,
         "content/events.html",
         {
             "nearest": upcoming[0] if upcoming else None,
             "upcoming": upcoming[1:],
-            "past": list(Event.objects.past_visible(today)),
+            "past": list(Event.objects.published().past_visible(today)),
             "past_shown": PAST_EVENTS_SHOWN,
             "seo": page_seo("events"),
         },
@@ -32,7 +32,7 @@ def events(request):
 
 
 def event_detail(request, slug):
-    event = get_object_or_404(Event.objects.visible(), slug=slug)
+    event = get_object_or_404(Event.objects.published(), slug=slug)
     when = date_format(event.date, "j E Y")
     # Место проведения вне парка: описание не должно утверждать, что событие в Т-Парке (как «Где» и JSON-LD на странице).
     default_description = (
@@ -47,6 +47,8 @@ def event_detail(request, slug):
         obj=event,
         default_description=default_description,
     )
+    # Прошедшее без «Показывать после даты»: по прямой ссылке открывается, в поиск не попадает.
+    seo["noindex"] = event.is_past and not event.show_after_date
     crumbs = [ld.home_crumb(), ("Мероприятия", reverse("content:events")), (event.title, "")]
     site = SiteSettings.load()
     return render(
@@ -55,7 +57,7 @@ def event_detail(request, slug):
         {
             "event": event,
             "contact_topic": "" if event.is_past else event.title,
-            "related": list(Event.objects.upcoming().exclude(pk=event.pk)[:RELATED_EVENTS]),
+            "related": list(Event.objects.published().upcoming().exclude(pk=event.pk)[:RELATED_EVENTS]),
             "route": route_links(site.latitude, site.longitude),
             "seo": seo,
             "breadcrumbs": crumbs,
