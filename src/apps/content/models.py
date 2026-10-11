@@ -2,7 +2,7 @@ from datetime import datetime
 from urllib.parse import urlsplit
 
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
@@ -96,8 +96,9 @@ class Event(SeoModel):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = unique_slug(self, f"{self.title} {self.date:%Y}")
-        remember_slug_change(self)
-        super().save(*args, **kwargs)
+        with transaction.atomic():
+            remember_slug_change(self)
+            super().save(*args, **kwargs)
 
     def get_absolute_url(self) -> str:
         return reverse("content:event", args=[self.slug])

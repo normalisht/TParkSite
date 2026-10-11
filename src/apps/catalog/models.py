@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from django.urls import reverse
 
 from apps.catalog.prices import format_price
@@ -47,8 +47,9 @@ class Category(SeoModel, OrderedModel):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = unique_slug(self, self.name)
-        remember_slug_change(self)
-        super().save(*args, **kwargs)
+        with transaction.atomic():
+            remember_slug_change(self)
+            super().save(*args, **kwargs)
 
     def get_absolute_url(self) -> str:
         return reverse("catalog:category", args=[self.slug])
@@ -122,8 +123,9 @@ class Service(SeoModel):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = unique_slug(self, self.name)
-        remember_slug_change(self)
-        super().save(*args, **kwargs)
+        with transaction.atomic():
+            remember_slug_change(self)
+            super().save(*args, **kwargs)
 
     def get_absolute_url(self) -> str:
         return reverse("catalog:service", args=[self.slug])

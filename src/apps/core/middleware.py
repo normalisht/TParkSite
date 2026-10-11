@@ -28,10 +28,11 @@ class RedirectFallbackMiddleware:
         response = self.get_response(request)
         if response.status_code != 404:
             return response
-        from apps.core.models import Redirect
+        from apps.core.models import Redirect, is_site_path
 
         target = Redirect.objects.filter(old_path=request.path).values_list("new_path", flat=True).first()
-        if not target:
+        if not target or not is_site_path(target):  # строка могла попасть в обход валидации — на чужой сайт не уводим
             return response
         query = request.META.get("QUERY_STRING", "")
-        return HttpResponsePermanentRedirect(f"{target}?{query}" if query else target)
+        separator = "&" if "?" in target else "?"
+        return HttpResponsePermanentRedirect(f"{target}{separator}{query}" if query else target)

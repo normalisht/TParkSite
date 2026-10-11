@@ -1,5 +1,8 @@
+import re
+
+from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Q
 from django.urls import reverse
 
@@ -311,20 +314,43 @@ class InfoPage(SeoModel):
             self.slug = unique_slug(self, self.title)
         from apps.core.redirects import remember_slug_change
 
-        remember_slug_change(self)
-        super().save(*args, **kwargs)
+        with transaction.atomic():
+            remember_slug_change(self)
+            super().save(*args, **kwargs)
 
     def get_absolute_url(self) -> str:
         return reverse("core:info", args=[self.slug])
+
+
+SITE_PATH_RE = re.compile(r"^/(?![/\\])[^\s\\]*$")
+
+
+def is_site_path(value: str) -> bool:
+    """Путь внутри сайта: начинается с одного «/», без схемы, хоста, обратных слэшей и пробелов."""
+    return bool(SITE_PATH_RE.match(value or ""))
+
+
+def validate_site_path(value: str) -> None:
+    if not is_site_path(value):
+        raise ValidationError("Нужен путь от корня сайта, например /category/shkola/ (без https:// и домена).")
 
 
 class Redirect(models.Model):
     """301 со старого адреса страницы на новый. Создаётся сам при смене slug (`apps.core.redirects`), можно и вручную."""
 
     old_path = models.CharField(
-        "Старый адрес", max_length=255, unique=True, help_text="Путь от корня сайта: /category/shkola-2026/"
+        "Старый адрес",
+        max_length=255,
+        unique=True,
+        validators=[validate_site_path],
+        help_text="Путь от корня сайта: /category/shkola-2026/",
     )
-    new_path = models.CharField("Новый адрес", max_length=255, help_text="Путь от корня сайта: /category/shkola/")
+    new_path = models.CharField(
+        "Новый адрес",
+        max_length=255,
+        validators=[validate_site_path],
+        help_text="Путь от корня сайта: /category/shkola/",
+    )
     created_at = models.DateTimeField("Создан", auto_now_add=True)
 
     class Meta:
@@ -334,3 +360,9 @@ class Redirect(models.Model):
 
     def __str__(self):
         return f"{self.old_path} → {self.new_path}"
+
+    def clean(self):
+        if "?" in self.old_path or "#" in self.old_path:
+            raise ValidationError({"old_path": "Старый адрес — только путь, без «?» и «#»."})
+        if self.old_path == self.new_path:
+            raise ValidationError({"new_path": "Новый адрес совпадает со старым — получится бесконечный редирект."})
