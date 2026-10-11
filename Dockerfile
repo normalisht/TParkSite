@@ -3,7 +3,8 @@ FROM ghcr.io/astral-sh/uv:python3.14-bookworm-slim@sha256:7cf77f594be8042dab6daa
 ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
     UV_PYTHON_DOWNLOADS=never \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
 
 WORKDIR /app
 
@@ -29,6 +30,9 @@ RUN SECRET_KEY=build-only python manage.py tailwind build \
  && mkdir -p /data/db /data/media \
  && chown -R app:app /data \
  && chmod +x /usr/local/bin/entrypoint.sh
+
+# Задаётся после сборки: проверка Django требует, чтобы каталог существовал, а создаёт его entrypoint.
+ENV FILE_UPLOAD_TEMP_DIR=/data/db/upload-tmp
 
 USER app
 EXPOSE 8000

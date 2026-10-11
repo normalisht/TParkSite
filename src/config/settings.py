@@ -159,6 +159,9 @@ STATIC_ROOT = Path(os.environ.get("STATIC_ROOT", BASE_DIR / "staticfiles"))
 STATICFILES_DIRS = [BASE_DIR / "static"]
 MEDIA_URL = "/media/"
 MEDIA_ROOT = Path(os.environ.get("MEDIA_ROOT", BASE_DIR / "media"))
+# Куда Django складывает большие загрузки (>2,5 МБ, пачка фото). В контейнере /tmp — tmpfs в памяти и
+# считается в mem_limit, поэтому каталог задаётся на томе (см. Dockerfile); пусто — системный по умолчанию.
+FILE_UPLOAD_TEMP_DIR = os.environ.get("FILE_UPLOAD_TEMP_DIR") or None
 # Миниатюры: недостающие создаются при показе, после сохранения фото — сразу в фоне (apps.core.images).
 IMAGEKIT_DEFAULT_CACHEFILE_STRATEGY = "apps.core.images.GenerateAfterCommit"
 IMAGEKIT_DEFAULT_CACHEFILE_BACKEND = "apps.core.images.AtomicBackend"

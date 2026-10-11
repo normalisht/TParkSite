@@ -182,3 +182,20 @@ def test_nginx_containers_have_healthchecks():
     assert "healthcheck:" in _service_block(ROOT / "compose.nginx.yaml", "tpark-nginx")
     assert "location = /healthz" in (ROOT / "docker/nginx-media.conf").read_text(encoding="utf-8")
     assert "location = /healthz" in (ROOT / "docker/nginx.conf.template").read_text(encoding="utf-8")
+
+
+def test_upload_temp_dir_is_on_db_volume_and_created_at_start():
+    # Файлы больших загрузок — на диск (том db), а не в tmpfs /tmp, который считается в mem_limit.
+    # Том media раздаёт nginx, поэтому временные файлы туда класть нельзя.
+    dockerfile = (ROOT / "Dockerfile").read_text(encoding="utf-8")
+    match = re.search(r"FILE_UPLOAD_TEMP_DIR=(\S+)", dockerfile)
+    assert match, "Dockerfile не задаёт FILE_UPLOAD_TEMP_DIR"
+    assert match.group(1).startswith("/data/db/")
+    assert "/data/media" not in match.group(1)
+    entrypoint = (ROOT / "docker/entrypoint.sh").read_text(encoding="utf-8")
+    assert 'mkdir -p "$FILE_UPLOAD_TEMP_DIR"' in entrypoint
+
+
+def test_python_does_not_write_bytecode_into_read_only_image():
+    dockerfile = (ROOT / "Dockerfile").read_text(encoding="utf-8")
+    assert "PYTHONDONTWRITEBYTECODE=1" in dockerfile

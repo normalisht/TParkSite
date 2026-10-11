@@ -137,3 +137,12 @@ def test_page_with_metrika_keeps_stable_etag(client, settings):
 def test_500_page_has_no_inline_handlers():
     html = (ROOT / "templates" / "500.html").read_text(encoding="utf-8")
     assert "onclick=" not in html
+
+
+def test_upload_temp_dir_comes_from_env():
+    # Большие загрузки (пачка фото) не должны оседать в tmpfs /tmp контейнера: каталог задаётся окружением.
+    result = _settings_probe({"DEBUG": "1", "FILE_UPLOAD_TEMP_DIR": "/data/db/upload-tmp"}, "s.FILE_UPLOAD_TEMP_DIR")
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.strip() == "/data/db/upload-tmp"
+    result = _settings_probe({"DEBUG": "1", "FILE_UPLOAD_TEMP_DIR": ""}, "s.FILE_UPLOAD_TEMP_DIR")
+    assert result.stdout.strip() == "None"
