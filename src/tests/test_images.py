@@ -1,4 +1,8 @@
+import os
+import time
+
 import pytest
+from django.core.management import call_command
 from django.template import Context, Template
 from PIL import Image
 
@@ -140,3 +144,22 @@ def test_missing_thumbnail_still_generated_on_view(make_image):
     storage = photo.image.storage
     assert not storage.exists(photo.thumb_avif.name)
     assert photo.thumb_avif.url and storage.exists(photo.thumb_avif.name)
+
+
+def test_prune_image_cache(make_image, media_root):
+    photo = GalleryPhoto.objects.create(image=make_image())
+    kept = media_root / photo.thumb.url.removeprefix("/media/")  # url создаёт файл
+    stale = media_root / "CACHE/images/gallery/old/stale.webp"
+    fresh = media_root / "CACHE/images/gallery/old/fresh.webp"
+    stale.parent.mkdir(parents=True)
+    stale.write_bytes(b"x")
+    fresh.write_bytes(b"x")
+    two_hours_ago = time.time() - 2 * 3600
+    os.utime(stale, (two_hours_ago, two_hours_ago))
+    os.utime(kept, (two_hours_ago, two_hours_ago))
+
+    call_command("prune_image_cache", "--dry-run")
+    assert stale.exists()
+
+    call_command("prune_image_cache")
+    assert not stale.exists() and fresh.exists() and kept.exists()

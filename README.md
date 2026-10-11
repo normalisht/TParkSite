@@ -11,6 +11,7 @@ Django-проект — в [src/](src/), в корне — инфраструк�
 3. В reverse-proxy: `/media/` → `http://tpark-media:80`, остальное → `http://tpark-web:8000`, передавать заголовок `X-Forwarded-Proto`.
 4. Перенос данных: `docker compose run --rm -v /путь/к/старым/данным:/legacy tpark-web python manage.py import_legacy --db /legacy/T_Park.db --images /legacy/images --price-csv /legacy/price.csv` (повторный прогон — с `--flush`).
 5. Бэкап по cron: `scripts/backup.sh` (хранит последние `BACKUP_KEEP` копий, по умолчанию 14).
+6. Миниатюры фото создаются в фоне при старте контейнера (`generateimages`) и сразу после загрузки фото. Если поменялись размеры или качество миниатюр (`src/apps/core/fields.py`, модели), после деплоя первые минуты, пока идёт генерация, страницы с новыми миниатюрами (особенно галерея) могут открываться медленно. Когда генерация закончится (в `docker compose logs tpark-web` — последний `Validating generator`), удалить ненужные: `docker compose exec tpark-web python manage.py prune_image_cache --dry-run`, затем без `--dry-run`. Папку `media/CACHE` целиком не удалять: до перезапуска сайт будет отдавать битые картинки.
 
 ### Вариант со своим nginx
 
