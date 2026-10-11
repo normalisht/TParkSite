@@ -71,9 +71,6 @@ def event_detail(request, slug):
     )
 
 
-GALLERY_STRIP_SIZE = 6
-
-
 def about(request):
     site = SiteSettings.load()
     seo = page_seo("about")
@@ -85,7 +82,7 @@ def about(request):
             "formats": list(site.park_formats.select_related("category")),
             "facts": list(site.founder_facts.all()),
             "route": route_links(site.latitude, site.longitude),
-            "photos": list(GalleryPhoto.objects.all()[:GALLERY_STRIP_SIZE]),
+            "photos": GalleryPhoto.strip_photos("about"),
             "partners": list(Partner.objects.all()),
             "seo": seo,
             "structured_data": [ld.organization(request, with_founder=True)],
@@ -99,7 +96,7 @@ def reviews(request):
         "content/reviews.html",
         {
             "reviews": Review.objects.published(),
-            "photos": list(GalleryPhoto.objects.all()[:GALLERY_STRIP_SIZE]),
+            "photos": GalleryPhoto.strip_photos("reviews"),
             "seo": page_seo("reviews"),
         },
     )

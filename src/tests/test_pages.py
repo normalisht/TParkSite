@@ -316,6 +316,47 @@ def test_reviews_page_photo_strip(client, make_image):
     assert "Как это выглядит" in html and 'alt="Закат"' in html
 
 
+def _strip_gallery(make_image, count):
+    """count фото с подписями «Фото 0…»: по alt видно, какие попали в полосу."""
+    first = GalleryPhoto.objects.create(image=make_image(), caption="Фото 0")
+    GalleryPhoto.objects.bulk_create(
+        [GalleryPhoto(image=first.image.name, caption=f"Фото {i}", order=i) for i in range(1, count)]
+    )
+
+
+def _strip_alts(html):
+    strip = html.split("Как это выглядит")[1].split("</section>")[0]
+    return re.findall(r'alt="(Фото \d+)"', strip)
+
+
+@pytest.mark.parametrize("url", ["/", "/about/", "/reviews/"])
+def test_photo_strip_rotates_daily(client, make_image, monkeypatch, url):
+    _strip_gallery(make_image, 15)
+    seen = set()
+    for shift in range(10):
+        day = date(2026, 10, 1) + timedelta(days=shift)
+        monkeypatch.setattr("django.utils.timezone.localdate", lambda day=day: day)
+        alts = _strip_alts(client.get(url).content.decode())
+        assert len(alts) == GalleryPhoto.STRIP_SIZE
+        assert alts == sorted(alts, key=lambda alt: int(alt.split()[1]))  # порядок — как в галерее
+        seen.update(alts)
+    assert len(seen) > GalleryPhoto.STRIP_SIZE  # не всегда первые шесть
+
+
+def test_photo_strip_differs_between_pages(client, make_image, monkeypatch):
+    _strip_gallery(make_image, 15)
+    monkeypatch.setattr("django.utils.timezone.localdate", lambda: date(2026, 10, 11))
+    home, about = (_strip_alts(client.get(url).content.decode()) for url in ("/", "/about/"))
+    assert home != about
+
+
+def test_photo_strip_stable_within_day_keeps_304(client, make_image):
+    _strip_gallery(make_image, 15)
+    first = client.get("/")
+    assert first.has_header("ETag")
+    assert client.get("/", HTTP_IF_NONE_MATCH=first["ETag"]).status_code == 304
+
+
 def test_gallery_page(client, make_image):
     GalleryPhoto.objects.create(image=make_image(), caption="Закат")
     html = client.get("/gallery/").content.decode()

@@ -10,7 +10,6 @@ from apps.core.seo import absolute_url, make_seo, page_seo
 
 HOME_REVIEWS = 8
 HOME_EVENTS = 3
-HOME_PHOTOS = 6
 
 
 def home(request):
@@ -25,7 +24,7 @@ def home(request):
             "lcp_card": not hero,
             "route": route_links(site.latitude, site.longitude),
             "events": list(Event.objects.published().upcoming()[:HOME_EVENTS]) if site.home_show_events else [],
-            "photos": list(GalleryPhoto.objects.all()[:HOME_PHOTOS]),
+            "photos": GalleryPhoto.strip_photos("home"),
             "reviews": list(Review.objects.published()[:HOME_REVIEWS]),
             "seo": page_seo("home"),
             "structured_data": [ld.organization(request)],

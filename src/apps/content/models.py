@@ -13,6 +13,7 @@ from django.utils.text import Truncator
 from apps.core.fields import HtmlField, full_spec, image_spec, image_specs, og_spec, photo_field
 from apps.core.models import OrderedModel, PublishedQuerySet, SeoModel
 from apps.core.redirects import remember_slug_change
+from apps.core.rotation import daily_pick
 from apps.core.slugs import unique_slug
 
 
@@ -203,6 +204,8 @@ class Partner(OrderedModel):
 
 
 class GalleryPhoto(OrderedModel):
+    STRIP_SIZE = 6  # фото в полосе «Как это выглядит» (главная, «О нас», отзывы)
+
     image = photo_field("Фото", "gallery", blank=False)
     caption = models.CharField("Подпись", max_length=255, blank=True)
     thumb, thumb_avif = image_specs("image", 600, 600)
@@ -215,3 +218,10 @@ class GalleryPhoto(OrderedModel):
 
     def __str__(self):
         return self.caption or f"Фото #{self.pk}"
+
+    @classmethod
+    def strip_photos(cls, key: str, size: int = STRIP_SIZE) -> list[GalleryPhoto]:
+        """Фото для полосы «Как это выглядит»: на каждой странице (key) свои, меняются раз в сутки."""
+        ids = daily_pick(list(cls.objects.values_list("pk", flat=True)), size, key)
+        photos = cls.objects.in_bulk(ids)
+        return [photos[pk] for pk in ids]
