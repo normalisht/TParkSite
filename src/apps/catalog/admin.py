@@ -1,6 +1,8 @@
 from django import forms
-from django.contrib import admin
+from django.contrib import admin, messages
+from django.db.models import Count
 from unfold.admin import TabularInline
+from unfold.widgets import UnfoldAdminCheckboxSelectMultipleWidget
 
 from apps.catalog.models import Category, CategoryGroup, CategoryPhoto, CategoryService, Service, ServicePhoto
 from apps.core.admin_utils import SEO_FIELDSET, SiteModelAdmin, image_preview
@@ -42,17 +44,44 @@ class ServiceCategoryInline(TabularInline):
     verbose_name_plural = "Категории"
 
 
-class CategoryAdminForm(forms.ModelForm):
+class BulkPhotosForm(forms.ModelForm):
+    """Поле «Загрузить фото пачкой»; фото добавляет `BulkPhotosAdminMixin.save_related`."""
+
     bulk_photos = MultipleImageField(label="Загрузить фото пачкой")
+
+
+class BulkPhotosAdminMixin:
+    """После сохранения формы добавляет фото из `bulk_photos` в конец (`photo_model` с FK `photo_owner`)."""
+
+    photo_model: type
+    photo_owner: str
+
+    def save_related(self, request, form, formsets, change):
+        super().save_related(request, form, formsets, change)
+        photos = form.cleaned_data.get("bulk_photos") or []  # в форме списка (list_editable) этого поля нет
+        append_images(self.photo_model, photos, **{self.photo_owner: form.instance})
+
+
+class CategoryAdminForm(BulkPhotosForm):
+    menu_groups = forms.ModelMultipleChoiceField(
+        CategoryGroup.objects.order_by("order", "id"),
+        required=False,
+        label="Группы меню",
+        widget=UnfoldAdminCheckboxSelectMultipleWidget,
+        help_text="Где категория видна в меню «Услуги» и на главной. Без группы её найдут только по прямой ссылке.",
+    )
 
     class Meta:
         model = Category
         fields = "__all__"
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:
+            self.fields["menu_groups"].initial = list(self.instance.groups.all())
 
-class ServiceAdminForm(forms.ModelForm):
-    bulk_photos = MultipleImageField(label="Загрузить фото пачкой")
 
+class ServiceAdminForm(BulkPhotosForm):
     class Meta:
         model = Service
         fields = "__all__"
@@ -70,9 +99,11 @@ class CategoryGroupAdmin(SiteModelAdmin):
 
 
 @admin.register(Category)
-class CategoryAdmin(SiteModelAdmin):
+class CategoryAdmin(BulkPhotosAdminMixin, SiteModelAdmin):
     form = CategoryAdminForm
-    list_display = ["name", "is_published"]
+    photo_model = CategoryPhoto
+    photo_owner = "category"
+    list_display = ["name", "menu_groups_display", "services_count", "is_published"]
     list_editable = ["is_published"]
     ordering = ["order", "id"]
     ordering_field = "order"
@@ -83,23 +114,75 @@ class CategoryAdmin(SiteModelAdmin):
     fieldsets = (
         (
             "Основное",
-            {"classes": ["tab"], "fields": ["name", "slug", "description", "preview", "is_published", "order"]},
+            {
+                "classes": ["tab"],
+                "fields": ["name", "slug", "menu_groups", "description", "preview", "is_published", "order"],
+            },
         ),
         ("Загрузка фото", {"classes": ["tab"], "fields": ["bulk_photos"]}),
         SEO_FIELDSET,
     )
 
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .annotate(services_total=Count("service_links", distinct=True))
+            .prefetch_related("groups")
+        )
+
+    @admin.display(description="Группы меню")
+    def menu_groups_display(self, obj):
+        return ", ".join(group.name for group in obj.groups.all()) or "— нет в меню"
+
+    @admin.display(description="Услуг", ordering="services_total")
+    def services_count(self, obj):
+        return obj.services_total
+
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)
-        append_images(CategoryPhoto, form.cleaned_data.get("bulk_photos") or [], category=form.instance)
+        if "menu_groups" in form.cleaned_data:  # в форме списка (list_editable) этого поля нет
+            form.instance.groups.set(form.cleaned_data["menu_groups"])
+
+    def delete_view(self, request, object_id, extra_context=None):
+        category = self.get_object(request, object_id)
+        if request.method == "GET" and category:
+            names = list(category.services_only_here().values_list("name", flat=True))
+            if names:
+                messages.warning(
+                    request,
+                    f"Без категории останутся услуги ({len(names)}): {', '.join(names)}. "
+                    "На сайте их не будет в меню — привяжите их к другой категории или снимите с публикации.",
+                )
+        return super().delete_view(request, object_id, extra_context)
+
+
+class ServicePlacementFilter(admin.SimpleListFilter):
+    title = "Видна на сайте"
+    parameter_name = "placement"
+
+    def lookups(self, request, model_admin):
+        return [
+            ("none", "Без категории"),
+            ("hidden", "Нет в меню (без опубликованной категории)"),
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value() == "none":
+            return queryset.filter(category_links__isnull=True)
+        if self.value() == "hidden":
+            return queryset.exclude(category_links__category__is_published=True)
+        return queryset
 
 
 @admin.register(Service)
-class ServiceAdmin(SiteModelAdmin):
+class ServiceAdmin(BulkPhotosAdminMixin, SiteModelAdmin):
     form = ServiceAdminForm
-    list_display = ["name", "price_display", "is_published", "has_page"]
+    photo_model = ServicePhoto
+    photo_owner = "service"
+    list_display = ["name", "price_display", "categories", "is_published", "has_page"]
     list_editable = ["is_published"]
-    list_filter = ["is_published", "has_page", "category_links__category"]
+    list_filter = [ServicePlacementFilter, "is_published", "has_page", "category_links__category"]
     search_fields = ["name"]
     prepopulated_fields = {"slug": ("name",)}
     inlines = [ServicePhotoInline, ServiceCategoryInline]
@@ -122,10 +205,13 @@ class ServiceAdmin(SiteModelAdmin):
         SEO_FIELDSET,
     )
 
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related("category_links__category")
+
+    @admin.display(description="Категории")
+    def categories(self, obj):
+        return ", ".join(link.category.name for link in obj.category_links.all()) or "—"
+
     @admin.display(description="Цена")
     def price_display(self, obj):
         return obj.price_display or "—"
-
-    def save_related(self, request, form, formsets, change):
-        super().save_related(request, form, formsets, change)
-        append_images(ServicePhoto, form.cleaned_data.get("bulk_photos") or [], service=form.instance)

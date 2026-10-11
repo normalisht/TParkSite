@@ -12,3 +12,5 @@ STORAGES = {
 PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
 SECURE_SSL_REDIRECT = False
 CANONICAL_HOST = ""
+# client.login() в тестах не передаёт request, а AxesStandaloneBackend его требует; тесты axes включают сами.
+AXES_ENABLED = False

@@ -402,3 +402,21 @@ def test_card_rings_not_clipped(live_server, browser, content):
     page.wait_for_function("!document.querySelector('[data-details-body]').getAnimations().length")
     assert page.evaluate(FIND_CLIPPED_RINGS, ".rich-text-cards li") == []
     context.close()
+
+
+@pytest.fixture
+def map_settings():
+    site = SiteSettings.load()
+    site.map_embed_url = "https://yandex.ru/map-widget/v1/org/t_park/17031236197/"
+    site.save()
+
+
+def test_contacts_map_appears_after_click(live_server, page, map_settings):
+    page.goto(f"{live_server.url}/contacts/")
+    assert page.locator("iframe").count() == 0
+    button = page.get_by_role("button", name="Показать карту")
+    button.click()
+    page.wait_for_selector("iframe[title='Т-Парк на Яндекс Картах']", state="attached")
+    button.wait_for(state="hidden")  # x-show скрывает кнопку на следующем кадре, is_hidden() гонится
+    # Кнопка скрылась вместе с заглушкой — фокус не должен падать на <body>.
+    page.wait_for_function("document.activeElement.tagName === 'IFRAME'")

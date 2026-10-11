@@ -13,7 +13,7 @@ class Command(BaseCommand):
         parser.add_argument("--images", required=True, type=Path, help="Путь к старой папке app/static/images")
         parser.add_argument("--flush", action="store_true", help="Удалить текущий контент перед импортом")
         parser.add_argument(
-            "--price-csv", type=Path, default=Path("price_legacy.csv"), help="Куда выгрузить таблицу price"
+            "--price-csv", type=Path, default=None, help="Куда выгрузить таблицу price (без параметра не выгружается)"
         )
 
     def handle(self, *args, db, images, flush, price_csv, **options):

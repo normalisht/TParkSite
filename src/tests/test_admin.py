@@ -5,7 +5,8 @@ import pytest
 from django.contrib import admin
 from django.urls import reverse
 
-from apps.catalog.models import Category, CategoryPhoto, Service
+from apps.catalog.admin import ServiceAdmin
+from apps.catalog.models import Category, CategoryGroup, CategoryPhoto, CategoryService, Service, ServicePhoto
 from apps.content.models import GalleryPhoto
 from apps.core.models import InfoPage, Phone, SiteSettings
 
@@ -114,6 +115,32 @@ def test_bulk_upload_appends_photos_to_category(admin_client, make_image):
     )
     assert response.status_code == 302, response.content.decode()[:2000]
     assert list(category.photos.values_list("order", flat=True)) == [7, 8, 9]
+
+
+def test_bulk_upload_appends_photos_to_service(admin_client, make_image):
+    service = Service.objects.create(name="Баня")
+    ServicePhoto.objects.create(service=service, image=make_image(), order=3)
+    data = {
+        "name": service.name,
+        "slug": service.slug,
+        "short_description": "",
+        "description": "",
+        "price_unit": "",
+        "is_published": "on",
+        "order": "0",
+        "photos-TOTAL_FORMS": "0",
+        "photos-INITIAL_FORMS": "0",
+        "photos-MIN_NUM_FORMS": "0",
+        "photos-MAX_NUM_FORMS": "1000",
+        "category_links-TOTAL_FORMS": "0",
+        "category_links-INITIAL_FORMS": "0",
+        "category_links-MIN_NUM_FORMS": "0",
+        "category_links-MAX_NUM_FORMS": "1000",
+        "bulk_photos": [make_image("a.jpg"), make_image("b.png", fmt="PNG")],
+    }
+    response = admin_client.post(reverse("admin:catalog_service_change", args=[service.pk]), data)
+    assert response.status_code == 302, response.content.decode()[:2000]
+    assert list(service.photos.values_list("order", flat=True)) == [3, 4, 5]
 
 
 def test_bulk_upload_rejects_whole_batch_on_bad_file(admin_client, make_image):
@@ -296,3 +323,151 @@ def test_seo_is_separate_tab(admin_client, model):
     tabs = re.findall(r"activeFieldsetTab = '([^']+)'\"", html)
     assert tabs[0] == "основное"
     assert "seo" in tabs
+
+
+def test_service_changelist_finds_services_hidden_from_navigation(admin_client):
+    shown = Category.objects.create(name="Видна", is_published=True)
+    hidden = Category.objects.create(name="Скрыта", is_published=False)
+    CategoryService.objects.create(category=shown, service=Service.objects.create(name="Зиплайн"))
+    CategoryService.objects.create(category=hidden, service=Service.objects.create(name="Каяк"))
+    Service.objects.create(name="Батут")
+    url = reverse("admin:catalog_service_changelist")
+
+    no_category = admin_client.get(url, {"placement": "none"}).content.decode()
+    assert "Батут" in no_category and "Каяк" not in no_category and "Зиплайн" not in no_category
+
+    not_in_menu = admin_client.get(url, {"placement": "hidden"}).content.decode()
+    assert "Батут" in not_in_menu and "Каяк" in not_in_menu and "Зиплайн" not in not_in_menu
+
+
+def test_service_admin_lists_categories(rf, admin_user):
+    category = Category.objects.create(name="Верёвочный парк")
+    service = Service.objects.create(name="Зиплайн")
+    CategoryService.objects.create(category=category, service=service)
+    request = rf.get("/")
+    request.user = admin_user
+    model_admin = ServiceAdmin(Service, admin.site)
+    service = model_admin.get_queryset(request).get(pk=service.pk)
+    assert model_admin.categories(service) == "Верёвочный парк"
+    assert model_admin.categories(Service.objects.create(name="Батут")) == "—"
+
+
+def _category_post(category, **extra):
+    """Данные формы категории без фото и услуг (инлайны пустые)."""
+    data = {"name": category.name, "slug": category.slug, "description": "", "order": "0"}
+    for prefix in ("photos", "service_links"):
+        data |= {
+            f"{prefix}-TOTAL_FORMS": "0",
+            f"{prefix}-INITIAL_FORMS": "0",
+            f"{prefix}-MIN_NUM_FORMS": "0",
+            f"{prefix}-MAX_NUM_FORMS": "1000",
+        }
+    return data | extra
+
+
+def test_category_form_sets_menu_groups(admin_client):
+    active, rent = CategoryGroup.objects.create(name="Активный отдых"), CategoryGroup.objects.create(name="Аренда")
+    category = Category.objects.create(name="Парк")
+    rent.categories.add(category)
+    url = reverse("admin:catalog_category_change", args=[category.pk])
+    assert list(admin_client.get(url).context["adminform"].form["menu_groups"].initial) == [rent]
+    response = admin_client.post(url, _category_post(category, menu_groups=[str(active.pk)]))
+    assert response.status_code == 302, response.context["adminform"].form.errors if response.context else ""
+    assert list(category.groups.all()) == [active]
+
+
+def test_category_changelist_save_keeps_menu_groups(admin_client):
+    group = CategoryGroup.objects.create(name="Активный отдых")
+    category = Category.objects.create(name="Парк", is_published=True, order=1)
+    group.categories.add(category)
+    response = admin_client.post(
+        reverse("admin:catalog_category_changelist"),
+        {
+            "form-TOTAL_FORMS": "1",
+            "form-INITIAL_FORMS": "1",
+            "form-0-id": str(category.pk),
+            "form-0-order": "5",
+            "_save": "Сохранить",
+        },
+    )
+    assert response.status_code == 302
+    category.refresh_from_db()
+    assert category.is_published is False
+    assert list(category.groups.all()) == [group]
+
+
+def test_category_changelist_shows_groups_and_service_count(admin_client):
+    group = CategoryGroup.objects.create(name="Активный отдых")
+    category = Category.objects.create(name="Парк")
+    group.categories.add(category)
+    for name in ("Зиплайн", "Каяк"):
+        CategoryService.objects.create(category=category, service=Service.objects.create(name=name))
+    html = admin_client.get(reverse("admin:catalog_category_changelist")).content.decode()
+    assert "Активный отдых" in html
+    assert re.search(r">\s*2\s*<", html)
+
+
+def test_delete_warns_only_about_services_left_without_category(admin_client):
+    category, other = Category.objects.create(name="Парк"), Category.objects.create(name="Сплавы")
+    only_here = Service.objects.create(name="Зиплайн")
+    shared = Service.objects.create(name="Каяк")
+    CategoryService.objects.create(category=category, service=only_here)
+    CategoryService.objects.create(category=category, service=shared)
+    CategoryService.objects.create(category=other, service=shared)
+    html = admin_client.get(reverse("admin:catalog_category_delete", args=[category.pk])).content.decode()
+    assert "Без категории останутся" in html
+    assert "Зиплайн" in html.split("Без категории останутся", 1)[1].split("<", 1)[0]
+    assert "Каяк" not in html.split("Без категории останутся", 1)[1].split("<", 1)[0]
+
+
+def test_admin_index_has_instructions(admin_client):
+    html = admin_client.get(reverse("admin:index")).content.decode()
+    for heading in ("Как добавить услугу", "Как показать категорию в меню", "Фото", "Адрес страницы"):
+        assert heading in html
+
+
+def test_photo_fields_explain_cropping():
+    assert "по-разному" in Category._meta.get_field("preview").help_text
+    for model in (CategoryPhoto, ServicePhoto):
+        assert "16:9" in model._meta.get_field("image").help_text
+    assert "карточке" in Service._meta.get_field("short_description").help_text
+
+
+ENGLISH_LEFTOVERS = [
+    "Are you sure",
+    "related items will be deleted",
+    "This item will be deleted",
+    "Click to cancel",
+    "Select action",
+    "Available shortcuts",
+    "Toggle dark/light mode",
+    "Open command tool",
+    "Toggle sidebar",
+    "Toggle filter",
+    "Create new record",
+    "Open selection",
+    "Navigate",
+    "categorygroup-category",
+    "object (",
+]
+
+
+def test_delete_confirmation_and_forms_are_russian(admin_client):
+    group = CategoryGroup.objects.create(name="Активный отдых")
+    category = Category.objects.create(name="Парк")
+    group.categories.add(category)
+    pages = [
+        reverse("admin:catalog_category_delete", args=[category.pk]),
+        reverse("admin:catalog_category_change", args=[category.pk]),
+        reverse("admin:catalog_category_changelist"),
+    ]
+    for url in pages:
+        html = admin_client.get(url).content.decode()
+        for phrase in ENGLISH_LEFTOVERS:
+            assert phrase not in html, (url, phrase)
+        # «Select» — отдельное слово в подсказке командного поиска (в других местах встречается как часть фраз)
+        assert not re.search(r">\s*Select\s*<", html), url
+    html = admin_client.get(pages[0]).content.decode()
+    assert "в группе «Активный отдых»" in html
+    assert "Удалить: категория «Парк»" not in html
+    assert "Вместе с этим будут удалены" in html

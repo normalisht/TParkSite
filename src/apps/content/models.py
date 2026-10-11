@@ -2,7 +2,7 @@ from datetime import datetime
 from urllib.parse import urlsplit
 
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
@@ -12,6 +12,7 @@ from django.utils.text import Truncator
 
 from apps.core.fields import HtmlField, full_spec, image_spec, image_specs, og_spec, photo_field
 from apps.core.models import OrderedModel, PublishedQuerySet, SeoModel
+from apps.core.redirects import remember_slug_change
 from apps.core.slugs import unique_slug
 
 
@@ -20,7 +21,7 @@ def _not_over(today) -> Q:
     return Q(date__gte=today) | Q(end_date__gte=today)
 
 
-class EventQuerySet(models.QuerySet):
+class EventQuerySet(PublishedQuerySet):
     def upcoming(self, today=None):
         """Предстоящие и идущие сейчас — по дате начала."""
         today = today or timezone.localdate()
@@ -50,7 +51,14 @@ def _days(n: int) -> str:
 class Event(SeoModel):
     title = models.CharField("Заголовок", max_length=128)
     slug = models.SlugField(
-        "Адрес страницы", max_length=255, unique=True, blank=True, help_text="Пусто — из заголовка и года."
+        "Адрес страницы",
+        max_length=255,
+        unique=True,
+        blank=True,
+        help_text=(
+            "Пусто — из заголовка и года. Если поменять, со старого адреса будет автоматический редирект "
+            "(раздел «Редиректы»), но лучше не менять адрес страниц, которые уже в поиске."
+        ),
     )
     date = models.DateField("Дата")
     end_date = models.DateField(
@@ -63,7 +71,14 @@ class Event(SeoModel):
     )
     description = HtmlField("Описание")
     link = models.URLField("Ссылка", max_length=500, blank=True, help_text="Соцсеть или сайт мероприятия.")
-    show_after_date = models.BooleanField("Показывать после даты", default=False)
+    show_after_date = models.BooleanField(
+        "Показывать после даты",
+        default=False,
+        help_text="Оставить в списке «Прошедшие» и в поиске. Без галочки прошедшее открывается только по прямой ссылке.",
+    )
+    is_published = models.BooleanField(
+        "Опубликовано", default=True, help_text="Снимите, чтобы подготовить мероприятие заранее: на сайте его не будет."
+    )
     image = photo_field("Фото", "events")
     card, card_avif = image_specs("image", 800, 600)
     card_small, card_small_avif = image_specs("image", 640, 480)  # карточки в сетке и на телефоне: srcset с card
@@ -88,7 +103,9 @@ class Event(SeoModel):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = unique_slug(self, f"{self.title} {self.date:%Y}")
-        super().save(*args, **kwargs)
+        with transaction.atomic():
+            remember_slug_change(self)
+            super().save(*args, **kwargs)
 
     def get_absolute_url(self) -> str:
         return reverse("content:event", args=[self.slug])

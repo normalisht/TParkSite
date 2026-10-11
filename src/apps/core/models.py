@@ -1,12 +1,15 @@
+import re
+
+from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Q
 from django.urls import reverse
 
 from apps.core import about_defaults
 from apps.core.fields import HtmlField, image_specs, og_spec, photo_field
 from apps.core.maps import MapEmbedURLField
-from apps.core.slugs import unique_slug
+from apps.core.slugs import SLUG_HELP, unique_slug
 
 
 class OrderedModel(models.Model):
@@ -54,6 +57,7 @@ def _seo_pair(page: str):
 
 
 class SiteSettings(models.Model):
+    updated_at = models.DateTimeField("Изменено", auto_now=True)
     address = models.CharField("Адрес", max_length=255, blank=True, default=PARK_ADDRESS)
     map_embed_url = MapEmbedURLField(
         "Яндекс Карта на странице контактов",
@@ -194,6 +198,15 @@ class SiteSettings(models.Model):
         obj, _ = cls.objects.get_or_create(pk=1)
         return obj
 
+    @classmethod
+    def for_request(cls, request) -> SiteSettings:
+        """Настройки один раз на запрос (контекст-процессоры, JSON-LD); без запроса — как `load()`."""
+        if request is None:
+            return cls.load()
+        from apps.core.request_cache import cached_on_request
+
+        return cached_on_request(request, "site_settings", cls.load)
+
 
 class Phone(models.Model):
     settings = models.ForeignKey(SiteSettings, on_delete=models.CASCADE, related_name="phones")
@@ -283,7 +296,7 @@ class FounderFact(models.Model):
 
 class InfoPage(SeoModel):
     title = models.CharField("Заголовок", max_length=255)
-    slug = models.SlugField("Адрес страницы", max_length=255, unique=True, blank=True)
+    slug = models.SlugField("Адрес страницы", max_length=255, unique=True, blank=True, help_text=SLUG_HELP)
     body = HtmlField("Текст")
     is_published = models.BooleanField("Опубликовано", default=True)
 
@@ -300,7 +313,57 @@ class InfoPage(SeoModel):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = unique_slug(self, self.title)
-        super().save(*args, **kwargs)
+        from apps.core.redirects import remember_slug_change
+
+        with transaction.atomic():
+            remember_slug_change(self)
+            super().save(*args, **kwargs)
 
     def get_absolute_url(self) -> str:
         return reverse("core:info", args=[self.slug])
+
+
+SITE_PATH_RE = re.compile(r"^/(?![/\\])[^\s\\]*\Z")
+
+
+def is_site_path(value: str) -> bool:
+    """Путь внутри сайта: начинается с одного «/», без схемы, хоста, обратных слэшей и пробелов."""
+    return bool(SITE_PATH_RE.match(value or ""))
+
+
+def validate_site_path(value: str) -> None:
+    if not is_site_path(value):
+        raise ValidationError("Нужен путь от корня сайта, например /category/shkola/ (без https:// и домена).")
+
+
+class Redirect(models.Model):
+    """301 со старого адреса страницы на новый. Создаётся сам при смене slug (`apps.core.redirects`), можно и вручную."""
+
+    old_path = models.CharField(
+        "Старый адрес",
+        max_length=255,
+        unique=True,
+        validators=[validate_site_path],
+        help_text="Путь от корня сайта: /category/shkola-2026/",
+    )
+    new_path = models.CharField(
+        "Новый адрес",
+        max_length=255,
+        validators=[validate_site_path],
+        help_text="Путь от корня сайта: /category/shkola/",
+    )
+    created_at = models.DateTimeField("Создан", auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Редирект"
+        verbose_name_plural = "Редиректы"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.old_path} → {self.new_path}"
+
+    def clean(self):
+        if "?" in self.old_path or "#" in self.old_path:
+            raise ValidationError({"old_path": "Старый адрес — только путь, без «?» и «#»."})
+        if self.old_path == self.new_path:
+            raise ValidationError({"new_path": "Новый адрес совпадает со старым — получится бесконечный редирект."})

@@ -1,17 +1,17 @@
 from django.contrib import admin
 from django.template.loader import render_to_string
-from django.utils.functional import lazy
 from django.utils.html import format_html
 from unfold.admin import ModelAdmin
 
 from apps.core.images import safe_spec_url
+from apps.core.request_cache import cached_on_request
 
 
-def _render_seo_help(name: str) -> str:
+def _render_seo_help(name: str, request=None) -> str:
     from apps.core.models import DEFAULT_TITLE_SUFFIX, SiteSettings
     from apps.core.seo import STATIC_PAGES, page_fallback
 
-    site = SiteSettings.load()
+    site = SiteSettings.for_request(request)
     suffix = site.seo_title_suffix or DEFAULT_TITLE_SUFFIX
     # Для превью в настройках: что выведется на странице, если её поля оставить пустыми.
     pages = []
@@ -21,8 +21,25 @@ def _render_seo_help(name: str) -> str:
     return render_to_string(f"admin/seo/{name}.html", {"suffix": suffix, "pages": pages})
 
 
-# Справка в описании вкладки (templates/admin/seo/): рендерится при показе формы — с текущим окончанием заголовков.
-seo_help = lazy(_render_seo_help, str)
+class SeoHelp:
+    """Справка в описании вкладки (templates/admin/seo/): собирается при показе формы — с текущим окончанием заголовков.
+
+    `SiteModelAdmin.get_fieldsets` подставляет готовый HTML один раз на запрос; шаблон Unfold вычисляет описание
+    дважды (`if` и вывод), поэтому без этого каждая справка ходила бы за настройками дважды."""
+
+    def __init__(self, name: str):
+        self.name = name
+
+    def render(self, request=None) -> str:
+        if request is None:
+            return _render_seo_help(self.name)
+        return cached_on_request(request, f"seo_help:{self.name}", lambda: _render_seo_help(self.name, request))
+
+    def __str__(self) -> str:
+        return self.render()
+
+
+seo_help = SeoHelp
 
 # Вкладка SEO в формах страниц с `apps.core.models.SeoModel`.
 SEO_FIELDSET = (
@@ -38,6 +55,14 @@ class SiteModelAdmin(ModelAdmin):
     class Media:
         css = {"all": ["css/admin_seo.css"]}
         js = ["js/admin_unsaved.js", "js/admin_seo.js"]
+
+    def get_fieldsets(self, request, obj=None):
+        return [
+            (title, {**options, "description": options["description"].render(request)})
+            if isinstance(options.get("description"), SeoHelp)
+            else (title, options)
+            for title, options in super().get_fieldsets(request, obj)
+        ]
 
 
 def image_preview(spec_name: str, size: int = 64):

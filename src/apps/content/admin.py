@@ -31,8 +31,9 @@ class EventPeriodFilter(admin.SimpleListFilter):
 
 @admin.register(Event)
 class EventAdmin(SiteModelAdmin):
-    list_display = ["title", "date", "show_after_date"]
-    list_filter = [EventPeriodFilter, "show_after_date"]
+    list_display = ["title", "date", "is_published", "show_after_date"]
+    list_editable = ["is_published"]
+    list_filter = [EventPeriodFilter, "is_published", "show_after_date"]
     date_hierarchy = "date"
     search_fields = ["title"]
     fieldsets = (
@@ -49,7 +50,7 @@ class EventAdmin(SiteModelAdmin):
                     "description",
                     "link",
                     "image",
-                    "show_after_date",
+                    ("is_published", "show_after_date"),
                 ],
             },
         ),

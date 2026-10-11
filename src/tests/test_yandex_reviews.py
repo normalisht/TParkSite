@@ -1,5 +1,7 @@
+import io
 import json
 from datetime import date
+from urllib.request import Request
 
 import pytest
 from django.urls import reverse
@@ -51,10 +53,32 @@ def test_review_key():
         review_key("https://reviews.yandex.ru/user/x")
 
 
+def test_redirect_outside_yandex_is_refused():
+    handler = yandex.YandexOnlyRedirects()
+    with pytest.raises(yandex.ReviewFetchError):
+        handler.redirect_request(
+            Request("https://reviews.yandex.ru/user/x"), None, 302, "Found", {}, "https://evil.example/"
+        )
+
+
+def test_redirect_inside_yandex_allowed():
+    handler = yandex.YandexOnlyRedirects()
+    new = handler.redirect_request(
+        Request("https://reviews.yandex.ru/user/x"), None, 302, "Found", {}, "https://yandex.ru/showcaptcha?retpath=x"
+    )
+    assert new.full_url.startswith("https://yandex.ru/showcaptcha")
+
+
+def test_read_limited():
+    assert yandex.read_limited(io.BytesIO(b"abc"), limit=10) == b"abc"
+    with pytest.raises(yandex.ReviewFetchError):
+        yandex.read_limited(io.BytesIO(b"x" * 11), limit=10)
+
+
 @pytest.mark.django_db
 def test_admin_fetch_view(admin_client, monkeypatch):
     fetch_url = reverse("admin:content_review_fetch_yandex")
-    monkeypatch.setattr(yandex, "urlopen", None)  # в тестах в сеть не ходим
+    monkeypatch.setattr(yandex, "_opener", None)  # в тестах в сеть не ходим
     monkeypatch.setattr(
         "apps.content.admin.fetch_review", lambda url: YandexReview("<p>Классно</p>", date(2023, 10, 26))
     )

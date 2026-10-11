@@ -13,5 +13,5 @@ docker compose cp tpark-web:/data/db/backup.sqlite3 "$DEST/db.sqlite3"
 docker compose exec -T tpark-web rm -f /data/db/backup.sqlite3
 docker compose exec -T tpark-web tar -czf - -C /data media > "$DEST/media.tar.gz"
 
-ls -1dt backups/*/ | tail -n +$((KEEP + 1)) | xargs -r rm -rf
+ls -1dt backups/20*/ | tail -n +$((KEEP + 1)) | xargs -r rm -rf
 echo "Бэкап готов: $DEST"

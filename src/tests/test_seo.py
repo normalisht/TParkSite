@@ -1,6 +1,7 @@
 import json
 import re
 from datetime import timedelta
+from pathlib import Path
 
 import pytest
 from django.utils import timezone
@@ -15,9 +16,10 @@ OG_JPEG = re.compile(r'property="og:image" content="http://testserver/media/CACH
 
 
 def test_sitemap_lists_only_public_pages(client):
-    Category.objects.create(name="Открытая", is_published=True)
+    open_category = Category.objects.create(name="Открытая", is_published=True)
     Category.objects.create(name="Закрытая", is_published=False)
-    Service.objects.create(name="Со страницей", has_page=True)
+    with_page = Service.objects.create(name="Со страницей", has_page=True)
+    CategoryService.objects.create(category=open_category, service=with_page)
     Service.objects.create(name="Без страницы")
     InfoPage.objects.create(title="Правила")
     xml = client.get("/sitemap.xml").content.decode()
@@ -35,6 +37,29 @@ def test_robots(client):
     body = response.content.decode()
     assert "Disallow: /admin/" in body
     assert "Sitemap: http://testserver/sitemap.xml" in body
+
+
+def test_sitemap_skips_services_hidden_from_navigation(client):
+    shown = Category.objects.create(name="Видна", is_published=True)
+    hidden = Category.objects.create(name="Скрыта", is_published=False)
+    in_menu = Service.objects.create(name="Зиплайн", has_page=True)
+    CategoryService.objects.create(category=shown, service=in_menu)
+    CategoryService.objects.create(category=hidden, service=in_menu)  # в двух категориях — один раз в sitemap
+    only_hidden = Service.objects.create(name="Каяк", has_page=True)
+    CategoryService.objects.create(category=hidden, service=only_hidden)
+    Service.objects.create(name="Батут", has_page=True)  # без категории
+    xml = client.get("/sitemap.xml").content.decode()
+    assert xml.count("/service/ziplain/") == 1
+    assert "/service/kaiak/" not in xml
+    assert "/service/batut/" not in xml
+
+
+def test_robots_cleans_yandex_and_tracking_params(client):
+    clean = next(
+        line for line in client.get("/robots.txt").content.decode().splitlines() if line.startswith("Clean-param:")
+    )
+    for param in ("ysclid", "_openstat", "utm_referrer", "from", "utm_source", "yclid"):
+        assert param in clean.removeprefix("Clean-param: ").split("&"), param
 
 
 def test_category_meta(client, make_image):
@@ -66,7 +91,10 @@ def test_favicon_redirects_to_static(client):
 
 def ld_nodes(html: str) -> dict:
     raw = re.search(r'<script type="application/ld\+json">(.*?)</script>', html, re.DOTALL).group(1)
-    return {node["@type"]: node for node in json.loads(raw)["@graph"]}
+    return {
+        (node["@type"][0] if isinstance(node["@type"], list) else node["@type"]): node
+        for node in json.loads(raw)["@graph"]
+    }
 
 
 def test_custom_seo_fields_win(client):
@@ -205,7 +233,7 @@ def test_metrika_and_verification(client, settings):
     site.google_verification = "g-456"
     site.save()
     html = client.get("/").content.decode()
-    assert 'ym(12345678, "init"' in html
+    assert 'data-counter-id="12345678"' in html
     assert '<meta name="yandex-verification" content="abc123">' in html
     assert '<meta name="google-site-verification" content="g-456">' in html
     settings.DEBUG = True
@@ -280,6 +308,83 @@ def test_metrika_tracks_contact_clicks(client, settings):
     site.yandex_metrika_id = "12345"
     site.save()
     html = client.get("/").content.decode()
-    assert 'ym(12345, "reachGoal", goal)' in html
+    assert 'js/metrika.js"' in html and 'data-counter-id="12345"' in html
+    script = (Path(__file__).resolve().parents[1] / "static" / "js" / "metrika.js").read_text(encoding="utf-8")
+    assert 'ym(counterId, "reachGoal", goal)' in script
     for goal in ("call", "whatsapp", "telegram", "vk", "max"):
-        assert f'"{goal}"' in html
+        assert f'"{goal}"' in script
+
+
+def _graph(html: str) -> list[dict]:
+    raw = re.search(r'<script type="application/ld\+json">(.*?)</script>', html, re.DOTALL).group(1)
+    return json.loads(raw)["@graph"]
+
+
+def test_organization_type_and_hours(client):
+    site = SiteSettings.load()
+    site.opening_hours = "Mo-Su 10:00-18:00"
+    site.save()
+    org = next(n for n in _graph(client.get("/").content.decode()) if n.get("@id", "").endswith("#organization"))
+    assert org["@type"] == ["LocalBusiness", "SportsActivityLocation"]
+    assert org["openingHoursSpecification"][0]["opens"] == "10:00"
+    assert "openingHours" not in org
+
+
+def test_static_pages_have_lastmod(client):
+    SiteSettings.load().save()
+    xml = client.get("/sitemap.xml").content.decode()
+    contacts = xml.split("/contacts/</loc>", 1)[1].split("</url>", 1)[0]
+    assert "<lastmod>" in contacts
+
+
+def _static_lastmod(client, path: str) -> str | None:
+    xml = client.get("/sitemap.xml").content.decode()
+    block = xml.split(f"{path}</loc>", 1)[1].split("</url>", 1)[0]
+    return block.split("<lastmod>", 1)[1].split("</lastmod>", 1)[0] if "<lastmod>" in block else None
+
+
+def _set_updated(model, pk, day: str):
+    model.objects.filter(pk=pk).update(updated_at=f"{day}T12:00:00+00:00")
+
+
+def test_static_sitemap_lastmod_follows_the_content_of_each_page(client):
+    site = SiteSettings.load()
+    _set_updated(SiteSettings, site.pk, "2020-01-01")
+    category = Category.objects.create(name="Сплавы", is_published=True)
+    _set_updated(Category, category.pk, "2023-03-03")
+    event = Event.objects.create(title="Фест", date=timezone.localdate() + timedelta(days=5), is_published=True)
+    _set_updated(Event, event.pk, "2024-04-04")
+    Review.objects.create(text="<p>Хорошо</p>")
+    assert _static_lastmod(client, "/contacts/") == "2020-01-01"
+    assert _static_lastmod(client, "/about/") == "2020-01-01"
+    assert _static_lastmod(client, "/events/") == "2024-04-04"
+    assert _static_lastmod(client, "http://testserver/") == "2024-04-04"
+    # У отзывов и галереи нет собственной даты изменения — надёжного lastmod нет, лучше его не отдавать.
+    assert _static_lastmod(client, "/reviews/") is None
+    assert _static_lastmod(client, "/gallery/") is None
+
+
+def test_home_lastmod_uses_newest_category_when_it_is_newer(client):
+    site = SiteSettings.load()
+    _set_updated(SiteSettings, site.pk, "2020-01-01")
+    category = Category.objects.create(name="Сплавы", is_published=True)
+    _set_updated(Category, category.pk, "2023-03-03")
+    hidden = Category.objects.create(name="Черновик", is_published=False)
+    _set_updated(Category, hidden.pk, "2025-05-05")
+    assert _static_lastmod(client, "http://testserver/") == "2023-03-03"
+
+
+def test_static_sitemap_loads_site_settings_once(rf):
+    from django.contrib.sites.requests import RequestSite
+    from django.db import connection
+    from django.test.utils import CaptureQueriesContext
+
+    from apps.core.sitemaps import StaticSitemap
+
+    SiteSettings.load()
+    sitemap = StaticSitemap()
+    with CaptureQueriesContext(connection) as ctx:
+        sitemap.get_latest_lastmod()
+        assert len(sitemap.get_urls(site=RequestSite(rf.get("/")))) == 6
+    # lastmod зовётся на каждую страницу и дважды (Last-Modified и запись), а настройки нужны один раз.
+    assert sum('"core_sitesettings"' in q["sql"] for q in ctx.captured_queries) == 1

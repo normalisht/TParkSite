@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{% firstof seo.title "Т-Парк — тренинг-парк и активный отдых в Калужской области" %}{% endblock %}</title>
   <meta name="description" content="{% firstof seo.description default_description %}">
+  {% if seo.noindex %}<meta name="robots" content="noindex">{% endif %}
   {% block canonical %}{% if canonical_url %}<link rel="canonical" href="{{ canonical_url }}">{% endif %}{% endblock %}
   {% if site.yandex_verification %}<meta name="yandex-verification" content="{{ site.yandex_verification }}">{% endif %}
   {% if site.google_verification %}<meta name="google-site-verification" content="{{ site.google_verification }}">{% endif %}

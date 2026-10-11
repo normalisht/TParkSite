@@ -8,10 +8,19 @@ pytestmark = pytest.mark.django_db
 
 @pytest.mark.parametrize(
     ("price", "unit", "expected"),
-    [("1500", "час", "1500 руб / час"), ("1500", "", "1500 руб"), ("", "час", ""), ("", "", "")],
+    [
+        ("900", "час", "900 ₽ / час"),
+        ("15000", "", "15 000 ₽"),
+        ("15 000", "день", "15 000 ₽ / день"),
+        ("от 3500", "участник", "от 3500 ₽ / участник"),
+        ("договорная", "", "договорная"),
+        ("договорная", "час", "договорная / час"),
+        ("", "час", ""),
+    ],
 )
 def test_price_display(price, unit, expected):
-    assert Service(name="x", price=price, price_unit=unit).price_display == expected
+    # В выводе неразрывные пробелы (перед «₽» и в «15 000»); сравниваем с обычными.
+    assert Service(name="Услуга", price=price, price_unit=unit).price_display.replace("\u00a0", " ") == expected
 
 
 def test_slugs_generated():
@@ -40,3 +49,8 @@ def test_category_service_unique():
 
 def test_category_defaults_hidden():
     assert Category.objects.create(name="Новая").is_published is False
+
+
+def test_service_str_shows_price_to_tell_duplicates_apart():
+    assert str(Service(name="Фрироуп", price="900", price_unit="час")).replace("\u00a0", " ") == "Фрироуп — 900 ₽ / час"
+    assert str(Service(name="Фрироуп")) == "Фрироуп"

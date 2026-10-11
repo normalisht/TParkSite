@@ -9,7 +9,8 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.db import models
 
-WIDGET_HOSTS = {"yandex.ru", "www.yandex.ru", "yandex.com", "www.yandex.com"}
+from apps.core.map_hosts import WIDGET_HOSTS
+
 _IFRAME_SRC_RE = re.compile(r"""<iframe\b[^>]*?\ssrc\s*=\s*["']([^"']+)["']""", re.IGNORECASE)
 
 

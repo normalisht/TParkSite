@@ -35,6 +35,8 @@ def HtmlField(verbose_name: str, **kwargs) -> ProseEditorField:
 
 
 MAX_UPLOAD_BYTES = 20 * 1024 * 1024
+# Пережатие держит в памяти всё фото: 50 Мп ≈ 150 МБ. Больше — риск, что воркер убьёт OOM (фото с телефона — 12–48 Мп).
+MAX_IMAGE_PIXELS = 50_000_000
 ALLOWED_IMAGE_FORMATS = {"JPEG", "PNG", "WEBP"}
 
 
@@ -47,11 +49,14 @@ def validate_image_upload(file) -> None:
         position = file.tell()
         with Image.open(file) as image:
             image_format = image.format
+            width, height = image.size
         file.seek(position)
     except Exception as exc:
         raise ValidationError("Файл не похож на изображение.") from exc
     if image_format not in ALLOWED_IMAGE_FORMATS:
         raise ValidationError("Допустимые форматы: jpg, png или webp.")
+    if width * height > MAX_IMAGE_PIXELS:
+        raise ValidationError("Фото больше 50 мегапикселей — уменьшите его перед загрузкой.")
 
 
 @deconstructible

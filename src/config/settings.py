@@ -2,11 +2,15 @@
 (локально — из файла .env в корне репозитория)."""
 
 import os
+from datetime import timedelta
 from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
 from django.templatetags.static import static
 from django.urls import reverse_lazy
+from django.utils.csp import CSP
+
+from apps.core.map_hosts import WIDGET_HOSTS
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -52,6 +56,7 @@ INSTALLED_APPS = [
     "unfold.contrib.simple_history",
     "django.contrib.admin",
     "django.contrib.auth",
+    "axes",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
@@ -69,15 +74,22 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "django.middleware.csp.ContentSecurityPolicyMiddleware",
+    "apps.core.middleware.PermissionsPolicyMiddleware",
+    # ETag для HTML: повторный заход на неизменённую страницу — 304 без тела.
+    "django.middleware.http.ConditionalGetMiddleware",
     "apps.core.middleware.CanonicalHostMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
+    "apps.core.middleware.RedirectFallbackMiddleware",  # 404 по старому адресу переименованной страницы → 301
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",  # автор правки в истории текстов
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # Блокировка подбора пароля к админке; должен быть последним (документация django-axes).
+    "axes.middleware.AxesMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -122,6 +134,22 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+AUTHENTICATION_BACKENDS = [
+    "axes.backends.AxesStandaloneBackend",  # первым: отказывает заблокированным до проверки пароля
+    "django.contrib.auth.backends.ModelBackend",
+]
+# 5 неудачных попыток — пара «логин + IP» заблокирована на 30 минут. Не весь IP: за общим прокси без X-Real-IP
+# все запросы с одного адреса, и блокировка IP закрыла бы админку всем. Разблокировать: manage.py axes_reset.
+AXES_FAILURE_LIMIT = 5
+AXES_COOLOFF_TIME = timedelta(minutes=30)
+AXES_LOCKOUT_PARAMETERS = [["username", "ip_address"]]
+AXES_RESET_ON_SUCCESS = True
+# Их ModelAdmin — не SiteModelAdmin (без Unfold и предупреждения о несохранённом); блокировки снимает manage.py axes_reset.
+AXES_ENABLE_ADMIN = False
+# IP клиента — из X-Real-IP: наш nginx перезаписывает его адресом соединения, клиент подделать не может.
+# Без прокси (runserver) заголовка нет — берётся REMOTE_ADDR.
+AXES_IPWARE_META_PRECEDENCE_ORDER = ["HTTP_X_REAL_IP", "REMOTE_ADDR"]
+
 LANGUAGE_CODE = "ru"
 TIME_ZONE = "Europe/Moscow"
 USE_I18N = True
@@ -133,6 +161,9 @@ STATIC_ROOT = Path(os.environ.get("STATIC_ROOT", BASE_DIR / "staticfiles"))
 STATICFILES_DIRS = [BASE_DIR / "static"]
 MEDIA_URL = "/media/"
 MEDIA_ROOT = Path(os.environ.get("MEDIA_ROOT", BASE_DIR / "media"))
+# Куда Django складывает большие загрузки (>2,5 МБ, пачка фото). В контейнере /tmp — tmpfs в памяти и
+# считается в mem_limit, поэтому каталог задаётся на томе (см. Dockerfile); пусто — системный по умолчанию.
+FILE_UPLOAD_TEMP_DIR = os.environ.get("FILE_UPLOAD_TEMP_DIR") or None
 # Миниатюры: недостающие создаются при показе, после сохранения фото — сразу в фоне (apps.core.images).
 IMAGEKIT_DEFAULT_CACHEFILE_STRATEGY = "apps.core.images.GenerateAfterCommit"
 IMAGEKIT_DEFAULT_CACHEFILE_BACKEND = "apps.core.images.AtomicBackend"
@@ -149,11 +180,33 @@ if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    SECURE_HSTS_SECONDS = int(os.environ.get("HSTS_SECONDS", "31536000"))
+    # По умолчанию сутки: на старте ошибка с сертификатом не «запомнится» браузерами надолго; после стабильной недели — 31536000 (год).
+    SECURE_HSTS_SECONDS = int(os.environ.get("HSTS_SECONDS", "86400"))
     # http → https силами Django; включать, только если прокси передаёт X-Forwarded-Proto (иначе — петля редиректов).
     SECURE_SSL_REDIRECT = env_bool("SECURE_SSL_REDIRECT")
+    # Редирект http → https ведёт сразу на главный домен (http://www… → https://t-camp.ru одним переходом, без лишнего www).
+    SECURE_SSL_HOST = CANONICAL_HOST or None
     SECURE_REDIRECT_EXEMPT = [r"^healthz/$"]
     SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# CSP пока только отчётом (Report-Only): нарушения видны в консоли браузера, ничего не блокируется.
+# Inline-скриптов нет (Метрика — static/js/metrika.js), поэтому без nonce: nonce сделал бы каждую страницу
+# уникальной и сломал бы ETag/304. JSON-LD (type="application/ld+json") — блок данных, CSP его не касается.
+# Alpine (стандартная сборка) вычисляет выражения через new Function — нужен 'unsafe-eval'; уйти от него можно
+# только на CSP-сборку Alpine (отдельная задача). Метрика: tag.js и Вебвизор — с mc.yandex.ru/.com.
+YANDEX_METRIKA = ["https://mc.yandex.ru", "https://mc.yandex.com"]
+SECURE_CSP_REPORT_ONLY = {
+    "default-src": [CSP.SELF],
+    "script-src": [CSP.SELF, CSP.UNSAFE_EVAL, *YANDEX_METRIKA],
+    "style-src": [CSP.SELF, CSP.UNSAFE_INLINE],
+    "img-src": [CSP.SELF, "data:", *YANDEX_METRIKA],
+    "connect-src": [CSP.SELF, *YANDEX_METRIKA, "wss://mc.yandex.com", "wss://mc.yandex.ru"],
+    "frame-src": [*(f"https://{host}" for host in sorted(WIDGET_HOSTS)), *YANDEX_METRIKA],
+    "font-src": [CSP.SELF],
+    "frame-ancestors": [CSP.NONE],
+    "base-uri": [CSP.SELF],
+    "form-action": [CSP.SELF],
+}
 
 LOGGING = {
     "version": 1,
@@ -235,6 +288,7 @@ UNFOLD = {
                     _nav("Настройки сайта", "settings", "admin:core_sitesettings_changelist"),
                     _nav("Тексты сайта", "text_fields", "admin:texts_sitetext_changelist"),
                     _nav("Инфо-страницы", "description", "admin:core_infopage_changelist"),
+                    _nav("Редиректы", "alt_route", "admin:core_redirect_changelist"),
                 ],
             },
             {

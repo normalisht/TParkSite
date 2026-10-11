@@ -54,7 +54,10 @@ def test_event_page_json_ld(client):
     event = make_event(description="<p>Описание</p>")
     html = client.get(event.get_absolute_url()).content.decode()
     raw = re.search(r'<script type="application/ld\+json">(.*?)</script>', html, re.DOTALL).group(1)
-    nodes = {node["@type"]: node for node in json.loads(raw)["@graph"]}
+    nodes = {
+        (node["@type"][0] if isinstance(node["@type"], list) else node["@type"]): node
+        for node in json.loads(raw)["@graph"]
+    }
     data = nodes["Event"]
     assert data["name"] == "Слёт"
     assert data["startDate"] == data["endDate"] == event.date.isoformat()
@@ -73,7 +76,13 @@ def test_event_page_json_ld_time_period_and_offer(client):
     data = next(node for node in json.loads(raw)["@graph"] if node["@type"] == "Event")
     assert data["startDate"] == f"{event.date.isoformat()}T18:00:00+03:00"
     assert data["endDate"] == event.end_date.isoformat()
-    assert data["offers"] == {"@type": "Offer", "price": "1500", "priceCurrency": "RUB", "url": data["url"]}
+    assert data["offers"] == {
+        "@type": "Offer",
+        "price": "1500",
+        "priceCurrency": "RUB",
+        "url": data["url"],
+        "availability": "https://schema.org/InStock",
+    }
 
 
 def test_event_page_booking_card(client):
@@ -109,9 +118,30 @@ def test_events_list_sections(client):
     assert html.count(":class=\"all && '!block'\"") == 2
 
 
-def test_hidden_past_event_is_404(client):
-    event = make_event(days=-5)
-    assert client.get(event.get_absolute_url()).status_code == 404
+def test_past_event_without_flag_opens_by_link_but_is_not_indexed(client):
+    event = make_event("Прошлый слёт", days=-5)
+    response = client.get(event.get_absolute_url())
+    assert response.status_code == 200
+    assert '<meta name="robots" content="noindex">' in response.content.decode()
+    assert event.get_absolute_url() not in client.get("/sitemap.xml").content.decode()
+    assert "Прошлый слёт" not in client.get("/events/").content.decode()
+
+
+def test_visible_events_are_indexed(client):
+    for event in (make_event(days=3), make_event("Архив", days=-5, show_after_date=True)):
+        assert 'name="robots"' not in client.get(event.get_absolute_url()).content.decode()
+
+
+def test_draft_event_is_hidden_everywhere(client):
+    site = SiteSettings.load()
+    site.home_show_events = True
+    site.save()
+    make_event("Опубликованное", days=2)
+    draft = make_event("Черновик", days=3, is_published=False)
+    assert client.get(draft.get_absolute_url()).status_code == 404
+    for url in ("/", "/events/", "/sitemap.xml"):
+        html = client.get(url).content.decode()
+        assert "Черновик" not in html and draft.slug not in html, url
 
 
 def test_events_list_links_to_detail(client):
@@ -183,3 +213,35 @@ def test_event_default_description_uses_venue_instead_of_park(client):
     assert "ТИЦ Обнинска" in description
     assert "в Т-Парке" not in description
     assert PARK_ADDRESS not in description
+
+
+def _graph(html):
+    raw = re.search(r'<script type="application/ld\+json">(.*?)</script>', html, re.DOTALL).group(1)
+    return json.loads(raw)["@graph"]
+
+
+def test_event_ld_has_performer_and_availability(client):
+    event = make_event(price="1000 ₽")
+    node = next(n for n in _graph(client.get(event.get_absolute_url()).content.decode()) if n["@type"] == "Event")
+    assert node["performer"] == node["organizer"]
+    assert node["offers"]["availability"] == "https://schema.org/InStock"
+
+
+def test_events_page_lists_upcoming_in_item_list(client):
+    first, second = make_event("Первое", days=2), make_event("Второе", days=9)
+    graph = _graph(client.get("/events/").content.decode())
+    items = next(n for n in graph if n["@type"] == "ItemList")["itemListElement"]
+    assert [i["url"] for i in items] == [f"http://testserver{e.get_absolute_url()}" for e in (first, second)]
+
+
+def test_events_page_without_events_has_no_item_list(client):
+    html = client.get("/events/").content.decode()
+    assert '"ItemList"' not in html
+
+
+def test_past_event_offer_has_no_availability(client):
+    event = make_event(days=-30, price="500", show_after_date=True, is_published=True)
+    html = client.get(event.get_absolute_url()).content.decode()
+    node = next(n for n in _graph(html) if n["@type"] == "Event")
+    assert node["offers"]["price"] == "500"
+    assert "availability" not in node["offers"]

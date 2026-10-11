@@ -1,9 +1,14 @@
-from django.db import models
+from django.db import models, transaction
 from django.urls import reverse
 
+from apps.catalog.prices import format_price
 from apps.core.fields import HtmlField, full_spec, image_spec, image_specs, og_spec, photo_field
 from apps.core.models import OrderedModel, PublishedQuerySet, SeoModel
-from apps.core.slugs import unique_slug
+from apps.core.redirects import remember_slug_change
+from apps.core.slugs import SLUG_HELP, unique_slug
+
+PREVIEW_HELP = "Карточка на главной и шапка страницы категории: кадр обрезается по-разному (4:3, 16:9, 3:2) — главное держите в центре."
+SLIDE_HELP = "Слайдер: кадр обрезается до 16:9 (как экран телевизора) — людей снимайте с запасом сверху и снизу."
 
 
 class CategoryGroup(OrderedModel):
@@ -23,15 +28,19 @@ class CategoryGroup(OrderedModel):
 
 class Category(SeoModel, OrderedModel):
     name = models.CharField("Название", max_length=128)
-    slug = models.SlugField("Адрес страницы", max_length=255, unique=True, blank=True)
+    slug = models.SlugField("Адрес страницы", max_length=255, unique=True, blank=True, help_text=SLUG_HELP)
     description = HtmlField("Описание")
-    preview = photo_field("Превью для главной", "catalog/previews", size=(1080, 720))
+    preview = photo_field("Превью для главной", "catalog/previews", size=(1080, 720), help_text=PREVIEW_HELP)
     preview_card, preview_card_avif = image_specs("preview", 640, 427)
     preview_large, preview_large_avif = image_specs(
         "preview", 1080, 720
     )  # шапка страницы категории: srcset с preview_card
     og = og_spec("preview")
-    is_published = models.BooleanField("Опубликовано", default=False)
+    is_published = models.BooleanField(
+        "Опубликовано",
+        default=False,
+        help_text="Новая категория — черновик: опубликуйте, когда добавите услуги и фото.",
+    )
 
     objects = PublishedQuerySet.as_manager()
 
@@ -45,7 +54,9 @@ class Category(SeoModel, OrderedModel):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = unique_slug(self, self.name)
-        super().save(*args, **kwargs)
+        with transaction.atomic():
+            remember_slug_change(self)
+            super().save(*args, **kwargs)
 
     def get_absolute_url(self) -> str:
         return reverse("catalog:category", args=[self.slug])
@@ -69,10 +80,16 @@ class Category(SeoModel, OrderedModel):
         )
         return list(related[:limit])
 
+    def services_only_here(self):
+        """Услуги, у которых эта категория — единственная: после её удаления они пропадут из навигации."""
+        return Service.objects.filter(category_links__category=self).exclude(
+            category_links__category__in=Category.objects.exclude(pk=self.pk)
+        )
+
 
 class CategoryPhoto(OrderedModel):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="photos")
-    image = photo_field("Фото", "catalog/categories", blank=False)
+    image = photo_field("Фото", "catalog/categories", blank=False, help_text=SLIDE_HELP)
     # Слайдер — рамка 16:9 с object-cover: режем так же на сервере, чтобы ширины в srcset были настоящими.
     slide, slide_avif = image_specs("image", 1600, 900)
     slide_small, slide_small_avif = image_specs("image", 800, 450)  # слайдер на телефоне: srcset со slide
@@ -90,12 +107,27 @@ class CategoryPhoto(OrderedModel):
 
 class Service(SeoModel):
     name = models.CharField("Название", max_length=128)
-    slug = models.SlugField("Адрес страницы", max_length=255, unique=True, blank=True)
-    short_description = HtmlField("Краткое описание")
-    description = HtmlField("Полное описание")
-    price = models.CharField("Цена", max_length=32, blank=True, help_text="Например: 1500 или «договорная».")
+    slug = models.SlugField("Адрес страницы", max_length=255, unique=True, blank=True, help_text=SLUG_HELP)
+    short_description = HtmlField(
+        "Краткое описание",
+        help_text=(
+            "1–2 предложения. Видно в карточке на странице категории; у услуги без отдельной страницы "
+            "раскрывается в списке. Если SEO-описание пустое — начало этого текста идёт в поисковики."
+        ),
+    )
+    description = HtmlField(
+        "Полное описание", help_text="Текст отдельной страницы услуги (нужна галочка «Отдельная страница»)."
+    )
+    price = models.CharField(
+        "Цена",
+        max_length=32,
+        blank=True,
+        help_text="Число («1500», «от 3500») — на сайте с «₽». Или текстом: «договорная».",
+    )
     price_unit = models.CharField("За что", max_length=128, blank=True, help_text="Например: час, сутки, человек.")
-    is_published = models.BooleanField("Опубликовано", default=True)
+    is_published = models.BooleanField(
+        "Опубликовано", default=True, help_text="На сайте услуга видна только внутри опубликованной категории."
+    )
     has_page = models.BooleanField(
         "Отдельная страница", default=False, help_text="Карточка в категории ведёт на страницу услуги."
     )
@@ -108,21 +140,30 @@ class Service(SeoModel):
         ordering = ["name"]
 
     def __str__(self):
-        return self.name
+        # С ценой: в автодополнении админки варианты одной услуги («Фрироуп» на час и на день) различимы.
+        return f"{self.name} — {self.price_display}" if self.price_display else self.name
 
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = unique_slug(self, self.name)
-        super().save(*args, **kwargs)
+        with transaction.atomic():
+            remember_slug_change(self)
+            super().save(*args, **kwargs)
 
     def get_absolute_url(self) -> str:
         return reverse("catalog:service", args=[self.slug])
 
     @property
+    def price_amount(self) -> str:
+        """Цена без единицы: «₽» только у числа, «договорная» — как есть."""
+        return format_price(self.price)
+
+    @property
     def price_display(self) -> str:
         if not self.price:
             return ""
-        return f"{self.price} руб / {self.price_unit}" if self.price_unit else f"{self.price} руб"
+        amount = self.price_amount
+        return f"{amount} / {self.price_unit}" if self.price_unit else amount
 
     @property
     def cover(self) -> ServicePhoto | None:
@@ -148,7 +189,7 @@ class CategoryService(OrderedModel):
 
 class ServicePhoto(OrderedModel):
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name="photos")
-    image = photo_field("Фото", "catalog/services", blank=False)
+    image = photo_field("Фото", "catalog/services", blank=False, help_text=SLIDE_HELP)
     # Слайдер — рамка 16:9 с object-cover: режем так же на сервере, чтобы ширины в srcset были настоящими.
     slide, slide_avif = image_specs("image", 1600, 900)
     slide_small, slide_small_avif = image_specs("image", 800, 450)  # слайдер на телефоне: srcset со slide
@@ -164,3 +205,11 @@ class ServicePhoto(OrderedModel):
 
     def __str__(self):
         return f"Фото #{self.pk}"
+
+
+# Связь «группа меню — категория» (авто-модель M2M): на странице удаления в админке вместо
+# «Связь categorygroup-category: CategoryGroup_categories object (13)».
+_GroupLink = CategoryGroup.categories.through
+_GroupLink._meta.verbose_name = "место в группе меню"
+_GroupLink._meta.verbose_name_plural = "места в группах меню"
+_GroupLink.__str__ = lambda link: f"«{link.category}» в группе «{link.categorygroup}»"

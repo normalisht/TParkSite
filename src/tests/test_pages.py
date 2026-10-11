@@ -34,11 +34,11 @@ def test_category_page_lists_services(client, category):
     hidden = Service.objects.create(name="Скрытая услуга", is_published=False)
     for order, service in enumerate([with_page, inline, hidden]):
         CategoryService.objects.create(category=category, service=service, order=order)
-    html = client.get(category.get_absolute_url()).content.decode()
+    html = client.get(category.get_absolute_url()).content.decode().replace("\u00a0", " ")
     assert "Описание сплавов" in html
     assert with_page.get_absolute_url() in html
     # Цена разбита по слешу: перенос только между ценой и единицей.
-    assert '<span class="inline-block whitespace-nowrap">2000 руб</span>' in html
+    assert '<span class="inline-block whitespace-nowrap">2000 ₽</span>' in html
     assert (
         '<span class="js-price-unit group/price inline-block data-wrapped:block"><span class="group-data-wrapped/price:hidden">/ </span>человек</span>'
         in html
@@ -417,6 +417,43 @@ def test_contacts_page_embeds_yandex_map_only_when_set(client):
     site.save()
     html = client.get("/contacts/").content.decode()
     assert 'src="https://yandex.ru/map-widget/v1/?um=constructor%3Aabc&amp;source=constructor"' in html
+
+
+MAP_URL = "https://yandex.ru/map-widget/v1/org/t_park/17031236197/"
+
+
+def _set_map(url: str, yandex_maps_url: str = "") -> None:
+    site = SiteSettings.load()
+    site.map_embed_url, site.yandex_maps_url = url, yandex_maps_url
+    site.save()
+
+
+@pytest.mark.django_db
+def test_contacts_map_loads_on_click(client):
+    _set_map(MAP_URL)
+    html = client.get("/contacts/").content.decode()
+    assert "Показать карту" in html
+    template_at = html.index('<template x-if="map">')
+    assert html.index("<iframe") > template_at  # iframe только внутри <template>: до клика браузер его не грузит
+    assert html.count("<iframe") == 1
+
+
+@pytest.mark.django_db
+def test_contacts_map_has_no_js_fallback(client):
+    _set_map(MAP_URL, "https://yandex.ru/maps/org/t_park/17031236197/")
+    html = client.get("/contacts/").content.decode()
+    assert "<noscript>" not in html
+    link = html.split("Открыть в Яндекс Картах", 1)[0].rsplit("<a ", 1)[1]
+    assert 'href="https://yandex.ru/maps/org/t_park/17031236197/"' in link
+    assert "btn-ghost" in link and 'rel="noopener"' in link
+
+
+@pytest.mark.django_db
+def test_contacts_without_map(client):
+    _set_map("")
+    html = client.get("/contacts/").content.decode()
+    assert "Показать карту" not in html and "<iframe" not in html
+    assert "md:max-w-xl" in html
 
 
 def test_reviews_page_header_cta_and_tones(client):

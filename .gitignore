@@ -12,6 +12,8 @@ __pycache__/
 /src/staticfiles/
 /src/static/css/tailwind.css
 /src/.django_tailwind_cli/
+/src/.coverage*
+/src/htmlcov/
 /src/price_legacy.csv
 /src/old_migrate
 

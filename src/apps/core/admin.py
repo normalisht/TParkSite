@@ -13,7 +13,7 @@ from unfold.widgets import UnfoldAdminTextareaWidget
 
 from apps.core.admin_utils import SEO_FIELDSET, SiteModelAdmin, copy_url_button, seo_help
 from apps.core.maps import MapEmbedURLField
-from apps.core.models import FounderFact, InfoPage, ParkFormat, Phone, SiteSettings
+from apps.core.models import FounderFact, InfoPage, ParkFormat, Phone, Redirect, SiteSettings
 from apps.texts.hints import texts_hint
 from apps.texts.registry import Page
 
@@ -196,6 +196,13 @@ class InfoPageAdmin(SiteModelAdmin):
         if not obj.pk:
             return "Появится после сохранения"
         return copy_url_button(obj.get_absolute_url())
+
+
+@admin.register(Redirect)
+class RedirectAdmin(SiteModelAdmin):
+    list_display = ["old_path", "new_path", "created_at"]
+    search_fields = ["old_path", "new_path"]
+    fields = ["old_path", "new_path"]
 
 
 admin.site.unregister(User)

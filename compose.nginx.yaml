@@ -7,6 +7,14 @@
 #   DB_DIR (по умолчанию ./data/db)       — в нём db.sqlite3; каталог целиком, т. к. SQLite пишет рядом журнал;
 #   MEDIA_DIR (по умолчанию ./data/media) — содержимое MEDIA_ROOT (папки как в src/media).
 # Владелец обоих каталогов — uid 1000 (пользователь app в образе): sudo chown -R 1000:1000 data
+
+# Логи контейнеров: не больше 5 файлов по 10 МБ, иначе access-логи забьют диск, и SQLite перестанет писать.
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
 services:
   tpark-web:
     build: .
@@ -16,6 +24,16 @@ services:
     volumes:
       - ${DB_DIR:-./data/db}:/data/db
       - ${MEDIA_DIR:-./data/media}:/data/media
+    # Пережатие фото держит их в памяти; без лимита OOM-killer может положить весь сервер.
+    mem_limit: ${WEB_MEM_LIMIT:-1g}
+    logging: *logging
+    # Код в образе только для чтения; пишет сайт лишь в тома /data и во временную /tmp.
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz/', timeout=5)"]
       interval: 30s
@@ -24,15 +42,25 @@ services:
       start_period: 20s
 
   tpark-nginx:
-    image: nginx:stable-alpine
+    image: nginx:stable-alpine@sha256:0985e772fb9f729e6fa0980da05fca5d9c468e870eed43071545afa9d2e27d94
     restart: unless-stopped
     depends_on:
       tpark-web:
         condition: service_healthy
+    logging: *logging
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
     environment:
       # Подставляются в docker/nginx.conf.template (envsubst образа nginx); шаблон — целый nginx.conf.
       NGINX_ENVSUBST_OUTPUT_DIR: /etc/nginx
       SERVER_NAME: ${SERVER_NAME:-t-camp.ru www.t-camp.ru}
+      # Куда ведёт редирект с http и www (как CANONICAL_HOST в Django).
+      CANONICAL_HOST: ${CANONICAL_HOST:-t-camp.ru}
       ACME_EMAIL: ${ACME_EMAIL:?Укажите ACME_EMAIL в .env — почта для Let's Encrypt}
       # Для проверки без лимитов: https://acme-staging-v02.api.letsencrypt.org/directory
       ACME_SERVER: ${ACME_SERVER:-https://acme-v02.api.letsencrypt.org/directory}
