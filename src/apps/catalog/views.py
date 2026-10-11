@@ -110,7 +110,7 @@ def service_detail(request, slug):
         *([(category.name, category.get_absolute_url())] if category else []),
         (service.name, ""),
     ]
-    image = safe_spec_url(photos[0], "slide") if photos else ""
+    image = safe_spec_url(photos[0], "og") if photos else ""
     related = related_services(category, service) if category else []
     return render(
         request,

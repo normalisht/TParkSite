@@ -1,13 +1,17 @@
 import json
 import re
+from datetime import timedelta
 
 import pytest
+from django.utils import timezone
 
-from apps.catalog.models import Category, CategoryService, Service
-from apps.content.models import GalleryPhoto, Review
+from apps.catalog.models import Category, CategoryService, Service, ServicePhoto
+from apps.content.models import Event, GalleryPhoto, Review
 from apps.core.models import InfoPage, Phone, SiteSettings
 
 pytestmark = pytest.mark.django_db
+
+OG_JPEG = re.compile(r'property="og:image" content="http://testserver/media/CACHE/images/[^"]+\.jpg"')
 
 
 def test_sitemap_lists_only_public_pages(client):
@@ -40,7 +44,18 @@ def test_category_meta(client, make_image):
     html = client.get(category.get_absolute_url()).content.decode()
     assert "<title>Байдарки — Т-Парк, Калужская область</title>" in html
     assert 'name="description" content="Сплавы по Протве для всей семьи"' in html
-    assert 'property="og:image" content="http://testserver/media/' in html
+    assert OG_JPEG.search(html)
+
+
+def test_og_image_is_jpeg_on_service_event_and_about(client, make_image):
+    service = Service.objects.create(name="Сплав", has_page=True)
+    ServicePhoto.objects.create(service=service, image=make_image())
+    event = Event.objects.create(title="Слёт", date=timezone.localdate() + timedelta(days=5), image=make_image())
+    site = SiteSettings.load()
+    site.about_photo = make_image()
+    site.save()
+    for url in (service.get_absolute_url(), event.get_absolute_url(), "/about/"):
+        assert OG_JPEG.search(client.get(url).content.decode()), url
 
 
 def test_favicon_redirects_to_static(client):
@@ -205,7 +220,7 @@ def test_default_og_image(client, make_image):
     site.og_image = make_image(size=(1300, 700))
     site.save()
     html = client.get("/contacts/").content.decode()
-    assert 'property="og:image" content="http://testserver/media/' in html
+    assert OG_JPEG.search(html)
     assert 'name="twitter:card" content="summary_large_image"' in html
 
 
