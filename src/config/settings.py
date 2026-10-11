@@ -135,6 +135,7 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = Path(os.environ.get("MEDIA_ROOT", BASE_DIR / "media"))
 # Миниатюры: недостающие создаются при показе, после сохранения фото — сразу в фоне (apps.core.images).
 IMAGEKIT_DEFAULT_CACHEFILE_STRATEGY = "apps.core.images.GenerateAfterCommit"
+IMAGEKIT_DEFAULT_CACHEFILE_BACKEND = "apps.core.images.AtomicBackend"
 
 TAILWIND_CLI_SRC_CSS = "tailwind/source.css"
 TAILWIND_CLI_DIST_CSS = "css/tailwind.css"

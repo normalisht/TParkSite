@@ -1,15 +1,24 @@
 import logging
+import os
+import shutil
+import tempfile
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
+from pathlib import Path
 
 from django.db import transaction
 from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
+from imagekit.cachefiles.backends import CacheFileState, Simple
 from imagekit.cachefiles.strategies import JustInTime
+from imagekit.utils import generate
+from PIL import features
 
 logger = logging.getLogger(__name__)
 
 AVIF_SUFFIX = "_avif"
+# Без кодировщика AVIF (другая сборка Pillow) <source type="image/avif"> не выводим: миниатюры не создадутся.
+AVIF_SUPPORTED = features.check("avif")
 
 
 def safe_spec_url(obj, spec_name: str) -> str:
@@ -47,6 +56,8 @@ def _candidates(obj, entries, suffix: str = "") -> list[tuple[str, str]]:
     for name, descriptor in entries:
         name += suffix
         if suffix and not hasattr(type(obj), name):
+            continue
+        if suffix == AVIF_SUFFIX and not AVIF_SUPPORTED:
             continue
         if url := safe_spec_url(obj, name):
             found.append((url, descriptor))
@@ -126,3 +137,45 @@ class GenerateAfterCommit(JustInTime):
 
     def on_source_saved(self, file):
         transaction.on_commit(lambda: run_in_background(partial(_generate, file)))
+
+
+def _save_atomically(file) -> None:
+    """Пишет миниатюру во временный файл рядом и переименовывает: читатель видит либо целый файл, либо никакого
+    (недописанный файл после SIGKILL или параллельной генерации иначе отдавался бы вечно)."""
+    content = generate(file.generator)
+    path = Path(file.storage.path(file.name))
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=path.parent, prefix=".", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "wb") as out:
+            shutil.copyfileobj(content, out)
+        os.chmod(tmp, file.storage.file_permissions_mode or 0o644)  # mkstemp создаёт 0600, а nginx читает от себя
+        os.replace(tmp, path)
+    except BaseException:
+        Path(tmp).unlink(missing_ok=True)
+        raise
+
+
+class AtomicBackend(Simple):
+    """Backend imagekit (`IMAGEKIT_DEFAULT_CACHEFILE_BACKEND`) с двумя исправлениями `Simple`:
+
+    - ошибка генерации не оставляет состояние «создаётся» навсегда — иначе со второго показа сайт отдавал бы
+      URL несуществующего файла (битый AVIF в `<source>` ломает и запасной WebP);
+    - «создаётся» в другом потоке — не повод отдавать URL: если файла ещё нет, создаём сами (запись атомарная,
+      так что двойная генерация безвредна).
+    """
+
+    def generate_now(self, file, force=False):
+        state = None if force else self.get_state(file)
+        if state == CacheFileState.EXISTS:
+            return
+        if state == CacheFileState.GENERATING and self._exists(file):
+            self.set_state(file, CacheFileState.EXISTS)
+            return
+        self.set_state(file, CacheFileState.GENERATING)
+        try:
+            _save_atomically(file)
+        except Exception:
+            self.set_state(file, CacheFileState.DOES_NOT_EXIST)  # проверим снова через existence_check_timeout
+            raise
+        self.set_state(file, CacheFileState.EXISTS)

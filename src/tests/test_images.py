@@ -169,3 +169,47 @@ def test_lightbox_webp_is_lighter_than_jpeg_originals(make_image):
     # Оригиналы галереи уже сжаты JPEG: при WebP q80 каждое шестое фото выходило тяжелее оригинала, q75 + method=6 — ни одно.
     photo = GalleryPhoto.objects.create(image=make_image())
     assert photo.full.generator.options == {"quality": 75, "method": 6}
+
+
+def test_failed_thumbnail_is_not_remembered_as_ready(make_image, media_root):
+    # Ошибка генерации не должна запоминаться: на втором показе — снова заглушка, а не URL несуществующего файла.
+    photo = GalleryPhoto.objects.create(image=make_image())
+    (media_root / photo.image.name).unlink()
+    assert images.safe_spec_url(photo, "thumb") == ""
+    assert images.safe_spec_url(photo, "thumb") == ""
+    assert picture_html(photo, "thumb_small 400w, thumb 600w", alt="") == ""
+
+
+def test_broken_avif_never_yields_avif_source(monkeypatch, make_image):
+    real_save = Image.Image.save
+
+    def save(self, fp, format=None, **params):
+        if (format or "").upper() == "AVIF":
+            raise OSError("нет кодировщика AVIF")
+        return real_save(self, fp, format, **params)
+
+    monkeypatch.setattr(Image.Image, "save", save)
+    photo = GalleryPhoto.objects.create(image=make_image())
+    for _ in range(2):
+        html = picture_html(photo, "thumb", alt="")
+        assert html.startswith("<img ") and ".avif" not in html
+
+
+def test_picture_skips_avif_when_pillow_cannot_encode_it(monkeypatch):
+    monkeypatch.setattr(images, "AVIF_SUPPORTED", False)
+    assert picture_html(Photo(), "card", alt="") == '<img src="/m/card.webp" alt="">'
+
+
+def test_url_while_generating_elsewhere_waits_for_real_file(make_image):
+    # Другой поток пометил миниатюру «создаётся», но файла ещё нет: показ создаёт её сам, а не отдаёт пустой URL.
+    photo = GalleryPhoto.objects.create(image=make_image())
+    spec = photo.thumb
+    spec.cachefile_backend.set_state(spec, "generating")
+    assert spec.url and spec.storage.exists(spec.name)
+
+
+def test_thumbnail_written_atomically_and_readable_by_nginx(make_image, media_root):
+    photo = GalleryPhoto.objects.create(image=make_image())
+    path = media_root / photo.thumb.url.removeprefix("/media/")
+    assert path.stat().st_mode & 0o777 == 0o644  # nginx в соседнем контейнере читает под своим пользователем
+    assert not list(path.parent.glob(".*"))  # временных файлов не осталось

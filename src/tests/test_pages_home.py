@@ -388,3 +388,19 @@ def test_contact_button_icons_morph(client):
     assert "group-aria-expanded:opacity-0" in phone and "group-aria-expanded:opacity-100" in cross
     assert all("transition" in icon and "motion-reduce:transition-none" in icon for icon in icons)
     assert 'x-show="!open"' not in fab
+
+
+def _card_sizes(html: str) -> list[str]:
+    return [re.search(r'sizes="([^"]+)"', tag).group(1) for tag in _preview_imgs(html)]
+
+
+def test_home_full_width_cards_get_full_width_sizes(client, make_image):
+    """Карточка во всю ширину (первая при нечётном числе, единственная в группе) на телефоне — 100vw, а не половина."""
+    odd, single = CategoryGroup.objects.create(name="Три"), CategoryGroup.objects.create(name="Одна")
+    for i in range(3):
+        odd.categories.add(Category.objects.create(name=f"Три {i}", is_published=True, preview=make_image()))
+    single.categories.add(Category.objects.create(name="Одна 0", is_published=True, preview=make_image()))
+    sizes = _card_sizes(client.get("/").content.decode())
+    assert [s.endswith("calc(100vw - 32px)") for s in sizes] == [True, False, False, True]
+    assert sizes[0].startswith("(min-width: 1152px) 357px")  # с lg — в ряд по три
+    assert sizes[3].startswith("(min-width: 1152px) 548px")  # с sm — половина ширины
