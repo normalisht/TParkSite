@@ -73,6 +73,12 @@ class Category(SeoModel, OrderedModel):
         )
         return list(related[:limit])
 
+    def services_only_here(self):
+        """Услуги, у которых эта категория — единственная: после её удаления они пропадут из навигации."""
+        return Service.objects.filter(category_links__category=self).exclude(
+            category_links__category__in=Category.objects.exclude(pk=self.pk)
+        )
+
 
 class CategoryPhoto(OrderedModel):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="photos")

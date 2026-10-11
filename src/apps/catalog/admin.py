@@ -1,6 +1,8 @@
 from django import forms
-from django.contrib import admin
+from django.contrib import admin, messages
+from django.db.models import Count
 from unfold.admin import TabularInline
+from unfold.widgets import UnfoldAdminCheckboxSelectMultipleWidget
 
 from apps.catalog.models import Category, CategoryGroup, CategoryPhoto, CategoryService, Service, ServicePhoto
 from apps.core.admin_utils import SEO_FIELDSET, SiteModelAdmin, image_preview
@@ -44,10 +46,22 @@ class ServiceCategoryInline(TabularInline):
 
 class CategoryAdminForm(forms.ModelForm):
     bulk_photos = MultipleImageField(label="Загрузить фото пачкой")
+    menu_groups = forms.ModelMultipleChoiceField(
+        CategoryGroup.objects.order_by("order", "id"),
+        required=False,
+        label="Группы меню",
+        widget=UnfoldAdminCheckboxSelectMultipleWidget,
+        help_text="Где категория видна в меню «Услуги» и на главной. Без группы её найдут только по прямой ссылке.",
+    )
 
     class Meta:
         model = Category
         fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:
+            self.fields["menu_groups"].initial = list(self.instance.groups.all())
 
 
 class ServiceAdminForm(forms.ModelForm):
@@ -72,7 +86,7 @@ class CategoryGroupAdmin(SiteModelAdmin):
 @admin.register(Category)
 class CategoryAdmin(SiteModelAdmin):
     form = CategoryAdminForm
-    list_display = ["name", "is_published"]
+    list_display = ["name", "menu_groups_display", "services_count", "is_published"]
     list_editable = ["is_published"]
     ordering = ["order", "id"]
     ordering_field = "order"
@@ -83,15 +97,47 @@ class CategoryAdmin(SiteModelAdmin):
     fieldsets = (
         (
             "Основное",
-            {"classes": ["tab"], "fields": ["name", "slug", "description", "preview", "is_published", "order"]},
+            {
+                "classes": ["tab"],
+                "fields": ["name", "slug", "menu_groups", "description", "preview", "is_published", "order"],
+            },
         ),
         ("Загрузка фото", {"classes": ["tab"], "fields": ["bulk_photos"]}),
         SEO_FIELDSET,
     )
 
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .annotate(services_total=Count("service_links", distinct=True))
+            .prefetch_related("groups")
+        )
+
+    @admin.display(description="Группы меню")
+    def menu_groups_display(self, obj):
+        return ", ".join(group.name for group in obj.groups.all()) or "— нет в меню"
+
+    @admin.display(description="Услуг", ordering="services_total")
+    def services_count(self, obj):
+        return obj.services_total
+
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)
+        form.instance.groups.set(form.cleaned_data["menu_groups"])
         append_images(CategoryPhoto, form.cleaned_data.get("bulk_photos") or [], category=form.instance)
+
+    def delete_view(self, request, object_id, extra_context=None):
+        category = self.get_object(request, object_id)
+        if request.method == "GET" and category:
+            names = list(category.services_only_here().values_list("name", flat=True))
+            if names:
+                messages.warning(
+                    request,
+                    f"Без категории останутся услуги ({len(names)}): {', '.join(names)}. "
+                    "На сайте их не будет в меню — привяжите их к другой категории или снимите с публикации.",
+                )
+        return super().delete_view(request, object_id, extra_context)
 
 
 class ServicePlacementFilter(admin.SimpleListFilter):

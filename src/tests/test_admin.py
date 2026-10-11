@@ -6,7 +6,7 @@ from django.contrib import admin
 from django.urls import reverse
 
 from apps.catalog.admin import ServiceAdmin
-from apps.catalog.models import Category, CategoryPhoto, CategoryService, Service
+from apps.catalog.models import Category, CategoryGroup, CategoryPhoto, CategoryService, Service
 from apps.content.models import GalleryPhoto
 from apps.core.models import InfoPage, Phone, SiteSettings
 
@@ -324,3 +324,51 @@ def test_service_admin_lists_categories(rf, admin_user):
     service = model_admin.get_queryset(request).get(pk=service.pk)
     assert model_admin.categories(service) == "Верёвочный парк"
     assert model_admin.categories(Service.objects.create(name="Батут")) == "—"
+
+
+def _category_post(category, **extra):
+    """Данные формы категории без фото и услуг (инлайны пустые)."""
+    data = {"name": category.name, "slug": category.slug, "description": "", "order": "0"}
+    for prefix in ("photos", "service_links"):
+        data |= {
+            f"{prefix}-TOTAL_FORMS": "0",
+            f"{prefix}-INITIAL_FORMS": "0",
+            f"{prefix}-MIN_NUM_FORMS": "0",
+            f"{prefix}-MAX_NUM_FORMS": "1000",
+        }
+    return data | extra
+
+
+def test_category_form_sets_menu_groups(admin_client):
+    active, rent = CategoryGroup.objects.create(name="Активный отдых"), CategoryGroup.objects.create(name="Аренда")
+    category = Category.objects.create(name="Парк")
+    rent.categories.add(category)
+    url = reverse("admin:catalog_category_change", args=[category.pk])
+    assert list(admin_client.get(url).context["adminform"].form["menu_groups"].initial) == [rent]
+    response = admin_client.post(url, _category_post(category, menu_groups=[str(active.pk)]))
+    assert response.status_code == 302, response.context["adminform"].form.errors if response.context else ""
+    assert list(category.groups.all()) == [active]
+
+
+def test_category_changelist_shows_groups_and_service_count(admin_client):
+    group = CategoryGroup.objects.create(name="Активный отдых")
+    category = Category.objects.create(name="Парк")
+    group.categories.add(category)
+    for name in ("Зиплайн", "Каяк"):
+        CategoryService.objects.create(category=category, service=Service.objects.create(name=name))
+    html = admin_client.get(reverse("admin:catalog_category_changelist")).content.decode()
+    assert "Активный отдых" in html
+    assert re.search(r">\s*2\s*<", html)
+
+
+def test_delete_warns_only_about_services_left_without_category(admin_client):
+    category, other = Category.objects.create(name="Парк"), Category.objects.create(name="Сплавы")
+    only_here = Service.objects.create(name="Зиплайн")
+    shared = Service.objects.create(name="Каяк")
+    CategoryService.objects.create(category=category, service=only_here)
+    CategoryService.objects.create(category=category, service=shared)
+    CategoryService.objects.create(category=other, service=shared)
+    html = admin_client.get(reverse("admin:catalog_category_delete", args=[category.pk])).content.decode()
+    assert "Без категории останутся" in html
+    assert "Зиплайн" in html.split("Без категории останутся", 1)[1].split("<", 1)[0]
+    assert "Каяк" not in html.split("Без категории останутся", 1)[1].split("<", 1)[0]
