@@ -46,7 +46,7 @@ def test_dev_compose_renews_venv_volume():
 def test_entrypoint_prunes_thumbnails_after_generating_in_background():
     # Сначала досоздать миниатюры, потом удалить ненужные — в фоне, чтобы сайт стартовал сразу.
     script = (ROOT / "docker/entrypoint.sh").read_text(encoding="utf-8")
-    assert re.search(r"\(.*generateimages && .*prune_image_cache\) &", script)
+    assert re.search(r"\(.*generate_missing_images && .*prune_image_cache\) &", script)
 
 
 def test_dockerignore_excludes_legacy_data():
@@ -214,3 +214,27 @@ def test_upload_temp_dir_is_on_db_volume_and_created_at_start():
 def test_python_does_not_write_bytecode_into_read_only_image():
     dockerfile = (ROOT / "Dockerfile").read_text(encoding="utf-8")
     assert "PYTHONDONTWRITEBYTECODE=1" in dockerfile
+
+
+def _dockerfile_stages() -> dict[str, str]:
+    text = (ROOT / "Dockerfile").read_text(encoding="utf-8")
+    parts = re.split(r"^FROM .* AS (\w+)\s*$", text, flags=re.MULTILINE)
+    return dict(zip(parts[1::2], parts[2::2], strict=True))
+
+
+def test_production_image_ships_without_build_tools():
+    # uv и бинарник Tailwind (~150 МБ) нужны только для сборки: в продакшен-образ идут .venv, код и статика.
+    text = (ROOT / "Dockerfile").read_text(encoding="utf-8")
+    assert text.rstrip().splitlines()[-1] == "FROM app AS production"  # последний этап — образ по умолчанию
+    app = _dockerfile_stages()["app"]
+    assert "uv" not in re.findall(r"\b\w+\b", app.split("COPY --from=build /app /app", 1)[0])
+    assert "--mount=type=cache,target=/app/.django_tailwind_cli" in _dockerfile_stages()["build"]
+    dev = (ROOT / "compose.dev.yaml").read_text(encoding="utf-8")
+    assert "target: dev" in dev
+    assert "image: tpark-web\n" not in dev  # иначе dev-сборка затирала бы продакшен-образ
+
+
+def test_tailwind_version_is_pinned():
+    from django.conf import settings
+
+    assert settings.TAILWIND_CLI_VERSION != "latest"

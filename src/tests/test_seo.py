@@ -330,6 +330,18 @@ def test_organization_type_and_hours(client):
     assert "openingHours" not in org
 
 
+def _organization(client) -> dict:
+    return next(n for n in _graph(client.get("/").content.decode()) if n.get("@id", "").endswith("#organization"))
+
+
+def test_organization_logo(client, make_image):
+    assert _organization(client)["logo"] == "http://testserver/static/img/logo.png"
+    site = SiteSettings.load()
+    site.header_logo = make_image("logo.png", size=(600, 150), fmt="PNG")
+    site.save()
+    assert _organization(client)["logo"] == f"http://testserver{site.header_logo.url}"
+
+
 def test_static_pages_have_lastmod(client):
     SiteSettings.load().save()
     xml = client.get("/sitemap.xml").content.decode()

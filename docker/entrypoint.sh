@@ -7,8 +7,9 @@ if [ -n "$FILE_UPLOAD_TEMP_DIR" ]; then
   find "$FILE_UPLOAD_TEMP_DIR" -type f -mmin +60 -delete
 fi
 python manage.py migrate --noinput
-# Миниатюры — в фоне с низким приоритетом: сайт стартует сразу, а недостающие миниатюры
-# ImageKit всё равно создаёт при первом запросе страницы. Затем удаляются ненужные (старые
-# размеры и качество — после смены спек). Ошибка здесь контейнер не роняет.
-(nice -n 10 python manage.py generateimages && nice -n 10 python manage.py prune_image_cache) &
+# Недостающие миниатюры — в фоне с низким приоритетом: сайт стартует сразу, а при первом запросе страницы
+# ImageKit всё равно создаёт их сам. Готовые не пережимаются; generateimages не используем — он пишет
+# в лог строку на каждую миниатюру. Затем удаляются ненужные (старые размеры и качество — после смены спек).
+# Ошибка здесь контейнер не роняет.
+(nice -n 10 python manage.py generate_missing_images && nice -n 10 python manage.py prune_image_cache) &
 exec "$@"

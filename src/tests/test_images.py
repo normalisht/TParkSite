@@ -166,6 +166,35 @@ def test_prune_image_cache(make_image, media_root):
     assert not stale.exists() and fresh.exists() and kept.exists()
 
 
+def test_generate_missing_images_skips_ready_and_stays_quiet(make_image, media_root, capsys):
+    # Запускается при каждом старте контейнера: готовые миниатюры не пережимает, а в лог пишет итог,
+    # а не строку на каждую из тысяч миниатюр (как generateimages).
+    photo = GalleryPhoto.objects.create(image=make_image())
+    ready = photo.thumb.storage.path(photo.thumb.name)
+    photo.thumb.generate()
+    two_hours_ago = time.time() - 2 * 3600
+    os.utime(ready, (two_hours_ago, two_hours_ago))
+    missing = photo.full.storage.path(photo.full.name)
+    assert not os.path.exists(missing)
+
+    call_command("generate_missing_images")
+
+    assert os.path.exists(missing)
+    assert os.path.getmtime(ready) == two_hours_ago
+    out = capsys.readouterr().out
+    assert len(out.splitlines()) == 1 and "создано" in out
+    assert photo.full.name not in out
+
+
+def test_generate_missing_images_reports_failures(make_image, media_root, capsys):
+    photo = GalleryPhoto.objects.create(image=make_image())
+    (media_root / photo.image.name).unlink()
+    call_command("generate_missing_images")
+    captured = capsys.readouterr()
+    assert photo.thumb.name in captured.err
+    assert "ошибок" in captured.out
+
+
 def test_lightbox_webp_is_lighter_than_jpeg_originals(make_image):
     # Оригиналы галереи уже сжаты JPEG: при WebP q80 каждое шестое фото выходило тяжелее оригинала, при q75 — ни одно.
     # method=6 не нужен: вдвое дольше кодирует (дольше прогрев после деплоя) ради 3 % размера.

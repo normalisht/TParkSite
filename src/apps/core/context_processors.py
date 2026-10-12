@@ -1,10 +1,23 @@
 from django.conf import settings
+from django.templatetags.static import static
 
 from apps.core.images import safe_spec_url
-from apps.core.models import SiteSettings
+from apps.core.models import HEADER_LOGO_HEIGHT, SiteSettings
 from apps.core.opening_hours import human_opening_hours
 from apps.core.request_cache import cached_on_request
 from apps.core.seo import SITE_DESCRIPTION, absolute_url, plaintext
+
+# Стандартный логотип шапки: 3× от 119×44 (квантованный PNG, грузится вместе с LCP-фото). Снизу — прозрачное поле
+# высотой с выступ солнца над буквами: надпись по центру картинки, а значит, на одной оси с кнопками шапки.
+DEFAULT_HEADER_LOGO = ("img/logo-header.png", 119, HEADER_LOGO_HEIGHT)
+
+
+def header_logo(site: SiteSettings) -> dict:
+    """Логотип для шапки: из настроек, а если его нет или миниатюра не получилась — стандартный."""
+    if site.header_logo and (url := safe_spec_url(site, "header_logo_img")) and site.header_logo_display_width:
+        return {"url": url, "width": site.header_logo_display_width, "height": HEADER_LOGO_HEIGHT}
+    path, width, height = DEFAULT_HEADER_LOGO
+    return {"url": static(path), "width": width, "height": height}
 
 
 def _site_context(request):
@@ -15,6 +28,7 @@ def _site_context(request):
     )
     return {
         "site": settings_obj,
+        "header_logo": header_logo(settings_obj),
         "phones": phones,
         # Часы работы по-русски: для подвала, главной и страницы контактов.
         "hours": human_opening_hours(settings_obj.opening_hours),

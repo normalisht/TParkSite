@@ -168,6 +168,8 @@ FILE_UPLOAD_TEMP_DIR = os.environ.get("FILE_UPLOAD_TEMP_DIR") or None
 IMAGEKIT_DEFAULT_CACHEFILE_STRATEGY = "apps.core.images.GenerateAfterCommit"
 IMAGEKIT_DEFAULT_CACHEFILE_BACKEND = "apps.core.images.AtomicBackend"
 
+# Версия закреплена: с "latest" CSS продакшена собирался бы той версией, что вышла к моменту сборки образа.
+TAILWIND_CLI_VERSION = "4.3.3"
 TAILWIND_CLI_SRC_CSS = "tailwind/source.css"
 TAILWIND_CLI_DIST_CSS = "css/tailwind.css"
 
