@@ -164,11 +164,33 @@ def test_no_low_contrast_gray_text():
 
 
 def test_header_logo_is_lightweight(client):
-    """В шапке — уменьшенный логотип (3× от 122×40), а не исходник 600×197: он грузится вместе с LCP-фото."""
+    """В шапке — уменьшенный логотип (3× от 132×40), а не исходник 600×182: он грузится вместе с LCP-фото."""
     html = client.get("/").content.decode()
-    assert re.search(r'<img src="/static/img/logo-header\.png" alt="Т-Парк" width="122" height="40"', html)
+    assert re.search(r'<img src="/static/img/logo-header\.png" alt="Т-Парк" width="132" height="40"', html)
     logo = Path(settings.BASE_DIR) / "static/img/logo-header.png"
     assert logo.stat().st_size < 8 * 1024
+
+
+def test_header_logo_from_settings(client, make_image):
+    """Логотип из настроек: в шапке — WebP высотой 120 px (3× от 40), размеры — по пропорциям загруженного."""
+    site = SiteSettings.load()
+    site.header_logo = make_image("logo.png", size=(600, 150), fmt="PNG")
+    site.save()
+    html = client.get("/").content.decode()
+    match = re.search(r'<img src="(/media/CACHE/[^"]+\.webp)" alt="Т-Парк" width="160" height="40"', _header(html))
+    assert match
+    assert (site.header_logo_img.width, site.header_logo_img.height) == (480, 120)
+    error_page = (Path(settings.BASE_DIR) / "templates/500.html").read_text()
+    assert 'width="132" height="40"' in error_page  # без базы — стандартный логотип
+
+
+def test_header_logo_falls_back_when_file_missing(client, make_image):
+    site = SiteSettings.load()
+    site.header_logo = make_image("logo.png", size=(600, 150), fmt="PNG")
+    site.save()
+    Path(site.header_logo.path).unlink()
+    html = client.get("/").content.decode()
+    assert re.search(r'<img src="/static/img/logo-header\.png" alt="Т-Парк" width="132" height="40"', _header(html))
 
 
 def _header(html: str) -> str:

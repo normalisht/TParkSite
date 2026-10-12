@@ -54,7 +54,7 @@ def organization(request, *, with_founder: bool = False) -> dict:
         "name": SITE_NAME,
         "alternateName": ALTERNATE_NAME,
         "url": request.build_absolute_uri("/"),
-        "logo": request.build_absolute_uri(static("img/logo.png")),
+        "logo": request.build_absolute_uri(site.header_logo.url if site.header_logo else static("img/logo.png")),
         "address": postal_address(site),
         "description": plaintext(site.home_intro) or None,
         "telephone": [phone.tel_url.removeprefix("tel:") for phone in site.phones.all()] or None,

@@ -7,7 +7,7 @@ from django.db.models import Q
 from django.urls import reverse
 
 from apps.core import about_defaults
-from apps.core.fields import HtmlField, image_specs, og_spec, photo_field
+from apps.core.fields import HtmlField, image_specs, logo_spec, og_spec, photo_field
 from apps.core.maps import MapEmbedURLField
 from apps.core.slugs import SLUG_HELP, unique_slug
 
@@ -22,6 +22,8 @@ class OrderedModel(models.Model):
 
 PARK_ADDRESS = "Калужская область, Жуковский район, село Восход"
 DEFAULT_TITLE_SUFFIX = "Т-Парк, Калужская область"
+# Высота логотипа в шапке, px (класс h-10 в partials/header.html).
+HEADER_LOGO_HEIGHT = 40
 
 
 class SeoModel(models.Model):
@@ -58,6 +60,19 @@ def _seo_pair(page: str):
 
 class SiteSettings(models.Model):
     updated_at = models.DateTimeField("Изменено", auto_now=True)
+    header_logo = photo_field(
+        "Логотип",
+        "logo",
+        size=(3000, 1000),
+        fmt=None,
+        width_field="header_logo_width",
+        height_field="header_logo_height",
+        help_text="PNG с прозрачным фоном, горизонтальный, высотой от 120 px. Показывается в шапке высотой 40 px "
+        "и в разметке для поисковиков. Пусто — стандартный логотип.",
+    )
+    header_logo_width = models.PositiveIntegerField(null=True, editable=False)
+    header_logo_height = models.PositiveIntegerField(null=True, editable=False)
+    header_logo_img = logo_spec("header_logo", HEADER_LOGO_HEIGHT * 3)
     address = models.CharField("Адрес", max_length=255, blank=True, default=PARK_ADDRESS)
     map_embed_url = MapEmbedURLField(
         "Яндекс Карта на странице контактов",
@@ -197,6 +212,13 @@ class SiteSettings(models.Model):
     def load(cls) -> SiteSettings:
         obj, _ = cls.objects.get_or_create(pk=1)
         return obj
+
+    @property
+    def header_logo_display_width(self) -> int | None:
+        """Ширина логотипа в шапке при высоте `HEADER_LOGO_HEIGHT` — для width/height у <img> (без сдвига вёрстки)."""
+        if not (self.header_logo_width and self.header_logo_height):
+            return None
+        return round(HEADER_LOGO_HEIGHT * self.header_logo_width / self.header_logo_height)
 
     @classmethod
     def for_request(cls, request) -> SiteSettings:
