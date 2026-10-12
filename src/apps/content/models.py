@@ -165,10 +165,19 @@ class Review(models.Model):
         blank=True,
         help_text="Например, на отзыв в Яндекс Картах: открывается по клику на подпись источника под отзывом.",
     )
-    date = models.DateField("Дата отзыва", null=True, blank=True)
-    photo = photo_field("Фото", "reviews")
+    date = models.DateField(
+        "Дата отзыва",
+        null=True,
+        blank=True,
+        help_text="От неё зависит порядок: новые сверху, без даты — в конце. «Подтянуть» заполнит её сама.",
+    )
+    photo = photo_field(
+        "Фото",
+        "reviews",
+        help_text="Маленький кружок рядом с подписью «Гость Т-Парка», кадр обрезается до квадрата. Необязательно.",
+    )
     avatar, avatar_avif = image_specs("photo", 160, 160)
-    is_published = models.BooleanField("Опубликовано", default=True)
+    is_published = models.BooleanField("Опубликовано", default=True, help_text="Снимите, чтобы скрыть отзыв на сайте.")
 
     objects = PublishedQuerySet.as_manager()
 
@@ -190,9 +199,22 @@ class Review(models.Model):
 
 
 class Partner(OrderedModel):
-    name = models.CharField("Название", max_length=128, blank=True)
-    link = models.URLField("Ссылка", max_length=500, blank=True)
-    logo = photo_field("Логотип", "partners", size=(800, 800), fmt=None)
+    name = models.CharField(
+        "Название",
+        max_length=128,
+        blank=True,
+        help_text="Описание логотипа для поисковиков; без логотипа на сайте будет плитка с этим названием.",
+    )
+    link = models.URLField(
+        "Ссылка", max_length=500, blank=True, help_text="Откроется в новой вкладке. Пусто — логотип без ссылки."
+    )
+    logo = photo_field(
+        "Логотип",
+        "partners",
+        size=(800, 800),
+        fmt=None,
+        help_text="На «О нас» — целиком, без обрезки. Лучше PNG с прозрачным или белым фоном.",
+    )
     logo_small = image_spec("logo", 600, 600, crop=False)
 
     class Meta(OrderedModel.Meta):
@@ -206,8 +228,15 @@ class Partner(OrderedModel):
 class GalleryPhoto(OrderedModel):
     STRIP_SIZE = 6  # фото в полосе «Как это выглядит» (главная, «О нас», отзывы)
 
-    image = photo_field("Фото", "gallery", blank=False)
-    caption = models.CharField("Подпись", max_length=255, blank=True)
+    image = photo_field(
+        "Фото", "gallery", blank=False, help_text="В галерее — квадратом с обрезкой краёв, по клику — целиком."
+    )
+    caption = models.CharField(
+        "Подпись",
+        max_length=255,
+        blank=True,
+        help_text="Видна при просмотре фото на весь экран и описывает фото для поисковиков.",
+    )
     thumb, thumb_avif = image_specs("image", 600, 600)
     thumb_small, thumb_small_avif = image_specs("image", 400, 400)  # сетка на телефоне: srcset с thumb
     full = full_spec("image")

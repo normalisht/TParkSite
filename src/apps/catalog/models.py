@@ -12,9 +12,21 @@ SLIDE_HELP = "Слайдер: кадр обрезается до 16:9 (как э
 
 
 class CategoryGroup(OrderedModel):
-    name = models.CharField("Название", max_length=128)
-    categories = models.ManyToManyField("Category", related_name="groups", blank=True, verbose_name="Категории")
-    is_published = models.BooleanField("Опубликовано", default=True)
+    name = models.CharField(
+        "Название", max_length=128, help_text="Заголовок раздела в меню «Услуги» в шапке и блока на главной."
+    )
+    categories = models.ManyToManyField(
+        "Category",
+        related_name="groups",
+        blank=True,
+        verbose_name="Категории",
+        help_text="Одна категория может быть в нескольких группах.",
+    )
+    is_published = models.BooleanField(
+        "Опубликовано",
+        default=True,
+        help_text="Снятая — группа и её категории пропадут из меню и с главной; страницы категорий открываются.",
+    )
 
     objects = PublishedQuerySet.as_manager()
 
@@ -29,7 +41,10 @@ class CategoryGroup(OrderedModel):
 class Category(SeoModel, OrderedModel):
     name = models.CharField("Название", max_length=128)
     slug = models.SlugField("Адрес страницы", max_length=255, unique=True, blank=True, help_text=SLUG_HELP)
-    description = HtmlField("Описание")
+    description = HtmlField(
+        "Описание",
+        help_text="Текст под заголовком страницы категории. Если на вкладке «SEO» описание пустое — идёт и в поиск.",
+    )
     preview = photo_field("Превью для главной", "catalog/previews", size=(1080, 720), help_text=PREVIEW_HELP)
     preview_card, preview_card_avif = image_specs("preview", 640, 427)
     preview_large, preview_large_avif = image_specs(
@@ -126,7 +141,12 @@ class Service(SeoModel):
     )
     price_unit = models.CharField("За что", max_length=128, blank=True, help_text="Например: час, сутки, человек.")
     is_published = models.BooleanField(
-        "Опубликовано", default=True, help_text="На сайте услуга видна только внутри опубликованной категории."
+        "Опубликовано",
+        default=True,
+        help_text=(
+            "В списках услуга видна только внутри опубликованной категории; "
+            "отдельная страница открывается и по прямой ссылке."
+        ),
     )
     has_page = models.BooleanField(
         "Отдельная страница", default=False, help_text="Карточка в категории ведёт на страницу услуги."

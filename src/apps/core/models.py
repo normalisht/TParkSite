@@ -75,14 +75,25 @@ class SiteSettings(models.Model):
     header_logo_width = models.PositiveIntegerField(null=True, editable=False)
     header_logo_height = models.PositiveIntegerField(null=True, editable=False)
     header_logo_img = logo_spec("header_logo", HEADER_LOGO_HEIGHT * 3)
-    address = models.CharField("Адрес", max_length=255, blank=True, default=PARK_ADDRESS)
+    address = models.CharField(
+        "Адрес",
+        max_length=255,
+        blank=True,
+        default=PARK_ADDRESS,
+        help_text="Главная, подвал, «Контакты», «О нас» и место мероприятий без своего адреса.",
+    )
     map_embed_url = MapEmbedURLField(
         "Яндекс Карта на странице контактов",
         max_length=1000,
         blank=True,
         help_text="В Яндекс Картах: «Поделиться» → «Встроить карту» → скопируйте код и вставьте сюда целиком.",
     )
-    vk_url = models.URLField("ВКонтакте", max_length=500, blank=True)
+    vk_url = models.URLField(
+        "ВКонтакте",
+        max_length=500,
+        blank=True,
+        help_text="Кнопка в «Связаться», в подвале и на «Контактах». Пусто — кнопки нет.",
+    )
     max_url = models.URLField(
         "MAX", max_length=500, blank=True, help_text="Ссылка на профиль или канал в MAX. Пусто — кнопки нет."
     )
@@ -90,16 +101,22 @@ class SiteSettings(models.Model):
         "Отзывы на Яндекс Картах",
         max_length=500,
         blank=True,
-        help_text="Страница отзывов о Т-Парке: кнопки «Все отзывы» и «Оставить отзыв» на странице отзывов.",
+        help_text=(
+            "Страница отзывов о Т-Парке: кнопки «Все отзывы» и «Оставить отзыв» на страницах отзывов и контактов "
+            "и ссылка «Оставить отзыв» на главной. Пусто — кнопок нет."
+        ),
     )
-    home_intro = HtmlField("Вступление на главной")
+    home_intro = HtmlField(
+        "Вступление на главной",
+        help_text="Текст в начале главной. Он же — описание сайта для поисковиков и соцсетей по умолчанию.",
+    )
     home_show_events = models.BooleanField(
         "Ближайшие мероприятия на главной",
         default=True,
         help_text="Блок появляется, только если есть предстоящие мероприятия.",
     )
-    events_intro = HtmlField("Вступление на странице мероприятий")
-    contacts_text = HtmlField("Текст на странице контактов")
+    events_intro = HtmlField("Вступление на странице мероприятий", help_text="Текст в начале страницы «Мероприятия».")
+    contacts_text = HtmlField("Текст на странице контактов", help_text="Дополнительный текст на странице «Контакты».")
 
     # Страница «О нас»
     about_motto = models.CharField(
@@ -120,7 +137,7 @@ class SiteSettings(models.Model):
     founder_photo = photo_field("Основатель: фото", "about", help_text="Портрет, лучше вертикальный.")
     founder_card, founder_card_avif = image_specs("founder_photo", 600, 750)
     founder_text = HtmlField("Основатель: о нём", help_text="Регалии и роли — удобнее списком.")
-    nearby_text = HtmlField("Что рядом")
+    nearby_text = HtmlField("Что рядом", help_text="Блок «Что рядом» на «О нас»: достопримечательности, жильё, кафе.")
     safety_page = models.ForeignKey(
         "InfoPage",
         verbose_name="Правила безопасности",
@@ -128,7 +145,7 @@ class SiteSettings(models.Model):
         null=True,
         blank=True,
         related_name="+",
-        help_text="Инфо-страница, на которую ведёт плашка «Правила безопасности» на странице «О нас».",
+        help_text="Инфо-страница, на которую ведут плашка «Правила безопасности» на «О нас» и ссылка в подвале.",
     )
     privacy_page = models.ForeignKey(
         "InfoPage",
@@ -238,10 +255,15 @@ class Phone(models.Model):
         "Номер",
         max_length=10,
         validators=[RegexValidator(r"^\d{10}$", "10 цифр без +7 и 8, например 9029856594.")],
+        help_text="10 цифр без +7, 8 и пробелов. Первый номер — главный в кнопке «Связаться».",
     )
     order = models.PositiveIntegerField("Порядок", default=0, db_index=True)
-    is_whatsapp = models.BooleanField("WhatsApp", default=False)
-    is_telegram = models.BooleanField("Telegram", default=False)
+    is_whatsapp = models.BooleanField(
+        "WhatsApp", default=False, help_text="Кнопка WhatsApp ведёт на этот номер. Можно отметить только у одного."
+    )
+    is_telegram = models.BooleanField(
+        "Telegram", default=False, help_text="Кнопка Telegram ведёт на этот номер. Можно отметить только у одного."
+    )
 
     class Meta:
         verbose_name = "Телефон"
@@ -321,8 +343,12 @@ class FounderFact(models.Model):
 class InfoPage(SeoModel):
     title = models.CharField("Заголовок", max_length=255)
     slug = models.SlugField("Адрес страницы", max_length=255, unique=True, blank=True, help_text=SLUG_HELP)
-    body = HtmlField("Текст")
-    is_published = models.BooleanField("Опубликовано", default=True)
+    body = HtmlField("Текст", help_text="Заголовки, списки и ссылки — кнопками редактора.")
+    is_published = models.BooleanField(
+        "Опубликовано",
+        default=True,
+        help_text="Снятая — страница не откроется, ссылок на неё в подвале и на «О нас» не будет.",
+    )
 
     objects = PublishedQuerySet.as_manager()
 

@@ -3,10 +3,15 @@ import re
 import pytest
 from django.conf import settings
 from django.contrib import admin
+from django.core.management import call_command
 from django.urls import resolve, reverse
 
+from apps.catalog.models import Category, CategoryGroup, Service
+from apps.content.models import GalleryPhoto, Partner, Review
 from apps.core.admin import SiteSettingsAdmin
 from apps.core.admin_help import HELP_ANCHORS, HELP_SECTIONS
+from apps.core.models import InfoPage, Phone, SiteSettings
+from apps.texts.registry import BY_KEY
 
 pytestmark = pytest.mark.django_db
 
@@ -134,3 +139,35 @@ def test_every_admin_form_links_to_help(admin_client):
             response = admin_client.get(reverse("admin:{}_{}_add".format(*info)))
         html = response.content.decode()
         assert f"{reverse('admin_help')}#{model_admin.help_anchor}" in html, model
+
+
+def _help(model, field):
+    return str(model._meta.get_field(field).help_text)
+
+
+def test_fields_explain_where_they_show():
+    assert "без даты" in _help(Review, "date")
+    assert "кружок" in _help(Review, "photo")
+    assert "без обрезки" in _help(Partner, "logo")
+    assert "плитка" in _help(Partner, "name")
+    assert "квадрат" in _help(GalleryPhoto, "image")
+    assert "весь экран" in _help(GalleryPhoto, "caption")
+    assert "только у одного" in _help(Phone, "is_whatsapp")
+    assert "только у одного" in _help(Phone, "is_telegram")
+    assert "Связаться" in _help(Phone, "number")
+    assert "подвале" in _help(InfoPage, "is_published")
+    assert "меню «Услуги»" in _help(CategoryGroup, "name")
+    assert "под заголовком" in _help(Category, "description")
+    assert "подвал" in _help(SiteSettings, "address")
+    assert "поисковиков" in _help(SiteSettings, "home_intro")
+
+
+def test_fixed_hints_match_site():
+    assert "главной" in _help(SiteSettings, "reviews_url")
+    assert "подвале" in _help(SiteSettings, "safety_page")
+    assert "прямой ссылке" in _help(Service, "is_published")
+    assert "Отзывы" in BY_KEY["common.photo_strip_title"].where
+
+
+def test_no_missing_migrations():
+    call_command("makemigrations", "--check", "--dry-run", verbosity=0)
