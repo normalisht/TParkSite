@@ -58,3 +58,11 @@ def test_help_covers_basics_photos_catalog(admin_client):
         assert f'<section id="{anchor}">' in html
     for phrase in ("перетаскиванием", "20 МБ", "16:9", "Отдельная страница", "«Ещё в категории»"):
         assert phrase in html, phrase
+
+
+def test_help_covers_events_reviews_gallery(admin_client):
+    html = _help_html(admin_client)
+    for anchor in ("events", "reviews", "gallery"):
+        assert f'<section id="{anchor}">' in html
+    for phrase in ("«Показывать после даты»", "«Подтянуть»", "«Гость Т-Парка»", "«О нас»"):
+        assert phrase in html, phrase

@@ -24,6 +24,9 @@ HELP_SECTIONS = (
     HelpSection("basics", "Общие приёмы"),
     HelpSection("photos", "Фото"),
     HelpSection("catalog", "Каталог: группы, категории, услуги"),
+    HelpSection("events", "Мероприятия"),
+    HelpSection("reviews", "Отзывы"),
+    HelpSection("gallery", "Галерея и партнёры"),
 )
 HELP_ANCHORS = frozenset(section.anchor for section in HELP_SECTIONS)
 
