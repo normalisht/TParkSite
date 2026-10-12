@@ -89,6 +89,8 @@ class ServiceAdminForm(BulkPhotosForm):
 
 @admin.register(CategoryGroup)
 class CategoryGroupAdmin(SiteModelAdmin):
+    help_intro = "Разделы меню «Услуги» в шапке и блоки категорий на главной. Порядок — перетаскиванием."
+    help_anchor = "catalog"
     list_display = ["name", "is_published"]
     list_editable = ["is_published"]
     ordering = ["order", "id"]
@@ -100,6 +102,11 @@ class CategoryGroupAdmin(SiteModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(BulkPhotosAdminMixin, SiteModelAdmin):
+    help_intro = (
+        "Страницы с услугами. В меню и на главной категория появится, когда опубликованы и она, и её группа. "
+        "Новая категория — черновик."
+    )
+    help_anchor = "catalog"
     form = CategoryAdminForm
     photo_model = CategoryPhoto
     photo_owner = "category"
@@ -177,6 +184,11 @@ class ServicePlacementFilter(admin.SimpleListFilter):
 
 @admin.register(Service)
 class ServiceAdmin(BulkPhotosAdminMixin, SiteModelAdmin):
+    help_intro = (
+        "Услуги показываются на страницах категорий, в которые добавлены. "
+        "Фильтр «Видна на сайте» находит услуги, которых посетители не увидят."
+    )
+    help_anchor = "catalog"
     form = ServiceAdminForm
     photo_model = ServicePhoto
     photo_owner = "service"

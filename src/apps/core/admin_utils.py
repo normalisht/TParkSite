@@ -50,7 +50,13 @@ SEO_FIELDSET = (
 
 class SiteModelAdmin(ModelAdmin):
     """Базовая админка проекта: предупреждает при уходе со страницы с несохранёнными изменениями,
-    у SEO-полей показывает счётчики символов и превью сниппета (admin_seo.js)."""
+    у SEO-полей показывает счётчики символов и превью сниппета (admin_seo.js), над списком — вводную
+    `help_intro`, над формой — ссылку на раздел справки `help_anchor` (apps/core/admin_help.py)."""
+
+    help_intro = ""  # 1–2 предложения над списком; доверенный HTML (выводится через |safe)
+    help_anchor = ""  # якорь раздела справки из HELP_SECTIONS
+    list_before_template = "admin/help/list_intro.html"
+    change_form_before_template = "admin/help/form_link.html"
 
     class Media:
         css = {"all": ["css/admin_seo.css"]}

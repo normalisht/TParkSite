@@ -1,0 +1,22 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static 'css/admin_help.css' %}">{% endblock %}
+
+{% block content %}
+<div class="admin-help">
+  <p>Как работать с сайтом Т-Парка: где что править и почему что-то может не появиться на сайте. Ищите по странице — Ctrl+F (на Mac — ⌘+F).</p>
+  <nav id="toc" aria-label="Оглавление" class="admin-help-toc">
+    <ol>
+      {% for section in sections %}<li><a href="#{{ section.anchor }}">{{ section.title }}</a></li>{% endfor %}
+    </ol>
+  </nav>
+  {% for section in sections %}
+  <section id="{{ section.anchor }}">
+    <h2>{{ section.title }}</h2>
+    {% include section.template %}
+    <p class="admin-help-top"><a href="#toc">↑ К оглавлению</a></p>
+  </section>
+  {% endfor %}
+</div>
+{% endblock %}

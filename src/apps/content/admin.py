@@ -31,6 +31,11 @@ class EventPeriodFilter(admin.SimpleListFilter):
 
 @admin.register(Event)
 class EventAdmin(SiteModelAdmin):
+    help_intro = (
+        "Предстоящие — на странице «Мероприятия» и до трёх на главной. "
+        "На следующий день после окончания мероприятие становится прошедшим."
+    )
+    help_anchor = "events"
     list_display = ["title", "date", "is_published", "show_after_date"]
     list_editable = ["is_published"]
     list_filter = [EventPeriodFilter, "is_published", "show_after_date"]
@@ -66,6 +71,8 @@ class OrderedPhotoAdmin(SiteModelAdmin):
 
 @admin.register(Review)
 class ReviewAdmin(SiteModelAdmin):
+    help_intro = "Новые сверху — по дате отзыва. Ссылка на отзыв с Яндекса и кнопка «Подтянуть» заполнят текст и дату."
+    help_anchor = "reviews"
     # Порядок — по дате (Meta.ordering), без перетаскивания.
     list_display = ["__str__", "date", "is_published"]
     list_filter = ["is_published"]
@@ -105,6 +112,8 @@ class ReviewAdmin(SiteModelAdmin):
 
 @admin.register(Partner)
 class PartnerAdmin(OrderedPhotoAdmin):
+    help_intro = "Логотипы в блоке «Партнёры» на странице «О нас». Порядок — перетаскиванием."
+    help_anchor = "gallery"
     list_display = ["preview", "name", "link"]
     list_display_links = ["preview", "name"]
     fields = ["name", "link", "logo", "order"]
@@ -113,6 +122,11 @@ class PartnerAdmin(OrderedPhotoAdmin):
 
 @admin.register(GalleryPhoto)
 class GalleryPhotoAdmin(OrderedPhotoAdmin):
+    help_intro = (
+        "Фото для страницы «Галерея» и полосы «Как это выглядит» на главной, «О нас» и «Отзывах». "
+        "Порядок — перетаскиванием."
+    )
+    help_anchor = "gallery"
     list_display = ["preview", "caption"]
     list_display_links = ["preview", "caption"]
     fields = ["image", "caption", "order"]

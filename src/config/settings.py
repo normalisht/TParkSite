@@ -265,6 +265,7 @@ UNFOLD = {
         "show_search": False,
         "show_all_applications": False,
         "navigation": [
+            {"items": [_nav("Справка", "help", "admin_help")]},
             {
                 "title": "Каталог",
                 "items": [

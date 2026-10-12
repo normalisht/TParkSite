@@ -1,0 +1,3 @@
+{% with model_admin=cl.model_admin %}{% if model_admin.help_anchor %}
+<p class="mb-4 text-sm text-base-500">{% if model_admin.help_intro %}{{ model_admin.help_intro|safe }} {% endif %}<a href="{% url 'admin_help' %}#{{ model_admin.help_anchor }}" class="text-primary-600 underline dark:text-primary-500">Подробнее в справке →</a></p>
+{% endif %}{% endwith %}
