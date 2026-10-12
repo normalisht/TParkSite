@@ -1,8 +1,11 @@
 import re
 
 import pytest
-from django.urls import reverse
+from django.conf import settings
+from django.contrib import admin
+from django.urls import resolve, reverse
 
+from apps.core.admin import SiteSettingsAdmin
 from apps.core.admin_help import HELP_ANCHORS, HELP_SECTIONS
 
 pytestmark = pytest.mark.django_db
@@ -90,3 +93,44 @@ def test_help_sections_complete(admin_client):
     html = _help_html(admin_client)
     for phrase in ("WhatsApp", "«Восстановить»", "[укажите", "Вебмастер", "30 минут"):
         assert phrase in html, phrase
+
+
+def _sidebar_admins():
+    for group in settings.UNFOLD["SIDEBAR"]["navigation"]:
+        for item in group["items"]:
+            model_admin = getattr(resolve(str(item["link"])).func, "model_admin", None)
+            if model_admin is not None:
+                yield model_admin
+
+
+def test_every_sidebar_section_has_help():
+    admins = list(_sidebar_admins())
+    assert len(admins) == 13
+    for model_admin in admins:
+        assert model_admin.help_anchor in HELP_ANCHORS, model_admin
+        if not isinstance(model_admin, SiteSettingsAdmin):
+            assert model_admin.help_intro, model_admin
+
+
+def test_help_anchors_exist():
+    for model_admin in admin.site._registry.values():
+        if getattr(model_admin, "help_anchor", ""):
+            assert model_admin.help_anchor in HELP_ANCHORS, model_admin
+
+
+def test_changelist_shows_intro_and_help_link(admin_client):
+    html = admin_client.get(reverse("admin:content_galleryphoto_changelist")).content.decode()
+    assert "Как это выглядит" in html
+    assert f"{reverse('admin_help')}#gallery" in html
+
+
+def test_every_admin_form_links_to_help(admin_client):
+    for model, model_admin in admin.site._registry.items():
+        if not getattr(model_admin, "help_anchor", ""):
+            continue
+        info = (model._meta.app_label, model._meta.model_name)
+        response = admin_client.get(reverse("admin:{}_{}_changelist".format(*info)), follow=True)
+        if model_admin.has_add_permission(response.wsgi_request):
+            response = admin_client.get(reverse("admin:{}_{}_add".format(*info)))
+        html = response.content.decode()
+        assert f"{reverse('admin_help')}#{model_admin.help_anchor}" in html, model

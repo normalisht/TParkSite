@@ -87,6 +87,7 @@ class FounderFactInline(TabularInline):
 
 @admin.register(SiteSettings)
 class SiteSettingsAdmin(SiteModelAdmin):
+    help_anchor = "settings"  # списка нет — сразу форма, вводная не нужна
     inlines = [PhoneInline, ParkFormatInline, FounderFactInline]
     # Unfold ставит URL-полям <input type="url">: браузер не пропустит вставленный код <iframe>.
     formfield_overrides = {MapEmbedURLField: {"widget": UnfoldAdminTextareaWidget(attrs={"rows": 3})}}
@@ -178,6 +179,11 @@ class SiteSettingsAdmin(SiteModelAdmin):
 
 @admin.register(InfoPage)
 class InfoPageAdmin(SiteModelAdmin):
+    help_intro = (
+        "Отдельные страницы с текстом: правила, политика конфиденциальности. В меню их нет — "
+        "ссылки выбираются в «Настройках сайта» или копируются из формы."
+    )
+    help_anchor = "info-pages"
     list_display = ["title", "page_url", "is_published"]
     list_editable = ["is_published"]
     list_filter = ["is_published"]
@@ -201,6 +207,11 @@ class InfoPageAdmin(SiteModelAdmin):
 
 @admin.register(Redirect)
 class RedirectAdmin(SiteModelAdmin):
+    help_intro = (
+        "Перенаправления со старых адресов на новые. Создаются сами, когда меняют «Адрес страницы»; "
+        "вручную добавлять нужно редко."
+    )
+    help_anchor = "basics"
     list_display = ["old_path", "new_path", "created_at"]
     search_fields = ["old_path", "new_path"]
     fields = ["old_path", "new_path"]
@@ -215,8 +226,11 @@ class UserAdmin(BaseUserAdmin, SiteModelAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
     change_password_form = AdminPasswordChangeForm
+    help_intro = "Учётные записи для входа в админку."
+    help_anchor = "access"
 
 
 @admin.register(Group)
 class GroupAdmin(BaseGroupAdmin, SiteModelAdmin):
-    pass
+    help_intro = "Наборы прав: какие разделы пользователь может смотреть и менять."
+    help_anchor = "access"

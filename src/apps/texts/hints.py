@@ -17,3 +17,15 @@ def _texts_hint(*pages: Page) -> str:
 
 # Описание вкладки настроек: рендерится при показе формы (URL-ы к этому моменту уже загружены).
 texts_hint = lazy(_texts_hint, str)
+
+
+def _texts_intro() -> str:
+    return format_html(
+        "Короткие фразы и заголовки блоков витрины. Вступления и длинные тексты страниц («О нас», биография, "
+        '«Что рядом», текст контактов) — в <a href="{}" class="text-primary-600 underline">«Настройках сайта»</a>.',
+        reverse("admin:core_sitesettings_changelist"),
+    )
+
+
+# Вводная над списком «Текстов сайта»: ссылка собирается при показе (URL-ы к этому моменту уже загружены).
+texts_intro = lazy(_texts_intro, str)()
