@@ -11,6 +11,7 @@ from apps.content.models import GalleryPhoto, Partner, Review
 from apps.core.admin import SiteSettingsAdmin
 from apps.core.admin_help import HELP_ANCHORS, HELP_SECTIONS
 from apps.core.models import InfoPage, Phone, SiteSettings
+from apps.texts.models import SiteText
 from apps.texts.registry import BY_KEY
 
 pytestmark = pytest.mark.django_db
@@ -163,7 +164,8 @@ def test_fields_explain_where_they_show():
 
 
 def test_fixed_hints_match_site():
-    assert "главной" in _help(SiteSettings, "reviews_url")
+    assert "Все отзывы на Яндекс Картах" in _help(SiteSettings, "reviews_url")
+    assert "Снятая — услуги нет на сайте" in _help(Service, "is_published")
     assert "подвале" in _help(SiteSettings, "safety_page")
     assert "прямой ссылке" in _help(Service, "is_published")
     assert "Отзывы" in BY_KEY["common.photo_strip_title"].where
@@ -171,3 +173,20 @@ def test_fixed_hints_match_site():
 
 def test_no_missing_migrations():
     call_command("makemigrations", "--check", "--dry-run", verbosity=0)
+
+
+def test_help_text_has_no_wrong_claims(admin_client):
+    html = _help_html(admin_client)
+    assert "маленькие не растягивает" not in html
+    assert "размытыми" in html
+    assert "у неё сменился адрес. Старый адрес сам ведёт на новый" not in html
+
+
+def test_texts_intro_and_form_link(admin_client):
+    html = admin_client.get(reverse("admin:texts_sitetext_changelist")).content.decode()
+    assert "Короткие фразы и заголовки блоков витрины." in html
+    intro = html.split("Короткие фразы и заголовки блоков витрины.", 1)[1].split("</p>", 1)[0]
+    assert reverse("admin:core_sitesettings_changelist") in intro
+    text = SiteText.objects.first()
+    html = admin_client.get(reverse("admin:texts_sitetext_change", args=[text.pk])).content.decode()
+    assert f"{reverse('admin_help')}#texts" in html
