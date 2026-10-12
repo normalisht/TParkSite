@@ -420,10 +420,18 @@ def test_delete_warns_only_about_services_left_without_category(admin_client):
     assert "Каяк" not in html.split("Без категории останутся", 1)[1].split("<", 1)[0]
 
 
-def test_admin_index_has_instructions(admin_client):
+def test_admin_index_has_quick_start(admin_client):
     html = admin_client.get(reverse("admin:index")).content.decode()
-    for heading in ("Как добавить услугу", "Как показать категорию в меню", "Фото", "Адрес страницы"):
-        assert heading in html
+    assert "Быстрый старт" in html
+    assert reverse("admin_help") in html
+    for name in (
+        "admin:catalog_service_add",
+        "admin:content_event_add",
+        "admin:content_review_add",
+        "admin:content_galleryphoto_bulk_upload",
+        "admin:core_sitesettings_changelist",
+    ):
+        assert f'href="{reverse(name)}"' in html, name
 
 
 def test_photo_fields_explain_cropping():
