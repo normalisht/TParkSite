@@ -50,3 +50,11 @@ def test_help_admin_links_open(admin_client):
     for link in links:
         response = admin_client.get(link.replace("&amp;", "&"), follow=True)
         assert response.status_code == 200, link
+
+
+def test_help_covers_basics_photos_catalog(admin_client):
+    html = _help_html(admin_client)
+    for anchor in ("basics", "photos", "catalog"):
+        assert f'<section id="{anchor}">' in html
+    for phrase in ("перетаскиванием", "20 МБ", "16:9", "Отдельная страница", "«Ещё в категории»"):
+        assert phrase in html, phrase

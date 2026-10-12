@@ -21,6 +21,9 @@ class HelpSection(NamedTuple):
 HELP_SECTIONS = (
     HelpSection("structure", "Как устроен сайт"),
     HelpSection("not-visible", "Почему этого не видно на сайте"),
+    HelpSection("basics", "Общие приёмы"),
+    HelpSection("photos", "Фото"),
+    HelpSection("catalog", "Каталог: группы, категории, услуги"),
 )
 HELP_ANCHORS = frozenset(section.anchor for section in HELP_SECTIONS)
 

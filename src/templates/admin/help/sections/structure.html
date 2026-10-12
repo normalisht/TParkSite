@@ -8,7 +8,7 @@
   <thead><tr><th>На сайте</th><th>Где в админке</th></tr></thead>
   <tbody>
     <tr><td>Меню «Услуги» в шапке, категории на главной</td><td><a href="{% url 'admin:catalog_categorygroup_changelist' %}">«Группы категорий»</a> и <a href="{% url 'admin:catalog_category_changelist' %}">«Категории»</a></td></tr>
-    <tr><td>Страница категории: текст, фото, список услуг</td><td><a href="{% url 'admin:catalog_category_changelist' %}">«Категории»</a> (вкладки «Основное», «Фото», «Услуги»)</td></tr>
+    <tr><td>Страница категории: текст, фото, список услуг</td><td><a href="{% url 'admin:catalog_category_changelist' %}">«Категории»</a> (вкладки «Основное», «Фото категории», «Услуги»)</td></tr>
     <tr><td>Услуга: цена, описание, своя страница</td><td><a href="{% url 'admin:catalog_service_changelist' %}">«Услуги»</a></td></tr>
     <tr><td>Вступление и цитата на главной, блок мероприятий на главной</td><td><a href="{% url 'admin:core_sitesettings_changelist' %}">«Настройки сайта»</a>, вкладки «Главная» и «О нас»</td></tr>
     <tr><td>Мероприятия</td><td><a href="{% url 'admin:content_event_changelist' %}">«Мероприятия»</a>; вступление — «Настройки сайта», вкладка «Мероприятия и контакты»</td></tr>
