@@ -22,8 +22,8 @@ class OrderedModel(models.Model):
 
 PARK_ADDRESS = "Калужская область, Жуковский район, село Восход"
 DEFAULT_TITLE_SUFFIX = "Т-Парк, Калужская область"
-# Высота логотипа в шапке, px (класс h-10 в partials/header.html).
-HEADER_LOGO_HEIGHT = 40
+# Высота логотипа в шапке, px (класс h-11 в partials/header.html и 500.html).
+HEADER_LOGO_HEIGHT = 44
 
 
 class SeoModel(models.Model):
@@ -67,8 +67,10 @@ class SiteSettings(models.Model):
         fmt=None,
         width_field="header_logo_width",
         height_field="header_logo_height",
-        help_text="PNG с прозрачным фоном, горизонтальный, высотой от 120 px. Показывается в шапке высотой 40 px "
-        "и в разметке для поисковиков. Пусто — стандартный логотип.",
+        help_text="PNG с прозрачным фоном, горизонтальный, высотой от 132 px. В шапке — высотой 44 px, по центру "
+        "между краями картинки: если над надписью что-то выступает (как солнце), оставьте снизу прозрачное поле той же "
+        "высоты, иначе надпись окажется ниже кнопок. Ещё логотип попадает в разметку для поисковиков. "
+        "Пусто — стандартный логотип.",
     )
     header_logo_width = models.PositiveIntegerField(null=True, editable=False)
     header_logo_height = models.PositiveIntegerField(null=True, editable=False)

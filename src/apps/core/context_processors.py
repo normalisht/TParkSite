@@ -7,8 +7,9 @@ from apps.core.opening_hours import human_opening_hours
 from apps.core.request_cache import cached_on_request
 from apps.core.seo import SITE_DESCRIPTION, absolute_url, plaintext
 
-# Стандартный логотип шапки: 3× от 132×40 (квантованный PNG, грузится вместе с LCP-фото).
-DEFAULT_HEADER_LOGO = ("img/logo-header.png", 132, HEADER_LOGO_HEIGHT)
+# Стандартный логотип шапки: 3× от 119×44 (квантованный PNG, грузится вместе с LCP-фото). Снизу — прозрачное поле
+# высотой с выступ солнца над буквами: надпись по центру картинки, а значит, на одной оси с кнопками шапки.
+DEFAULT_HEADER_LOGO = ("img/logo-header.png", 119, HEADER_LOGO_HEIGHT)
 
 
 def header_logo(site: SiteSettings) -> dict:
