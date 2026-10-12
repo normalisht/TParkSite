@@ -66,3 +66,27 @@ def test_help_covers_events_reviews_gallery(admin_client):
         assert f'<section id="{anchor}">' in html
     for phrase in ("«Показывать после даты»", "«Подтянуть»", "«Гость Т-Парка»", "«О нас»"):
         assert phrase in html, phrase
+
+
+EXPECTED_SECTIONS = [
+    "structure",
+    "not-visible",
+    "basics",
+    "photos",
+    "catalog",
+    "events",
+    "reviews",
+    "gallery",
+    "settings",
+    "texts",
+    "info-pages",
+    "seo",
+    "access",
+]
+
+
+def test_help_sections_complete(admin_client):
+    assert [s.anchor for s in HELP_SECTIONS] == EXPECTED_SECTIONS
+    html = _help_html(admin_client)
+    for phrase in ("WhatsApp", "«Восстановить»", "[укажите", "Вебмастер", "30 минут"):
+        assert phrase in html, phrase
