@@ -9,8 +9,28 @@ document.addEventListener("alpine:init", () => {
     open: false,
     long: true,
     animation: null,
+    width: 0,
     init() {
-      this.$nextTick(() => (this.long = this.$refs.text.scrollHeight > this.$refs.text.clientHeight + 4));
+      // Длинный ли текст, перемеряем при каждой смене ширины: на главной Alpine успевает раньше Swiper (при первом
+      // заходе его скрипт ещё грузится), слайд пока во всю ширину — и отзыв в нём помещается. Высоту не следим:
+      // её меняет сам свёрнутый/раскрытый вид.
+      this.observer = new ResizeObserver(([entry]) => {
+        const width = entry.contentRect.width;
+        if (width === this.width) return;
+        this.width = width;
+        if (!this.open) this.measure();
+      });
+      this.observer.observe(this.$refs.text);
+    },
+    destroy() {
+      this.observer.disconnect();
+    },
+    measure() {
+      // Меряем в свёрнутом виде; класс сразу ставим по результату — промежуточный вид не успевает отрисоваться.
+      const text = this.$refs.text;
+      text.classList.add("is-clamped");
+      this.long = text.scrollHeight > text.clientHeight + 4;
+      text.classList.toggle("is-clamped", this.long);
     },
     toggle() {
       const text = this.$refs.text;

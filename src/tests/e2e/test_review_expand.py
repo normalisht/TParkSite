@@ -1,5 +1,6 @@
 """Плавное раскрытие длинного отзыва в настоящем браузере (make e2e)."""
 
+import time
 from itertools import pairwise
 
 import pytest
@@ -143,3 +144,22 @@ def test_home_carousel_neighbours_do_not_stretch(live_server, browser):
         page.wait_for_timeout(50)
         assert max(page.evaluate("window.neighbours")) == pytest.approx(before[1], abs=1), label
     assert _card_heights(page) == pytest.approx(before, abs=1)
+
+
+def test_home_carousel_clamps_review_when_swiper_loads_late(live_server, browser):
+    """Первый заход на главную: Swiper ещё грузится, когда Alpine меряет отзыв, — слайд пока во всю ширину и отзыв
+    средней длины в нём помещается. После раскладки карусели (слайд — треть ширины) он должен свернуться."""
+    Review.objects.bulk_create([Review(text="<p>" + "Очень понравилось, обязательно приедем ещё. " * 14 + "</p>")] * 3)
+    context = browser.new_context(viewport={"width": 1280, "height": 900})
+
+    def slow_swiper(route):
+        time.sleep(0.5)  # первый заход: скрипт Swiper ещё не в кеше
+        route.continue_()
+
+    context.route("**/swiper-bundle.min.js", slow_swiper)
+    page = context.new_page()
+    page.goto(live_server.url + "/")
+    page.wait_for_load_state("networkidle")
+    page.wait_for_timeout(100)
+    assert page.locator(".swiper-slide").first.get_by_role("button", name="Читать полностью").is_visible()
+    assert "is-clamped" in page.locator(".review-text").first.get_attribute("class")
