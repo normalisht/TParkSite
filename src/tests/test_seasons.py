@@ -6,6 +6,7 @@ from datetime import date
 import pytest
 from django.core.exceptions import ValidationError
 
+from apps.core.models import Season, SiteSettings
 from apps.core.seasons import (
     Kind,
     Mode,
@@ -103,3 +104,47 @@ def test_site_link_accepts(value):
 def test_site_link_rejects(value):
     with pytest.raises(ValidationError):
         validate_site_link(value)
+
+
+@pytest.mark.django_db
+def test_migration_creates_both_seasons():
+    seasons = {s.kind: s for s in Season.objects.all()}
+    assert set(seasons) == {Kind.NEW_YEAR, Kind.WINTER}
+    assert (seasons[Kind.NEW_YEAR].start, seasons[Kind.NEW_YEAR].end) == ("15.12", "14.01")
+    assert (seasons[Kind.WINTER].start, seasons[Kind.WINTER].end) == ("01.12", "28.02")
+    assert all(s.mode == Mode.AUTO and s.settings_id == SiteSettings.load().pk for s in seasons.values())
+    assert [s.kind for s in Season.objects.all()] == [Kind.NEW_YEAR, Kind.WINTER]  # порядок в админке = приоритет
+
+
+@pytest.mark.django_db
+def test_ensure_for_restores_deleted_seasons():
+    site = SiteSettings.load()
+    Season.objects.filter(kind=Kind.WINTER).update(start="05.12")
+    Season.objects.filter(kind=Kind.NEW_YEAR).delete()
+    Season.ensure_for(site)
+    assert Season.objects.get(kind=Kind.NEW_YEAR).start == "15.12"
+    assert Season.objects.get(kind=Kind.WINTER).start == "05.12"  # существующие не трогаем
+
+
+@pytest.mark.django_db
+def test_clean_normalizes_dates_and_validates():
+    season = Season.objects.get(kind=Kind.WINTER)
+    season.start, season.end = "1.12", "28.2"
+    season.full_clean()
+    assert (season.start, season.end) == ("01.12", "28.02")
+    season.end = "31.02"
+    with pytest.raises(ValidationError) as exc:
+        season.full_clean()
+    assert "end" in exc.value.message_dict
+    season.end, season.banner_link = "28.02", "javascript:alert(1)"
+    with pytest.raises(ValidationError) as exc:
+        season.full_clean()
+    assert "banner_link" in exc.value.message_dict
+
+
+def test_logo_display_width():
+    from apps.core.models import logo_display_width
+
+    assert logo_display_width(600, 150) == 176
+    assert logo_display_width(None, 150) is None
+    assert logo_display_width(600, 0) is None

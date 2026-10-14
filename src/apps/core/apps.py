@@ -10,9 +10,10 @@ class CoreConfig(AppConfig):
 
         from apps.core import images
         from apps.core.files import register_file_cleanup
-        from apps.core.models import InfoPage, SiteSettings
+        from apps.core.models import InfoPage, Season, SiteSettings
 
         register_file_cleanup(SiteSettings)
         register_file_cleanup(InfoPage)
+        register_file_cleanup(Season)
         request_started.connect(images.start_request_budget, dispatch_uid="thumbnail-budget-start")
         request_finished.connect(images.end_request_budget, dispatch_uid="thumbnail-budget-end")

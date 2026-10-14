@@ -6,9 +6,10 @@ from django.db import models, transaction
 from django.db.models import Q
 from django.urls import reverse
 
-from apps.core import about_defaults
+from apps.core import about_defaults, seasons
 from apps.core.fields import INFO_HTML_EXTENSIONS, HtmlField, image_specs, logo_spec, og_spec, photo_field
 from apps.core.maps import MapEmbedURLField
+from apps.core.seasons import format_day_month, validate_day_month, validate_site_link
 from apps.core.slugs import SLUG_HELP, unique_slug
 
 
@@ -24,6 +25,13 @@ PARK_ADDRESS = "Калужская область, Жуковский район
 DEFAULT_TITLE_SUFFIX = "Т-Парк, Калужская область"
 # Высота логотипа в шапке, px (класс h-11 в partials/header.html и 500.html).
 HEADER_LOGO_HEIGHT = 44
+
+
+def logo_display_width(width: int | None, height: int | None) -> int | None:
+    """Ширина логотипа в шапке при высоте `HEADER_LOGO_HEIGHT` — для width/height у <img> (без сдвига вёрстки)."""
+    if not (width and height):
+        return None
+    return round(HEADER_LOGO_HEIGHT * width / height)
 
 
 class SeoModel(models.Model):
@@ -344,6 +352,81 @@ class FounderFact(models.Model):
 
     def __str__(self):
         return f"{self.value} {self.label}"
+
+
+class Season(models.Model):
+    """Сезонное оформление (apps/core/seasons.py): по записи на сезон, набор сезонов фиксирован (`Kind`)."""
+
+    Kind = seasons.Kind
+    Mode = seasons.Mode
+    DEFAULT_DATES = {Kind.NEW_YEAR: ("15.12", "14.01"), Kind.WINTER: ("01.12", "28.02")}
+
+    settings = models.ForeignKey(SiteSettings, on_delete=models.CASCADE, related_name="seasons")
+    kind = models.CharField("Сезон", max_length=16, choices=Kind.choices, unique=True, editable=False)
+    mode = models.CharField(
+        "Показ",
+        max_length=8,
+        choices=Mode.choices,
+        default=Mode.AUTO,
+        help_text="«По датам» — тема сама включается и выключается каждый год. «Включено» — сейчас, без учёта дат "
+        "(например, посмотреть, как выглядит). Если подходят оба сезона, показывается «Новый год».",
+    )
+    start = models.CharField("С", max_length=5, validators=[validate_day_month], help_text="День и месяц: 15.12.")
+    end = models.CharField(
+        "По",
+        max_length=5,
+        validators=[validate_day_month],
+        help_text="Включительно. Может быть в следующем году: 15.12 — 14.01.",
+    )
+    logo = photo_field(
+        "Логотип на сезон",
+        "logo",
+        size=(3000, 1000),
+        fmt=None,
+        width_field="logo_width",
+        height_field="logo_height",
+        help_text="Заменяет логотип в шапке, пока тема показывается; требования — как у основного логотипа "
+        "(вкладка «Логотип»). В разметку для поисковиков не попадает. Пусто — основной логотип.",
+    )
+    logo_width = models.PositiveIntegerField(null=True, editable=False)
+    logo_height = models.PositiveIntegerField(null=True, editable=False)
+    logo_img = logo_spec("logo", HEADER_LOGO_HEIGHT * 3)
+    banner_text = models.CharField(
+        "Плашка: текст",
+        max_length=160,
+        blank=True,
+        help_text="Полоса под шапкой на всех страницах, пока тема показывается: например, «Новогодние корпоративы — "
+        "бронируйте даты заранее». Пусто — плашки нет.",
+    )
+    banner_link = models.CharField(
+        "Плашка: ссылка",
+        max_length=500,
+        blank=True,
+        validators=[validate_site_link],
+        help_text="Куда ведёт плашка: адрес страницы сайта (/events/…) или полная ссылка https://…. "
+        "Пусто — плашка без ссылки.",
+    )
+
+    class Meta:
+        verbose_name = "Сезонное оформление"
+        verbose_name_plural = "Сезонное оформление"
+        ordering = ["kind"]  # new_year < winter — как в seasons.PRIORITY
+
+    def __str__(self):
+        return self.get_kind_display()
+
+    def clean(self):
+        for field in ("start", "end"):
+            try:
+                setattr(self, field, format_day_month(getattr(self, field)))
+            except ValueError:
+                pass  # ошибку покажет валидатор поля
+
+    @classmethod
+    def ensure_for(cls, site: SiteSettings) -> None:
+        """Создаёт недостающие сезоны: импорт со сбросом удаляет их вместе с настройками, а добавлять в админке нельзя."""
+        for kind, (start, end) in cls.DEFAULT_DATES.items():
+            cls.objects.get_or_create(kind=kind, defaults={"settings": site, "start": start, "end": end})
 
 
 class InfoPage(SeoModel, OrderedModel):
