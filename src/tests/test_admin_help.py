@@ -166,7 +166,9 @@ def test_fields_explain_where_they_show():
 def test_fixed_hints_match_site():
     assert "Все отзывы на Яндекс Картах" in _help(SiteSettings, "reviews_url")
     assert "Снятая — услуги нет на сайте" in _help(Service, "is_published")
-    assert "подвале" in _help(SiteSettings, "safety_page")
+    assert "«О нас»" in _help(SiteSettings, "safety_page")
+    assert "cookie" in _help(SiteSettings, "privacy_page")
+    assert "рядом с «© Т-Парк»" in _help(InfoPage, "show_in_footer")
     assert "прямой ссылке" in _help(Service, "is_published")
     assert "Отзывы" in BY_KEY["common.photo_strip_title"].where
 

@@ -2,7 +2,7 @@ from django.conf import settings
 from django.templatetags.static import static
 
 from apps.core.images import safe_spec_url
-from apps.core.models import HEADER_LOGO_HEIGHT, SiteSettings
+from apps.core.models import HEADER_LOGO_HEIGHT, InfoPage, SiteSettings
 from apps.core.opening_hours import human_opening_hours
 from apps.core.request_cache import cached_on_request
 from apps.core.seo import SITE_DESCRIPTION, absolute_url, plaintext
@@ -32,9 +32,11 @@ def _site_context(request):
         "phones": phones,
         # Часы работы по-русски: для подвала, главной и страницы контактов.
         "hours": human_opening_hours(settings_obj.opening_hours),
-        # Ссылки в подвале: только опубликованные страницы.
+        # Политика (баннер cookie) и правила (плашка на «О нас»): только опубликованные страницы.
         "privacy_page": privacy_page,
         "safety_page": safety_page,
+        # Инфо-страницы с галочкой «В подвале»; запрос — только при выводе подвала (в админке его нет).
+        "footer_pages": InfoPage.objects.published().filter(show_in_footer=True).only("title", "slug"),
         "whatsapp_phone": next((p for p in phones if p.is_whatsapp), None),
         "telegram_phone": next((p for p in phones if p.is_telegram), None),
         "default_description": plaintext(settings_obj.home_intro) or SITE_DESCRIPTION,

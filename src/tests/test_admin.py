@@ -231,13 +231,14 @@ def test_every_admin_warns_about_unsaved_changes(admin_client):
 
 
 @pytest.mark.parametrize(
-    ("model", "create_kwargs"),
+    ("model", "create_kwargs", "extra"),
     [
-        (Service, {"name": "Баня", "slug": "banya"}),
-        (InfoPage, {"title": "Правила", "slug": "pravila", "body": "<p>Текст</p>"}),
+        (Service, {"name": "Баня", "slug": "banya"}, {}),
+        # У инфо-страниц в списке ещё скрытое поле порядка (перетаскивание).
+        (InfoPage, {"title": "Правила", "slug": "pravila", "body": "<p>Текст</p>"}, {"form-0-order": "0"}),
     ],
 )
-def test_is_published_editable_in_changelist(admin_client, model, create_kwargs):
+def test_is_published_editable_in_changelist(admin_client, model, create_kwargs, extra):
     obj = model.objects.create(is_published=True, **create_kwargs)
     url = reverse(f"admin:{model._meta.app_label}_{model._meta.model_name}_changelist")
     response = admin_client.post(
@@ -247,6 +248,7 @@ def test_is_published_editable_in_changelist(admin_client, model, create_kwargs)
             "form-INITIAL_FORMS": "1",
             "form-0-id": str(obj.pk),
             "_save": "Сохранить",
+            **extra,
         },
     )
     assert response.status_code == 302

@@ -248,15 +248,16 @@ def _footer(client):
     return html[html.index("<footer") : html.index("</footer>")]
 
 
-@pytest.mark.parametrize(
-    ("field", "title"),
-    [("privacy_page", "Политика конфиденциальности"), ("safety_page", "Правила безопасности")],
-)
-def test_footer_legal_link_only_when_published(client, field, title):
+def test_footer_link_by_checkbox_and_only_when_published(client):
+    title = "Правила безопасности"
     page = InfoPage.objects.create(title=title, body="<p>x</p>")
     site = SiteSettings.load()
-    setattr(site, field, page)
+    site.safety_page = page  # выбор в настройках на подвал не влияет
     site.save()
+    assert title not in _footer(client)
+
+    page.show_in_footer = True
+    page.save()
     footer = _footer(client)
     assert f'href="{page.get_absolute_url()}"' in footer
     assert title in footer
@@ -276,11 +277,16 @@ def test_footer_legal_links_without_pages(client):
 
 
 def test_footer_legal_links_separated(client):
-    site = SiteSettings.load()
-    site.privacy_page = InfoPage.objects.create(title="Политика конфиденциальности", body="<p>x</p>")
-    site.safety_page = InfoPage.objects.create(title="Правила безопасности", body="<p>y</p>")
-    site.save()
+    InfoPage.objects.create(title="Политика конфиденциальности", body="<p>x</p>", show_in_footer=True)
+    InfoPage.objects.create(title="Правила безопасности", body="<p>y</p>", show_in_footer=True)
     assert _footer(client).count("·") == 2
+
+
+def test_footer_links_in_admin_order(client):
+    second = InfoPage.objects.create(title="А — вторая", body="<p>x</p>", show_in_footer=True, order=2)
+    first = InfoPage.objects.create(title="Я — первая", body="<p>y</p>", show_in_footer=True, order=1)
+    footer = _footer(client)
+    assert footer.index(first.get_absolute_url()) < footer.index(second.get_absolute_url())
 
 
 def test_reviews_newest_first_and_published(client):

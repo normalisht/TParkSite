@@ -180,13 +180,18 @@ class SiteSettingsAdmin(SiteModelAdmin):
 @admin.register(InfoPage)
 class InfoPageAdmin(SiteModelAdmin):
     help_intro = (
-        "Отдельные страницы с текстом: правила, политика конфиденциальности, вопросы и ответы. В меню их нет — "
-        "ссылки выбираются в «Настройках сайта» или копируются из формы. Вид страницы — поле «Оформление»."
+        "Отдельные страницы с текстом: правила, политика конфиденциальности, вопросы и ответы. В меню их нет; "
+        "ссылка внизу сайта — галочка «В подвале», другие ссылки — в «Настройках сайта» или копируются из формы. "
+        "Вид страницы — поле «Оформление»."
     )
     help_anchor = "info-pages"
-    list_display = ["title", "page_url", "layout", "is_published"]
-    list_editable = ["is_published"]
-    list_filter = ["is_published"]
+    list_display = ["title", "page_url", "layout", "show_in_footer", "is_published"]
+    list_editable = ["show_in_footer", "is_published"]
+    list_filter = ["is_published", "show_in_footer"]
+    # Порядок — в списке админки и ссылок в подвале.
+    ordering = ["order", "id"]
+    ordering_field = "order"
+    hide_ordering_field = True
     search_fields = ["title"]
     prepopulated_fields = {"slug": ("title",)}
     fieldsets = (
@@ -194,7 +199,18 @@ class InfoPageAdmin(SiteModelAdmin):
             "Основное",
             {
                 "classes": ["tab"],
-                "fields": ["title", "slug", "page_url", "lead", "cover", "layout", "body", "is_published"],
+                "fields": [
+                    "title",
+                    "slug",
+                    "page_url",
+                    "lead",
+                    "cover",
+                    "layout",
+                    "body",
+                    "show_in_footer",
+                    "is_published",
+                    "order",
+                ],
             },
         ),
         SEO_FIELDSET,

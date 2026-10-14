@@ -68,3 +68,5 @@ def import_site(db, images: Path, report) -> None:
         report.add("Инфо-страницы")
 
     ensure_privacy_page(InfoPage, SiteSettings)
+    # В старой версии ссылок на инфо-страницы нигде не было; в подвал — только политика конфиденциальности.
+    InfoPage.objects.filter(slug=PRIVACY_SLUG).update(show_in_footer=True)

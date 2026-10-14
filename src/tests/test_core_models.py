@@ -83,10 +83,29 @@ def _privacy_migration():
     return importlib.import_module("apps.core.migrations.0014_privacy_policy")
 
 
+def _footer_migration():
+    return importlib.import_module("apps.core.migrations.0021_info_page_layout")
+
+
+def test_footer_migration_keeps_footer_links_from_settings():
+    site = SiteSettings.load()
+    site.safety_page = InfoPage.objects.create(title="Правила", body="<p>x</p>")
+    site.save()
+    other = InfoPage.objects.create(title="Цены", body="<p>y</p>")
+    _footer_migration().footer_links_and_order(django_apps, None)
+    assert InfoPage.objects.get(pk=site.safety_page.pk).show_in_footer
+    assert InfoPage.objects.get(slug=PRIVACY_SLUG).show_in_footer
+    assert not InfoPage.objects.get(pk=other.pk).show_in_footer
+    # Порядок — прежний, по алфавиту.
+    titles = list(InfoPage.objects.values_list("title", flat=True))
+    assert titles == sorted(titles)
+
+
 def test_privacy_page_created_unpublished_and_selected(client):
     InfoPage.objects.filter(slug=PRIVACY_SLUG).delete()  # миграция могла создать её в тестовой БД
     site = SiteSettings.load()
     _privacy_migration().forwards(django_apps, None)
+    _footer_migration().footer_links_and_order(django_apps, None)
     page = InfoPage.objects.get(slug=PRIVACY_SLUG)
     assert page.title == "Политика конфиденциальности" and not page.is_published
     for required in (

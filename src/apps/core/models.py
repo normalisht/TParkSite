@@ -145,7 +145,10 @@ class SiteSettings(models.Model):
         null=True,
         blank=True,
         related_name="+",
-        help_text="Инфо-страница, на которую ведут плашка «Правила безопасности» на «О нас» и ссылка в подвале.",
+        help_text=(
+            "Инфо-страница, на которую ведёт плашка «Правила безопасности» на «О нас». "
+            "Ссылка в подвале — галочкой «В подвале» у самой страницы."
+        ),
     )
     privacy_page = models.ForeignKey(
         "InfoPage",
@@ -154,7 +157,10 @@ class SiteSettings(models.Model):
         null=True,
         blank=True,
         related_name="+",
-        help_text="Инфо-страница, на которую ведёт ссылка в подвале сайта. Пока не указана или не опубликована — ссылки нет.",
+        help_text=(
+            "Инфо-страница, на которую ведёт ссылка в баннере cookie. Пока не указана или не опубликована — ссылки нет. "
+            "Ссылка в подвале — галочкой «В подвале» у самой страницы."
+        ),
     )
 
     # Разметка организации (schema.org LocalBusiness)
@@ -340,7 +346,7 @@ class FounderFact(models.Model):
         return f"{self.value} {self.label}"
 
 
-class InfoPage(SeoModel):
+class InfoPage(SeoModel, OrderedModel):
     class Layout(models.TextChoices):
         TEXT = "text", "Текст"
         RULES = "rules", "Правила"
@@ -380,13 +386,17 @@ class InfoPage(SeoModel):
         default=True,
         help_text="Снятая — страница не откроется, ссылок на неё в подвале и на «О нас» не будет.",
     )
+    show_in_footer = models.BooleanField(
+        "В подвале",
+        default=False,
+        help_text="Ссылка на страницу внизу каждой страницы сайта, рядом с «© Т-Парк». Только у опубликованной.",
+    )
 
     objects = PublishedQuerySet.as_manager()
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         verbose_name = "Инфо-страница"
         verbose_name_plural = "Инфо-страницы"
-        ordering = ["title"]
 
     def __str__(self):
         return self.title
