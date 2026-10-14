@@ -31,16 +31,18 @@ def test_published_announcement_shows_under_header(client):
 
 
 def test_banner_is_light_and_orange_only_when_clickable(client):
-    """Плашка светлая (тёмно-синяя полоса под белой шапкой выглядела тяжёлой); оранжевый значок — только у плашки со
-    ссылкой: оранжевый на сайте значит «можно нажать»."""
+    """Плашка светлая (тёмно-синяя полоса под белой шапкой выглядела тяжёлой), но насыщеннее кремовой шапки главной,
+    иначе с ней сливается; оранжевая — только со ссылкой (оранжевый на сайте значит «можно нажать»), без ссылки —
+    светло-зелёная, как информационные блоки."""
     item = Announcement.objects.create(text="Корпоративы", link="/events/")
-    html = client.get("/").content.decode()
-    tag = html.split('class="site-banner', 1)[1].split(">", 1)[0]
-    assert "bg-navy" not in tag and "bg-brand-100" in tag
-    assert "bg-brand-500" in _banner(html)  # значок-рупор
+
+    def tag():
+        return client.get("/").content.decode().split('class="site-banner', 1)[1].split(">", 1)[0]
+
+    assert "bg-navy" not in tag() and "bg-brand-300" in tag()
     item.link = ""
     item.save()
-    assert "bg-brand-500" not in _banner(client.get("/").content.decode())
+    assert "bg-brand" not in tag() and "bg-pine-100" in tag()
 
 
 def test_announcement_without_link_is_plain_text(client):
