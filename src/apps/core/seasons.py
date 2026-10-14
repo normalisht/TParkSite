@@ -73,13 +73,17 @@ def _covers_safely(season, day: date) -> bool:
         return False  # кривая дата в базе — не показываем сезон, но и не роняем сайт
 
 
+def _matches(season, day: date) -> bool:
+    return season.mode == Mode.ON or (season.mode == Mode.AUTO and _covers_safely(season, day))
+
+
 def pick(seasons: Iterable, day: date | None = None):
-    """Сезон для показа или None (обычное оформление): включённый вручную важнее дат, среди равных — по PRIORITY."""
+    """Сезон для показа или None (обычное оформление). «Включено» — как будто даты подходят всегда; из подходящих —
+    первый по PRIORITY: ранний снег («Зима» включена в ноябре) не отнимает новогоднюю тему в её даты. Сезон, которого
+    нет в коде (строка осталась после удаления), пропускается — иначе упали бы и сайт, и админка."""
     day = day or today()
-    ranked = sorted(seasons, key=lambda s: PRIORITY.index(s.kind))
-    if forced := [s for s in ranked if s.mode == Mode.ON]:
-        return forced[0]
-    return next((s for s in ranked if s.mode == Mode.AUTO and _covers_safely(s, day)), None)
+    shown = [s for s in seasons if s.kind in PRIORITY and _matches(s, day)]
+    return min(shown, key=lambda s: PRIORITY.index(s.kind), default=None)
 
 
 _url_validator = URLValidator(

@@ -6,7 +6,7 @@ import pytest
 
 pytest.importorskip("playwright")
 
-from apps.core.models import Season, SiteSettings
+from apps.core.models import InfoPage, Season, SiteSettings
 from tests.e2e.test_mobile_layout import FIND_OVERFLOW
 
 pytestmark = [pytest.mark.e2e, pytest.mark.django_db(transaction=True)]
@@ -54,4 +54,16 @@ def test_banner_fits_narrow_screen_and_menu_still_fits(live_server, browser, new
     panel.wait_for(state="visible")
     box = panel.bounding_box()
     assert box["y"] + box["height"] <= 700 + 1  # меню не уходит за низ экрана
+    context.close()
+
+
+def test_garland_clears_breadcrumbs_on_phone(live_server, browser, new_year):
+    """У инфо-страниц, услуг и мероприятий шапка с py-6: крошки начинаются в 24 px от верха — гирлянда выше них."""
+    info = InfoPage.objects.create(title="Правила посещения парка", body="<p>Текст</p>", is_published=True)
+    context = browser.new_context(viewport={"width": 390, "height": 800}, is_mobile=True, has_touch=True)
+    page = context.new_page()
+    page.goto(live_server.url + info.get_absolute_url())
+    garland = page.locator(".season-garland").bounding_box()
+    first = page.locator(".page-hero nav, .page-hero h1").first.bounding_box()
+    assert garland["y"] + garland["height"] <= first["y"] + 1
     context.close()

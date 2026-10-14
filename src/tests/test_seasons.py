@@ -84,16 +84,26 @@ def test_pick_by_dates_new_year_wins_overlap():
     assert pick([WINTER, NEW_YEAR], date(2026, 10, 14)) is None
 
 
-def test_pick_forced_beats_dates_and_off_never_shows():
+def test_pick_forced_shows_any_day_but_new_year_still_wins_its_dates():
+    """«Включено» — как будто даты подходят всегда; «Новый год» в свои даты всё равно важнее (ранний снег в ноябре
+    не отнимает у сайта новогоднюю тему и плашку)."""
     forced_winter = S(Kind.WINTER, mode=Mode.ON)
-    assert pick([forced_winter, NEW_YEAR], date(2026, 12, 31)) is forced_winter
+    assert pick([forced_winter, NEW_YEAR], date(2026, 12, 31)) is NEW_YEAR
+    assert pick([forced_winter, NEW_YEAR], date(2026, 11, 20)) is forced_winter
     assert pick([forced_winter], date(2026, 7, 1)) is forced_winter
+    forced_new_year = S(Kind.NEW_YEAR, mode=Mode.ON, start="15.12", end="14.01")
+    assert pick([WINTER, forced_new_year], date(2026, 12, 5)) is forced_new_year
     assert pick([S(Kind.NEW_YEAR, mode=Mode.OFF, start="15.12", end="14.01")], date(2026, 12, 31)) is None
 
 
 def test_pick_ignores_broken_dates():
     """Кривая дата в базе (в обход формы) — сезон не показывается, сайт не падает."""
     assert pick([S(Kind.WINTER, start="31.02", end="bad")], date(2026, 12, 31)) is None
+
+
+def test_pick_skips_unknown_kind():
+    """Строка с сезоном, которого больше нет в коде (переименовали без миграции), не роняет сайт и админку."""
+    assert pick([S("summer", mode=Mode.ON), WINTER], date(2026, 12, 5)) is WINTER
 
 
 def test_pick_uses_today(monkeypatch):
