@@ -1,5 +1,5 @@
 """Рисует сезонные варианты стандартного логотипа шапки: зимой — снежные шапки на буквах и ёлке, на Новый год —
-ещё шарики и звезда, осенью — листья на буквах и в воздухе.
+ещё шарики и звезда, осенью — крупные листья на буквах, у их подножия и в воздухе.
 Запуск из корня: `uv run --project src python scripts/draw_season_logos.py`.
 
 Источник — src/static/img/logo-header.png (357×132, 3× от 119×44); результат того же размера, чтобы шапка не сдвинулась:
@@ -225,7 +225,7 @@ def draw_leaf(draw, x, y, angle, length, colors):
     def point(u, v):
         return ((x + u * cos - v * sin) * SS, (y + u * sin + v * cos) * SS)
 
-    width = length * 0.36
+    width = length * 0.34
     outline = [
         point(length * t, -width * math.sin(math.pi * t))
         for t in (i / 16 for i in range(17))
@@ -242,24 +242,22 @@ def draw_leaf(draw, x, y, angle, length, colors):
     )
 
 
-def draw_autumn(draw, segs):
-    """Листья лежат на верхних гранях букв (на широких планках «Т» и «П» — по два) и летят над тире и в пустом верху."""
+def baseline(im):
+    """Нижний край букв: ниже — прозрачное поле (компенсирует выступ солнца сверху)."""
+    px, (w, h) = im.load(), im.size
+    return max(y for y in range(h) for x in range(w) if is_navy(px[x, y]))
+
+
+def draw_autumn(draw, segs, ground):
+    """Немного крупных листьев, чтобы читались в шапке высотой 44 px: два лежат на верхних гранях букв, три — у их
+    подножия (в прозрачном поле под буквами), два летят."""
     colors = iter(LEAVES * 4)
-    for x0, x1, y in segs:
-        width = x1 - x0
-        if width < 10:
-            continue
-        spots = [0.18, 0.62] if width >= 40 else [0.45]
-        for i, t in enumerate(spots):
-            length = 17 if width >= 24 else 12
-            draw_leaf(
-                draw, x0 + width * t, y - 3.2, -10 if i % 2 else 7, length, next(colors)
-            )
-    for x, y, angle, length in (
-        (62, 50, 35, 15),
-        (40, 10, -25, 14),
-        (272, 12, 150, 15),
-    ):
+    wide = [seg for seg in segs if seg[1] - seg[0] >= 24]  # планки «Т», «П», верх «Р»
+    for (x0, x1, y), t, angle in zip(wide[:2], (0.28, 0.5), (-6, 8)):
+        draw_leaf(draw, x0 + (x1 - x0) * t, y - 4.2, angle, 24, next(colors))
+    for x, angle, length in ((10, -6, 26), (118, 7, 24), (318, -4, 26)):
+        draw_leaf(draw, x, ground + 4.5, angle, length, next(colors))
+    for x, y, angle, length in ((60, 47, 35, 20), (300, 9, 150, 20)):
         draw_leaf(draw, x, y, angle, length, next(colors))
 
 
@@ -270,7 +268,7 @@ def render(base, kind):
     layer = Image.new("RGBA", (w * SS, h * SS), (0, 0, 0, 0))
     draw = ImageDraw.Draw(layer)
     if kind == "autumn":
-        draw_autumn(draw, segs)
+        draw_autumn(draw, segs, baseline(base))
     else:
         draw_snow(draw, segs, random.Random(7))
     if kind == "new_year":

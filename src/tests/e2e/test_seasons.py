@@ -7,6 +7,7 @@ import pytest
 pytest.importorskip("playwright")
 
 from apps.core.models import Announcement, InfoPage, Season, SiteSettings
+from tests.e2e.test_admin_chrome import admin_page  # noqa: F401
 from tests.e2e.test_mobile_layout import FIND_OVERFLOW
 
 pytestmark = [pytest.mark.e2e, pytest.mark.django_db(transaction=True)]
@@ -84,3 +85,17 @@ def test_autumn_leaves_drift(live_server, page, monkeypatch):
     assert drift.strip() not in ("", "0", "0px")
     hero_bg = page.eval_on_selector(".page-hero", "el => getComputedStyle(el).backgroundImage")
     assert "251, 233, 210" in hero_bg  # maple-100 #fbe9d2
+
+
+def test_admin_season_tabs_show_one_form(admin_page, live_server):  # noqa: F811
+    Season.ensure_for(SiteSettings.load())
+    page = admin_page
+    page.goto(f"{live_server.url}/admin/core/sitesettings/1/change/")
+    page.get_by_role("link", name="Сезонное оформление").first.click()
+    forms = page.locator("#seasons-data > .form-group")
+    assert [forms.nth(i).is_visible() for i in range(3)] == [True, False, False]
+    page.locator("[data-season-tab]", has_text="Зима").click()
+    assert [forms.nth(i).is_visible() for i in range(3)] == [False, True, False]
+    # На других вкладках формы настроек табов сезонов не видно.
+    page.get_by_role("link", name="Основное").first.click()
+    page.locator("[data-season-tabs]").wait_for(state="hidden")

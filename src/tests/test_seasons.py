@@ -13,6 +13,7 @@ from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 from PIL import Image
 
+from apps.core import seasons
 from apps.core.models import Season, SiteSettings
 from apps.core.seasons import (
     Kind,
@@ -346,3 +347,28 @@ def test_drawn_season_logos_match_default(kind):
     path = Path(settings.BASE_DIR) / f"static/img/logo-header-{kind}.png"
     assert Image.open(path).size == (357, 132)
     assert path.stat().st_size < 8 * 1024
+
+
+def _season_tabs(html):
+    return html.split("data-season-tabs", 1)[1].split("</nav>", 1)[0]
+
+
+@pytest.mark.django_db
+def test_admin_seasons_switch_by_tabs(admin_client):
+    """Сезоны в форме — табами (а не формами подряд): по кнопке на сезон, по старшинству."""
+    tabs = _season_tabs(admin_client.get(SETTINGS_URL).content.decode())
+    assert tabs.count("data-season-tab=") == 3
+    assert tabs.index("Новый год") < tabs.index("Зима") < tabs.index("Осень")
+
+
+@pytest.mark.django_db
+def test_admin_season_tab_marks_errors(admin_client):
+    # Порядок форм — как на странице (по старшинству): админка сопоставляет формы и записи по номеру.
+    by_kind = {s.kind: s for s in Season.objects.all()}
+    seasons_data = [(by_kind[kind], {"mode": "auto", "start": "01.09", "end": "31.10"}) for kind in seasons.PRIORITY]
+    seasons_data[1] = (by_kind[Kind.WINTER], {"mode": "auto", "start": "31.02", "end": "01.03"})
+    html = admin_client.post(SETTINGS_URL, _season_post(seasons_data)).content.decode()
+    tabs = _season_tabs(html)
+    winter_tab = tabs.split("Зима", 1)[1].split("</button>", 1)[0]
+    assert 'data-testid="error-count"' in winter_tab
+    assert 'data-testid="error-count"' not in tabs.split("Зима", 1)[0]

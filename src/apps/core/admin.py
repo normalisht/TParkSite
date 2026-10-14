@@ -91,6 +91,7 @@ class SeasonInline(StackedInline):
     """Сезонное оформление: набор сезонов фиксирован (apps/core/seasons.py) — без добавления и удаления."""
 
     model = Season
+    template = "admin/core/season/tabs_inline.html"  # сезоны — табами, а не формами подряд
     extra = 0
     tab = True
     can_delete = False
