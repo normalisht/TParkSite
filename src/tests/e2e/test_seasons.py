@@ -6,7 +6,7 @@ import pytest
 
 pytest.importorskip("playwright")
 
-from apps.core.models import InfoPage, Season, SiteSettings
+from apps.core.models import Announcement, InfoPage, Season, SiteSettings
 from tests.e2e.test_mobile_layout import FIND_OVERFLOW
 
 pytestmark = [pytest.mark.e2e, pytest.mark.django_db(transaction=True)]
@@ -18,19 +18,17 @@ ANIMATION = "(sel) => getComputedStyle(document.querySelector(sel), '::before').
 def new_year(monkeypatch):
     monkeypatch.setattr("apps.core.seasons.today", lambda: date(2026, 12, 31))
     Season.ensure_for(SiteSettings.load())  # transaction=True очищает базу — записи из миграции пропадают
-    Season.objects.filter(kind=Season.Kind.NEW_YEAR).update(
-        banner_text="Новогодние корпоративы в Т-Парке — бронируйте даты заранее", banner_link="/events/"
-    )
+    Announcement.objects.create(text="Новогодние корпоративы в Т-Парке — бронируйте даты заранее", link="/events/")
 
 
 def test_decor_is_inert_and_animated(live_server, page, new_year):
     page.goto(live_server.url + "/")
-    for sel in (".season-snow", ".season-garland"):
+    for sel in (".season-particles", ".season-garland"):
         assert page.eval_on_selector(sel, "el => getComputedStyle(el).pointerEvents") == "none"
-    assert page.evaluate(ANIMATION, ".season-snow") == "season-snow"
+    assert page.evaluate(ANIMATION, ".season-particles") == "season-fall"
     hero_bg = page.eval_on_selector(".page-hero", "el => getComputedStyle(el).backgroundImage")
     assert "linear-gradient" in hero_bg and "226, 238, 248" in hero_bg  # frost-100 #e2eef8
-    page.click(".season-banner a")
+    page.click(".site-banner a")
     assert page.url.endswith("/events/")
 
 
@@ -38,7 +36,7 @@ def test_reduced_motion_stops_snow(live_server, browser, new_year):
     context = browser.new_context(reduced_motion="reduce")
     page = context.new_page()
     page.goto(live_server.url + "/")
-    assert page.evaluate(ANIMATION, ".season-snow") == "none"
+    assert page.evaluate(ANIMATION, ".season-particles") == "none"
     context.close()
 
 
@@ -67,3 +65,22 @@ def test_garland_clears_breadcrumbs_on_phone(live_server, browser, new_year):
     first = page.locator(".page-hero nav, .page-hero h1").first.bounding_box()
     assert garland["y"] + garland["height"] <= first["y"] + 1
     context.close()
+
+
+def test_autumn_leaves_drift(live_server, page, monkeypatch):
+    """Осень: тёплый фон шапки и листья — плитка с картинкой, сдвигается не только вниз, но и вбок."""
+    monkeypatch.setattr("apps.core.seasons.today", lambda: date(2026, 10, 14))
+    Season.ensure_for(SiteSettings.load())
+    page.goto(live_server.url + "/")
+    assert page.evaluate("() => document.documentElement.dataset.season") == "autumn"
+    leaves = page.evaluate(
+        "() => getComputedStyle(document.querySelector('.season-particles'), '::before').backgroundImage"
+    )
+    assert "data:image/svg+xml" in leaves
+    assert page.evaluate(ANIMATION, ".season-particles") == "season-fall"
+    drift = page.evaluate(
+        "() => getComputedStyle(document.querySelector('.season-particles'), '::before').getPropertyValue('--drift')"
+    )
+    assert drift.strip() not in ("", "0", "0px")
+    hero_bg = page.eval_on_selector(".page-hero", "el => getComputedStyle(el).backgroundImage")
+    assert "251, 233, 210" in hero_bg  # maple-100 #fbe9d2

@@ -77,6 +77,15 @@ class S:
 
 NEW_YEAR = S(Kind.NEW_YEAR, start="15.12", end="14.01")
 WINTER = S(Kind.WINTER)
+AUTUMN = S(Kind.AUTUMN, start="01.09", end="31.10")
+
+
+def test_pick_autumn_and_priority():
+    assert pick([AUTUMN, WINTER, NEW_YEAR], date(2026, 10, 14)) is AUTUMN
+    # Включённая вручную осень в декабре уступает зиме и Новому году в их даты.
+    forced_autumn = S(Kind.AUTUMN, mode=Mode.ON)
+    assert pick([forced_autumn, WINTER, NEW_YEAR], date(2026, 12, 5)) is WINTER
+    assert pick([forced_autumn, WINTER, NEW_YEAR], date(2026, 7, 14)) is forced_autumn
 
 
 def test_pick_by_dates_new_year_wins_overlap():
@@ -127,11 +136,11 @@ def test_site_link_rejects(value):
 @pytest.mark.django_db
 def test_migration_creates_both_seasons():
     seasons = {s.kind: s for s in Season.objects.all()}
-    assert set(seasons) == {Kind.NEW_YEAR, Kind.WINTER}
+    assert set(seasons) == {Kind.NEW_YEAR, Kind.WINTER, Kind.AUTUMN}
+    assert (seasons[Kind.AUTUMN].start, seasons[Kind.AUTUMN].end) == ("01.09", "31.10")
     assert (seasons[Kind.NEW_YEAR].start, seasons[Kind.NEW_YEAR].end) == ("15.12", "14.01")
     assert (seasons[Kind.WINTER].start, seasons[Kind.WINTER].end) == ("01.12", "28.02")
     assert all(s.mode == Mode.AUTO and s.settings_id == SiteSettings.load().pk for s in seasons.values())
-    assert [s.kind for s in Season.objects.all()] == [Kind.NEW_YEAR, Kind.WINTER]  # порядок в админке = приоритет
 
 
 @pytest.mark.django_db
@@ -154,10 +163,6 @@ def test_clean_normalizes_dates_and_validates():
     with pytest.raises(ValidationError) as exc:
         season.full_clean()
     assert "end" in exc.value.message_dict
-    season.end, season.banner_link = "28.02", "javascript:alert(1)"
-    with pytest.raises(ValidationError) as exc:
-        season.full_clean()
-    assert "banner_link" in exc.value.message_dict
 
 
 def test_logo_display_width():
@@ -178,41 +183,27 @@ def _header(html):
 
 @pytest.mark.django_db
 def test_off_season_page_has_no_decor(client):
-    Season.objects.update(banner_text="Корпоративы")
     html = client.get("/").content.decode()
     assert '<html lang="ru" class="motion-safe:scroll-smooth">' in html
-    assert "season-snow" not in html and "season-banner" not in html
+    assert "season-particles" not in html
 
 
+@pytest.mark.parametrize(
+    ("day", "kind", "garland"),
+    [
+        (date(2026, 12, 31), "new_year", True),
+        (date(2027, 2, 1), "winter", False),
+        (date(2026, 10, 14), "autumn", False),
+    ],
+)
 @pytest.mark.django_db
-def test_new_year_decor_and_banner(client, monkeypatch):
-    _set_today(monkeypatch, date(2026, 12, 31))
-    Season.objects.filter(kind=Kind.NEW_YEAR).update(banner_text="Корпоративы <b>", banner_link="/events/")
+def test_season_decor(client, monkeypatch, day, kind, garland):
+    """Снег или листья — один слой частиц (вид задаёт CSS по data-season), гирлянда — только на Новый год."""
+    _set_today(monkeypatch, day)
     html = client.get("/").content.decode()
-    assert '<html lang="ru" class="motion-safe:scroll-smooth" data-season="new_year">' in html
-    assert 'class="season-snow' in html and 'class="season-garland' in html
-    banner = html.split('class="season-banner', 1)[1].split("</div>", 1)[0]
-    assert '<a href="/events/"' in banner and "Корпоративы &lt;b&gt;" in banner
-    # Плашка — под шапкой, а не над ней (иначе мобильное меню не влезает в экран).
-    assert html.index("</header>") < html.index('class="season-banner') < html.index('<main id="content"')
-
-
-@pytest.mark.django_db
-def test_winter_has_snow_without_garland_and_banner_without_link(client, monkeypatch):
-    _set_today(monkeypatch, date(2027, 2, 1))
-    Season.objects.filter(kind=Kind.WINTER).update(banner_text="Зимние программы")
-    html = client.get("/").content.decode()
-    assert 'data-season="winter"' in html
-    assert 'class="season-snow' in html and "season-garland" not in html
-    banner = html.split('class="season-banner', 1)[1].split("</div>", 1)[0]
-    assert "<a " not in banner and "Зимние программы" in banner
-
-
-@pytest.mark.django_db
-def test_season_without_banner_text_has_no_banner(client, monkeypatch):
-    _set_today(monkeypatch, date(2027, 2, 1))
-    Season.objects.update(banner_link="/events/")
-    assert "season-banner" not in client.get("/").content.decode()
+    assert f'<html lang="ru" class="motion-safe:scroll-smooth" data-season="{kind}">' in html
+    assert 'class="season-particles' in html
+    assert ('class="season-garland' in html) is garland
 
 
 @pytest.mark.django_db
@@ -298,36 +289,40 @@ def test_admin_shows_season_tab_and_status(admin_client, monkeypatch):
     html = admin_client.get(SETTINGS_URL).content.decode()
     assert "Сезонное оформление" in html
     assert 'placeholder="ДД.ММ"' in html
-    assert html.count("Показывается на сайте") == 1 and html.count("Не показывается") == 1
+    assert html.count("Показывается на сайте") == 1 and html.count("Не показывается") == 2
+    # Сезоны в форме — по старшинству: кто важнее при пересечении, тот выше.
+    assert html.index(">Новый год<") < html.index(">Зима<") < html.index(">Осень<")
 
 
 @pytest.mark.django_db
 def test_admin_saves_season_and_normalizes_dates(admin_client):
     season = Season.objects.get(kind=Kind.WINTER)
-    fields = {"mode": "on", "start": "5.12", "end": "1.3", "banner_text": "Зима!", "banner_link": "/events/"}
+    fields = {"mode": "on", "start": "5.12", "end": "1.3"}
     response = admin_client.post(SETTINGS_URL, _season_post([(season, fields)]))
     assert response.status_code == 302, response.content.decode()[:2000]
     season.refresh_from_db()
-    assert (season.mode, season.start, season.end, season.banner_link) == ("on", "05.12", "01.03", "/events/")
+    assert (season.mode, season.start, season.end) == ("on", "05.12", "01.03")
 
 
 @pytest.mark.django_db
 def test_admin_rejects_bad_season_input(admin_client):
     season = Season.objects.get(kind=Kind.WINTER)
-    fields = {"mode": "auto", "start": "31.02", "end": "01.03", "banner_link": "javascript:alert(1)"}
+    fields = {"mode": "auto", "start": "31.02", "end": "01.03"}
     html = admin_client.post(SETTINGS_URL, _season_post([(season, fields)])).content.decode()
-    assert "Дата в виде ДД.ММ" in html and "Адрес страницы сайта" in html
+    assert "Дата в виде ДД.ММ" in html
 
 
 @pytest.mark.django_db
 def test_admin_restores_missing_seasons(admin_client):
     Season.objects.all().delete()
     assert admin_client.get(SETTINGS_URL).status_code == 200
-    assert Season.objects.count() == 2
+    assert Season.objects.count() == 3
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize(("day", "kind"), [(date(2026, 12, 31), "new_year"), (date(2027, 2, 1), "winter")])
+@pytest.mark.parametrize(
+    ("day", "kind"), [(date(2026, 12, 31), "new_year"), (date(2027, 2, 1), "winter"), (date(2026, 10, 14), "autumn")]
+)
 def test_drawn_season_logo_by_default(client, monkeypatch, day, kind):
     """Без своих логотипов в сезон — нарисованный вариант стандартного (scripts/draw_season_logos.py), того же размера."""
     _set_today(monkeypatch, day)

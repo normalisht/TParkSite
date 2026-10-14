@@ -28,6 +28,7 @@ HELP_SECTIONS = (
     HelpSection("reviews", "Отзывы"),
     HelpSection("gallery", "Галерея и партнёры"),
     HelpSection("settings", "Настройки сайта"),
+    HelpSection("announcements", "Плашка под шапкой"),
     HelpSection("texts", "Тексты сайта"),
     HelpSection("info-pages", "Инфо-страницы"),
     HelpSection("seo", "Поиск и SEO"),

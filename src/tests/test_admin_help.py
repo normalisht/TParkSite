@@ -10,7 +10,7 @@ from apps.catalog.models import Category, CategoryGroup, Service
 from apps.content.models import GalleryPhoto, Partner, Review
 from apps.core.admin import SiteSettingsAdmin
 from apps.core.admin_help import HELP_ANCHORS, HELP_SECTIONS
-from apps.core.models import InfoPage, Phone, Season, SiteSettings
+from apps.core.models import Announcement, InfoPage, Phone, Season, SiteSettings
 from apps.texts.models import SiteText
 from apps.texts.registry import BY_KEY
 
@@ -87,6 +87,7 @@ EXPECTED_SECTIONS = [
     "reviews",
     "gallery",
     "settings",
+    "announcements",
     "texts",
     "info-pages",
     "seo",
@@ -97,7 +98,15 @@ EXPECTED_SECTIONS = [
 def test_help_sections_complete(admin_client):
     assert [s.anchor for s in HELP_SECTIONS] == EXPECTED_SECTIONS
     html = _help_html(admin_client)
-    for phrase in ("WhatsApp", "«Восстановить»", "[укажите", "Вебмастер", "30 минут", "Сезонное оформление"):
+    for phrase in (
+        "WhatsApp",
+        "«Восстановить»",
+        "[укажите",
+        "Вебмастер",
+        "30 минут",
+        "Сезонное оформление",
+        "Показывать с",
+    ):
         assert phrase in html, phrase
 
 
@@ -111,7 +120,7 @@ def _sidebar_admins():
 
 def test_every_sidebar_section_has_help():
     admins = list(_sidebar_admins())
-    assert len(admins) == 13
+    assert len(admins) == 14
     for model_admin in admins:
         assert model_admin.help_anchor in HELP_ANCHORS, model_admin
         if not isinstance(model_admin, SiteSettingsAdmin):
@@ -161,7 +170,7 @@ def test_fields_explain_where_they_show():
     assert "под заголовком" in _help(Category, "description")
     assert "подвал" in _help(SiteSettings, "address")
     assert "поисковиков" in _help(SiteSettings, "home_intro")
-    assert "под шапкой" in _help(Season, "banner_text")
+    assert "под шапкой" in _help(Announcement, "text")
     assert "поисковиков" in _help(Season, "logo")
 
 

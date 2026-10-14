@@ -3,6 +3,7 @@ from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ValidationError
+from django.db.models import Case, When
 from django.forms.models import BaseInlineFormSet, ModelForm
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -14,7 +15,7 @@ from unfold.widgets import UnfoldAdminTextareaWidget
 from apps.core import seasons
 from apps.core.admin_utils import SEO_FIELDSET, SiteModelAdmin, copy_url_button, seo_help
 from apps.core.maps import MapEmbedURLField
-from apps.core.models import FounderFact, InfoPage, ParkFormat, Phone, Redirect, Season, SiteSettings
+from apps.core.models import Announcement, FounderFact, InfoPage, ParkFormat, Phone, Redirect, Season, SiteSettings
 from apps.texts.hints import texts_hint
 from apps.texts.registry import Page
 
@@ -93,11 +94,18 @@ class SeasonInline(StackedInline):
     extra = 0
     tab = True
     can_delete = False
-    fields = ["status", "mode", ("start", "end"), "logo", "banner_text", "banner_link"]
+    fields = ["status", "mode", ("start", "end"), "logo"]
     readonly_fields = ["status"]
 
     def has_add_permission(self, request, obj=None):
         return False
+
+    def get_queryset(self, request):
+        # По старшинству (seasons.PRIORITY): кто важнее при пересечении дат, тот выше.
+        rank = Case(
+            *(When(kind=kind, then=i) for i, kind in enumerate(seasons.PRIORITY)), default=len(seasons.PRIORITY)
+        )
+        return super().get_queryset(request).order_by(rank)
 
     def formfield_for_dbfield(self, db_field, request, **kwargs):
         field = super().formfield_for_dbfield(db_field, request, **kwargs)
@@ -113,7 +121,7 @@ class SeasonInline(StackedInline):
 @admin.register(SiteSettings)
 class SiteSettingsAdmin(SiteModelAdmin):
     help_anchor = "settings"  # списка нет — сразу форма, вводная не нужна
-    inlines = [PhoneInline, ParkFormatInline, FounderFactInline, SeasonInline]
+    inlines = [PhoneInline, SeasonInline, ParkFormatInline, FounderFactInline]
     # Unfold ставит URL-полям <input type="url">: браузер не пропустит вставленный код <iframe>.
     formfield_overrides = {MapEmbedURLField: {"widget": UnfoldAdminTextareaWidget(attrs={"rows": 3})}}
     fieldsets = (
@@ -204,6 +212,27 @@ class SiteSettingsAdmin(SiteModelAdmin):
     def change_view(self, request, object_id, form_url="", extra_context=None):
         Season.ensure_for(SiteSettings.load())  # после импорта со сбросом записей сезонов нет, а добавить их нельзя
         return super().change_view(request, object_id, form_url, extra_context)
+
+
+@admin.register(Announcement)
+class AnnouncementAdmin(SiteModelAdmin):
+    help_intro = (
+        "Полоса с текстом и ссылкой под шапкой на всех страницах: акции, корпоративы, изменения в работе. "
+        "Убрать с сайта — снять галочку «Показывать»; одновременно видна одна плашка — первая по порядку."
+    )
+    help_anchor = "announcements"
+    list_display = ["text", "link", "starts_on", "ends_on", "is_published", "status"]
+    list_editable = ["is_published"]
+    list_filter = ["is_published"]
+    ordering = ["order", "id"]
+    ordering_field = "order"
+    hide_ordering_field = True
+    fields = ["text", "link", "is_published", ("starts_on", "ends_on"), "order"]
+
+    @admin.display(description="Сейчас")
+    def status(self, obj):
+        current = Announcement.objects.current(seasons.today())
+        return "Показывается" if current is not None and current.pk == obj.pk else "—"
 
 
 @admin.register(InfoPage)

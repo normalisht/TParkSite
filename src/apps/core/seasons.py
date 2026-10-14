@@ -17,6 +17,7 @@ from django.utils import timezone
 class Kind(models.TextChoices):
     NEW_YEAR = "new_year", "Новый год"
     WINTER = "winter", "Зима"
+    AUTUMN = "autumn", "Осень"
 
 
 class Mode(models.TextChoices):
@@ -25,8 +26,9 @@ class Mode(models.TextChoices):
     OFF = "off", "Выключено"
 
 
-# Если подходят несколько сезонов, показывается тот, что раньше: «Новый год» лежит внутри «Зимы».
-PRIORITY = [Kind.NEW_YEAR, Kind.WINTER]
+# Если подходят несколько сезонов, показывается тот, что раньше (старший): «Новый год» лежит внутри «Зимы»,
+# а ранняя зима, наступившая по датам, важнее осени, оставленной включённой вручную.
+PRIORITY = [Kind.NEW_YEAR, Kind.WINTER, Kind.AUTUMN]
 
 DAY_MONTH_RE = re.compile(r"^\s*(\d{1,2})\.(\d{1,2})\s*$")
 

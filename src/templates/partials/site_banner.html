@@ -1,0 +1,13 @@
+{% load site_tags %}
+{# Плашка (Announcement, «Сайт → Плашки»): под шапкой и уезжает при прокрутке — над шапкой мобильное меню не влезло бы в экран. #}
+{% if announcement %}
+<div class="site-banner bg-navy text-white">
+  {% if announcement.link %}
+  <a href="{{ announcement.link }}" class="mx-auto flex min-h-11 max-w-6xl items-center justify-center gap-1.5 px-4 py-2 text-center text-sm font-semibold hover:underline">
+    <span>{{ announcement.text|nobr }}</span><span class="icon h-4 w-4 text-brand-300" aria-hidden="true">{% include "icons/chevron-right.svg" %}</span>
+  </a>
+  {% else %}
+  <p class="mx-auto max-w-6xl px-4 py-2.5 text-center text-sm font-semibold">{{ announcement.text|nobr }}</p>
+  {% endif %}
+</div>
+{% endif %}

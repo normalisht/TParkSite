@@ -3,7 +3,7 @@ from django.templatetags.static import static
 
 from apps.core import seasons
 from apps.core.images import safe_spec_url
-from apps.core.models import HEADER_LOGO_HEIGHT, InfoPage, Season, SiteSettings, logo_display_width
+from apps.core.models import HEADER_LOGO_HEIGHT, Announcement, InfoPage, Season, SiteSettings, logo_display_width
 from apps.core.opening_hours import human_opening_hours
 from apps.core.request_cache import cached_on_request
 from apps.core.seo import SITE_DESCRIPTION, absolute_url, plaintext
@@ -38,14 +38,17 @@ def header_logo(site: SiteSettings, season: Season | None = None) -> dict:
 def _site_context(request):
     settings_obj = SiteSettings.for_request(request)
     phones = list(settings_obj.phones.all())
+    today = seasons.today()
     # Сезонное оформление (apps/core/seasons.py): одна выборка на запрос, None — обычное.
-    season = seasons.pick(settings_obj.seasons.all())
+    season = seasons.pick(settings_obj.seasons.all(), today)
     privacy_page, safety_page = (
         page if page and page.is_published else None for page in (settings_obj.privacy_page, settings_obj.safety_page)
     )
     return {
         "site": settings_obj,
         "season": season,
+        # Плашка под шапкой (Announcement): от сезона не зависит, одна выборка на запрос.
+        "announcement": Announcement.objects.current(today),
         "header_logo": header_logo(settings_obj, season),
         "phones": phones,
         # Часы работы по-русски: для подвала, главной и страницы контактов.

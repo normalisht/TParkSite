@@ -22,7 +22,7 @@ def no_background_thumbnails(monkeypatch):
 @pytest.fixture(autouse=True)
 def off_season(monkeypatch):
     """Сезонное оформление выбирается по сегодняшней дате — тесты идут в «обычный» день, сезонные подменяют дату сами."""
-    monkeypatch.setattr("apps.core.seasons.today", lambda: date(2026, 10, 14))
+    monkeypatch.setattr("apps.core.seasons.today", lambda: date(2026, 7, 14))
 
 
 @pytest.fixture

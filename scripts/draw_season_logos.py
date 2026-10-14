@@ -1,9 +1,9 @@
-"""Рисует сезонные варианты стандартного логотипа шапки: снежные шапки на буквах и ёлке, на Новый год — ещё
-шарики и звезда. Запуск из корня: `uv run --project src python scripts/draw_season_logos.py`.
+"""Рисует сезонные варианты стандартного логотипа шапки: зимой — снежные шапки на буквах и ёлке, на Новый год —
+ещё шарики и звезда, осенью — листья на буквах и в воздухе.
+Запуск из корня: `uv run --project src python scripts/draw_season_logos.py`.
 
 Источник — src/static/img/logo-header.png (357×132, 3× от 119×44); результат того же размера, чтобы шапка не сдвинулась:
-src/static/img/logo-header-winter.png и logo-header-new_year.png (имена — по Season.Kind). Рисуем с запасом 4× и
-уменьшаем — края сглажены.
+src/static/img/logo-header-<kind>.png (имена — по Season.Kind). Рисуем с запасом 4× и уменьшаем — края сглажены.
 """
 
 import math
@@ -29,6 +29,12 @@ BALLS = [
     (255, 255, 255, 255),
 ]
 STAR = (229, 72, 77, 255)
+# Осенние листья: (заливка, прожилка)
+LEAVES = [
+    ((217, 122, 43, 255), (163, 86, 28, 255)),
+    ((194, 80, 46, 255), (142, 58, 32, 255)),
+    ((227, 167, 47, 255), (168, 122, 28, 255)),
+]
 
 
 def is_navy(p):
@@ -211,18 +217,69 @@ def draw_star(draw, im):
     draw.polygon(points, fill=STAR, outline=(255, 255, 255, 255), width=int(1.3 * SS))
 
 
-def render(base, *, new_year):
+def draw_leaf(draw, x, y, angle, length, colors):
+    """Лист-«лодочка» с прожилкой; (x, y) — черенок, angle — в градусах."""
+    fill, vein = colors
+    cos, sin = math.cos(math.radians(angle)), math.sin(math.radians(angle))
+
+    def point(u, v):
+        return ((x + u * cos - v * sin) * SS, (y + u * sin + v * cos) * SS)
+
+    width = length * 0.36
+    outline = [
+        point(length * t, -width * math.sin(math.pi * t))
+        for t in (i / 16 for i in range(17))
+    ]
+    outline += [
+        point(length * t, width * math.sin(math.pi * t))
+        for t in (i / 16 for i in range(16, -1, -1))
+    ]
+    draw.polygon(outline, fill=fill)
+    draw.line(
+        [point(-length * 0.15, 0), point(length * 0.85, 0)],
+        fill=vein,
+        width=int(0.9 * SS),
+    )
+
+
+def draw_autumn(draw, segs):
+    """Листья лежат на верхних гранях букв (на широких планках «Т» и «П» — по два) и летят над тире и в пустом верху."""
+    colors = iter(LEAVES * 4)
+    for x0, x1, y in segs:
+        width = x1 - x0
+        if width < 10:
+            continue
+        spots = [0.18, 0.62] if width >= 40 else [0.45]
+        for i, t in enumerate(spots):
+            length = 17 if width >= 24 else 12
+            draw_leaf(
+                draw, x0 + width * t, y - 3.2, -10 if i % 2 else 7, length, next(colors)
+            )
+    for x, y, angle, length in (
+        (62, 50, 35, 15),
+        (40, 10, -25, 14),
+        (272, 12, 150, 15),
+    ):
+        draw_leaf(draw, x, y, angle, length, next(colors))
+
+
+def render(base, kind):
     w, h = base.size
     tiers = green_tiers(base)
+    segs = segments(top_surfaces(base))
     layer = Image.new("RGBA", (w * SS, h * SS), (0, 0, 0, 0))
     draw = ImageDraw.Draw(layer)
-    draw_snow(draw, segments(top_surfaces(base)), random.Random(7))
-    if new_year:
+    if kind == "autumn":
+        draw_autumn(draw, segs)
+    else:
+        draw_snow(draw, segs, random.Random(7))
+    if kind == "new_year":
         draw_balls(draw, tiers)
         draw_star(draw, base)
     layer = layer.resize((w, h), Image.LANCZOS)
     out = base.copy()
-    snow_on_tiers(out, tiers)
+    if kind != "autumn":
+        snow_on_tiers(out, tiers)
     out.alpha_composite(layer)
     return out.quantize(
         colors=64, method=Image.Quantize.FASTOCTREE, dither=Image.Dither.NONE
@@ -231,9 +288,9 @@ def render(base, *, new_year):
 
 def main():
     base = Image.open(IMG / "logo-header.png").convert("RGBA")
-    for kind, new_year in (("winter", False), ("new_year", True)):
+    for kind in ("autumn", "winter", "new_year"):
         path = IMG / f"logo-header-{kind}.png"
-        render(base, new_year=new_year).save(path, optimize=True)
+        render(base, kind).save(path, optimize=True)
         print(path.relative_to(IMG.parent.parent.parent), path.stat().st_size, "байт")
 
 
