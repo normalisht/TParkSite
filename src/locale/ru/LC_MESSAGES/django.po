@@ -120,3 +120,9 @@ msgstr "На этой странице нет результатов. Созда
 
 msgid "Type to search"
 msgstr "Введите текст для поиска"
+
+msgid "Welcome back to"
+msgstr "С возвращением в"
+
+msgid "Return to site"
+msgstr "Вернуться на сайт"

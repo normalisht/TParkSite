@@ -23,7 +23,13 @@ document.addEventListener("alpine:init", () => {
       // и запускать анимацию нужно в этой же задаче, иначе браузер успевает нарисовать кадр с конечной высотой.
       text.classList.toggle("is-clamped", this.long && !this.open);
       text.style.overflow = "";
-      if (reducedMotion.matches) return;
+      // data-expanded снимает растяжение слайдов карусели (tailwind/source.css). При сворачивании — только в конце
+      // анимации: иначе соседи сразу вытянулись бы до высоты ещё не свёрнутой карточки.
+      if (this.open) this.$root.dataset.expanded = "";
+      if (reducedMotion.matches) {
+        if (!this.open) delete this.$root.dataset.expanded;
+        return;
+      }
       const to = this.open ? text.scrollHeight : text.getBoundingClientRect().height;
       text.style.overflow = "hidden"; // пока высота меняется, хвост текста не вылезает из карточки
       const animation = text.animate({ maxHeight: [`${from}px`, `${to}px`] }, { duration: DURATION, easing: "ease-out" });
@@ -33,6 +39,7 @@ document.addEventListener("alpine:init", () => {
         if (this.animation !== animation) return;
         this.animation = null;
         text.style.overflow = "";
+        if (!this.open) delete this.$root.dataset.expanded;
       };
     },
   }));

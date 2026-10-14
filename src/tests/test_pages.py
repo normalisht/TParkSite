@@ -351,6 +351,23 @@ def test_photo_strip_rotates_daily(client, make_image, monkeypatch, url):
     assert len(seen) > GalleryPhoto.STRIP_SIZE  # не всегда первые шесть
 
 
+@pytest.mark.parametrize("url", ["/", "/about/", "/reviews/"])
+def test_photo_strip_opens_lightbox(client, make_image, url):
+    _strip_gallery(make_image, 3)
+    html = client.get(url).content.decode()
+    strip = html.split("Как это выглядит")[1].split("</section>")[0]
+    # Фото открывается на весь экран и листается в пределах полосы, а не уводит в галерею.
+    assert strip.count('data-gallery="strip"') == 3 and 'class="glightbox' in strip
+    assert 'data-title="Фото 0"' in strip
+    assert 0 < html.find("vendor/glightbox.min.js") < html.index("js/site.js")  # site.js запускает GLightbox
+    assert "vendor/glightbox.min.css" not in html.split("</head>")[0]  # стили — перед полосой, не блокируют отрисовку
+
+
+def test_pages_without_photos_skip_lightbox(client):
+    for url in ("/", "/about/", "/reviews/"):
+        assert "glightbox" not in client.get(url).content.decode()
+
+
 def test_photo_strip_differs_between_pages(client, make_image, monkeypatch):
     _strip_gallery(make_image, 15)
     monkeypatch.setattr("django.utils.timezone.localdate", lambda: date(2026, 10, 11))

@@ -80,10 +80,12 @@ html.menu-open .cookie-notice { display: none; }
    плавающая «Связаться» его не перекрывает. Без слоя — по той же причине, что и menu-open. */
 html.cookie-open .contact-fab { display: none; }
 
-/* GLightbox на телефоне прячет стрелки (только свайп) — возвращаем их по бокам. Без слоя: иначе vendored-CSS перебьёт. */
+/* GLightbox на телефоне прячет стрелки (только свайп) — возвращаем их по бокам. Без слоя: иначе vendored-CSS перебьёт.
+   .glightbox-container — для специфичности: в полосе фото (content/partials/photo_strip.html) стили GLightbox
+   подключаются в body, после этого файла, и при равной специфичности их top: -100% снова уводил стрелки за экран. */
 @media (max-width: 768px) {
-  .glightbox-clean .gprev,
-  .glightbox-clean .gnext {
+  .glightbox-container.glightbox-clean .gprev,
+  .glightbox-container.glightbox-clean .gnext {
     top: 50%;
     width: 40px;
     height: 40px;
@@ -91,10 +93,10 @@ html.cookie-open .contact-fab { display: none; }
     background-color: rgb(0 0 0 / 0.4);
     transform: translateY(-50%);
   }
-  .glightbox-clean .gprev { left: 8px; }
-  .glightbox-clean .gnext { right: 8px; }
-  .glightbox-clean .gprev svg,
-  .glightbox-clean .gnext svg { width: 20px; }
+  .glightbox-container.glightbox-clean .gprev { left: 8px; }
+  .glightbox-container.glightbox-clean .gnext { right: 8px; }
+  .glightbox-container.glightbox-clean .gprev svg,
+  .glightbox-container.glightbox-clean .gnext svg { width: 20px; }
 }
 
 /* Слайдер фото: точки в цвет бренда, стрелки на тёмной подложке — видны и на светлых фото. Без слоя: иначе vendored-CSS перебьёт. */
@@ -162,6 +164,9 @@ html.cookie-open .contact-fab { display: none; }
   @media (prefers-reduced-motion: reduce) {
     .review-text { transition: none; }
   }
+  /* Карусель отзывов (главная): в покое слайды одной высоты (stretch), а пока отзыв раскрыт — каждый по своему
+     содержимому, иначе соседи вытягиваются до высоты раскрытого пустым местом. data-expanded ставит reviewCard. */
+  .swiper-wrapper:has([data-expanded]) > .swiper-slide { align-self: flex-start; }
 
   /* anywhere: длинный URL в тексте переносится, а не распирает карточку или колонку сетки. */
   .rich-text { @apply leading-relaxed text-ink/85; overflow-wrap: anywhere; }

@@ -110,3 +110,36 @@ def test_reduced_motion_expands_instantly(live_server, browser):
     page.get_by_role("button", name="Читать полностью").click()
     assert not page.evaluate(ANIMATING)
     assert "is-clamped" not in page.locator(".review-text").get_attribute("class")
+
+
+def _card_heights(page):
+    return page.locator(".swiper-slide article").evaluate_all(
+        "(els) => els.map((el) => el.getBoundingClientRect().height)"
+    )
+
+
+def test_home_carousel_neighbours_do_not_stretch(live_server, browser):
+    """Карусель на главной: раскрытый отзыв не вытягивает соседей пустым местом — ни после, ни во время анимации."""
+    Review.objects.bulk_create([Review(text=LONG) for _ in range(3)])
+    page = browser.new_context(viewport={"width": 1280, "height": 900}).new_page()
+    page.goto(live_server.url + "/")
+    page.wait_for_load_state("networkidle")
+    before = _card_heights(page)
+    assert len(set(before)) == 1  # в покое — одной высоты
+    button = page.locator(".swiper-slide").first.get_by_role("button")
+    for label in ("Читать полностью", "Свернуть"):
+        page.evaluate(
+            """() => {
+              const els = [...document.querySelectorAll('.swiper-slide article')].slice(1);
+              window.neighbours = [];
+              const tick = () => { window.neighbours.push(...els.map((el) => el.getBoundingClientRect().height)); requestAnimationFrame(tick); };
+              requestAnimationFrame(tick);
+            }"""
+        )
+        assert button.inner_text() == label
+        button.click(force=True)
+        page.wait_for_timeout(50)
+        page.wait_for_function(f"!({ANIMATING})")
+        page.wait_for_timeout(50)
+        assert max(page.evaluate("window.neighbours")) == pytest.approx(before[1], abs=1), label
+    assert _card_heights(page) == pytest.approx(before, abs=1)

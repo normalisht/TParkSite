@@ -1,5 +1,7 @@
 {% load site_tags site_texts %}
-{# Полоса из нескольких фото галереи со ссылкой на всю галерею («О нас», главная). #}
+{# Полоса из нескольких фото галереи (главная, «О нас», «Отзывы»): по клику — просмотр во весь экран, листается по фото полосы. #}
+{# Полоса ниже первого экрана: стили GLightbox — здесь, а не в vendor_css, чтобы не задерживать первую отрисовку; скрипт — в vendor_js страницы. #}
+{% include "partials/vendor.html" with part="css" glightbox=1 %}
 <div class="mb-4 flex flex-wrap items-end justify-between gap-x-4 gap-y-2 md:mb-6">
   <h2 class="min-w-0 text-2xl font-bold md:text-3xl">{% text "common.photo_strip_title" %}</h2>
   <a href="{% url 'content:gallery' %}" class="inline-flex shrink-0 items-center gap-1 font-semibold text-brand-700 hover:text-brand-600">Вся галерея<span class="icon h-4 w-4">{% include "icons/chevron-right.svg" %}</span></a>
@@ -7,7 +9,7 @@
 <div class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
   {% for photo in photos %}{% with n=forloop.counter|stringformat:"s" %}{% with fallback="Т-Парк — фото "|add:n %}
   {% picture photo "thumb_small 400w, thumb 600w" sizes="(min-width: 1152px) 177px, (min-width: 1024px) calc((100vw - 92px) / 6), (min-width: 768px) calc((100vw - 56px) / 3), calc((100vw - 44px) / 2)" alt=photo.caption|default:fallback width=600 height=600 loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105" as image %}{% if image %}
-  <a href="{% url 'content:gallery' %}" class="group block aspect-square overflow-hidden rounded-xl bg-sand-200">
+  <a href="{{ photo|lightbox_url }}" class="glightbox group block aspect-square cursor-zoom-in overflow-hidden rounded-xl bg-sand-200" data-gallery="strip"{% if photo.caption %} data-title="{{ photo.caption }}"{% endif %}>
     {{ image }}
   </a>
   {% endif %}{% endwith %}{% endwith %}{% endfor %}

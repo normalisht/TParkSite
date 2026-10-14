@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load site_tags site_texts %}
+{% block vendor_js %}{% include "partials/vendor.html" with part="js" glightbox=photos %}{% endblock %}
 {% block content %}
 <section class="page-hero">
   {% include "partials/hero_decor.html" %}
