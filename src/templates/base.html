@@ -1,5 +1,5 @@
 {% load static tailwind_cli site_tags %}<!doctype html>
-<html lang="ru" class="motion-safe:scroll-smooth">
+<html lang="ru" class="motion-safe:scroll-smooth"{% if season %} data-season="{{ season.kind }}"{% endif %}>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -34,6 +34,7 @@
 <body class="flex min-h-screen flex-col bg-white font-sans text-ink antialiased">
   <a href="#content" class="btn btn-primary sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60]">Перейти к содержимому</a>
   {% include "partials/header.html" %}
+  {% include "partials/season_banner.html" %}
   <main id="content" tabindex="-1" class="flex-1 outline-none">{% block content %}{% endblock %}</main>
   {% include "partials/footer.html" %}
   {% if metrika_enabled %}{% include "partials/cookie_notice.html" %}{% endif %}

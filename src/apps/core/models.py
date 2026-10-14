@@ -246,13 +246,6 @@ class SiteSettings(models.Model):
         obj, _ = cls.objects.get_or_create(pk=1)
         return obj
 
-    @property
-    def header_logo_display_width(self) -> int | None:
-        """Ширина логотипа в шапке при высоте `HEADER_LOGO_HEIGHT` — для width/height у <img> (без сдвига вёрстки)."""
-        if not (self.header_logo_width and self.header_logo_height):
-            return None
-        return round(HEADER_LOGO_HEIGHT * self.header_logo_width / self.header_logo_height)
-
     @classmethod
     def for_request(cls, request) -> SiteSettings:
         """Настройки один раз на запрос (контекст-процессоры, JSON-LD); без запроса — как `load()`."""

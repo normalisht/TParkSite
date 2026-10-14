@@ -1,8 +1,9 @@
 from django.conf import settings
 from django.templatetags.static import static
 
+from apps.core import seasons
 from apps.core.images import safe_spec_url
-from apps.core.models import HEADER_LOGO_HEIGHT, InfoPage, SiteSettings
+from apps.core.models import HEADER_LOGO_HEIGHT, InfoPage, Season, SiteSettings, logo_display_width
 from apps.core.opening_hours import human_opening_hours
 from apps.core.request_cache import cached_on_request
 from apps.core.seo import SITE_DESCRIPTION, absolute_url, plaintext
@@ -12,10 +13,19 @@ from apps.core.seo import SITE_DESCRIPTION, absolute_url, plaintext
 DEFAULT_HEADER_LOGO = ("img/logo-header.png", 119, HEADER_LOGO_HEIGHT)
 
 
-def header_logo(site: SiteSettings) -> dict:
-    """Логотип для шапки: из настроек, а если его нет или миниатюра не получилась — стандартный."""
-    if site.header_logo and (url := safe_spec_url(site, "header_logo_img")) and site.header_logo_display_width:
-        return {"url": url, "width": site.header_logo_display_width, "height": HEADER_LOGO_HEIGHT}
+def _uploaded_logo(obj, field: str, spec: str) -> dict | None:
+    width = logo_display_width(getattr(obj, f"{field}_width"), getattr(obj, f"{field}_height"))
+    if getattr(obj, field) and width and (url := safe_spec_url(obj, spec)):
+        return {"url": url, "width": width, "height": HEADER_LOGO_HEIGHT}
+    return None
+
+
+def header_logo(site: SiteSettings, season: Season | None = None) -> dict:
+    """Логотип для шапки: сезонный, если идёт сезон, иначе из настроек; нет файла или миниатюры — следующий,
+    в конце — стандартный."""
+    for obj, field, spec in ((season, "logo", "logo_img"), (site, "header_logo", "header_logo_img")):
+        if obj is not None and (logo := _uploaded_logo(obj, field, spec)):
+            return logo
     path, width, height = DEFAULT_HEADER_LOGO
     return {"url": static(path), "width": width, "height": height}
 
@@ -23,12 +33,15 @@ def header_logo(site: SiteSettings) -> dict:
 def _site_context(request):
     settings_obj = SiteSettings.for_request(request)
     phones = list(settings_obj.phones.all())
+    # Сезонное оформление (apps/core/seasons.py): одна выборка на запрос, None — обычное.
+    season = seasons.pick(settings_obj.seasons.all())
     privacy_page, safety_page = (
         page if page and page.is_published else None for page in (settings_obj.privacy_page, settings_obj.safety_page)
     )
     return {
         "site": settings_obj,
-        "header_logo": header_logo(settings_obj),
+        "season": season,
+        "header_logo": header_logo(settings_obj, season),
         "phones": phones,
         # Часы работы по-русски: для подвала, главной и страницы контактов.
         "hours": human_opening_hours(settings_obj.opening_hours),

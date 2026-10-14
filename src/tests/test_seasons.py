@@ -1,10 +1,14 @@
 """Сезонное оформление: выбор сезона по датам, модель, вывод на сайте."""
 
+import re
 from dataclasses import dataclass
 from datetime import date
+from pathlib import Path
 
 import pytest
 from django.core.exceptions import ValidationError
+from django.db import connection
+from django.test.utils import CaptureQueriesContext
 
 from apps.core.models import Season, SiteSettings
 from apps.core.seasons import (
@@ -17,6 +21,7 @@ from apps.core.seasons import (
     validate_day_month,
     validate_site_link,
 )
+from tests.test_seo import _organization
 
 
 @pytest.mark.parametrize(("value", "expected"), [("15.12", (12, 15)), ("1.3", (3, 1)), (" 29.02 ", (2, 29))])
@@ -148,3 +153,106 @@ def test_logo_display_width():
     assert logo_display_width(600, 150) == 176
     assert logo_display_width(None, 150) is None
     assert logo_display_width(600, 0) is None
+
+
+def _set_today(monkeypatch, day):
+    monkeypatch.setattr("apps.core.seasons.today", lambda: day)
+
+
+def _header(html):
+    return html.split("<header", 1)[1].split("</header>", 1)[0]
+
+
+@pytest.mark.django_db
+def test_off_season_page_has_no_decor(client):
+    Season.objects.update(banner_text="Корпоративы")
+    html = client.get("/").content.decode()
+    assert '<html lang="ru" class="motion-safe:scroll-smooth">' in html
+    assert "season-snow" not in html and "season-banner" not in html
+
+
+@pytest.mark.django_db
+def test_new_year_decor_and_banner(client, monkeypatch):
+    _set_today(monkeypatch, date(2026, 12, 31))
+    Season.objects.filter(kind=Kind.NEW_YEAR).update(banner_text="Корпоративы <b>", banner_link="/events/")
+    html = client.get("/").content.decode()
+    assert '<html lang="ru" class="motion-safe:scroll-smooth" data-season="new_year">' in html
+    assert 'class="season-snow' in html and 'class="season-garland' in html
+    banner = html.split('class="season-banner', 1)[1].split("</div>", 1)[0]
+    assert '<a href="/events/"' in banner and "Корпоративы &lt;b&gt;" in banner
+    # Плашка — под шапкой, а не над ней (иначе мобильное меню не влезает в экран).
+    assert html.index("</header>") < html.index('class="season-banner') < html.index('<main id="content"')
+
+
+@pytest.mark.django_db
+def test_winter_has_snow_without_garland_and_banner_without_link(client, monkeypatch):
+    _set_today(monkeypatch, date(2027, 2, 1))
+    Season.objects.filter(kind=Kind.WINTER).update(banner_text="Зимние программы")
+    html = client.get("/").content.decode()
+    assert 'data-season="winter"' in html
+    assert 'class="season-snow' in html and "season-garland" not in html
+    banner = html.split('class="season-banner', 1)[1].split("</div>", 1)[0]
+    assert "<a " not in banner and "Зимние программы" in banner
+
+
+@pytest.mark.django_db
+def test_season_without_banner_text_has_no_banner(client, monkeypatch):
+    _set_today(monkeypatch, date(2027, 2, 1))
+    Season.objects.update(banner_link="/events/")
+    assert "season-banner" not in client.get("/").content.decode()
+
+
+@pytest.mark.django_db
+def test_season_logo_replaces_header_logo(client, monkeypatch, make_image):
+    _set_today(monkeypatch, date(2026, 12, 31))
+    site = SiteSettings.load()
+    site.header_logo = make_image("main.png", size=(600, 150), fmt="PNG")
+    site.save()
+    season = Season.objects.get(kind=Kind.NEW_YEAR)
+    season.logo = make_image("ny.png", size=(400, 200), fmt="PNG")
+    season.save()
+    header = _header(client.get("/").content.decode())
+    assert re.search(r'<img src="/media/CACHE/[^"]+\.webp" alt="Т-Парк" width="88" height="44"', header)
+    # В разметке для поисковиков — основной логотип.
+    assert _organization(client)["logo"] == f"http://testserver{site.header_logo.url}"
+
+
+@pytest.mark.django_db
+def test_season_logo_falls_back_when_file_missing(client, monkeypatch, make_image):
+    """Файла сезонного логотипа нет (а миниатюра ещё не создана) — в шапке основной."""
+    _set_today(monkeypatch, date(2026, 12, 31))
+    site = SiteSettings.load()
+    site.header_logo = make_image("main.png", size=(600, 150), fmt="PNG")
+    site.save()
+    season = Season.objects.get(kind=Kind.NEW_YEAR)
+    season.logo = make_image("ny.png", size=(400, 200), fmt="PNG")
+    season.save()
+    Path(season.logo.path).unlink()
+    assert re.search(r'width="176" height="44"', _header(client.get("/").content.decode()))
+
+
+@pytest.mark.django_db
+def test_season_logo_ignored_off_season(client, make_image):
+    season = Season.objects.get(kind=Kind.NEW_YEAR)
+    season.logo = make_image("ny.png", size=(400, 200), fmt="PNG")
+    season.save()
+    assert re.search(r'<img src="/static/img/logo-header\.png"', _header(client.get("/").content.decode()))
+
+
+@pytest.mark.django_db
+def test_no_season_rows_renders_plain_site(client, monkeypatch):
+    _set_today(monkeypatch, date(2026, 12, 31))
+    Season.objects.all().delete()
+    response = client.get("/")
+    assert response.status_code == 200 and "data-season" not in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_season_keeps_etag_and_costs_one_query(client, monkeypatch):
+    _set_today(monkeypatch, date(2026, 12, 31))
+    first = client.get("/")
+    assert first["ETag"] == client.get("/")["ETag"]
+    assert client.get("/", HTTP_IF_NONE_MATCH=first["ETag"]).status_code == 304
+    with CaptureQueriesContext(connection) as ctx:
+        client.get("/")
+    assert sum('"core_season"' in q["sql"] for q in ctx.captured_queries) == 1
