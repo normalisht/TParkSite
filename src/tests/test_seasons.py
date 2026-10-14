@@ -9,6 +9,7 @@ import pytest
 from django.core.exceptions import ValidationError
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
+from django.urls import reverse
 
 from apps.core.models import Season, SiteSettings
 from apps.core.seasons import (
@@ -256,3 +257,58 @@ def test_season_keeps_etag_and_costs_one_query(client, monkeypatch):
     with CaptureQueriesContext(connection) as ctx:
         client.get("/")
     assert sum('"core_season"' in q["sql"] for q in ctx.captured_queries) == 1
+
+
+SETTINGS_URL = reverse("admin:core_sitesettings_change", args=[1])
+
+
+def _season_post(seasons_data):
+    """Форма настроек: пустые прочие инлайны + вкладка сезонов."""
+    data = {"address": "село Восход"}
+    for prefix in ("phones", "park_formats", "founder_facts"):
+        data.update({f"{prefix}-TOTAL_FORMS": "0", f"{prefix}-INITIAL_FORMS": "0", f"{prefix}-MIN_NUM_FORMS": "0"})
+    data.update(
+        {
+            "seasons-TOTAL_FORMS": str(len(seasons_data)),
+            "seasons-INITIAL_FORMS": str(len(seasons_data)),
+            "seasons-MIN_NUM_FORMS": "0",
+        }
+    )
+    for i, (season, fields) in enumerate(seasons_data):
+        data.update({f"seasons-{i}-id": str(season.pk), f"seasons-{i}-settings": "1"})
+        data.update({f"seasons-{i}-{key}": value for key, value in fields.items()})
+    return data
+
+
+@pytest.mark.django_db
+def test_admin_shows_season_tab_and_status(admin_client, monkeypatch):
+    _set_today(monkeypatch, date(2026, 12, 31))
+    html = admin_client.get(SETTINGS_URL).content.decode()
+    assert "Сезонное оформление" in html
+    assert 'placeholder="ДД.ММ"' in html
+    assert html.count("Показывается на сайте") == 1 and html.count("Не показывается") == 1
+
+
+@pytest.mark.django_db
+def test_admin_saves_season_and_normalizes_dates(admin_client):
+    season = Season.objects.get(kind=Kind.WINTER)
+    fields = {"mode": "on", "start": "5.12", "end": "1.3", "banner_text": "Зима!", "banner_link": "/events/"}
+    response = admin_client.post(SETTINGS_URL, _season_post([(season, fields)]))
+    assert response.status_code == 302, response.content.decode()[:2000]
+    season.refresh_from_db()
+    assert (season.mode, season.start, season.end, season.banner_link) == ("on", "05.12", "01.03", "/events/")
+
+
+@pytest.mark.django_db
+def test_admin_rejects_bad_season_input(admin_client):
+    season = Season.objects.get(kind=Kind.WINTER)
+    fields = {"mode": "auto", "start": "31.02", "end": "01.03", "banner_link": "javascript:alert(1)"}
+    html = admin_client.post(SETTINGS_URL, _season_post([(season, fields)])).content.decode()
+    assert "Дата в виде ДД.ММ" in html and "Адрес страницы сайта" in html
+
+
+@pytest.mark.django_db
+def test_admin_restores_missing_seasons(admin_client):
+    Season.objects.all().delete()
+    assert admin_client.get(SETTINGS_URL).status_code == 200
+    assert Season.objects.count() == 2
