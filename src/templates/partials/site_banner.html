@@ -1,19 +1,19 @@
 {% load site_tags %}
 {# Плашка (Announcement, «Сайт → Плашки»): под шапкой и уезжает при прокрутке — над шапкой мобильное меню не влезло бы в экран. #}
-{# Светлая, но насыщеннее кремовой шапки главной (иначе сливается); оранжевая — только со ссылкой (оранжевый = можно нажать), без ссылки — светло-зелёная. #}
-{% if announcement.link %}
-<div class="site-banner border-b border-brand-500/40 bg-brand-300 text-ink">
+{# Вересковая, как карточки отзывов: светлая и отличается по тону от кремовой шапки главной; со ссылкой и без — один цвет, кликабельную выдаёт стрелка. #}
+{% if announcement %}
+<div class="site-banner border-b border-heather-300 bg-heather-100 text-ink">
+  {% if announcement.link %}
   <a href="{{ announcement.link }}" class="group mx-auto flex min-h-11 max-w-6xl items-center justify-center gap-3 px-4 py-2 text-sm font-semibold">
-    <span class="icon h-7 w-7 rounded-full bg-white p-1.5 text-brand-700 shadow-sm" aria-hidden="true">{% include "icons/megaphone.svg" %}</span>
+    <span class="icon h-7 w-7 rounded-full bg-white p-1.5 text-heather-700 shadow-sm" aria-hidden="true">{% include "icons/megaphone.svg" %}</span>
     <span class="underline-offset-2 group-hover:underline">{{ announcement.text|nobr }}</span>
-    <span class="icon h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true">{% include "icons/chevron-right.svg" %}</span>
+    <span class="icon h-4 w-4 text-heather-700 transition-transform group-hover:translate-x-0.5" aria-hidden="true">{% include "icons/chevron-right.svg" %}</span>
   </a>
-</div>
-{% elif announcement %}
-<div class="site-banner border-b border-pine-300/60 bg-pine-100 text-ink">
+  {% else %}
   <p class="mx-auto flex min-h-11 max-w-6xl items-center justify-center gap-3 px-4 py-2 text-sm font-semibold">
-    <span class="icon h-7 w-7 rounded-full bg-white p-1.5 text-pine-700 shadow-sm" aria-hidden="true">{% include "icons/megaphone.svg" %}</span>
+    <span class="icon h-7 w-7 rounded-full bg-white p-1.5 text-heather-700 shadow-sm" aria-hidden="true">{% include "icons/megaphone.svg" %}</span>
     <span>{{ announcement.text|nobr }}</span>
   </p>
+  {% endif %}
 </div>
 {% endif %}

@@ -30,19 +30,22 @@ def test_published_announcement_shows_under_header(client):
     assert html.index("</header>") < html.index('class="site-banner') < html.index('<main id="content"')
 
 
-def test_banner_is_light_and_orange_only_when_clickable(client):
-    """Плашка светлая (тёмно-синяя полоса под белой шапкой выглядела тяжёлой), но насыщеннее кремовой шапки главной,
-    иначе с ней сливается; оранжевая — только со ссылкой (оранжевый на сайте значит «можно нажать»), без ссылки —
-    светло-зелёная, как информационные блоки."""
+def test_banner_is_lavender_with_arrow_only_when_clickable(client):
+    """Плашка — вересковая, как карточки отзывов: светлая (тёмно-синяя была тяжёлой) и отличается по тону от кремовой
+    шапки главной (кремовая сливалась). Цвет один со ссылкой и без; кликабельную выдаёт стрелка."""
     item = Announcement.objects.create(text="Корпоративы", link="/events/")
 
-    def tag():
-        return client.get("/").content.decode().split('class="site-banner', 1)[1].split(">", 1)[0]
+    def banner():
+        html = client.get("/").content.decode()
+        return html.split('class="site-banner', 1)[1].split(">", 1)[0], _banner(html)
 
-    assert "bg-navy" not in tag() and "bg-brand-300" in tag()
+    tag, body = banner()
+    assert "bg-heather-100" in tag and "bg-brand" not in tag and "bg-navy" not in tag
+    assert "lucide-chevron-right" in body
     item.link = ""
     item.save()
-    assert "bg-brand" not in tag() and "bg-pine-100" in tag()
+    tag, body = banner()
+    assert "bg-heather-100" in tag and "lucide-chevron-right" not in body
 
 
 def test_announcement_without_link_is_plain_text(client):
