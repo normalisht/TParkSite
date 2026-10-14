@@ -11,6 +11,8 @@ from apps.core.seo import SITE_DESCRIPTION, absolute_url, plaintext
 # Стандартный логотип шапки: 3× от 119×44 (квантованный PNG, грузится вместе с LCP-фото). Снизу — прозрачное поле
 # высотой с выступ солнца над буквами: надпись по центру картинки, а значит, на одной оси с кнопками шапки.
 DEFAULT_HEADER_LOGO = ("img/logo-header.png", 119, HEADER_LOGO_HEIGHT)
+# Он же со снегом (на Новый год — с шариками и звездой), того же размера; рисует scripts/draw_season_logos.py.
+SEASON_HEADER_LOGO = "img/logo-header-{kind}.png"
 
 
 def _uploaded_logo(obj, field: str, spec: str) -> dict | None:
@@ -21,12 +23,15 @@ def _uploaded_logo(obj, field: str, spec: str) -> dict | None:
 
 
 def header_logo(site: SiteSettings, season: Season | None = None) -> dict:
-    """Логотип для шапки: сезонный, если идёт сезон, иначе из настроек; нет файла или миниатюры — следующий,
-    в конце — стандартный."""
+    """Логотип для шапки: загруженный на сезон, затем загруженный в настройках (нет файла или миниатюры — следующий),
+    затем стандартный — в сезон в нарисованном сезонном варианте. Свой основной логотип важнее нарисованного:
+    тот сделан из стандартного и мог устареть вместе с ним."""
     for obj, field, spec in ((season, "logo", "logo_img"), (site, "header_logo", "header_logo_img")):
         if obj is not None and (logo := _uploaded_logo(obj, field, spec)):
             return logo
     path, width, height = DEFAULT_HEADER_LOGO
+    if season is not None:
+        path = SEASON_HEADER_LOGO.format(kind=season.kind)
     return {"url": static(path), "width": width, "height": height}
 
 

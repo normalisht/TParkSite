@@ -380,7 +380,8 @@ class Season(models.Model):
         width_field="logo_width",
         height_field="logo_height",
         help_text="Заменяет логотип в шапке, пока тема показывается; требования — как у основного логотипа "
-        "(вкладка «Логотип»). В разметку для поисковиков не попадает. Пусто — основной логотип.",
+        "(вкладка «Логотип»). В разметку для поисковиков не попадает. Пусто — стандартный логотип со снегом "
+        "(на Новый год — с шариками и звездой), а если загружен свой основной логотип — он.",
     )
     logo_width = models.PositiveIntegerField(null=True, editable=False)
     logo_height = models.PositiveIntegerField(null=True, editable=False)

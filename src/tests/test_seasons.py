@@ -6,10 +6,12 @@ from datetime import date
 from pathlib import Path
 
 import pytest
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
+from PIL import Image
 
 from apps.core.models import Season, SiteSettings
 from apps.core.seasons import (
@@ -322,3 +324,30 @@ def test_admin_restores_missing_seasons(admin_client):
     Season.objects.all().delete()
     assert admin_client.get(SETTINGS_URL).status_code == 200
     assert Season.objects.count() == 2
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(("day", "kind"), [(date(2026, 12, 31), "new_year"), (date(2027, 2, 1), "winter")])
+def test_drawn_season_logo_by_default(client, monkeypatch, day, kind):
+    """Без своих логотипов в сезон — нарисованный вариант стандартного (scripts/draw_season_logos.py), того же размера."""
+    _set_today(monkeypatch, day)
+    header = _header(client.get("/").content.decode())
+    assert f'<img src="/static/img/logo-header-{kind}.png" alt="Т-Парк" width="119" height="44"' in header
+
+
+@pytest.mark.django_db
+def test_uploaded_main_logo_beats_drawn_season_logo(client, monkeypatch, make_image):
+    """Нарисованный вариант — от стандартного логотипа: если загружен свой основной, в сезон показывается он."""
+    _set_today(monkeypatch, date(2026, 12, 31))
+    site = SiteSettings.load()
+    site.header_logo = make_image("main.png", size=(600, 150), fmt="PNG")
+    site.save()
+    assert re.search(r'width="176" height="44"', _header(client.get("/").content.decode()))
+
+
+@pytest.mark.parametrize("kind", list(Kind))
+def test_drawn_season_logos_match_default(kind):
+    """Есть вариант для каждого сезона, размер — как у стандартного (3× от 119×44), лёгкий: грузится вместе с LCP."""
+    path = Path(settings.BASE_DIR) / f"static/img/logo-header-{kind}.png"
+    assert Image.open(path).size == (357, 132)
+    assert path.stat().st_size < 8 * 1024
