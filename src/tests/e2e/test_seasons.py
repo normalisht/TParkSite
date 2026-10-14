@@ -6,6 +6,8 @@ import pytest
 
 pytest.importorskip("playwright")
 
+from playwright.sync_api import expect
+
 from apps.core.models import Announcement, InfoPage, Season, SiteSettings
 from tests.e2e.test_admin_chrome import admin_page  # noqa: F401
 from tests.e2e.test_mobile_layout import FIND_OVERFLOW
@@ -93,9 +95,12 @@ def test_admin_season_tabs_show_one_form(admin_page, live_server):  # noqa: F811
     page.goto(f"{live_server.url}/admin/core/sitesettings/1/change/")
     page.get_by_role("link", name="Сезонное оформление").first.click()
     forms = page.locator("#seasons-data > .form-group")
-    assert [forms.nth(i).is_visible() for i in range(3)] == [True, False, False]
+    # expect ждёт, пока Alpine переключит вкладку и табы; is_visible проверил бы мгновенно и иногда раньше времени.
+    for i, visible in enumerate([True, False, False]):
+        (expect(forms.nth(i)).to_be_visible if visible else expect(forms.nth(i)).to_be_hidden)()
     page.locator("[data-season-tab]", has_text="Зима").click()
-    assert [forms.nth(i).is_visible() for i in range(3)] == [False, True, False]
+    for i, visible in enumerate([False, True, False]):
+        (expect(forms.nth(i)).to_be_visible if visible else expect(forms.nth(i)).to_be_hidden)()
     # На других вкладках формы настроек табов сезонов не видно.
     page.get_by_role("link", name="Основное").first.click()
     page.locator("[data-season-tabs]").wait_for(state="hidden")
