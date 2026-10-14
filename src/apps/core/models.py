@@ -1,4 +1,5 @@
 import re
+from datetime import date
 
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
@@ -6,9 +7,10 @@ from django.db import models, transaction
 from django.db.models import Q
 from django.urls import reverse
 
-from apps.core import about_defaults
+from apps.core import about_defaults, seasons
 from apps.core.fields import INFO_HTML_EXTENSIONS, HtmlField, image_specs, logo_spec, og_spec, photo_field
 from apps.core.maps import MapEmbedURLField
+from apps.core.seasons import format_day_month, validate_day_month, validate_site_link
 from apps.core.slugs import SLUG_HELP, unique_slug
 
 
@@ -24,6 +26,13 @@ PARK_ADDRESS = "Калужская область, Жуковский район
 DEFAULT_TITLE_SUFFIX = "Т-Парк, Калужская область"
 # Высота логотипа в шапке, px (класс h-11 в partials/header.html и 500.html).
 HEADER_LOGO_HEIGHT = 44
+
+
+def logo_display_width(width: int | None, height: int | None) -> int | None:
+    """Ширина логотипа в шапке при высоте `HEADER_LOGO_HEIGHT` — для width/height у <img> (без сдвига вёрстки)."""
+    if not (width and height):
+        return None
+    return round(HEADER_LOGO_HEIGHT * width / height)
 
 
 class SeoModel(models.Model):
@@ -238,13 +247,6 @@ class SiteSettings(models.Model):
         obj, _ = cls.objects.get_or_create(pk=1)
         return obj
 
-    @property
-    def header_logo_display_width(self) -> int | None:
-        """Ширина логотипа в шапке при высоте `HEADER_LOGO_HEIGHT` — для width/height у <img> (без сдвига вёрстки)."""
-        if not (self.header_logo_width and self.header_logo_height):
-            return None
-        return round(HEADER_LOGO_HEIGHT * self.header_logo_width / self.header_logo_height)
-
     @classmethod
     def for_request(cls, request) -> SiteSettings:
         """Настройки один раз на запрос (контекст-процессоры, JSON-LD); без запроса — как `load()`."""
@@ -344,6 +346,129 @@ class FounderFact(models.Model):
 
     def __str__(self):
         return f"{self.value} {self.label}"
+
+
+class Season(models.Model):
+    """Сезонное оформление (apps/core/seasons.py): по записи на сезон, набор сезонов фиксирован (`Kind`)."""
+
+    Kind = seasons.Kind
+    Mode = seasons.Mode
+    DEFAULT_DATES = {
+        Kind.NEW_YEAR: ("15.12", "14.01"),
+        Kind.WINTER: ("01.12", "28.02"),
+        Kind.AUTUMN: ("01.09", "31.10"),
+    }
+
+    settings = models.ForeignKey(SiteSettings, on_delete=models.CASCADE, related_name="seasons")
+    kind = models.CharField("Сезон", max_length=16, choices=Kind.choices, unique=True, editable=False)
+    mode = models.CharField(
+        "Показ",
+        max_length=8,
+        choices=Mode.choices,
+        default=Mode.AUTO,
+        help_text="«По датам» — тема сама включается и выключается каждый год. «Включено» — сразу для всех "
+        "посетителей и без учёта дат, пока не вернёте «По датам» (например, ранний снег). Если подходят несколько "
+        "сезонов, показывается старший: «Новый год», затем «Зима», затем «Осень» — даже когда младший включён вручную.",
+    )
+    start = models.CharField("С", max_length=5, validators=[validate_day_month], help_text="День и месяц: 15.12.")
+    end = models.CharField(
+        "По",
+        max_length=5,
+        validators=[validate_day_month],
+        help_text="Включительно. Может быть в следующем году: 15.12 — 14.01.",
+    )
+    logo = photo_field(
+        "Логотип на сезон",
+        "logo",
+        size=(3000, 1000),
+        fmt=None,
+        width_field="logo_width",
+        height_field="logo_height",
+        help_text="Заменяет логотип в шапке, пока тема показывается; требования — как у основного логотипа "
+        "(вкладка «Логотип»). В разметку для поисковиков не попадает. Пусто — стандартный логотип в сезонном "
+        "варианте (зимой — со снегом, на Новый год — ещё с шариками и звездой, осенью — с листьями), а если загружен "
+        "свой основной логотип — он.",
+    )
+    logo_width = models.PositiveIntegerField(null=True, editable=False)
+    logo_height = models.PositiveIntegerField(null=True, editable=False)
+    logo_img = logo_spec("logo", HEADER_LOGO_HEIGHT * 3)
+
+    class Meta:
+        verbose_name = "Сезонное оформление"
+        verbose_name_plural = "Сезонное оформление"
+        ordering = ["kind"]  # new_year < winter — как в seasons.PRIORITY
+
+    def __str__(self):
+        return self.get_kind_display()
+
+    def clean(self):
+        for field in ("start", "end"):
+            try:
+                setattr(self, field, format_day_month(getattr(self, field)))
+            except ValueError:
+                pass  # ошибку покажет валидатор поля
+
+    @classmethod
+    def ensure_for(cls, site: SiteSettings) -> None:
+        """Создаёт недостающие сезоны: импорт со сбросом удаляет их вместе с настройками, а добавлять в админке нельзя."""
+        for kind, (start, end) in cls.DEFAULT_DATES.items():
+            cls.objects.get_or_create(kind=kind, defaults={"settings": site, "start": start, "end": end})
+
+
+class AnnouncementQuerySet(models.QuerySet):
+    def current(self, day: date) -> Announcement | None:
+        """Плашка для показа в этот день: первая по порядку включённая, у которой подходят даты."""
+        return (
+            self.filter(is_published=True)
+            .filter(Q(starts_on__isnull=True) | Q(starts_on__lte=day))
+            .filter(Q(ends_on__isnull=True) | Q(ends_on__gte=day))
+            .order_by("order", "id")
+            .first()
+        )
+
+
+class Announcement(OrderedModel):
+    """Плашка под шапкой на всех страницах (partials/site_banner.html); одновременно показывается одна."""
+
+    text = models.CharField(
+        "Текст",
+        max_length=160,
+        help_text="Одна фраза в полосе под шапкой на всех страницах сайта, например «Новогодние корпоративы — "
+        "бронируйте даты заранее».",
+    )
+    link = models.CharField(
+        "Ссылка",
+        max_length=500,
+        blank=True,
+        validators=[validate_site_link],
+        help_text="Куда ведёт плашка: адрес страницы сайта (/events/…) или полная ссылка (https://…). "
+        "Пусто — плашка без ссылки.",
+    )
+    is_published = models.BooleanField(
+        "Показывать",
+        default=True,
+        help_text="Снимите галочку, чтобы убрать плашку с сайта, не удаляя её. Одновременно показывается одна плашка — "
+        "первая по порядку в списке из тех, что включены и подходят по датам.",
+    )
+    starts_on = models.DateField(
+        "Показывать с", null=True, blank=True, help_text="Необязательно: до этой даты плашки на сайте нет."
+    )
+    ends_on = models.DateField(
+        "по", null=True, blank=True, help_text="Включительно. Необязательно: после этой даты плашка пропадёт сама."
+    )
+
+    objects = AnnouncementQuerySet.as_manager()
+
+    class Meta(OrderedModel.Meta):
+        verbose_name = "Плашка"
+        verbose_name_plural = "Плашки"
+
+    def __str__(self):
+        return self.text
+
+    def clean(self):
+        if self.starts_on and self.ends_on and self.ends_on < self.starts_on:
+            raise ValidationError({"ends_on": "Дата окончания раньше даты начала."})
 
 
 class InfoPage(SeoModel, OrderedModel):

@@ -1,0 +1,22 @@
+{% comment %}
+Сезоны (SeasonInline) — табами внутри вкладки «Сезонное оформление»: формы подряд заставляли долго листать.
+Сами формы — стандартный stacked-inline Unfold; видна одна (по номеру в formset), остальные скрыты атрибутом hidden.
+При ошибке сохранения открывается первый сезон с ошибкой. Стиль табов — как у вкладок fieldsets Unfold
+(unfold/helpers/fieldsets_tabs.html), сверять при обновлении Unfold.
+{% endcomment %}
+{% with prefix=inline_admin_formset.formset.prefix %}
+<div x-data="{ season: [{% for inline_admin_form in inline_admin_formset %}{% if inline_admin_form.form.errors %}{{ forloop.counter0 }},{% endif %}{% endfor %}][0] ?? 0 }"
+     x-effect="$el.querySelectorAll('#{{ prefix }}-data > .form-group').forEach((el, i) => el.hidden = i !== season)">
+  <div class="mb-4 border-b border-base-200 dark:border-base-800" x-show="activeTab == '{{ prefix|slugify }}'">
+    <nav data-season-tabs class="flex flex-row items-center *:border-x *:border-transparent *:font-medium *:text-important *:first:border-l-0 *:cursor-pointer *:relative *:py-2 *:px-3.5 *:hover:text-primary-600 dark:*:hover:text-primary-500 dark:*:border-transparent [&>.active]:bg-white dark:[&>.active]:bg-base-900 [&>.active]:border-base-200 dark:[&>.active]:border-base-800  [&>.active]:text-primary-600 dark:[&>.active]:text-primary-500 [&>.active]:after:absolute [&>.active]:after:content-[''] [&>.active]:after:-bottom-px [&>.active]:after:left-0 [&>.active]:after:right-0 [&>.active]:after:h-px [&>.active]:after:bg-white dark:[&>.active]:after:bg-base-900">
+      {% for inline_admin_form in inline_admin_formset %}
+      <button type="button" data-season-tab="{{ inline_admin_form.form.instance.kind }}" x-on:click="season = {{ forloop.counter0 }}" x-bind:class="season === {{ forloop.counter0 }} && 'active'">
+        {{ inline_admin_form.form.instance }}
+        {% if inline_admin_form.form.errors %}<span data-testid="error-count" class="bg-red-500 inline-flex font-semibold items-center justify-center leading-none rounded-full w-4 h-4 text-white relative text-center text-[11px] whitespace-nowrap uppercase">!</span>{% endif %}
+      </button>
+      {% endfor %}
+    </nav>
+  </div>
+  {% include "admin/edit_inline/stacked.html" %}
+</div>
+{% endwith %}

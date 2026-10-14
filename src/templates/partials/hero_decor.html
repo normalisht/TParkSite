@@ -1,3 +1,7 @@
-{# Мягкие пятна фирменных цветов за текстом шапки (.page-hero) — только декор. #}
-<div class="pointer-events-none absolute -right-24 -top-32 -z-10 h-96 w-96 rounded-full bg-brand-300/35 blur-3xl" aria-hidden="true"></div>
-<div class="pointer-events-none absolute -bottom-40 left-1/4 -z-10 h-96 w-96 rounded-full bg-pine-300/25 blur-3xl" aria-hidden="true"></div>
+{# Мягкие пятна фирменных цветов за текстом шапки (.page-hero) — только декор; в сезон пятна перекрашивает CSS, поверх — снег или листья (вид — по data-season), на Новый год — гирлянда. #}
+<div class="hero-spot-warm pointer-events-none absolute -right-24 -top-32 -z-10 h-96 w-96 rounded-full bg-brand-300/35 blur-3xl" aria-hidden="true"></div>
+<div class="hero-spot-cool pointer-events-none absolute -bottom-40 left-1/4 -z-10 h-96 w-96 rounded-full bg-pine-300/25 blur-3xl" aria-hidden="true"></div>
+{% if season %}
+<div class="season-particles pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true"></div>
+{% if season.kind == "new_year" %}<div class="season-garland pointer-events-none absolute inset-x-0 top-0 -z-10 h-6" aria-hidden="true"></div>{% endif %}
+{% endif %}

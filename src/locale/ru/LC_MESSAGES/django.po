@@ -126,3 +126,6 @@ msgstr "С возвращением в"
 
 msgid "Return to site"
 msgstr "Вернуться на сайт"
+
+msgid "Reset filters"
+msgstr "Сбросить фильтры"
