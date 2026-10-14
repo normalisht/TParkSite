@@ -50,7 +50,7 @@ def test_history_page_opens(admin_client, site_text):
 
 
 def test_registry_keys_unique_and_pages_known():
-    assert len(TEXTS) == len(BY_KEY) == 48
+    assert len(TEXTS) == len(BY_KEY) == 51
     assert {item.page for item in TEXTS} <= set(Page.values)
 
 

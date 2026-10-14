@@ -181,6 +181,39 @@ html.cookie-open .contact-fab { display: none; }
   .rich-text-cards ul { @apply grid list-none gap-3 pl-0 sm:grid-cols-2; }
   .rich-text-cards li { @apply rounded-xl bg-white p-4 text-[0.95rem] shadow-sm ring-1 ring-ink/5; }
   .rich-text-cards li > * + * { @apply mt-2; }
+  /* Цитата редактора — выноска «Важно» (инфо-страницы): песочная плашка с синей иконкой «i». */
+  .rich-text blockquote { @apply relative rounded-2xl bg-sand-100 py-4 pr-5 pl-14 text-ink; }
+  .rich-text blockquote > * + * { @apply mt-2; }
+  .rich-text blockquote::before {
+    @apply absolute top-[1.0625rem] left-5 h-6 w-6 bg-navy;
+    content: "";
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 16v-4M12 8h.01'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+  /* Таблица — в обёртке с прокруткой (apps/core/rich_text.py): на телефоне широкая таблица не распирает страницу. */
+  .rich-table { @apply overflow-x-auto rounded-xl ring-1 ring-ink/10; }
+  /* Перенос по словам, а не по буквам (как у .rich-text): узкая колонка не рвёт «Залог», а таблица прокручивается. */
+  .rich-text table { @apply w-full border-collapse text-left text-[0.95rem]; overflow-wrap: normal; }
+  .rich-text th, .rich-text td { @apply border-b border-ink/10 px-4 py-2.5 align-top; }
+  .rich-text th { @apply bg-sand-100 font-semibold text-ink; }
+  .rich-text tr:last-child > * { @apply border-b-0; }
+  .rich-text td > * + *, .rich-text th > * + * { @apply mt-2; }
+  /* Оформление «Правила»: пункты списка — с галочками, нумерованный список — номерами в кружках. */
+  .rich-text-rules ul, .rich-text-rules ol { @apply list-none pl-0; }
+  .rich-text-rules li { @apply relative pl-10; }
+  .rich-text-rules li + li { @apply mt-3; }
+  .rich-text-rules li > * + * { @apply mt-2; }
+  .rich-text-rules ul > li::before { @apply absolute top-0 left-0 h-7 w-7 rounded-full bg-pine-100; content: ""; }
+  .rich-text-rules ul > li::after {
+    @apply absolute top-1.5 left-1.5 h-4 w-4 bg-pine-700;
+    content: "";
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+  .rich-text-rules ol { counter-reset: rule; }
+  .rich-text-rules ol > li { counter-increment: rule; }
+  .rich-text-rules ol > li::before {
+    @apply absolute top-0 left-0 flex h-7 w-7 items-center justify-center rounded-full bg-sand-200 text-sm font-bold text-navy;
+    content: counter(rule);
+  }
 }
 
 /* Тон карточки отзыва — набор переменных; карточка берёт из них фон, кавычку и аватар. */

@@ -1,0 +1,3 @@
+<nav aria-label="{{ label }}"><ol class="{{ extra_class }} space-y-1 text-[0.95rem]">
+  {% for section in body.toc %}<li><a href="#{{ section.anchor }}" class="-ml-0.5 block border-l-2 border-transparent py-1.5 pl-3 text-ink/75 hover:border-brand-500 hover:text-brand-700">{{ section.text_title }}</a></li>{% endfor %}
+</ol></nav>

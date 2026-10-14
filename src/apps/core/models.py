@@ -7,7 +7,7 @@ from django.db.models import Q
 from django.urls import reverse
 
 from apps.core import about_defaults
-from apps.core.fields import HtmlField, image_specs, logo_spec, og_spec, photo_field
+from apps.core.fields import INFO_HTML_EXTENSIONS, HtmlField, image_specs, logo_spec, og_spec, photo_field
 from apps.core.maps import MapEmbedURLField
 from apps.core.slugs import SLUG_HELP, unique_slug
 
@@ -341,9 +341,40 @@ class FounderFact(models.Model):
 
 
 class InfoPage(SeoModel):
+    class Layout(models.TextChoices):
+        TEXT = "text", "Текст"
+        RULES = "rules", "Правила"
+        FAQ = "faq", "Вопросы и ответы"
+
     title = models.CharField("Заголовок", max_length=255)
     slug = models.SlugField("Адрес страницы", max_length=255, unique=True, blank=True, help_text=SLUG_HELP)
-    body = HtmlField("Текст", help_text="Заголовки, списки и ссылки — кнопками редактора.")
+    lead = models.CharField(
+        "Подзаголовок",
+        max_length=300,
+        blank=True,
+        help_text="Одна-две фразы под заголовком страницы. Он же — описание для поисковиков, если на вкладке SEO оно пустое.",
+    )
+    cover = photo_field("Фото в шапке", "info", help_text="Необязательно. Справа от заголовка, обрезается до 4:3.")
+    cover_card, cover_card_avif = image_specs("cover", 960, 720)
+    cover_og = og_spec("cover")
+    layout = models.CharField(
+        "Оформление",
+        max_length=8,
+        choices=Layout.choices,
+        default=Layout.TEXT,
+        help_text=(
+            "«Текст» — обычная статья. «Правила» — каждый раздел (заголовок H2) карточкой с номером, пункты списков "
+            "с галочками. «Вопросы и ответы» — каждый заголовок H3 — вопрос, ответ раскрывается по нажатию."
+        ),
+    )
+    body = HtmlField(
+        "Текст",
+        extensions=INFO_HTML_EXTENSIONS,
+        help_text=(
+            "Заголовки H2 делят текст на разделы (от трёх разделов появляется оглавление). "
+            "Кнопка «Цитата» — выноска «Важно», таблица — кнопкой редактора."
+        ),
+    )
     is_published = models.BooleanField(
         "Опубликовано",
         default=True,

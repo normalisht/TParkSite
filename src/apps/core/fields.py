@@ -22,6 +22,16 @@ HTML_EXTENSIONS = {
     "Link": {"enableTarget": True, "protocols": ["http", "https", "mailto", "tel"]},
 }
 
+# Инфо-страницы: ещё выноска «Важно» (цитата) и таблицы.
+INFO_HTML_EXTENSIONS = {
+    **HTML_EXTENSIONS,
+    "Blockquote": True,
+    "Table": True,
+    "TableRow": True,
+    "TableHeader": True,
+    "TableCell": True,
+}
+
 _sanitizer = create_sanitizer(HTML_EXTENSIONS)
 
 
@@ -30,9 +40,9 @@ def sanitize_html(html: str) -> str:
     return _sanitizer(html or "")
 
 
-def HtmlField(verbose_name: str, **kwargs) -> ProseEditorField:
+def HtmlField(verbose_name: str, *, extensions=HTML_EXTENSIONS, **kwargs) -> ProseEditorField:
     kwargs.setdefault("blank", True)
-    return ProseEditorField(verbose_name, extensions=HTML_EXTENSIONS, sanitize=True, **kwargs)
+    return ProseEditorField(verbose_name, extensions=extensions, sanitize=True, **kwargs)
 
 
 MAX_UPLOAD_BYTES = 20 * 1024 * 1024

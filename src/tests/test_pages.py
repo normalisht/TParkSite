@@ -442,6 +442,59 @@ def test_info_page(client):
     assert client.get(hidden.get_absolute_url()).status_code == 404
 
 
+INFO_BODY = (
+    "<p>Вступление</p><h2>Допуск</h2><ul><li><p>Инструктаж</p></li></ul><h2>Порядок</h2><p>a</p><h2>Вещи</h2><p>b</p>"
+)
+
+
+def test_info_page_text_layout_sections_and_toc(client):
+    page = InfoPage.objects.create(title="Правила", lead="Что важно знать", body=INFO_BODY)
+    html = client.get(page.get_absolute_url()).content.decode()
+    assert '<p class="page-lead">Что важно знать</p>' in html
+    assert '<h2 id="dopusk" class="scroll-mt-24">Допуск</h2>' in html
+    assert html.count('href="#dopusk"') == 2  # оглавление: на телефоне и на ПК
+    assert 'name="description" content="Что важно знать"' in html  # подзаголовок — описание по умолчанию
+    assert "rich-text-rules" not in html
+
+
+def test_info_page_without_toc_for_few_sections(client):
+    page = InfoPage.objects.create(title="Правила", body="<h2>Один</h2><p>a</p><h2>Два</h2><p>b</p>")
+    html = client.get(page.get_absolute_url()).content.decode()
+    assert 'href="#odin"' not in html
+    assert '<h2 id="odin"' in html
+
+
+def test_info_page_rules_layout(client):
+    page = InfoPage.objects.create(title="Правила", body=INFO_BODY, layout=InfoPage.Layout.RULES)
+    html = client.get(page.get_absolute_url()).content.decode()
+    assert re.search(r'<section id="dopusk" class="card[^"]*" aria-labelledby="dopusk-title">', html)
+    assert html.count('class="rich-text rich-text-rules') == 4  # вступление и три раздела
+
+
+def test_info_page_faq_layout(client):
+    page = InfoPage.objects.create(
+        title="Вопросы", body="<h3>Можно с собакой?</h3><p>Да, на поводке.</p>", layout=InfoPage.Layout.FAQ
+    )
+    html = client.get(page.get_absolute_url()).content.decode()
+    assert re.search(r"<details class=\"group card\" data-smooth>\s*<summary[^>]*>\s*<h3>Можно с собакой\?</h3>", html)
+    assert "<p>Да, на поводке.</p>" in html
+
+
+def test_info_page_cover_and_og_image(client, make_image):
+    page = InfoPage.objects.create(title="Правила", body="<p>x</p>", cover=make_image())
+    html = client.get(page.get_absolute_url()).content.decode()
+    assert 'fetchpriority="high"' in html and "/media/CACHE/images/" in html
+    assert 'property="og:image" content="http://testserver/media/CACHE/images/' in html
+
+
+def test_info_page_contacts_card(client):
+    site = SiteSettings.load()
+    page = InfoPage.objects.create(title="Правила", body="<p>x</p>")
+    assert "Остались вопросы?" not in client.get(page.get_absolute_url()).content.decode()
+    Phone.objects.create(settings=site, number="9029856594")
+    assert "Остались вопросы?" in client.get(page.get_absolute_url()).content.decode()
+
+
 def test_nav_has_all_sections(client):
     html = client.get("/").content.decode()
     for url in STATIC_PAGES:

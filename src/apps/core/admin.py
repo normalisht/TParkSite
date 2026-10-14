@@ -180,17 +180,23 @@ class SiteSettingsAdmin(SiteModelAdmin):
 @admin.register(InfoPage)
 class InfoPageAdmin(SiteModelAdmin):
     help_intro = (
-        "Отдельные страницы с текстом: правила, политика конфиденциальности. В меню их нет — "
-        "ссылки выбираются в «Настройках сайта» или копируются из формы."
+        "Отдельные страницы с текстом: правила, политика конфиденциальности, вопросы и ответы. В меню их нет — "
+        "ссылки выбираются в «Настройках сайта» или копируются из формы. Вид страницы — поле «Оформление»."
     )
     help_anchor = "info-pages"
-    list_display = ["title", "page_url", "is_published"]
+    list_display = ["title", "page_url", "layout", "is_published"]
     list_editable = ["is_published"]
     list_filter = ["is_published"]
     search_fields = ["title"]
     prepopulated_fields = {"slug": ("title",)}
     fieldsets = (
-        ("Основное", {"classes": ["tab"], "fields": ["title", "slug", "page_url", "body", "is_published"]}),
+        (
+            "Основное",
+            {
+                "classes": ["tab"],
+                "fields": ["title", "slug", "page_url", "lead", "cover", "layout", "body", "is_published"],
+            },
+        ),
         SEO_FIELDSET,
     )
     readonly_fields = ["page_url"]

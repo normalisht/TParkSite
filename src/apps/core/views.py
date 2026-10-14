@@ -4,8 +4,10 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.templatetags.static import static
 
 from apps.core import structured_data as ld
+from apps.core.images import safe_spec_url
 from apps.core.models import InfoPage
-from apps.core.seo import make_seo
+from apps.core.rich_text import parse_info_body
+from apps.core.seo import absolute_url, make_seo
 
 TRACKING_PARAMS = [
     "utm_source",
@@ -36,8 +38,11 @@ def info_page(request, slug):
         "core/info.html",
         {
             "page": page,
+            "body": parse_info_body(page.body, questions=page.layout == InfoPage.Layout.FAQ),
             "breadcrumbs": crumbs,
-            "seo": make_seo(page.title, page.body, obj=page),
+            "seo": make_seo(
+                page.title, page.lead or page.body, absolute_url(request, safe_spec_url(page, "cover_og")), obj=page
+            ),
             "structured_data": [ld.breadcrumbs(request, crumbs)],
         },
     )
