@@ -1,0 +1,10 @@
+{# Сегмент переключателя темы: value — значение adminTheme Unfold (light, dark, auto). #}
+<button type="button"
+        class="cursor-pointer flex flex-col gap-1 items-center justify-center min-w-0 px-1 py-1.5 rounded-default transition-colors"
+        title="{{ hint }}"
+        x-on:click="switchTheme('{{ value }}')"
+        x-bind:aria-pressed="adminTheme == '{{ value }}'"
+        x-bind:class="adminTheme == '{{ value }}' ? 'bg-white shadow-xs text-primary-600 dark:bg-base-700 dark:text-primary-500' : 'hover:bg-base-50 hover:text-base-700 dark:hover:bg-base-800 dark:hover:text-base-200'">
+    <span class="material-symbols-outlined" aria-hidden="true">{{ icon }}</span>
+    <span class="leading-none text-xs truncate max-w-full @max-[240px]:hidden">{{ label }}</span>
+</button>

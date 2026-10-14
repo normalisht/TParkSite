@@ -226,6 +226,7 @@ UNFOLD = {
     "SITE_TITLE": "Т-Парк",
     "SITE_HEADER": "Т-Парк",
     "SITE_URL": "/",
+    "STYLES": [lambda request: static("css/admin.css")],
     "SCRIPTS": [lambda request: static("js/admin_dropzone.js")],  # перетаскивание файлов во все поля загрузки
     "SITE_FAVICONS": [
         {"rel": "icon", "sizes": "48x48", "href": lambda request: static("img/favicon.ico")},

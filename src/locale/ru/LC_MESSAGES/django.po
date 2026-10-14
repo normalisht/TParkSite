@@ -85,7 +85,7 @@ msgid "Dark"
 msgstr "Тёмная"
 
 msgid "System"
-msgstr "Как в системе"
+msgstr "Системная"
 
 # unfold/templates/unfold/helpers/shortcuts.html и command_help.html
 msgid "Open command tool"
