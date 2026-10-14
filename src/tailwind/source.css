@@ -43,6 +43,10 @@
   --color-heather-100: #e8dff5;
   --color-heather-300: #cfbfe8;
   --color-heather-700: #6b4f96;
+  /* Морозный голубой — сезонное оформление (html[data-season], apps/core/seasons.py) */
+  --color-frost-50: #f3f8fc;
+  --color-frost-100: #e2eef8;
+  --color-frost-300: #b7d3ea;
   --color-ink: #1c1919;
   --color-navy: #2b4757; /* тёмно-синий из логотипа */
 }
@@ -112,6 +116,68 @@ html.cookie-open .contact-fab { display: none; }
   padding: 11px;
   border-radius: 9999px;
   background-color: rgb(0 0 0 / 0.4);
+}
+
+/* Сезонное оформление (apps/core/seasons.py): <html data-season="winter|new_year"> ставит base.html, снег и гирлянду
+   выводит partials/hero_decor.html, всё — внутри .page-hero (overflow-hidden). Без слоя — иначе утилиты пятен
+   (bg-brand-300/35) и градиент .page-hero из слоя components перебьют. Анимации — только без «уменьшить движение». */
+html[data-season="winter"] .page-hero {
+  background-image: linear-gradient(to bottom right, var(--color-frost-100), var(--color-frost-50) 55%, #fff);
+}
+html[data-season="new_year"] .page-hero {
+  background-image: linear-gradient(to bottom right, var(--color-frost-100), var(--color-sand-100) 55%, var(--color-brand-50));
+}
+html[data-season="winter"] .hero-spot-warm { background-color: color-mix(in oklab, var(--color-frost-300) 55%, transparent); }
+html[data-season="new_year"] .hero-spot-cool { background-color: color-mix(in oklab, var(--color-frost-300) 45%, transparent); }
+
+/* Снег: два слоя (крупные медленнее, мелкие быстрее) — плитка из радиальных градиентов на псевдоэлементе выше шапки
+   на одну плитку; он сдвигается transform-ом ровно на плитку (компоновщик, без перерисовки), шов не виден.
+   Снежинка — белая точка с голубой каймой: просто белую на светлом фоне не видно. */
+.season-snow::before,
+.season-snow::after {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * var(--tile)) 0 0;
+  background-size: var(--tile) var(--tile);
+}
+.season-snow::before {
+  --tile: 220px;
+  opacity: .9;
+  background-image:
+    radial-gradient(circle at 12% 18%, #fff 0 3px, var(--color-frost-300) 3.5px, transparent 4.5px),
+    radial-gradient(circle at 58% 42%, #fff 0 2.5px, var(--color-frost-300) 3px, transparent 4px),
+    radial-gradient(circle at 84% 8%, #fff 0 3px, var(--color-frost-300) 3.5px, transparent 4.5px),
+    radial-gradient(circle at 34% 76%, #fff 0 2.5px, var(--color-frost-300) 3px, transparent 4px),
+    radial-gradient(circle at 76% 88%, #fff 0 3px, var(--color-frost-300) 3.5px, transparent 4.5px);
+}
+.season-snow::after {
+  --tile: 140px;
+  opacity: .8;
+  background-image:
+    radial-gradient(circle at 22% 34%, #fff 0 1.5px, var(--color-frost-300) 2px, transparent 2.5px),
+    radial-gradient(circle at 68% 64%, #fff 0 1.5px, var(--color-frost-300) 2px, transparent 2.5px),
+    radial-gradient(circle at 90% 22%, #fff 0 1px, var(--color-frost-300) 1.5px, transparent 2px),
+    radial-gradient(circle at 44% 92%, #fff 0 1px, var(--color-frost-300) 1.5px, transparent 2px);
+}
+@keyframes season-snow { to { transform: translateY(var(--tile)); } }
+
+/* Гирлянда (Новый год): провод с лампочками — плитка 200×44 по горизонтали; ::after — свечение ламп, мерцает. */
+.season-garland {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='44'%3E%3Cpath d='M0 4Q100 34 200 4' fill='none' stroke='%232b4757' stroke-opacity='.45' stroke-width='1.5'/%3E%3Cg fill='%232b4757' fill-opacity='.7'%3E%3Crect x='38' y='13.6' width='4' height='4' rx='1'/%3E%3Crect x='78' y='18.4' width='4' height='4' rx='1'/%3E%3Crect x='118' y='18.4' width='4' height='4' rx='1'/%3E%3Crect x='158' y='13.6' width='4' height='4' rx='1'/%3E%3C/g%3E%3Cellipse cx='40' cy='23.1' rx='4' ry='5.5' fill='%23e5484d'/%3E%3Cellipse cx='80' cy='27.9' rx='4' ry='5.5' fill='%23f5b82e'/%3E%3Cellipse cx='120' cy='27.9' rx='4' ry='5.5' fill='%233f9142'/%3E%3Cellipse cx='160' cy='23.1' rx='4' ry='5.5' fill='%234a8fd6'/%3E%3C/svg%3E") repeat-x 0 0 / 200px 44px;
+}
+.season-garland::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: .6;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='44'%3E%3Cg fill-opacity='.35'%3E%3Ccircle cx='40' cy='23.1' r='10' fill='%23e5484d'/%3E%3Ccircle cx='80' cy='27.9' r='10' fill='%23f5b82e'/%3E%3Ccircle cx='120' cy='27.9' r='10' fill='%233f9142'/%3E%3Ccircle cx='160' cy='23.1' r='10' fill='%234a8fd6'/%3E%3C/g%3E%3C/svg%3E") repeat-x 0 0 / 200px 44px;
+}
+@keyframes season-twinkle { from { opacity: .15; } to { opacity: .9; } }
+
+@media (prefers-reduced-motion: no-preference) {
+  .season-snow::before { animation: season-snow 16s linear infinite; }
+  .season-snow::after { animation: season-snow 9s linear infinite; }
+  .season-garland::after { animation: season-twinkle 1.6s ease-in-out infinite alternate; }
 }
 
 /* В слое components, иначе стили без слоя перебивают утилиты Tailwind (md:hidden и т. п.) */
