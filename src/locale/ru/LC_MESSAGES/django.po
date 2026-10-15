@@ -132,11 +132,8 @@ msgstr "Сбросить фильтры"
 
 msgid "You have been successfully logged out from the administration"
 msgstr "Вы успешно вышли из системы администрирования"
-
 msgid "Choose file to upload"
 msgstr "Выберите файл или перетащите сюда"
-
-
 
 msgid "Add another %(verbose_name)s"
 msgstr "Добавить ещё"
@@ -149,6 +146,7 @@ msgstr "Добавить"
 
 msgid "Save and add another"
 msgstr "Сохранить и добавить ещё"
+
 msgid "The {name} “{obj}” was added successfully."
 msgstr "«{obj}» — добавлено."
 
@@ -157,6 +155,14 @@ msgstr "«{obj}» — сохранено."
 
 msgid "The %(name)s “%(obj)s” was deleted successfully."
 msgstr "«%(obj)s» — удалено."
+
+msgid ""
+"The {name} “{obj}” was added successfully. You may add another {name} below."
+msgstr "«{obj}» — добавлено. Ниже можно добавить ещё."
+
+msgid ""
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr "«{obj}» — сохранено. Можно продолжить редактирование."
 
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "

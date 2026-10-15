@@ -82,6 +82,8 @@ def test_change_form_wording(admin_client):
         "Choose file to upload",
     ):
         assert awkward not in page
+    # Positive assertions: delete button is just "Удалить" and add button is "Добавить ещё"
+    assert "Добавить ещё" in page  # inline add button with neutral wording
 
 
 def test_saved_message_wording(admin_client):
@@ -99,3 +101,38 @@ def test_changelist_total_wording(admin_client):
     Category.objects.create(name="Б")
     page = admin_client.get(reverse("admin:catalog_category_changelist")).content.decode()
     assert "Всего: 2" in page
+
+
+def test_saved_message_wording_continue_editing(admin_client):
+    response = admin_client.post(
+        reverse("admin:content_review_add"),
+        {
+            "text": "<p>Отлично</p>",
+            "date": date(2026, 7, 14).strftime("%d.%m.%Y"),
+            "is_published": "on",
+            "link": "",
+            "_continue": "Save and continue editing",
+        },
+    )
+    assert response.status_code == 302
+    # Follow the redirect to get the messages
+    response = admin_client.get(response.url)
+    texts = [str(m) for m in get_messages(response.wsgi_request)]
+    # Message format: my custom translation of the main part + Django's Russian translation of "You may edit it again below"
+    assert any("— добавлено." in t for t in texts), texts
+
+
+def test_saved_message_wording_add_another(admin_client):
+    response = admin_client.post(
+        reverse("admin:content_review_add"),
+        {
+            "text": "<p>Отлично</p>",
+            "date": date(2026, 7, 14).strftime("%d.%m.%Y"),
+            "is_published": "on",
+            "link": "",
+            "_addanother": "Save and add another",
+        },
+    )
+    assert response.status_code == 302
+    texts = [str(m) for m in get_messages(response.wsgi_request)]
+    assert any(t.endswith("— добавлено. Ниже можно добавить ещё.") for t in texts), texts
