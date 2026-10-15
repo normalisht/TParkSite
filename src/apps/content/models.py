@@ -112,7 +112,7 @@ class Event(TrashableModel, SeoModel):
     def duplicate(self) -> Event:
         """Черновик-копия для повторяющихся мероприятий: дату и описание администратор поправит."""
         return Event.objects.create(
-            title=self.title,
+            title=f"{self.title[:120]} (копия)",
             date=self.date,
             end_date=self.end_date,
             start_time=self.start_time,

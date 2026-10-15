@@ -1,7 +1,7 @@
 from django.contrib import admin, messages
 from django.core.exceptions import PermissionDenied
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect, render
 from django.urls import path, reverse
 from django.utils import timezone
 from django.utils.formats import localize_input
@@ -11,6 +11,7 @@ from apps.content.models import Event, GalleryPhoto, Partner, Review
 from apps.content.yandex import ReviewFetchError, fetch_review
 from apps.core.admin_utils import (
     SEO_FIELDSET,
+    DuplicateAdminMixin,
     SiteModelAdmin,
     TrashAdminMixin,
     image_preview,
@@ -37,7 +38,7 @@ class EventPeriodFilter(admin.SimpleListFilter):
 
 
 @admin.register(Event)
-class EventAdmin(TrashAdminMixin, SiteModelAdmin):
+class EventAdmin(DuplicateAdminMixin, TrashAdminMixin, SiteModelAdmin):
     help_intro = (
         "Предстоящие — на странице «Мероприятия» и до трёх на главной. "
         "На следующий день после окончания мероприятие становится прошедшим."
@@ -75,11 +76,7 @@ class EventAdmin(TrashAdminMixin, SiteModelAdmin):
     # Право — строкой: см. ServiceAdmin.duplicate.
     @action(description="Дублировать", url_path="duplicate", permissions=["content.add_event"], icon="content_copy")
     def duplicate(self, request, object_id):
-        original = get_object_or_404(self.get_queryset(request), pk=object_id)
-        copy = original.duplicate()
-        self.log_addition(request, copy, f"Копия «{original}»")
-        messages.success(request, f"Создана копия «{original}» — черновик. Поменяйте дату и опубликуйте.")
-        return redirect(reverse("admin:content_event_change", args=[copy.pk]))
+        return self.duplicate_view(request, object_id, "Поменяйте дату и опубликуйте.")
 
     @admin.display(description="Фото")
     def photo(self, obj):

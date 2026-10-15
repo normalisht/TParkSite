@@ -1,0 +1,12 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<form method="post" class="flex max-w-xl flex-col gap-4">
+  {% csrf_token %}
+  <p>Создать черновик-копию «<strong>{{ object }}</strong>»? Фото и категории скопируются.</p>
+  <div class="flex flex-wrap gap-2">
+    <button type="submit" class="cursor-pointer bg-primary-600 rounded-md px-4 py-2 font-semibold text-white">Создать копию</button>
+    <a href="{{ change_url }}" class="rounded-md border border-base-200 px-4 py-2">Отмена</a>
+  </div>
+</form>
+{% endblock %}

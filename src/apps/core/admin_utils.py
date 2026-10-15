@@ -318,6 +318,29 @@ class TrashAdminMixin:
         return self.changeform_view(request, str(obj.pk), extra_context=extra_context)
 
 
+class DuplicateAdminMixin:
+    """Тело кнопки «Дублировать» (`actions_detail`): GET — страница подтверждения, копию создаёт только POST
+    (иначе любая страница могла бы создать запись в браузере администратора — CSRF). Модель задаёт `duplicate()`."""
+
+    def duplicate_view(self, request, object_id, hint: str):
+        original = get_object_or_404(self.get_queryset(request), pk=object_id)
+        opts = self.model._meta
+        change_name = f"admin:{opts.app_label}_{opts.model_name}_change"
+        if request.method != "POST":
+            context = {
+                **self.admin_site.each_context(request),
+                "title": "Дублировать",
+                "object": original,
+                "opts": opts,
+                "change_url": reverse(change_name, args=[original.pk]),
+            }
+            return TemplateResponse(request, "admin/duplicate_confirm.html", context)
+        copy = original.duplicate()
+        self.log_addition(request, copy, f"Копия «{original}»")
+        messages.success(request, f"Создана копия «{original}» — черновик. {hint}")
+        return redirect(reverse(change_name, args=[copy.pk]))
+
+
 def move_to_top(model, selected) -> int:
     """Ставит выбранные записи в начало списка (между собой — в прежнем порядке), остальные — следом."""
     picked = list(selected.order_by("order", "id").only("pk", "order"))
