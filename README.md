@@ -50,3 +50,18 @@ Django-проект — в [src/](src/), в корне — инфраструк�
 - `curl -sI http://t-camp.ru/.well-known/acme-challenge/test` — ответ `301` от nginx, а не обрыв соединения: проверка Let's Encrypt проходит.
 
 Ключ аккаунта и сертификаты лежат в томе `acme` — не удалять, иначе упрёмся в лимиты Let's Encrypt. Для отладки — `ACME_SERVER` с тестовым сервером (браузер такому сертификату не доверяет); при возврате на боевой удалить том `acme`.
+
+### Вариант без Docker (systemd)
+
+Как у старого сайта (`systemctl` + uwsgi-ini), только gunicorn: сервис `tpark` слушает unix-сокет `/run/tpark/gunicorn.sock`, nginx на хосте проксирует в него и сам отдаёт `/media/`. Конфиг gunicorn — `deploy/gunicorn.conf.py`, шаблон юнита — `deploy/tpark.service.in`, пример сайта nginx — `deploy/nginx-site.conf`. Все команды — от пользователя, от которого работает сайт (ему же принадлежат БД и медиа), `sudo` нужен только для `systemctl`.
+
+1. На сервере: [uv](https://docs.astral.sh/uv/) (Python 3.14 он скачает сам), репозиторий, например в `/srv/tpark`.
+2. `cp .env.example src/.env` и заполнить как для Docker (`SECRET_KEY`, `ALLOWED_HOSTS`, `CSRF_TRUSTED_ORIGINS`, `DEBUG=0`), плюс абсолютные пути `DATABASE_PATH` и `MEDIA_ROOT` (по умолчанию — `src/db.sqlite3` и `src/media/`). `PROXY_NETWORK` и строки для compose не нужны. Настройки читают `src/.env` и в сервисе, и в командах `make service-*`.
+3. `make service-install` — кладёт юнит в `/etc/systemd/system/tpark.service` и включает автозапуск (другое имя — `SERVICE=…`, другой пользователь — `SERVICE_USER=…`/`SERVICE_GROUP=…`).
+4. `make service-deploy` — зависимости (`uv sync --no-dev`), Tailwind и `collectstatic`, бэкап работающего сайта, миграции, плавный перезапуск (`systemctl reload` — воркеры gunicorn перезапускаются с новым кодом без обрыва запросов), затем недостающие миниатюры и очистка ненужных. Обновление сайта — `git pull && make service-deploy`.
+5. nginx: взять `deploy/nginx-site.conf`, подставить путь к медиа и сертификату (вместо `uwsgi_pass` старого сайта — `proxy_pass` в сокет gunicorn), `sudo nginx -t && sudo systemctl reload nginx`. Требования к прокси — те же, что выше (`X-Real-IP`, `X-Forwarded-Proto`, 200 МБ, 120 секунд).
+6. `make service-superuser`; бэкап по cron — `./scripts/backup.sh --host`.
+
+Переход со старого сайта: оба сервиса могут работать одновременно (`t-camp.ru.service` и `tpark.service`) — поднять новый, переключить nginx на его сокет, проверить, затем `sudo systemctl disable --now t-camp.ru.service`.
+
+Остальное: `make service-status`, `make service-logs` (journald), `make service-restart` (полный перезапуск — после обновления Python или gunicorn: `reload` их не подхватывает), разблокировка админки — `cd src && uv run --no-dev manage.py axes_reset`.

@@ -4,15 +4,21 @@
 SRC := src
 MANAGE := cd $(SRC) && uv run manage.py
 DEV_COMPOSE := docker compose -f compose.dev.yaml
+# Продакшен без Docker: только основные зависимости, uv.lock не меняется.
+PROD_MANAGE := cd $(SRC) && uv run --frozen --no-dev manage.py
+SERVICE ?= tpark
+SERVICE_USER ?= $(shell id -un)
+SERVICE_GROUP ?= $(shell id -gn)
 
 .DEFAULT_GOAL := help
 .PHONY: help install env migrate run superuser shell test lint format check e2e pre-commit \
 	messages tailwind collectstatic import-legacy \
 	dev dev-down dev-logs dev-superuser \
-	build up down restart logs prod-superuser backup
+	build up down restart logs prod-superuser backup \
+	service-install service-deploy service-restart service-status service-logs service-superuser service-backup
 
 help: ## Показать список команд
-	@grep -hE '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
+	@grep -hE '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}'
 
 ## --- Локальная разработка (без Docker) ---
 
@@ -103,3 +109,40 @@ prod-superuser: ## Создать администратора в продакш
 
 backup: ## Бэкап БД и медиа в backups/
 	./scripts/backup.sh
+
+## --- Продакшен без Docker (systemd + gunicorn; настройки — src/.env, запускать от SERVICE_USER) ---
+
+service-install: ## Установить systemd-юнит (SERVICE=tpark, пользователь — текущий)
+	@test -f $(SRC)/.env || (echo "Нет $(SRC)/.env: cp .env.example $(SRC)/.env и заполнить (DEBUG=0, SECRET_KEY, пути к БД и медиа)" && exit 1)
+	sed -e 's|@SERVICE@|$(SERVICE)|g' -e 's|@USER@|$(SERVICE_USER)|g' -e 's|@GROUP@|$(SERVICE_GROUP)|g' \
+		-e 's|@SRC_DIR@|$(CURDIR)/$(SRC)|g' -e 's|@DEPLOY_DIR@|$(CURDIR)/deploy|g' deploy/tpark.service.in \
+		| sudo tee /etc/systemd/system/$(SERVICE).service > /dev/null
+	sudo systemctl daemon-reload
+	sudo systemctl enable $(SERVICE)
+	@echo "Юнит $(SERVICE) установлен, сокет — /run/$(SERVICE)/gunicorn.sock. Дальше: make service-deploy"
+
+service-deploy: ## Обновить сайт: зависимости, статика, бэкап, миграции, плавный перезапуск, миниатюры
+	cd $(SRC) && uv sync --frozen --no-dev
+	$(PROD_MANAGE) tailwind build
+	$(PROD_MANAGE) collectstatic --noinput
+	@if systemctl is-active --quiet $(SERVICE); then ./scripts/backup.sh --host; else echo "Сайт не запущен — бэкап пропущен"; fi
+	$(PROD_MANAGE) migrate --noinput
+	sudo systemctl reload-or-restart $(SERVICE)
+	@# Сайт уже работает: недостающие миниатюры ImageKit создаёт и сам при показе, здесь — заранее и с низким приоритетом.
+	cd $(SRC) && nice -n 10 uv run --frozen --no-dev manage.py generate_missing_images
+	cd $(SRC) && nice -n 10 uv run --frozen --no-dev manage.py prune_image_cache
+
+service-restart: ## Полный перезапуск (после обновления Python или gunicorn)
+	sudo systemctl restart $(SERVICE)
+
+service-status: ## Состояние сервиса
+	systemctl status $(SERVICE) --no-pager
+
+service-logs: ## Логи сервиса (journald)
+	journalctl -u $(SERVICE) -f -n 200
+
+service-superuser: ## Создать администратора
+	$(PROD_MANAGE) createsuperuser
+
+service-backup: ## Бэкап БД и медиа в backups/
+	./scripts/backup.sh --host

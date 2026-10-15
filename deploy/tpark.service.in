@@ -1,0 +1,34 @@
+# Шаблон systemd-юнита для запуска без Docker. Не править на сервере вручную: make service-install
+# подставляет @SERVICE@, @USER@, @GROUP@, @SRC_DIR@, @DEPLOY_DIR@ и кладёт результат в /etc/systemd/system/.
+[Unit]
+Description=Т-Парк (t-camp.ru): Django + gunicorn
+After=network.target
+
+[Service]
+Type=notify
+NotifyAccess=main
+User=@USER@
+Group=@GROUP@
+WorkingDirectory=@SRC_DIR@
+# Те же переменные читают и настройки Django; здесь — чтобы gunicorn видел WEB_CONCURRENCY.
+EnvironmentFile=-@SRC_DIR@/.env
+Environment=PYTHONUNBUFFERED=1
+# /run/@SERVICE@/ — сокет gunicorn; 0755, чтобы nginx мог до него дойти.
+RuntimeDirectory=@SERVICE@
+RuntimeDirectoryMode=0755
+ExecStart=@SRC_DIR@/.venv/bin/gunicorn --config @DEPLOY_DIR@/gunicorn.conf.py
+# reload — плавный перезапуск воркеров с новым кодом (HUP), без обрыва запросов.
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=35
+Restart=on-failure
+RestartSec=5
+
+# Пережатие фото держит их в памяти; без лимита OOM-killer может положить весь сервер.
+MemoryMax=1G
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target
