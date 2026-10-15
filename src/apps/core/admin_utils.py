@@ -1,8 +1,10 @@
 from django.contrib import admin
+from django.db import connections
 from django.template.loader import render_to_string
 from django.utils.html import format_html
 from unfold.admin import ModelAdmin
 
+from apps.core import search
 from apps.core.images import safe_spec_url
 from apps.core.request_cache import cached_on_request
 
@@ -51,7 +53,8 @@ SEO_FIELDSET = (
 class SiteModelAdmin(ModelAdmin):
     """Базовая админка проекта: предупреждает при уходе со страницы с несохранёнными изменениями,
     у SEO-полей показывает счётчики символов и превью сниппета (admin_seo.js), над списком — вводную
-    `help_intro`, над формой — ссылку на раздел справки `help_anchor` (apps/core/admin_help.py)."""
+    `help_intro`, над формой — ссылку на раздел справки `help_anchor` (apps/core/admin_help.py).
+    Поиск — без учёта регистра и «ё»/«е» (apps/core/search.py)."""
 
     help_intro = ""  # 1–2 предложения над списком; доверенный HTML (выводится через |safe)
     help_anchor = ""  # якорь раздела справки из HELP_SECTIONS
@@ -69,6 +72,13 @@ class SiteModelAdmin(ModelAdmin):
             else (title, options)
             for title, options in super().get_fieldsets(request, obj)
         ]
+
+    def get_search_results(self, request, queryset, search_term):
+        # Без учёта регистра и «ё»/«е» (apps/core/search.py); кроме SQLite — как в Django.
+        search_fields = self.get_search_fields(request)
+        if not (search_fields and search_term) or connections[queryset.db].vendor != "sqlite":
+            return super().get_search_results(request, queryset, search_term)
+        return search.search(queryset, search_fields, search_term)
 
 
 def image_preview(spec_name: str, size: int = 64):
