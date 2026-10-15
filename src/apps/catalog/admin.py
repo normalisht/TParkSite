@@ -6,7 +6,7 @@ from unfold.forms import PaginationInlineFormSet
 from unfold.widgets import UnfoldAdminCheckboxSelectMultipleWidget
 
 from apps.catalog.models import Category, CategoryGroup, CategoryPhoto, CategoryService, Service, ServicePhoto
-from apps.core.admin_utils import SEO_FIELDSET, OrderedInlineMixin, SiteModelAdmin, image_preview
+from apps.core.admin_utils import SEO_FIELDSET, OrderedInlineMixin, SiteModelAdmin, image_preview, thumbnail_html
 from apps.core.bulk_upload import MultipleImageField, append_images
 from apps.core.models import next_order
 
@@ -121,7 +121,8 @@ class CategoryAdmin(BulkPhotosAdminMixin, SiteModelAdmin):
     form = CategoryAdminForm
     photo_model = CategoryPhoto
     photo_owner = "category"
-    list_display = ["name", "menu_groups_display", "services_count", "is_published"]
+    list_display = ["photo", "name", "menu_groups_display", "services_count", "is_published"]
+    list_display_links = ["photo", "name"]
     list_editable = ["is_published"]
     ordering = ["order", "id"]
     ordering_field = "order"
@@ -146,8 +147,15 @@ class CategoryAdmin(BulkPhotosAdminMixin, SiteModelAdmin):
             super()
             .get_queryset(request)
             .annotate(services_total=Count("service_links", distinct=True))
-            .prefetch_related("groups")
+            .prefetch_related("groups", "photos")
         )
+
+    @admin.display(description="Фото")
+    def photo(self, obj):
+        if obj.preview:
+            return thumbnail_html(obj, "preview_card")
+        photos = obj.photos.all()  # prefetch_related в get_queryset
+        return thumbnail_html(photos[0], "thumb") if photos else "—"
 
     @admin.display(description="Группы меню")
     def menu_groups_display(self, obj):
@@ -193,19 +201,38 @@ class ServicePlacementFilter(admin.SimpleListFilter):
         return queryset
 
 
+class ServiceGapsFilter(admin.SimpleListFilter):
+    title = "Чего не хватает"
+    parameter_name = "gaps"
+
+    def lookups(self, request, model_admin):
+        return [("photo", "Нет фото"), ("price", "Нет цены"), ("short", "Нет краткого описания")]
+
+    def queryset(self, request, queryset):
+        if self.value() == "photo":
+            return queryset.filter(photos__isnull=True)
+        if self.value() == "price":
+            return queryset.filter(price="")
+        if self.value() == "short":
+            return queryset.filter(short_description="")
+        return queryset
+
+
 @admin.register(Service)
 class ServiceAdmin(BulkPhotosAdminMixin, SiteModelAdmin):
     help_intro = (
         "Услуги показываются на страницах категорий, в которые добавлены. "
-        "Фильтр «Видна на сайте» находит услуги, которых посетители не увидят."
+        "Фильтр «Видна на сайте» находит услуги, которых посетители не увидят, "
+        "«Чего не хватает» — услуги без фото, цены или краткого описания."
     )
     help_anchor = "catalog"
     form = ServiceAdminForm
     photo_model = ServicePhoto
     photo_owner = "service"
-    list_display = ["name", "price_display", "categories", "is_published", "has_page"]
+    list_display = ["photo", "name", "price_display", "categories", "is_published", "has_page"]
+    list_display_links = ["photo", "name"]
     list_editable = ["is_published"]
-    list_filter = [ServicePlacementFilter, "is_published", "has_page", "category_links__category"]
+    list_filter = [ServicePlacementFilter, ServiceGapsFilter, "is_published", "has_page", "category_links__category"]
     search_fields = ["name"]
     prepopulated_fields = {"slug": ("name",)}
     inlines = [ServicePhotoInline, ServiceCategoryInline]
@@ -229,7 +256,12 @@ class ServiceAdmin(BulkPhotosAdminMixin, SiteModelAdmin):
     )
 
     def get_queryset(self, request):
-        return super().get_queryset(request).prefetch_related("category_links__category")
+        return super().get_queryset(request).prefetch_related("category_links__category", "photos")
+
+    @admin.display(description="Фото")
+    def photo(self, obj):
+        photos = obj.photos.all()  # prefetch_related в get_queryset
+        return thumbnail_html(photos[0], "thumb") if photos else "—"
 
     @admin.display(description="Категории")
     def categories(self, obj):

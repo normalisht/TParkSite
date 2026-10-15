@@ -9,7 +9,7 @@ from unfold.decorators import action
 
 from apps.content.models import Event, GalleryPhoto, Partner, Review
 from apps.content.yandex import ReviewFetchError, fetch_review
-from apps.core.admin_utils import SEO_FIELDSET, SiteModelAdmin, image_preview, move_to_top
+from apps.core.admin_utils import SEO_FIELDSET, SiteModelAdmin, image_preview, move_to_top, thumbnail_html
 from apps.core.bulk_upload import BulkUploadForm, append_images
 
 
@@ -36,10 +36,11 @@ class EventAdmin(SiteModelAdmin):
         "На следующий день после окончания мероприятие становится прошедшим."
     )
     help_anchor = "events"
-    list_display = ["title", "date", "is_published", "show_after_date"]
+    list_display = ["photo", "title", "date", "status", "is_published", "show_after_date"]
+    list_display_links = ["photo", "title"]
     list_editable = ["is_published"]
     list_filter = [EventPeriodFilter, "is_published", "show_after_date"]
-    date_hierarchy = "date"
+    # date_hierarchy убран: годы 2022/2023/2027 сверху списка не помогали найти мероприятие
     search_fields = ["title"]
     fieldsets = (
         (
@@ -62,6 +63,18 @@ class EventAdmin(SiteModelAdmin):
         SEO_FIELDSET,
     )
 
+    @admin.display(description="Фото")
+    def photo(self, obj):
+        return thumbnail_html(obj, "card_small")
+
+    @admin.display(description="Статус")
+    def status(self, obj):
+        if not obj.is_published:
+            return "Черновик"
+        if not obj.is_past:
+            return "Предстоящее"
+        return "Прошедшее, в архиве" if obj.show_after_date else "Прошедшее, скрыто"
+
 
 class OrderedPhotoAdmin(SiteModelAdmin):
     ordering = ["order", "id"]
@@ -75,6 +88,8 @@ class ReviewAdmin(SiteModelAdmin):
     help_anchor = "reviews"
     # Порядок — по дате (Meta.ordering), без перетаскивания.
     list_display = ["__str__", "date", "is_published"]
+    list_editable = ["is_published"]
+    search_fields = ["text"]
     list_filter = ["is_published"]
     date_hierarchy = "date"
     fields = ["link", "date", "text", "photo", "is_published"]
