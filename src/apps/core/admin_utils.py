@@ -386,6 +386,12 @@ class DuplicateAdminMixin:
     """Тело кнопки «Дублировать» (`actions_detail`): GET — страница подтверждения, копию создаёт только POST
     (иначе любая страница могла бы создать запись в браузере администратора — CSRF). Модель задаёт `duplicate()`."""
 
+    def has_duplicate_permission(self, request, object_id=None):
+        # Право кнопки — метод, а не строка «app.add_model»: строку системная проверка Unfold сверяет запросом
+        # к таблице прав, а образ собирается без базы (tests/test_deploy_config.py). Unfold передаёт и object_id,
+        # у стандартного has_add_permission такого аргумента нет.
+        return self.has_add_permission(request)
+
     def duplicate_view(self, request, object_id, hint: str):
         original = self.get_object(request, unquote(object_id))  # None и для «abc», и для записи в корзине
         if original is None:
