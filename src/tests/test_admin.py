@@ -319,12 +319,21 @@ def test_seo_help_in_admin_forms(admin_client):
     assert "Координаты" in html
 
 
-@pytest.mark.parametrize("model", ["catalog_category", "catalog_service", "content_event", "core_infopage"])
+@pytest.mark.parametrize("model", ["content_event", "core_infopage"])
 def test_seo_is_separate_tab(admin_client, model):
     html = admin_client.get(reverse(f"admin:{model}_add")).content.decode()
     tabs = re.findall(r"activeFieldsetTab = '([^']+)'\"", html)
     assert tabs[0] == "основное"
     assert "seo" in tabs
+
+
+@pytest.mark.parametrize("model", ["catalog_category", "catalog_service"])
+def test_catalog_seo_is_top_level_tab(admin_client, model):
+    # У категории и услуги вкладки — inline, поэтому SEO — вкладка верхнего уровня, а не второй ряд внутри «Основного».
+    html = admin_client.get(reverse(f"admin:{model}_add")).content.decode()
+    assert "activeFieldsetTab" not in html
+    assert re.search(r'<a href="#seo"[^>]*>\s*SEO\s*</a>', html)
+    assert html.index("x-show=\"activeTab == 'seo'\"") < html.index('name="seo_title"')
 
 
 def test_service_changelist_finds_services_hidden_from_navigation(admin_client):
@@ -477,7 +486,8 @@ def test_delete_confirmation_and_forms_are_russian(admin_client):
             assert phrase not in html, (url, phrase)
         # «Select» — отдельное слово в подсказке командного поиска (в других местах встречается как часть фраз)
         assert not re.search(r">\s*Select\s*<", html), url
+    # «Удалить» у категории переносит её в корзину (apps/core/trash.py): своя страница вместо подтверждения Django.
     html = admin_client.get(pages[0]).content.decode()
-    assert "в группе «Активный отдых»" in html
+    assert "Переместить в корзину?" in html
     assert "Удалить: категория «Парк»" not in html
-    assert "Вместе с этим будут удалены" in html
+    assert "Вместе с этим будут удалены" not in html

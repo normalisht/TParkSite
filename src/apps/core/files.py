@@ -5,6 +5,7 @@
 
 import os
 
+from django.core.files.base import ContentFile
 from django.db import models, transaction
 from django.db.models.signals import post_delete, pre_save
 from imagekit.cachefiles import ImageCacheFile
@@ -74,3 +75,15 @@ def register_file_cleanup(model) -> None:
 
     post_delete.connect(on_delete, sender=model, weak=False, dispatch_uid=f"cleanup-delete-{model._meta.label}")
     pre_save.connect(on_save, sender=model, weak=False, dispatch_uid=f"cleanup-save-{model._meta.label}")
+
+
+def clone_file(field_file) -> ContentFile | None:
+    """Копия файла для новой записи: общий файл у двух записей нельзя — удаление одной стёрло бы его у другой.
+    Новое имя даст `upload_to` поля. Файла нет на диске — None."""
+    if not field_file:
+        return None
+    try:
+        with field_file.storage.open(field_file.name, "rb") as source:
+            return ContentFile(source.read(), name=os.path.basename(field_file.name))
+    except OSError:  # в т. ч. FileNotFoundError
+        return None

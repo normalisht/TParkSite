@@ -11,3 +11,9 @@
     min-height: 100vh;
     min-height: 100dvh;
 }
+
+/* Вкладки полей формы (unfold/helpers/fieldsets_tabs.html) на узком экране — в несколько строк,
+   иначе правые обрезаны (13 вкладок настроек на телефоне). Сверять селектор при обновлении Unfold. */
+[x-data*="activeFieldsetTab"] > div > nav {
+  flex-wrap: wrap;
+}

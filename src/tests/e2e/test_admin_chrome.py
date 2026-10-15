@@ -60,3 +60,42 @@ def test_header_open_site_button(admin_page, live_server, width):
     assert button.is_visible()
     assert button.get_attribute("href") == "/"
     assert button.get_by_text("Открыть сайт").is_visible() == (width >= 768)
+
+
+# Вкладки полей (fieldsets_tabs Unfold), правый край которых за пределами экрана.
+CLIPPED_TABS = """
+() => [...document.querySelectorAll('[x-data*="activeFieldsetTab"] > div > nav > a')]
+  .filter(a => a.getBoundingClientRect().right > window.innerWidth + 1)
+  .map(a => a.textContent.trim())
+"""
+
+
+def test_settings_tabs_fit_phone(admin_page, live_server):
+    page = admin_page
+    page.set_viewport_size({"width": 390, "height": 800})
+    page.goto(f"{live_server.url}/admin/core/sitesettings/")
+    page.locator('[x-data*="activeFieldsetTab"]').first.wait_for()
+    assert page.evaluate(CLIPPED_TABS) == []
+
+
+def test_seo_tab_switches_and_survives_save(admin_page, live_server):
+    from apps.catalog.models import Service
+
+    service = Service.objects.create(name="Зиплайн")
+    page = admin_page
+    page.goto(f"{live_server.url}/admin/catalog/service/{service.pk}/change/")
+    nav = page.locator("#tabs-items")
+    assert nav.locator("a").all_inner_texts() == ["Основное", "Фото", "Категории", "SEO"]
+    assert page.locator("#id_name").is_visible()
+    assert not page.locator("#id_seo_title").is_visible()
+
+    nav.get_by_text("SEO", exact=True).click()
+    page.locator("#id_seo_title").wait_for(state="visible")
+    page.locator("#id_name").wait_for(state="hidden")
+
+    page.fill("#id_seo_title", "Прыжок над лесом")
+    page.get_by_role("button", name="Сохранить и продолжить редактирование").click()
+    page.wait_for_url("**/change/#seo")  # форма отправляется на адрес с #<вкладка>
+    page.locator("#id_seo_title").wait_for(state="visible")
+    assert page.input_value("#id_seo_title") == "Прыжок над лесом"
+    page.locator("#id_name").wait_for(state="hidden")

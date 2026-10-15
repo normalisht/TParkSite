@@ -11,7 +11,8 @@ from django.utils.html import strip_tags
 from django.utils.text import Truncator
 
 from apps.core.fields import HtmlField, full_spec, image_spec, image_specs, og_spec, photo_field
-from apps.core.models import OrderedModel, PublishedQuerySet, SeoModel
+from apps.core.files import clone_file
+from apps.core.models import OrderedModel, PublishedQuerySet, SeoModel, TrashableModel
 from apps.core.redirects import remember_slug_change
 from apps.core.rotation import daily_pick
 from apps.core.slugs import unique_slug
@@ -49,7 +50,7 @@ def _days(n: int) -> str:
     return f"{n} дней"
 
 
-class Event(SeoModel):
+class Event(TrashableModel, SeoModel):
     title = models.CharField("Заголовок", max_length=128)
     slug = models.SlugField(
         "Адрес страницы",
@@ -101,12 +102,31 @@ class Event(SeoModel):
         if self.end_date == self.date:
             self.end_date = None
 
+    def slug_source(self) -> str:
+        return f"{self.title} {self.date:%Y}"
+
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = unique_slug(self, f"{self.title} {self.date:%Y}")
+            self.slug = unique_slug(self, self.slug_source())
         with transaction.atomic():
             remember_slug_change(self)
             super().save(*args, **kwargs)
+
+    def duplicate(self) -> Event:
+        """Черновик-копия для повторяющихся мероприятий: дату и описание администратор поправит."""
+        return Event.objects.create(
+            title=f"{self.title[:120]} (копия)",
+            date=self.date,
+            end_date=self.end_date,
+            start_time=self.start_time,
+            venue=self.venue,
+            price=self.price,
+            description=self.description,
+            link=self.link,
+            image=clone_file(self.image) or "",
+            show_after_date=self.show_after_date,
+            is_published=False,
+        )
 
     def get_absolute_url(self) -> str:
         return reverse("content:event", args=[self.slug])
@@ -157,7 +177,7 @@ class Event(SeoModel):
 REVIEW_SOURCES = {"yandex.": "Яндекс Карты", "vk.com": "ВКонтакте", "2gis.": "2ГИС", "google.": "Google"}
 
 
-class Review(models.Model):
+class Review(TrashableModel):
     text = HtmlField("Текст")
     link = models.URLField(
         "Ссылка на отзыв",

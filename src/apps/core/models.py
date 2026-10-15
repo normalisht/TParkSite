@@ -4,8 +4,9 @@ from datetime import date
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db import models, transaction
-from django.db.models import Q
+from django.db.models import Max, Q
 from django.urls import reverse
+from django.utils import timezone
 
 from apps.core import about_defaults, seasons
 from apps.core.fields import INFO_HTML_EXTENSIONS, HtmlField, image_specs, logo_spec, og_spec, photo_field
@@ -20,6 +21,50 @@ class OrderedModel(models.Model):
     class Meta:
         abstract = True
         ordering = ["order", "id"]
+
+
+class TrashableModel(models.Model):
+    """Запись, которую «Удалить» в админке переносит в корзину (apps/core/trash.py), а не стирает.
+
+    В корзине запись снята с публикации — сайт её не показывает через обычные `published()`, — и скрыта из
+    списков админки (`TrashAdminMixin`). Фото, привязки и адрес страницы сохраняются."""
+
+    deleted_at = models.DateTimeField("В корзине с", null=True, blank=True, editable=False, db_index=True)
+
+    class Meta:
+        abstract = True
+
+    @property
+    def in_trash(self) -> bool:
+        return self.deleted_at is not None
+
+    def move_to_trash(self) -> None:
+        self.deleted_at = timezone.now()
+        self.is_published = False
+        self.save()
+
+    def restore(self) -> None:
+        # Возвращается черновиком: администратор проверит и опубликует сам.
+        self.deleted_at = None
+        self.save()
+
+    def unique_error_message(self, model_class, unique_check):
+        # Адрес страницы занят записью из корзины: в списке её не видно — объясняем, где она и что делать.
+        if tuple(unique_check) == ("slug",) and self.slug:
+            trashed = model_class._default_manager.filter(slug=self.slug, deleted_at__isnull=False)
+            clash = trashed.exclude(pk=self.pk).first()
+            if clash is not None:
+                return ValidationError(
+                    f"Этот адрес занят записью в корзине «{clash}» — восстановите её или удалите навсегда, "
+                    "либо выберите другой адрес.",
+                    code="unique",
+                )
+        return super().unique_error_message(model_class, unique_check)
+
+
+def next_order(model, **scope) -> int:
+    """Порядок для новой записи — после последней (в пределах `scope`, например `category=…`)."""
+    return (model._default_manager.filter(**scope).aggregate(m=Max("order"))["m"] or 0) + 1
 
 
 PARK_ADDRESS = "Калужская область, Жуковский район, село Восход"
@@ -236,7 +281,7 @@ class SiteSettings(models.Model):
         verbose_name_plural = "Настройки сайта"
 
     def __str__(self):
-        return "Настройки сайта"
+        return "Основные"
 
     def save(self, *args, **kwargs):
         self.pk = 1
@@ -385,7 +430,7 @@ class Season(models.Model):
         width_field="logo_width",
         height_field="logo_height",
         help_text="Заменяет логотип в шапке, пока тема показывается; требования — как у основного логотипа "
-        "(вкладка «Логотип»). В разметку для поисковиков не попадает. Пусто — стандартный логотип в сезонном "
+        "(вкладка «Логотип и политика»). В разметку для поисковиков не попадает. Пусто — стандартный логотип в сезонном "
         "варианте (зимой — со снегом, на Новый год — ещё с шариками и звездой, осенью — с листьями), а если загружен "
         "свой основной логотип — он.",
     )
@@ -427,7 +472,7 @@ class AnnouncementQuerySet(models.QuerySet):
         )
 
 
-class Announcement(OrderedModel):
+class Announcement(TrashableModel, OrderedModel):
     """Плашка под шапкой на всех страницах (partials/site_banner.html); одновременно показывается одна."""
 
     text = models.CharField(
@@ -471,7 +516,7 @@ class Announcement(OrderedModel):
             raise ValidationError({"ends_on": "Дата окончания раньше даты начала."})
 
 
-class InfoPage(SeoModel, OrderedModel):
+class InfoPage(TrashableModel, SeoModel, OrderedModel):
     class Layout(models.TextChoices):
         TEXT = "text", "Текст"
         RULES = "rules", "Правила"

@@ -13,7 +13,15 @@ from unfold.forms import AdminPasswordChangeForm, UserChangeForm, UserCreationFo
 from unfold.widgets import UnfoldAdminTextareaWidget
 
 from apps.core import seasons
-from apps.core.admin_utils import SEO_FIELDSET, SiteModelAdmin, copy_url_button, seo_help
+from apps.core.admin_utils import (
+    SEO_FIELDSET,
+    OrderedInlineMixin,
+    SiteModelAdmin,
+    TrashAdminMixin,
+    TrashLabelsMixin,
+    copy_url_button,
+    seo_help,
+)
 from apps.core.maps import MapEmbedURLField
 from apps.core.models import Announcement, FounderFact, InfoPage, ParkFormat, Phone, Redirect, Season, SiteSettings
 from apps.texts.hints import texts_hint
@@ -59,7 +67,7 @@ class PhoneFormSet(BaseInlineFormSet):
         return super().save(commit)
 
 
-class PhoneInline(TabularInline):
+class PhoneInline(OrderedInlineMixin, TabularInline):
     model = Phone
     form = PhoneForm
     formset = PhoneFormSet
@@ -67,9 +75,10 @@ class PhoneInline(TabularInline):
     ordering_field = "order"
     hide_ordering_field = True
     fields = ["number", "is_whatsapp", "is_telegram", "order"]
+    tab = True  # своя вкладка: без неё таблица телефонов видна под любой вкладкой полей
 
 
-class ParkFormatInline(TabularInline):
+class ParkFormatInline(TrashLabelsMixin, OrderedInlineMixin, TabularInline):
     model = ParkFormat
     extra = 0
     tab = True
@@ -78,7 +87,7 @@ class ParkFormatInline(TabularInline):
     fields = ["name", "caption", "description", "category", "order"]
 
 
-class FounderFactInline(TabularInline):
+class FounderFactInline(OrderedInlineMixin, TabularInline):
     model = FounderFact
     extra = 0
     tab = True
@@ -127,7 +136,7 @@ class SiteSettingsAdmin(SiteModelAdmin):
     formfield_overrides = {MapEmbedURLField: {"widget": UnfoldAdminTextareaWidget(attrs={"rows": 3})}}
     fieldsets = (
         ("Контакты", {"classes": ["tab"], "fields": ["address", "map_embed_url", "vk_url", "max_url", "reviews_url"]}),
-        ("Логотип", {"classes": ["tab"], "fields": ["header_logo"]}),
+        ("Логотип и политика", {"classes": ["tab"], "fields": ["header_logo", "privacy_page"]}),
         (
             "Главная",
             {"classes": ["tab"], "description": texts_hint(Page.HOME), "fields": ["home_intro", "home_show_events"]},
@@ -161,7 +170,6 @@ class SiteSettingsAdmin(SiteModelAdmin):
                 ],
             },
         ),
-        ("Юридическое", {"classes": ["tab"], "fields": ["privacy_page"]}),
         (
             "SEO",
             {
@@ -216,7 +224,7 @@ class SiteSettingsAdmin(SiteModelAdmin):
 
 
 @admin.register(Announcement)
-class AnnouncementAdmin(SiteModelAdmin):
+class AnnouncementAdmin(TrashAdminMixin, SiteModelAdmin):
     help_intro = (
         "Полоса с текстом и ссылкой под шапкой на всех страницах: акции, корпоративы, изменения в работе. "
         "Убрать с сайта — снять галочку «Показывать»; одновременно видна одна плашка — первая по порядку."
@@ -228,7 +236,8 @@ class AnnouncementAdmin(SiteModelAdmin):
     ordering = ["order", "id"]
     ordering_field = "order"
     hide_ordering_field = True
-    fields = ["text", "link", "is_published", ("starts_on", "ends_on"), "order"]
+    fields = ["text", "link", "is_published", ("starts_on", "ends_on")]
+    actions_list = ["trash"]
 
     @admin.display(description="Сейчас")
     def status(self, obj):
@@ -237,7 +246,7 @@ class AnnouncementAdmin(SiteModelAdmin):
 
 
 @admin.register(InfoPage)
-class InfoPageAdmin(SiteModelAdmin):
+class InfoPageAdmin(TrashAdminMixin, SiteModelAdmin):
     help_intro = (
         "Отдельные страницы с текстом: правила, политика конфиденциальности, вопросы и ответы. В меню их нет; "
         "ссылка внизу сайта — галочка «В подвале», другие ссылки — в «Настройках сайта» или копируются из формы. "
@@ -268,13 +277,13 @@ class InfoPageAdmin(SiteModelAdmin):
                     "body",
                     "show_in_footer",
                     "is_published",
-                    "order",
                 ],
             },
         ),
         SEO_FIELDSET,
     )
     readonly_fields = ["page_url"]
+    actions_list = ["trash"]
 
     class Media:
         js = ["js/admin_copy.js"]

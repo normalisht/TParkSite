@@ -3,7 +3,8 @@ from django.urls import reverse
 
 from apps.catalog.prices import format_price
 from apps.core.fields import HtmlField, full_spec, image_spec, image_specs, og_spec, photo_field
-from apps.core.models import OrderedModel, PublishedQuerySet, SeoModel
+from apps.core.files import clone_file
+from apps.core.models import OrderedModel, PublishedQuerySet, SeoModel, TrashableModel, next_order
 from apps.core.redirects import remember_slug_change
 from apps.core.slugs import SLUG_HELP, unique_slug
 
@@ -11,7 +12,7 @@ PREVIEW_HELP = "Карточка на главной и шапка страни�
 SLIDE_HELP = "Слайдер: кадр обрезается до 16:9 (как экран телевизора) — людей снимайте с запасом сверху и снизу."
 
 
-class CategoryGroup(OrderedModel):
+class CategoryGroup(TrashableModel, OrderedModel):
     name = models.CharField(
         "Название", max_length=128, help_text="Заголовок раздела в меню «Услуги» в шапке и блока на главной."
     )
@@ -38,7 +39,7 @@ class CategoryGroup(OrderedModel):
         return self.name
 
 
-class Category(SeoModel, OrderedModel):
+class Category(TrashableModel, SeoModel, OrderedModel):
     name = models.CharField("Название", max_length=128)
     slug = models.SlugField("Адрес страницы", max_length=255, unique=True, blank=True, help_text=SLUG_HELP)
     description = HtmlField(
@@ -97,8 +98,17 @@ class Category(SeoModel, OrderedModel):
 
     def services_only_here(self):
         """Услуги, у которых эта категория — единственная: после её удаления они пропадут из навигации."""
-        return Service.objects.filter(category_links__category=self).exclude(
-            category_links__category__in=Category.objects.exclude(pk=self.pk)
+        return Category.services_only_in([self.pk])
+
+    @staticmethod
+    def services_only_in(category_ids):
+        """Услуги, у которых нет других категорий, кроме `category_ids`. Записи в корзине не считаются —
+        ни услуги, ни категории."""
+        others = Category.objects.filter(deleted_at__isnull=True).exclude(pk__in=category_ids)
+        return (
+            Service.objects.filter(deleted_at__isnull=True, category_links__category__in=category_ids)
+            .exclude(category_links__category__in=others)
+            .distinct()
         )
 
 
@@ -120,7 +130,7 @@ class CategoryPhoto(OrderedModel):
         return f"Фото #{self.pk}"
 
 
-class Service(SeoModel):
+class Service(TrashableModel, SeoModel):
     name = models.CharField("Название", max_length=128)
     slug = models.SlugField("Адрес страницы", max_length=255, unique=True, blank=True, help_text=SLUG_HELP)
     short_description = HtmlField(
@@ -163,12 +173,39 @@ class Service(SeoModel):
         # С ценой: в автодополнении админки варианты одной услуги («Фрироуп» на час и на день) различимы.
         return f"{self.name} — {self.price_display}" if self.price_display else self.name
 
+    def slug_source(self) -> str:
+        return self.name
+
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = unique_slug(self, self.name)
+            self.slug = unique_slug(self, self.slug_source())
         with transaction.atomic():
             remember_slug_change(self)
             super().save(*args, **kwargs)
+
+    def duplicate(self) -> Service:
+        """Черновик-копия: те же тексты и цена, копии фото, те же категории (в конце каждой; из корзины — нет).
+        SEO-поля пустые — одинаковые заголовки у двух страниц мешают поиску. Адрес — из названия «… (копия)»:
+        пока копия не опубликована, он следует за названием (`SiteModelAdmin._draft_slug_follows`)."""
+        with transaction.atomic():
+            copy = Service.objects.create(
+                name=f"{self.name[:120]} (копия)",
+                short_description=self.short_description,
+                description=self.description,
+                price=self.price,
+                price_unit=self.price_unit,
+                has_page=self.has_page,
+                is_published=False,
+            )
+            for photo in self.photos.all():
+                image = clone_file(photo.image)
+                if image:
+                    ServicePhoto.objects.create(service=copy, image=image, order=photo.order)
+            for link in self.category_links.filter(category__deleted_at__isnull=True).select_related("category"):
+                CategoryService.objects.create(
+                    category=link.category, service=copy, order=next_order(CategoryService, category=link.category)
+                )
+        return copy
 
     def get_absolute_url(self) -> str:
         return reverse("catalog:service", args=[self.slug])
