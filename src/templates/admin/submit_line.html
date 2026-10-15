@@ -1,4 +1,4 @@
-{# Копия unfold/templates/admin/submit_line.html: «Удалить» без названия раздела. Сверять при обновлении Unfold. #}
+{# Копия unfold/templates/admin/submit_line.html: «Удалить» без названия раздела, у админок с корзиной — «В корзину». Сверять при обновлении Unfold. #}
 {% load i18n admin_urls unfold %}
 
 <div {% if not is_popup %}id="submit-row"{% endif %} class="relative lg:sticky lg:bottom-0 z-40">
@@ -61,7 +61,7 @@
                         {% add_preserved_filters delete_url as link %}
 
                         {% component "unfold/components/button.html" with href=link variant="danger" class="mr-auto w-full lg:w-auto" %}
-                            {% trans "Delete" %}
+                            {% if adminform.model_admin.trash_enabled %}В корзину{% else %}{% trans "Delete" %}{% endif %}
                         {% endcomponent %}
                     {% endif %}
                 </div>

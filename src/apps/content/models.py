@@ -11,7 +11,7 @@ from django.utils.html import strip_tags
 from django.utils.text import Truncator
 
 from apps.core.fields import HtmlField, full_spec, image_spec, image_specs, og_spec, photo_field
-from apps.core.models import OrderedModel, PublishedQuerySet, SeoModel
+from apps.core.models import OrderedModel, PublishedQuerySet, SeoModel, TrashableModel
 from apps.core.redirects import remember_slug_change
 from apps.core.rotation import daily_pick
 from apps.core.slugs import unique_slug
@@ -49,7 +49,7 @@ def _days(n: int) -> str:
     return f"{n} дней"
 
 
-class Event(SeoModel):
+class Event(TrashableModel, SeoModel):
     title = models.CharField("Заголовок", max_length=128)
     slug = models.SlugField(
         "Адрес страницы",
@@ -157,7 +157,7 @@ class Event(SeoModel):
 REVIEW_SOURCES = {"yandex.": "Яндекс Карты", "vk.com": "ВКонтакте", "2gis.": "2ГИС", "google.": "Google"}
 
 
-class Review(models.Model):
+class Review(TrashableModel):
     text = HtmlField("Текст")
     link = models.URLField(
         "Ссылка на отзыв",

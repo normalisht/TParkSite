@@ -6,6 +6,7 @@ from django.core.validators import RegexValidator
 from django.db import models, transaction
 from django.db.models import Max, Q
 from django.urls import reverse
+from django.utils import timezone
 
 from apps.core import about_defaults, seasons
 from apps.core.fields import INFO_HTML_EXTENSIONS, HtmlField, image_specs, logo_spec, og_spec, photo_field
@@ -20,6 +21,32 @@ class OrderedModel(models.Model):
     class Meta:
         abstract = True
         ordering = ["order", "id"]
+
+
+class TrashableModel(models.Model):
+    """Запись, которую «Удалить» в админке переносит в корзину (apps/core/trash.py), а не стирает.
+
+    В корзине запись снята с публикации — сайт её не показывает через обычные `published()`, — и скрыта из
+    списков админки (`TrashAdminMixin`). Фото, привязки и адрес страницы сохраняются."""
+
+    deleted_at = models.DateTimeField("В корзине с", null=True, blank=True, editable=False, db_index=True)
+
+    class Meta:
+        abstract = True
+
+    @property
+    def in_trash(self) -> bool:
+        return self.deleted_at is not None
+
+    def move_to_trash(self) -> None:
+        self.deleted_at = timezone.now()
+        self.is_published = False
+        self.save()
+
+    def restore(self) -> None:
+        # Возвращается черновиком: администратор проверит и опубликует сам.
+        self.deleted_at = None
+        self.save()
 
 
 def next_order(model, **scope) -> int:
@@ -432,7 +459,7 @@ class AnnouncementQuerySet(models.QuerySet):
         )
 
 
-class Announcement(OrderedModel):
+class Announcement(TrashableModel, OrderedModel):
     """Плашка под шапкой на всех страницах (partials/site_banner.html); одновременно показывается одна."""
 
     text = models.CharField(
@@ -476,7 +503,7 @@ class Announcement(OrderedModel):
             raise ValidationError({"ends_on": "Дата окончания раньше даты начала."})
 
 
-class InfoPage(SeoModel, OrderedModel):
+class InfoPage(TrashableModel, SeoModel, OrderedModel):
     class Layout(models.TextChoices):
         TEXT = "text", "Текст"
         RULES = "rules", "Правила"

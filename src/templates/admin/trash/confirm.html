@@ -1,0 +1,13 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<form method="post" class="flex max-w-xl flex-col gap-4">
+  {% csrf_token %}
+  <input type="hidden" name="post" value="yes">
+  <p>«<strong>{{ object }}</strong>» уйдёт с сайта и из списка. Его фото и связи сохранятся: {{ trash_days }} дней запись можно вернуть кнопкой «Корзина» над списком, потом она удалится навсегда.</p>
+  <div class="flex flex-wrap gap-2">
+    <button type="submit" class="bg-primary-600 rounded-md px-4 py-2 font-semibold text-white">В корзину</button>
+    <a href="{{ changelist_url }}" class="rounded-md border border-base-200 px-4 py-2">Отмена</a>
+  </div>
+</form>
+{% endblock %}

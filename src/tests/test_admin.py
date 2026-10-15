@@ -486,7 +486,8 @@ def test_delete_confirmation_and_forms_are_russian(admin_client):
             assert phrase not in html, (url, phrase)
         # «Select» — отдельное слово в подсказке командного поиска (в других местах встречается как часть фраз)
         assert not re.search(r">\s*Select\s*<", html), url
+    # «Удалить» у категории переносит её в корзину (apps/core/trash.py): своя страница вместо подтверждения Django.
     html = admin_client.get(pages[0]).content.decode()
-    assert "в группе «Активный отдых»" in html
+    assert "Переместить в корзину?" in html
     assert "Удалить: категория «Парк»" not in html
-    assert "Вместе с этим будут удалены" in html
+    assert "Вместе с этим будут удалены" not in html

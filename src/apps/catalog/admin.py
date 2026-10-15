@@ -6,7 +6,14 @@ from unfold.forms import PaginationInlineFormSet
 from unfold.widgets import UnfoldAdminCheckboxSelectMultipleWidget
 
 from apps.catalog.models import Category, CategoryGroup, CategoryPhoto, CategoryService, Service, ServicePhoto
-from apps.core.admin_utils import SEO_TAB, OrderedInlineMixin, SiteModelAdmin, image_preview, thumbnail_html
+from apps.core.admin_utils import (
+    SEO_TAB,
+    OrderedInlineMixin,
+    SiteModelAdmin,
+    TrashAdminMixin,
+    image_preview,
+    thumbnail_html,
+)
 from apps.core.bulk_upload import MultipleImageField, append_images
 from apps.core.models import next_order
 
@@ -39,6 +46,9 @@ class CategoryServiceInline(OrderedInlineMixin, TabularInline):
     fields = ["service", "order"]
     verbose_name_plural = "Услуги"
 
+    def get_queryset(self, request):
+        return super().get_queryset(request).filter(service__deleted_at__isnull=True)
+
 
 class AppendToCategoryFormSet(PaginationInlineFormSet):
     """Услуга, добавленная в категорию из формы услуги, встаёт в конец категории (а не в начало с order=0)."""
@@ -56,6 +66,9 @@ class ServiceCategoryInline(TabularInline):
     autocomplete_fields = ["category"]
     fields = ["category"]
     verbose_name_plural = "Категории"
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).filter(category__deleted_at__isnull=True)
 
 
 class BulkPhotosForm(forms.ModelForm):
@@ -102,7 +115,7 @@ class ServiceAdminForm(BulkPhotosForm):
 
 
 @admin.register(CategoryGroup)
-class CategoryGroupAdmin(SiteModelAdmin):
+class CategoryGroupAdmin(TrashAdminMixin, SiteModelAdmin):
     help_intro = "Разделы меню «Услуги» в шапке и блоки категорий на главной. Порядок — перетаскиванием."
     help_anchor = "catalog"
     list_display = ["name", "is_published"]
@@ -112,10 +125,11 @@ class CategoryGroupAdmin(SiteModelAdmin):
     hide_ordering_field = True
     filter_horizontal = ["categories"]
     fields = ["name", "categories", "is_published"]
+    actions_list = ["trash"]
 
 
 @admin.register(Category)
-class CategoryAdmin(BulkPhotosAdminMixin, SiteModelAdmin):
+class CategoryAdmin(TrashAdminMixin, BulkPhotosAdminMixin, SiteModelAdmin):
     help_intro = (
         "Страницы с услугами. В меню и на главной категория появится, когда опубликованы и она, и её группа. "
         "Новая категория — черновик."
@@ -133,6 +147,7 @@ class CategoryAdmin(BulkPhotosAdminMixin, SiteModelAdmin):
     search_fields = ["name"]
     prepopulated_fields = {"slug": ("name",)}
     inlines = [CategoryPhotoInline, CategoryServiceInline]
+    actions_list = ["trash"]
     fieldsets = (
         (None, {"fields": ["name", "slug", "menu_groups", "description", "preview", "is_published"]}),
         SEO_TAB,
@@ -215,7 +230,7 @@ class ServiceGapsFilter(admin.SimpleListFilter):
 
 
 @admin.register(Service)
-class ServiceAdmin(BulkPhotosAdminMixin, SiteModelAdmin):
+class ServiceAdmin(TrashAdminMixin, BulkPhotosAdminMixin, SiteModelAdmin):
     help_intro = (
         "Услуги показываются на страницах категорий, в которые добавлены. "
         "Фильтр «Видна на сайте» находит услуги, которых посетители не увидят, "
@@ -232,6 +247,7 @@ class ServiceAdmin(BulkPhotosAdminMixin, SiteModelAdmin):
     search_fields = ["name"]
     prepopulated_fields = {"slug": ("name",)}
     inlines = [ServicePhotoInline, ServiceCategoryInline]
+    actions_list = ["trash"]
     fieldsets = (
         (
             None,

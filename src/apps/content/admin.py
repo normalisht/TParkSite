@@ -9,7 +9,14 @@ from unfold.decorators import action
 
 from apps.content.models import Event, GalleryPhoto, Partner, Review
 from apps.content.yandex import ReviewFetchError, fetch_review
-from apps.core.admin_utils import SEO_FIELDSET, SiteModelAdmin, image_preview, move_to_top, thumbnail_html
+from apps.core.admin_utils import (
+    SEO_FIELDSET,
+    SiteModelAdmin,
+    TrashAdminMixin,
+    image_preview,
+    move_to_top,
+    thumbnail_html,
+)
 from apps.core.bulk_upload import BulkUploadForm, append_images
 
 
@@ -30,7 +37,7 @@ class EventPeriodFilter(admin.SimpleListFilter):
 
 
 @admin.register(Event)
-class EventAdmin(SiteModelAdmin):
+class EventAdmin(TrashAdminMixin, SiteModelAdmin):
     help_intro = (
         "Предстоящие — на странице «Мероприятия» и до трёх на главной. "
         "На следующий день после окончания мероприятие становится прошедшим."
@@ -42,6 +49,7 @@ class EventAdmin(SiteModelAdmin):
     list_filter = [EventPeriodFilter, "is_published", "show_after_date"]
     # date_hierarchy убран: годы 2022/2023/2027 сверху списка не помогали найти мероприятие
     search_fields = ["title"]
+    actions_list = ["trash"]
     fieldsets = (
         (
             "Основное",
@@ -83,7 +91,7 @@ class OrderedPhotoAdmin(SiteModelAdmin):
 
 
 @admin.register(Review)
-class ReviewAdmin(SiteModelAdmin):
+class ReviewAdmin(TrashAdminMixin, SiteModelAdmin):
     help_intro = "Новые сверху — по дате отзыва. Ссылка на отзыв с Яндекса и кнопка «Подтянуть» заполнят текст и дату."
     help_anchor = "reviews"
     # Порядок — по дате (Meta.ordering), без перетаскивания.
@@ -93,6 +101,7 @@ class ReviewAdmin(SiteModelAdmin):
     list_filter = ["is_published"]
     date_hierarchy = "date"
     fields = ["link", "date", "text", "photo", "is_published"]
+    actions_list = ["trash"]
 
     class Media:
         js = ["js/admin_review_fetch.js"]

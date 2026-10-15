@@ -3,7 +3,7 @@ from django.urls import reverse
 
 from apps.catalog.prices import format_price
 from apps.core.fields import HtmlField, full_spec, image_spec, image_specs, og_spec, photo_field
-from apps.core.models import OrderedModel, PublishedQuerySet, SeoModel
+from apps.core.models import OrderedModel, PublishedQuerySet, SeoModel, TrashableModel
 from apps.core.redirects import remember_slug_change
 from apps.core.slugs import SLUG_HELP, unique_slug
 
@@ -11,7 +11,7 @@ PREVIEW_HELP = "Карточка на главной и шапка страни�
 SLIDE_HELP = "Слайдер: кадр обрезается до 16:9 (как экран телевизора) — людей снимайте с запасом сверху и снизу."
 
 
-class CategoryGroup(OrderedModel):
+class CategoryGroup(TrashableModel, OrderedModel):
     name = models.CharField(
         "Название", max_length=128, help_text="Заголовок раздела в меню «Услуги» в шапке и блока на главной."
     )
@@ -38,7 +38,7 @@ class CategoryGroup(OrderedModel):
         return self.name
 
 
-class Category(SeoModel, OrderedModel):
+class Category(TrashableModel, SeoModel, OrderedModel):
     name = models.CharField("Название", max_length=128)
     slug = models.SlugField("Адрес страницы", max_length=255, unique=True, blank=True, help_text=SLUG_HELP)
     description = HtmlField(
@@ -120,7 +120,7 @@ class CategoryPhoto(OrderedModel):
         return f"Фото #{self.pk}"
 
 
-class Service(SeoModel):
+class Service(TrashableModel, SeoModel):
     name = models.CharField("Название", max_length=128)
     slug = models.SlugField("Адрес страницы", max_length=255, unique=True, blank=True, help_text=SLUG_HELP)
     short_description = HtmlField(
