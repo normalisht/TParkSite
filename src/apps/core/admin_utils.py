@@ -50,12 +50,12 @@ SEO_FIELDSET = (
     {"classes": ["tab"], "description": seo_help("object"), "fields": ["seo_title", "seo_description"]},
 )
 
-# То же в формах с вкладками-inline (услуга, категория): свёрнутый блок под основными полями,
-# а не вторая строка вкладок внутри «Основного».
-SEO_SECTION = (
-    "SEO",
-    {"classes": ["collapse"], "description": seo_help("object"), "fields": ["seo_title", "seo_description"]},
-)
+# То же в формах с вкладками-inline (услуга, категория): вкладка «SEO» в одном ряду с вкладками-inline,
+# а не вторая строка вкладок внутри «Основного». Класс «seo-pane» (не «tab»: Unfold ищет подстроку) —
+# метка для templates/admin/includes/fieldset.html; саму вкладку рисует templates/unfold/helpers/tab_items.html.
+SEO_PANE = "seo-pane"
+SEO_FIELDS = ["seo_title", "seo_description"]
+SEO_TAB = (None, {"classes": [SEO_PANE], "description": seo_help("object"), "fields": SEO_FIELDS})
 
 
 class OrderedInlineMixin:
@@ -92,6 +92,15 @@ class SiteModelAdmin(ModelAdmin):
             else (title, options)
             for title, options in super().get_fieldsets(request, obj)
         ]
+
+    def render_change_form(self, request, context, *args, **kwargs):
+        # Вкладка «SEO» (SEO_TAB) рисуется в ряду вкладок-inline: передаём ей число ошибок SEO-полей и поправку
+        # для счётчика «Основного» (Unfold считает в нём все ошибки формы).
+        if any(SEO_PANE in fieldset.classes for fieldset in context["adminform"]):
+            errors = sum(name in context["adminform"].form.errors for name in SEO_FIELDS)
+            for inline in context["inline_admin_formsets"]:
+                inline.seo_tab = {"error_count": errors, "general_offset": -errors}
+        return super().render_change_form(request, context, *args, **kwargs)
 
     def save_model(self, request, obj, form, change):
         # Поля «Порядок» в формах нет — порядок задают перетаскиванием в списке, новая запись встаёт в конец.

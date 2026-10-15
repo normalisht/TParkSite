@@ -1,3 +1,5 @@
+import re
+
 import pytest
 from django.urls import reverse
 
@@ -7,15 +9,42 @@ from apps.core.models import SiteSettings
 pytestmark = pytest.mark.django_db
 
 
-@pytest.mark.parametrize(
-    ("url_name", "model"), [("admin:catalog_service_change", Service), ("admin:catalog_category_change", Category)]
-)
-def test_one_row_of_tabs_and_bulk_upload_in_photos_tab(admin_client, url_name, model):
+CHANGE_FORMS = [
+    ("admin:catalog_service_change", Service, "category_links"),
+    ("admin:catalog_category_change", Category, "service_links"),
+]
+
+
+@pytest.mark.parametrize(("url_name", "model", "next_inline"), CHANGE_FORMS)
+def test_one_row_of_tabs_bulk_upload_in_photos_tab_and_seo_tab(admin_client, url_name, model, next_inline):
     obj = model.objects.create(name="Тест")
     page = admin_client.get(reverse(url_name, args=[obj.pk])).content.decode()
     assert "activeFieldsetTab" not in page  # нет второй строки вкладок
-    photos_group = page.index('id="photos-group"')
-    assert page.index('name="bulk_photos"') > photos_group  # поле пачки — во вкладке фото
+    assert re.search(r'<a href="#seo"[^>]*>\s*SEO\s*</a>', page)  # вкладка SEO — в том же ряду, что и остальные
+    photos_group, next_group = page.index('id="photos-group"'), page.index(f'id="{next_inline}-group"')
+    assert photos_group < page.index('name="bulk_photos"') < next_group  # поле пачки — только во вкладке фото
+    assert 'id="seo-group"' in page  # по нему Unfold открывает вкладку из #seo
+    seo_pane = page.index("x-show=\"activeTab == 'seo'\"")
+    assert page.index('id="id_name"') < seo_pane < page.index('name="seo_title"')  # SEO-поля — в своей вкладке
+    assert page.index('name="seo_title"') < page.index('name="seo_description"')
+    assert page.index('name="seo_description"') < photos_group  # а сама вкладка — до inline-вкладок в разметке
+
+
+@pytest.mark.parametrize(("url_name", "model", "next_inline"), CHANGE_FORMS)
+def test_seo_error_is_shown_on_seo_tab_badge(admin_client, url_name, model, next_inline):
+    obj = model.objects.create(name="Тест")
+    url = reverse(url_name, args=[obj.pk])
+    form = admin_client.get(url).context["adminform"].form
+    data = {name: form[name].value() for name in form.fields if name != "bulk_photos" and form[name].value()}
+    data["seo_title"] = "я" * 400
+    data.update(
+        {f"{prefix}-{key}": "0" for prefix in ("photos", next_inline) for key in ("TOTAL_FORMS", "INITIAL_FORMS")}
+    )
+    response = admin_client.post(url, data)
+    assert response.status_code == 200
+    page = response.content.decode()
+    assert re.search(r'<a href="#seo"[^>]*>\s*SEO\s*<span class="bg-red-500[^>]*>\s*1\s*</span>', page)
+    assert not re.search(r'<a href="#general"[^>]*>\s*Основное\s*<span class="bg-red-500', page)  # не засчитано дважды
 
 
 def test_bulk_upload_still_saves(admin_client, make_image):

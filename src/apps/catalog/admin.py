@@ -6,7 +6,7 @@ from unfold.forms import PaginationInlineFormSet
 from unfold.widgets import UnfoldAdminCheckboxSelectMultipleWidget
 
 from apps.catalog.models import Category, CategoryGroup, CategoryPhoto, CategoryService, Service, ServicePhoto
-from apps.core.admin_utils import SEO_SECTION, OrderedInlineMixin, SiteModelAdmin, image_preview, thumbnail_html
+from apps.core.admin_utils import SEO_TAB, OrderedInlineMixin, SiteModelAdmin, image_preview, thumbnail_html
 from apps.core.bulk_upload import MultipleImageField, append_images
 from apps.core.models import next_order
 
@@ -135,7 +135,7 @@ class CategoryAdmin(BulkPhotosAdminMixin, SiteModelAdmin):
     inlines = [CategoryPhotoInline, CategoryServiceInline]
     fieldsets = (
         (None, {"fields": ["name", "slug", "menu_groups", "description", "preview", "is_published"]}),
-        SEO_SECTION,
+        SEO_TAB,
     )
 
     def get_queryset(self, request):
@@ -246,7 +246,7 @@ class ServiceAdmin(BulkPhotosAdminMixin, SiteModelAdmin):
                 ]
             },
         ),
-        SEO_SECTION,
+        SEO_TAB,
     )
 
     def get_queryset(self, request):

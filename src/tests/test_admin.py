@@ -327,6 +327,15 @@ def test_seo_is_separate_tab(admin_client, model):
     assert "seo" in tabs
 
 
+@pytest.mark.parametrize("model", ["catalog_category", "catalog_service"])
+def test_catalog_seo_is_top_level_tab(admin_client, model):
+    # У категории и услуги вкладки — inline, поэтому SEO — вкладка верхнего уровня, а не второй ряд внутри «Основного».
+    html = admin_client.get(reverse(f"admin:{model}_add")).content.decode()
+    assert "activeFieldsetTab" not in html
+    assert re.search(r'<a href="#seo"[^>]*>\s*SEO\s*</a>', html)
+    assert html.index("x-show=\"activeTab == 'seo'\"") < html.index('name="seo_title"')
+
+
 def test_service_changelist_finds_services_hidden_from_navigation(admin_client):
     shown = Category.objects.create(name="Видна", is_published=True)
     hidden = Category.objects.create(name="Скрыта", is_published=False)

@@ -43,7 +43,7 @@ class Category(SeoModel, OrderedModel):
     slug = models.SlugField("Адрес страницы", max_length=255, unique=True, blank=True, help_text=SLUG_HELP)
     description = HtmlField(
         "Описание",
-        help_text="Текст под заголовком страницы категории. Если в блоке «SEO» описание пустое — идёт и в поиск.",
+        help_text="Текст под заголовком страницы категории. Если на вкладке «SEO» описание пустое — идёт и в поиск.",
     )
     preview = photo_field("Превью для главной", "catalog/previews", size=(1080, 720), help_text=PREVIEW_HELP)
     preview_card, preview_card_avif = image_specs("preview", 640, 427)
