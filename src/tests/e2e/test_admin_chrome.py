@@ -60,3 +60,19 @@ def test_header_open_site_button(admin_page, live_server, width):
     assert button.is_visible()
     assert button.get_attribute("href") == "/"
     assert button.get_by_text("Открыть сайт").is_visible() == (width >= 768)
+
+
+# Вкладки полей (fieldsets_tabs Unfold), правый край которых за пределами экрана.
+CLIPPED_TABS = """
+() => [...document.querySelectorAll('[x-data*="activeFieldsetTab"] > div > nav > a')]
+  .filter(a => a.getBoundingClientRect().right > window.innerWidth + 1)
+  .map(a => a.textContent.trim())
+"""
+
+
+def test_settings_tabs_fit_phone(admin_page, live_server):
+    page = admin_page
+    page.set_viewport_size({"width": 390, "height": 800})
+    page.goto(f"{live_server.url}/admin/core/sitesettings/")
+    page.locator('[x-data*="activeFieldsetTab"]').first.wait_for()
+    assert page.evaluate(CLIPPED_TABS) == []

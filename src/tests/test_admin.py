@@ -319,7 +319,7 @@ def test_seo_help_in_admin_forms(admin_client):
     assert "Координаты" in html
 
 
-@pytest.mark.parametrize("model", ["catalog_category", "catalog_service", "content_event", "core_infopage"])
+@pytest.mark.parametrize("model", ["content_event", "core_infopage"])
 def test_seo_is_separate_tab(admin_client, model):
     html = admin_client.get(reverse(f"admin:{model}_add")).content.decode()
     tabs = re.findall(r"activeFieldsetTab = '([^']+)'\"", html)

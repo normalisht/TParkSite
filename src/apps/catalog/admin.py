@@ -6,7 +6,7 @@ from unfold.forms import PaginationInlineFormSet
 from unfold.widgets import UnfoldAdminCheckboxSelectMultipleWidget
 
 from apps.catalog.models import Category, CategoryGroup, CategoryPhoto, CategoryService, Service, ServicePhoto
-from apps.core.admin_utils import SEO_FIELDSET, OrderedInlineMixin, SiteModelAdmin, image_preview, thumbnail_html
+from apps.core.admin_utils import SEO_SECTION, OrderedInlineMixin, SiteModelAdmin, image_preview, thumbnail_html
 from apps.core.bulk_upload import MultipleImageField, append_images
 from apps.core.models import next_order
 
@@ -20,6 +20,9 @@ class CategoryPhotoInline(OrderedInlineMixin, TabularInline):
     fields = ["preview", "image", "order"]
     readonly_fields = ["preview"]
     preview = image_preview("thumb")
+    # Поле «Загрузить фото пачкой» (форма записи, BulkPhotosForm) — над таблицей фото, в той же вкладке.
+    template_before = "admin/catalog/bulk_photos_field.html"
+    verbose_name_plural = "Фото"
 
 
 class ServicePhotoInline(CategoryPhotoInline):
@@ -131,15 +134,8 @@ class CategoryAdmin(BulkPhotosAdminMixin, SiteModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
     inlines = [CategoryPhotoInline, CategoryServiceInline]
     fieldsets = (
-        (
-            "Основное",
-            {
-                "classes": ["tab"],
-                "fields": ["name", "slug", "menu_groups", "description", "preview", "is_published"],
-            },
-        ),
-        ("Загрузка фото", {"classes": ["tab"], "fields": ["bulk_photos"]}),
-        SEO_FIELDSET,
+        (None, {"fields": ["name", "slug", "menu_groups", "description", "preview", "is_published"]}),
+        SEO_SECTION,
     )
 
     def get_queryset(self, request):
@@ -238,9 +234,8 @@ class ServiceAdmin(BulkPhotosAdminMixin, SiteModelAdmin):
     inlines = [ServicePhotoInline, ServiceCategoryInline]
     fieldsets = (
         (
-            "Основное",
+            None,
             {
-                "classes": ["tab"],
                 "fields": [
                     "name",
                     "slug",
@@ -248,11 +243,10 @@ class ServiceAdmin(BulkPhotosAdminMixin, SiteModelAdmin):
                     "short_description",
                     "description",
                     ("is_published", "has_page"),
-                ],
+                ]
             },
         ),
-        ("Загрузка фото", {"classes": ["tab"], "fields": ["bulk_photos"]}),
-        SEO_FIELDSET,
+        SEO_SECTION,
     )
 
     def get_queryset(self, request):

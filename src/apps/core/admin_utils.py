@@ -50,6 +50,13 @@ SEO_FIELDSET = (
     {"classes": ["tab"], "description": seo_help("object"), "fields": ["seo_title", "seo_description"]},
 )
 
+# То же в формах с вкладками-inline (услуга, категория): свёрнутый блок под основными полями,
+# а не вторая строка вкладок внутри «Основного».
+SEO_SECTION = (
+    "SEO",
+    {"classes": ["collapse"], "description": seo_help("object"), "fields": ["seo_title", "seo_description"]},
+)
+
 
 class OrderedInlineMixin:
     """Новая строка inline встаёт в конец: начальное значение порядка — после последней записи родителя.

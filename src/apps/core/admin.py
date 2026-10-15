@@ -67,6 +67,7 @@ class PhoneInline(OrderedInlineMixin, TabularInline):
     ordering_field = "order"
     hide_ordering_field = True
     fields = ["number", "is_whatsapp", "is_telegram", "order"]
+    tab = True  # своя вкладка: без неё таблица телефонов видна под любой вкладкой полей
 
 
 class ParkFormatInline(OrderedInlineMixin, TabularInline):
@@ -127,7 +128,7 @@ class SiteSettingsAdmin(SiteModelAdmin):
     formfield_overrides = {MapEmbedURLField: {"widget": UnfoldAdminTextareaWidget(attrs={"rows": 3})}}
     fieldsets = (
         ("Контакты", {"classes": ["tab"], "fields": ["address", "map_embed_url", "vk_url", "max_url", "reviews_url"]}),
-        ("Логотип", {"classes": ["tab"], "fields": ["header_logo"]}),
+        ("Логотип и политика", {"classes": ["tab"], "fields": ["header_logo", "privacy_page"]}),
         (
             "Главная",
             {"classes": ["tab"], "description": texts_hint(Page.HOME), "fields": ["home_intro", "home_show_events"]},
@@ -161,7 +162,6 @@ class SiteSettingsAdmin(SiteModelAdmin):
                 ],
             },
         ),
-        ("Юридическое", {"classes": ["tab"], "fields": ["privacy_page"]}),
         (
             "SEO",
             {
