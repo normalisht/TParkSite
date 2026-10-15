@@ -1,7 +1,7 @@
 from django.contrib import admin, messages
 from django.core.exceptions import PermissionDenied
 from django.http import JsonResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import path, reverse
 from django.utils import timezone
 from django.utils.formats import localize_input
@@ -50,6 +50,7 @@ class EventAdmin(TrashAdminMixin, SiteModelAdmin):
     # date_hierarchy убран: годы 2022/2023/2027 сверху списка не помогали найти мероприятие
     search_fields = ["title"]
     actions_list = ["trash"]
+    actions_detail = ["duplicate"]
     fieldsets = (
         (
             "Основное",
@@ -70,6 +71,15 @@ class EventAdmin(TrashAdminMixin, SiteModelAdmin):
         ),
         SEO_FIELDSET,
     )
+
+    # Право — строкой: см. ServiceAdmin.duplicate.
+    @action(description="Дублировать", url_path="duplicate", permissions=["content.add_event"], icon="content_copy")
+    def duplicate(self, request, object_id):
+        original = get_object_or_404(self.get_queryset(request), pk=object_id)
+        copy = original.duplicate()
+        self.log_addition(request, copy, f"Копия «{original}»")
+        messages.success(request, f"Создана копия «{original}» — черновик. Поменяйте дату и опубликуйте.")
+        return redirect(reverse("admin:content_event_change", args=[copy.pk]))
 
     @admin.display(description="Фото")
     def photo(self, obj):

@@ -1,7 +1,10 @@
 from django import forms
 from django.contrib import admin, messages
 from django.db.models import Count, Q
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse
 from unfold.admin import TabularInline
+from unfold.decorators import action
 from unfold.forms import PaginationInlineFormSet
 from unfold.widgets import UnfoldAdminCheckboxSelectMultipleWidget
 
@@ -259,6 +262,7 @@ class ServiceAdmin(TrashAdminMixin, BulkPhotosAdminMixin, SiteModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
     inlines = [ServicePhotoInline, ServiceCategoryInline]
     actions_list = ["trash"]
+    actions_detail = ["duplicate"]
     fieldsets = (
         (
             None,
@@ -275,6 +279,16 @@ class ServiceAdmin(TrashAdminMixin, BulkPhotosAdminMixin, SiteModelAdmin):
         ),
         SEO_TAB,
     )
+
+    # Право — строкой: для кнопок формы Unfold вызывает has_<право>_permission(request, object_id),
+    # а у стандартного has_add_permission второго аргумента нет.
+    @action(description="Дублировать", url_path="duplicate", permissions=["catalog.add_service"], icon="content_copy")
+    def duplicate(self, request, object_id):
+        original = get_object_or_404(self.get_queryset(request), pk=object_id)
+        copy = original.duplicate()
+        self.log_addition(request, copy, f"Копия «{original}»")
+        messages.success(request, f"Создана копия «{original}» — черновик. Поменяйте название и цену и опубликуйте.")
+        return redirect(reverse("admin:catalog_service_change", args=[copy.pk]))
 
     def view_on_site(self, obj):
         # У услуги без отдельной страницы адреса нет — ведём на её категорию; без категории кнопки нет.

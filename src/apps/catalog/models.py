@@ -3,7 +3,8 @@ from django.urls import reverse
 
 from apps.catalog.prices import format_price
 from apps.core.fields import HtmlField, full_spec, image_spec, image_specs, og_spec, photo_field
-from apps.core.models import OrderedModel, PublishedQuerySet, SeoModel, TrashableModel
+from apps.core.files import clone_file
+from apps.core.models import OrderedModel, PublishedQuerySet, SeoModel, TrashableModel, next_order
 from apps.core.redirects import remember_slug_change
 from apps.core.slugs import SLUG_HELP, unique_slug
 
@@ -169,6 +170,30 @@ class Service(TrashableModel, SeoModel):
         with transaction.atomic():
             remember_slug_change(self)
             super().save(*args, **kwargs)
+
+    def duplicate(self) -> Service:
+        """Черновик-копия: те же тексты и цена, копии фото, те же категории (в конце каждой; из корзины — нет).
+        SEO-поля пустые — одинаковые заголовки у двух страниц мешают поиску."""
+        with transaction.atomic():
+            copy = Service.objects.create(
+                name=f"{self.name[:120]} (копия)",
+                slug=unique_slug(Service(), self.name),
+                short_description=self.short_description,
+                description=self.description,
+                price=self.price,
+                price_unit=self.price_unit,
+                has_page=self.has_page,
+                is_published=False,
+            )
+            for photo in self.photos.all():
+                image = clone_file(photo.image)
+                if image:
+                    ServicePhoto.objects.create(service=copy, image=image, order=photo.order)
+            for link in self.category_links.filter(category__deleted_at__isnull=True).select_related("category"):
+                CategoryService.objects.create(
+                    category=link.category, service=copy, order=next_order(CategoryService, category=link.category)
+                )
+        return copy
 
     def get_absolute_url(self) -> str:
         return reverse("catalog:service", args=[self.slug])

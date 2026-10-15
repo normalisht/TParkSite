@@ -204,6 +204,10 @@ class TrashAdminMixin:
         )
         return [detail, *super().get_urls()]  # раньше «<path:object_id>/» формы записи
 
+    def get_actions_detail(self, request, object_id):
+        # Просмотр из корзины — только для чтения: «Дублировать» и другие кнопки формы не нужны.
+        return [] if self._trash_preview(request) else super().get_actions_detail(request, object_id)
+
     def get_actions_list(self, request):
         # Число записей в корзине — на кнопке над списком.
         actions = super().get_actions_list(request)
