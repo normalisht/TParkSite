@@ -190,7 +190,9 @@ def test_event_copy_slug_follows_title_and_year(admin_client):
     assert copy.slug == "klubnaia-vstrecha-2027"
     copy = _save(admin_client, copy, _event_data(copy, title="Клубная встреча летом", is_published="on"))
     assert copy.slug == "klubnaia-vstrecha-letom-2027"  # публикуют вместе с переименованием — адрес новый
-    assert not Redirect.objects.exists()  # адрес черновика никто не видел
+    # С адреса копии («…-kopiia-…») редиректа нет. Промежуточный адрес черновика остаётся: без поля «был
+    # опубликован» его не отличить от адреса записи, которую сняли с публикации, а редирект срабатывает только на 404.
+    assert not Redirect.objects.filter(old_path__contains="kopiia").exists()
 
 
 def test_service_copy_slug_follows_name(admin_client, service):
@@ -216,3 +218,18 @@ def test_hand_edited_draft_slug_stays(admin_client, service):
     assert copy.slug == "den"
     copy = _save(admin_client, copy, _service_data(copy, name="Фрироуп на сутки"))  # адрес задан руками раньше
     assert copy.slug == "den"
+
+
+def test_once_public_draft_keeps_redirect_on_rename(admin_client, client, service):
+    """Опубликованную услугу убрали в корзину и восстановили (или просто сняли с публикации), потом переименовали:
+    адрес следует за названием, но старый — возможно, уже в поиске — ведёт на новый."""
+    service.move_to_trash()
+    service.restore()
+    old_url = service.get_absolute_url()
+    service = _save(admin_client, service, _service_data(service, name="Фрироуп на сутки"))
+    assert service.slug == "friroup-na-sutki"
+    service.is_published = True
+    service.save()
+    response = client.get(old_url)
+    assert response.status_code == 301
+    assert response["Location"].endswith(service.get_absolute_url())

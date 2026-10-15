@@ -23,7 +23,7 @@ from unfold.decorators import action
 
 from apps.core import search
 from apps.core.images import safe_spec_url
-from apps.core.models import Redirect, TrashableModel, next_order
+from apps.core.models import COPY_SUFFIX, Redirect, TrashableModel, next_order
 from apps.core.request_cache import cached_on_request
 from apps.core.slugs import slugify_ru
 from apps.core.trash import TRASH_DAYS, purge_date, purge_expired
@@ -170,8 +170,14 @@ class SiteModelAdmin(TrashLabelsMixin, ModelAdmin):
         if draft_url:
             obj.slug = ""  # save() соберёт адрес заново — из нового названия
         super().save_model(request, obj, form, change)
-        if draft_url:
-            Redirect.objects.filter(old_path=draft_url).delete()  # адрес черновика на сайте не открывался
+        if draft_url and self._was_copy(form):
+            # Адрес копии на сайте не открывался — редирект с него не нужен. Прочим черновикам он остаётся:
+            # запись могла быть опубликована раньше (снята с публикации, восстановлена из корзины), и её
+            # старый адрес уже в поиске.
+            Redirect.objects.filter(old_path=draft_url).delete()
+
+    def _was_copy(self, form) -> bool:
+        return str(form.initial.get(self.slug_source_fields[0]) or "").endswith(COPY_SUFFIX)
 
     def _draft_slug_follows(self, obj, form) -> bool:
         """Адрес черновика следует за названием (и годом мероприятия): у копии «Встреча (копия)» после правки

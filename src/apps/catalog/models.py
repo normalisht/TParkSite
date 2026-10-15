@@ -4,7 +4,7 @@ from django.urls import reverse
 from apps.catalog.prices import format_price
 from apps.core.fields import HtmlField, full_spec, image_spec, image_specs, og_spec, photo_field
 from apps.core.files import clone_file
-from apps.core.models import OrderedModel, PublishedQuerySet, SeoModel, TrashableModel, next_order
+from apps.core.models import COPY_SUFFIX, OrderedModel, PublishedQuerySet, SeoModel, TrashableModel, next_order
 from apps.core.redirects import remember_slug_change
 from apps.core.slugs import SLUG_HELP, unique_slug
 
@@ -189,7 +189,7 @@ class Service(TrashableModel, SeoModel):
         пока копия не опубликована, он следует за названием (`SiteModelAdmin._draft_slug_follows`)."""
         with transaction.atomic():
             copy = Service.objects.create(
-                name=f"{self.name[:120]} (копия)",
+                name=f"{self.name[:120]}{COPY_SUFFIX}",
                 short_description=self.short_description,
                 description=self.description,
                 price=self.price,
