@@ -132,6 +132,7 @@ msgstr "Сбросить фильтры"
 
 msgid "You have been successfully logged out from the administration"
 msgstr "Вы успешно вышли из системы администрирования"
+
 msgid "Choose file to upload"
 msgstr "Выберите файл или перетащите сюда"
 
@@ -149,6 +150,10 @@ msgstr "Сохранить и добавить ещё"
 
 msgid "The {name} “{obj}” was added successfully."
 msgstr "«{obj}» — добавлено."
+
+# «Сохранить и продолжить редактирование» у новой записи: Django дописывает эту фразу к «added successfully».
+msgid "You may edit it again below."
+msgstr "Можно продолжить редактирование."
 
 msgid "The {name} “{obj}” was changed successfully."
 msgstr "«{obj}» — сохранено."

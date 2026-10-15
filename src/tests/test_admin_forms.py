@@ -118,8 +118,8 @@ def test_saved_message_wording_continue_editing(admin_client):
     # Follow the redirect to get the messages
     response = admin_client.get(response.url)
     texts = [str(m) for m in get_messages(response.wsgi_request)]
-    # Message format: my custom translation of the main part + Django's Russian translation of "You may edit it again below"
-    assert any("— добавлено." in t for t in texts), texts
+    # Django склеивает «added» и отдельный msgid «You may edit it again below.» — оба переведены у нас.
+    assert any(t.endswith("— добавлено. Можно продолжить редактирование.") for t in texts), texts
 
 
 def test_saved_message_wording_add_another(admin_client):
