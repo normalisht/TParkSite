@@ -129,3 +129,6 @@ msgstr "Вернуться на сайт"
 
 msgid "Reset filters"
 msgstr "Сбросить фильтры"
+
+msgid "You have been successfully logged out from the administration"
+msgstr "Вы успешно вышли из системы администрирования"

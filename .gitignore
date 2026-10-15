@@ -18,6 +18,8 @@ __pycache__/
 /src/old_migrate
 
 # Инфраструктура
+/deploy/nginx-site.conf
+/deploy/nginx-site.conf.bak
 /backups/
 /data/
 /.superpowers/

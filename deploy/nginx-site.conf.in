@@ -1,37 +1,35 @@
-# Пример сайта для nginx на хосте при запуске без Docker (systemd + gunicorn на unix-сокете).
-# Вместо uwsgi_pass старого сайта — proxy_pass в сокет gunicorn. Подставить:
-#   /run/tpark/      — /run/<SERVICE>/ (SERVICE из make service-install, по умолчанию tpark);
-#   /path/to/media/  — MEDIA_ROOT из src/.env (по умолчанию <репозиторий>/src/media/), со слешем на конце;
-#   ssl_certificate* — пути к уже выпущенному сертификату (certbot).
-# Положить в /etc/nginx/sites-available/, включить, проверить `sudo nginx -t` и `sudo systemctl reload nginx`.
+# Шаблон сайта для nginx на хосте при запуске без Docker (systemd + gunicorn на unix-сокете).
+# Не править собранный deploy/nginx-site.conf: его пересобирает make nginx-update (и service-deploy) —
+# подставляет @SERVICE@, @MEDIA_ROOT@ и @CANONICAL_HOST@ (из src/.env), @SERVER_NAME@, @CERT_DIR@ (переменные make).
+# Вместо uwsgi_pass старого сайта — proxy_pass в сокет gunicorn. Подключение — make nginx-install (symlink в sites-available).
 
-upstream tpark_web {
-    server unix:/run/tpark/gunicorn.sock fail_timeout=0;
+upstream @SERVICE@_web {
+    server unix:/run/@SERVICE@/gunicorn.sock fail_timeout=0;
 }
 
 # Подбор пароля к админке: не больше 10 попыток входа в минуту с адреса (+5 сразу), дальше — 429.
-limit_req_zone $binary_remote_addr zone=tpark_admin_login:10m rate=10r/m;
+limit_req_zone $binary_remote_addr zone=@SERVICE@_admin_login:10m rate=10r/m;
 
 server {
     listen 80;
     listen [::]:80;
-    server_name t-camp.ru www.t-camp.ru;
+    server_name @SERVER_NAME@;
 
     # Сразу на главный домен по https: http://www… — одним редиректом, без промежуточного www.
     location / {
-        return 301 https://t-camp.ru$request_uri;
+        return 301 https://@CANONICAL_HOST@$request_uri;
     }
 }
 
 server {
-    listen 443 ssl;
-    listen [::]:443 ssl;
-    http2 on;
-    server_name t-camp.ru www.t-camp.ru;
+    # http2 в listen, а не «http2 on;»: директиву знает только nginx 1.25.1+, а в Ubuntu 22.04/24.04 — 1.18/1.24.
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name @SERVER_NAME@;
     server_tokens off;
 
-    ssl_certificate /etc/letsencrypt/live/t-camp.ru/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/t-camp.ru/privkey.pem;
+    ssl_certificate @CERT_DIR@/fullchain.pem;
+    ssl_certificate_key @CERT_DIR@/privkey.pem;
 
     # Загрузка фото пачкой в админке.
     client_max_body_size 200m;
@@ -50,7 +48,7 @@ server {
     proxy_redirect off;
 
     location /media/ {
-        alias /path/to/media/;
+        alias @MEDIA_ROOT@/;
         autoindex off;
         # Имена файлов уникальны (UploadTo — случайные, CACHE/ imagekit — хеши), поэтому кешируем навсегда.
         expires 1y;
@@ -58,13 +56,13 @@ server {
     }
 
     location = /admin/login/ {
-        limit_req zone=tpark_admin_login burst=5 nodelay;
+        limit_req zone=@SERVICE@_admin_login burst=5 nodelay;
         limit_req_status 429;
-        proxy_pass http://tpark_web;
+        proxy_pass http://@SERVICE@_web;
     }
 
     # Статику (/static/) отдаёт WhiteNoise внутри gunicorn — со сжатием и вечным кешем.
     location / {
-        proxy_pass http://tpark_web;
+        proxy_pass http://@SERVICE@_web;
     }
 }
