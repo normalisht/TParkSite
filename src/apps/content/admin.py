@@ -9,7 +9,7 @@ from unfold.decorators import action
 
 from apps.content.models import Event, GalleryPhoto, Partner, Review
 from apps.content.yandex import ReviewFetchError, fetch_review
-from apps.core.admin_utils import SEO_FIELDSET, SiteModelAdmin, image_preview
+from apps.core.admin_utils import SEO_FIELDSET, SiteModelAdmin, image_preview, move_to_top
 from apps.core.bulk_upload import BulkUploadForm, append_images
 
 
@@ -124,14 +124,21 @@ class PartnerAdmin(OrderedPhotoAdmin):
 class GalleryPhotoAdmin(OrderedPhotoAdmin):
     help_intro = (
         "Фото для страницы «Галерея» и полосы «Как это выглядит» на главной, «О нас» и «Отзывах». "
-        "Порядок — перетаскиванием."
+        "Порядок — перетаскиванием; новые фото встают в конец — отметьте их и выберите «Поставить в начало»."
     )
     help_anchor = "gallery"
     list_display = ["preview", "caption"]
     list_display_links = ["preview", "caption"]
+    list_per_page = 400  # все фото на одной странице: перетаскивание работает только в пределах страницы
     fields = ["image", "caption"]
+    actions = ["move_to_top"]
     actions_list = ["bulk_upload"]
     preview = image_preview("thumb", size=96)
+
+    @admin.action(description="Поставить в начало", permissions=["change"])
+    def move_to_top(self, request, queryset):
+        moved = move_to_top(GalleryPhoto, queryset)
+        messages.success(request, f"Поставлено в начало: {moved}.")
 
     @action(description="Загрузить фото пачкой", url_path="bulk-upload", permissions=["add"])
     def bulk_upload(self, request):

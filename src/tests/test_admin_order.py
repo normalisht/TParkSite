@@ -4,7 +4,7 @@ from django.urls import reverse
 
 from apps.catalog.admin import CategoryPhotoInline, CategoryServiceInline, ServiceCategoryInline
 from apps.catalog.models import Category, CategoryGroup, CategoryPhoto, CategoryService, Service
-from apps.content.models import Partner
+from apps.content.models import GalleryPhoto, Partner
 from apps.core.models import next_order
 
 pytestmark = pytest.mark.django_db
@@ -96,3 +96,20 @@ def test_partner_added_in_admin_goes_last(admin_client, make_image):
 def test_order_field_hidden_in_forms(admin_client, url_name):
     form = admin_client.get(reverse(url_name)).context["adminform"].form
     assert "order" not in form.fields
+
+
+def test_move_gallery_photos_to_top(admin_client, make_image):
+    photos = [GalleryPhoto.objects.create(image=make_image(f"{i}.jpg"), order=i) for i in range(1, 6)]
+    response = admin_client.post(
+        reverse("admin:content_galleryphoto_changelist"),
+        {"action": "move_to_top", "_selected_action": [photos[4].pk, photos[2].pk]},
+    )
+    assert response.status_code == 302
+    order = list(GalleryPhoto.objects.order_by("order", "id").values_list("pk", flat=True))
+    assert order == [photos[2].pk, photos[4].pk, photos[0].pk, photos[1].pk, photos[3].pk]
+
+
+def test_gallery_list_fits_one_page():
+    from apps.content.admin import GalleryPhotoAdmin
+
+    assert GalleryPhotoAdmin.list_per_page >= 400

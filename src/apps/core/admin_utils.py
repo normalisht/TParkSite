@@ -100,15 +100,36 @@ class SiteModelAdmin(ModelAdmin):
         return search.search(queryset, search_fields, search_term)
 
 
+def move_to_top(model, selected) -> int:
+    """Ставит выбранные записи в начало списка (между собой — в прежнем порядке), остальные — следом."""
+    picked = list(selected.order_by("order", "id").only("pk", "order"))
+    picked_ids = {obj.pk for obj in picked}
+    rest = [
+        obj for obj in model._default_manager.order_by("order", "id").only("pk", "order") if obj.pk not in picked_ids
+    ]
+    rows = [*picked, *rest]
+    for position, obj in enumerate(rows, start=1):
+        obj.order = position
+    model._default_manager.bulk_update(rows, ["order"])
+    return len(picked)
+
+
+def thumbnail_html(obj, spec_name: str, size: int = 64) -> str:
+    """Генерирует HTML для превью фото в админке."""
+    url = safe_spec_url(obj, spec_name)
+    if not url:
+        return "—"
+    return format_html(
+        '<img src="{}" alt="" loading="lazy" style="height:{}px;width:auto;border-radius:6px;object-fit:cover">',
+        url,
+        size,
+    )
+
+
 def image_preview(spec_name: str, size: int = 64):
     @admin.display(description="Фото")
     def preview(_model_admin, obj):
-        url = safe_spec_url(obj, spec_name)
-        if not url:
-            return "—"
-        return format_html(
-            '<img src="{}" alt="" style="height:{}px;width:auto;border-radius:6px;object-fit:cover">', url, size
-        )
+        return thumbnail_html(obj, spec_name, size)
 
     return preview
 
