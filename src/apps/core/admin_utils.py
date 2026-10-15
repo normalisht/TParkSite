@@ -160,6 +160,10 @@ class TrashAdminMixin:
     def has_delete_permission(self, request, obj=None):
         return not self._trash_preview(request) and super().has_delete_permission(request, obj)
 
+    def get_view_on_site_url(self, obj=None):
+        # В просмотре из корзины ссылки «На сайте» нет: страница записи в корзине — 404.
+        return None if obj is not None and obj.in_trash else super().get_view_on_site_url(obj)
+
     def _url_name(self, view: str) -> str:
         opts = self.model._meta
         return f"admin:{opts.app_label}_{opts.model_name}_{view}"
@@ -263,7 +267,8 @@ class TrashAdminMixin:
                 self.message_user(
                     request, f"«{obj}» восстановлено черновиком — проверьте и опубликуйте.", messages.SUCCESS
                 )
-            elif "purge" in request.POST:
+                return redirect(reverse(self._url_name("change"), args=[obj.pk]))
+            if "purge" in request.POST:
                 name = str(obj)
                 with transaction.atomic():
                     self.log_deletions(request, self._trashed().filter(pk=obj.pk))
@@ -296,7 +301,8 @@ class TrashAdminMixin:
             "can_purge": self.has_delete_permission(request),
         }
         request._trash_preview = True
-        extra_context = {"title": f"«{obj}» — в корзине", "trash_preview": trash_preview}
+        # «История» ищет запись обычным get_queryset (без корзины) и ответила бы «не найдено» — ссылку прячем.
+        extra_context = {"title": f"«{obj}» — в корзине", "trash_preview": trash_preview, "show_history": False}
         return self.changeform_view(request, str(obj.pk), extra_context=extra_context)
 
 

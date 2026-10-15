@@ -41,10 +41,20 @@ def test_delete_moves_to_trash(admin_client, client, service):
 def test_restore_returns_draft(admin_client, service):
     service.move_to_trash()
     response = admin_client.post(reverse("admin:catalog_service_trash"), {"pk": service.pk, "restore": "1"})
-    assert response.status_code == 302
+    change_url = reverse("admin:catalog_service_change", args=[service.pk])
+    assert response.status_code == 302 and response.url == change_url  # сразу в форму: проверить и опубликовать
+    page = admin_client.get(change_url).content.decode()
+    assert "восстановлено черновиком — проверьте и опубликуйте" in page
     service.refresh_from_db()
     assert not service.in_trash and not service.is_published
     assert service in admin_client.get(reverse("admin:catalog_service_changelist")).context["cl"].result_list
+
+
+def test_purge_returns_to_trash_list(admin_client, service):
+    service.move_to_trash()
+    url = reverse("admin:catalog_service_trash")
+    response = admin_client.post(url, {"pk": service.pk, "purge": "1"})
+    assert response.status_code == 302 and response.url == url
 
 
 def test_purge_deletes_forever(admin_client, service, django_capture_on_commit_callbacks):
@@ -227,3 +237,14 @@ def test_trashed_category_view_shows_menu_groups(admin_client):
     category.move_to_trash()
     page = admin_client.get(reverse("admin:catalog_category_trash_detail", args=[category.pk])).content.decode()
     assert "Группы меню" in page and "Летом" in page
+
+
+def test_restore_from_read_only_view_opens_form(admin_client, service):
+    service.move_to_trash()
+    page = admin_client.get(reverse("admin:catalog_service_trash_detail", args=[service.pk])).content.decode()
+    trash_url = reverse("admin:catalog_service_trash")
+    assert f'action="{trash_url}"' in page  # кнопки плашки шлют POST в корзину
+    assert reverse("admin:catalog_service_history", args=[service.pk]) not in page  # история не нашла бы запись
+    assert "/admin/r/" not in page  # «На сайте» (admin:view_on_site) — 404 для записи в корзине
+    response = admin_client.post(trash_url, {"pk": service.pk, "restore": "1"})
+    assert response.url == reverse("admin:catalog_service_change", args=[service.pk])
