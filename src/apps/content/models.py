@@ -12,7 +12,7 @@ from django.utils.text import Truncator
 
 from apps.core.fields import HtmlField, full_spec, image_spec, image_specs, og_spec, photo_field
 from apps.core.files import clone_file
-from apps.core.models import OrderedModel, PublishedQuerySet, SeoModel, TrashableModel
+from apps.core.models import COPY_SUFFIX, OrderedModel, PublishedQuerySet, SeoModel, TrashableModel
 from apps.core.redirects import remember_slug_change
 from apps.core.rotation import daily_pick
 from apps.core.slugs import unique_slug
@@ -115,7 +115,7 @@ class Event(TrashableModel, SeoModel):
     def duplicate(self) -> Event:
         """Черновик-копия для повторяющихся мероприятий: дату и описание администратор поправит."""
         return Event.objects.create(
-            title=f"{self.title[:120]} (копия)",
+            title=f"{self.title[:120]}{COPY_SUFFIX}",
             date=self.date,
             end_date=self.end_date,
             start_time=self.start_time,

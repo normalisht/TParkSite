@@ -62,6 +62,10 @@ class TrashableModel(models.Model):
         return super().unique_error_message(model_class, unique_check)
 
 
+# Окончание названия копии («Дублировать»): по нему админка узнаёт черновик, адрес которого на сайте не открывался.
+COPY_SUFFIX = " (копия)"
+
+
 def next_order(model, **scope) -> int:
     """Порядок для новой записи — после последней (в пределах `scope`, например `category=…`)."""
     return (model._default_manager.filter(**scope).aggregate(m=Max("order"))["m"] or 0) + 1

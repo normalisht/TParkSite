@@ -238,3 +238,13 @@ def test_tailwind_version_is_pinned():
     from django.conf import settings
 
     assert settings.TAILWIND_CLI_VERSION != "latest"
+
+
+def test_system_checks_do_not_touch_database():
+    """Образ собирается без базы: `tailwind build` и `collectstatic` в Dockerfile запускают системные проверки, и
+    проверка, лезущая в БД, роняет сборку с «unable to open database file». Тест без `django_db` — pytest-django
+    запрещает любой запрос. Пример такой проверки: право `@action` Unfold строкой «app.codename» проверяется
+    запросом к таблице прав, поэтому права кнопок задаются методами `has_<право>_permission`."""
+    from django.core import checks
+
+    assert [str(e) for e in checks.run_checks() if e.is_serious()] == []

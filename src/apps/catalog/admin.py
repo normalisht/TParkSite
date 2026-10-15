@@ -299,9 +299,7 @@ class ServiceAdmin(DuplicateAdminMixin, TrashAdminMixin, BulkPhotosAdminMixin, S
         SEO_TAB,
     )
 
-    # Право — строкой: для кнопок формы Unfold вызывает has_<право>_permission(request, object_id),
-    # а у стандартного has_add_permission второго аргумента нет.
-    @action(description="Дублировать", url_path="duplicate", permissions=["catalog.add_service"], icon="content_copy")
+    @action(description="Дублировать", url_path="duplicate", permissions=["duplicate"], icon="content_copy")
     def duplicate(self, request, object_id):
         return self.duplicate_view(
             request,

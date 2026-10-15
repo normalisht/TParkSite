@@ -74,8 +74,7 @@ class EventAdmin(DuplicateAdminMixin, TrashAdminMixin, SiteModelAdmin):
         SEO_FIELDSET,
     )
 
-    # Право — строкой: см. ServiceAdmin.duplicate.
-    @action(description="Дублировать", url_path="duplicate", permissions=["content.add_event"], icon="content_copy")
+    @action(description="Дублировать", url_path="duplicate", permissions=["duplicate"], icon="content_copy")
     def duplicate(self, request, object_id):
         return self.duplicate_view(
             request, object_id, "Поменяйте дату и опубликуйте — адрес страницы подстроится под название и год."
