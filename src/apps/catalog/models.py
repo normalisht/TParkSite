@@ -98,8 +98,17 @@ class Category(TrashableModel, SeoModel, OrderedModel):
 
     def services_only_here(self):
         """Услуги, у которых эта категория — единственная: после её удаления они пропадут из навигации."""
-        return Service.objects.filter(category_links__category=self).exclude(
-            category_links__category__in=Category.objects.exclude(pk=self.pk)
+        return Category.services_only_in([self.pk])
+
+    @staticmethod
+    def services_only_in(category_ids):
+        """Услуги, у которых нет других категорий, кроме `category_ids`. Записи в корзине не считаются —
+        ни услуги, ни категории."""
+        others = Category.objects.filter(deleted_at__isnull=True).exclude(pk__in=category_ids)
+        return (
+            Service.objects.filter(deleted_at__isnull=True, category_links__category__in=category_ids)
+            .exclude(category_links__category__in=others)
+            .distinct()
         )
 
 

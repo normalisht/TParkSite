@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib import admin, messages
+from django.contrib.admin.utils import unquote
 from django.db.models import Count, Q
 from unfold.admin import TabularInline
 from unfold.decorators import action
@@ -193,16 +194,26 @@ class CategoryAdmin(TrashAdminMixin, BulkPhotosAdminMixin, SiteModelAdmin):
             form.instance.groups.set(form.cleaned_data["menu_groups"])
 
     def delete_view(self, request, object_id, extra_context=None):
-        category = self.get_object(request, object_id)
+        category = self.get_object(request, unquote(object_id))
         if request.method == "GET" and category:
-            names = list(category.services_only_here().values_list("name", flat=True))
-            if names:
-                messages.warning(
-                    request,
-                    f"Без категории останутся услуги ({len(names)}): {', '.join(names)}. "
-                    "На сайте их не будет в меню — привяжите их к другой категории или снимите с публикации.",
-                )
+            self._warn_orphans(request, category.services_only_here(), "останутся")
         return super().delete_view(request, object_id, extra_context)
+
+    @admin.action(description="Переместить в корзину")
+    def move_selected_to_trash(self, request, queryset):
+        orphans = list(Category.services_only_in(list(queryset.values_list("pk", flat=True))))
+        super().move_selected_to_trash(request, queryset)
+        self._warn_orphans(request, orphans, "остались")
+
+    @staticmethod
+    def _warn_orphans(request, services, verb: str):
+        names = [service.name for service in services]
+        if names:
+            messages.warning(
+                request,
+                f"Без категории {verb} услуги ({len(names)}): {', '.join(names)}. "
+                "На сайте их не будет в меню — привяжите их к другой категории или снимите с публикации.",
+            )
 
 
 class ServicePlacementFilter(admin.SimpleListFilter):

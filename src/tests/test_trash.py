@@ -265,3 +265,33 @@ def test_read_only_info_page_keeps_tables(admin_client):
     page.move_to_trash()
     html = admin_client.get(reverse("admin:core_infopage_trash_detail", args=[page.pk])).content.decode()
     assert "<td>" in html and "<blockquote>" in html
+
+
+def test_services_only_here_ignores_trash():
+    category, trashed, live = (Category.objects.create(name=n) for n in ("Парк", "Старая", "Сплавы"))
+    names = {}
+    for name, others in (("Зиплайн", [trashed]), ("Каяк", [live]), ("Батут", []), ("Удалённая", [])):
+        names[name] = Service.objects.create(name=name)
+        for other in [category, *others]:
+            CategoryService.objects.create(category=other, service=names[name])
+    trashed.move_to_trash()
+    names["Удалённая"].move_to_trash()
+    assert set(category.services_only_here().values_list("name", flat=True)) == {"Зиплайн", "Батут"}
+
+
+def test_bulk_trash_of_categories_warns_about_orphans(admin_client):
+    from django.contrib.messages import get_messages
+
+    first, second, live = (Category.objects.create(name=n) for n in ("Парк", "Сплавы", "Зима"))
+    for name, categories in (("Зиплайн", [first, second]), ("Каяк", [second, live]), ("Батут", [first])):
+        service = Service.objects.create(name=name)
+        for category in categories:
+            CategoryService.objects.create(category=category, service=service)
+    response = admin_client.post(
+        reverse("admin:catalog_category_changelist"),
+        {"action": "move_selected_to_trash", "_selected_action": [first.pk, second.pk]},
+    )
+    texts = [str(m) for m in get_messages(response.wsgi_request)]
+    warning = next(t for t in texts if t.startswith("Без категории остались"))
+    assert "Батут" in warning and "Зиплайн" in warning and "Каяк" not in warning
+    assert Category.objects.filter(deleted_at__isnull=False).count() == 2
