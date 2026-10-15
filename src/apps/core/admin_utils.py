@@ -19,7 +19,6 @@ from unfold.admin import ModelAdmin
 from unfold.decorators import action
 
 from apps.core import search
-from apps.core.fields import sanitize_html
 from apps.core.images import safe_spec_url
 from apps.core.models import next_order
 from apps.core.request_cache import cached_on_request
@@ -132,8 +131,11 @@ class SiteModelAdmin(ModelAdmin):
         return search.search(queryset, search_fields, search_term)
 
 
-def _readonly_html(contents: str) -> str:
-    return mark_safe(sanitize_html(html.unescape(contents)))  # очищено nh3 — как при сохранении
+def _readonly_html(sanitize):
+    def render(contents: str) -> str:
+        return mark_safe(sanitize(html.unescape(contents)))  # очищено nh3 — как при сохранении
+
+    return render
 
 
 class TrashAdminMixin:
@@ -142,6 +144,7 @@ class TrashAdminMixin:
     (`trash/<pk>/`: обычная форма только для чтения)."""
 
     trash_enabled = True  # подпись «В корзину» вместо «Удалить» (templates/admin/submit_line.html)
+    change_form_outer_before_template = "admin/trash/preview_banner.html"  # плашка просмотра из корзины
 
     @staticmethod
     def _trash_preview(request) -> bool:
@@ -184,8 +187,13 @@ class TrashAdminMixin:
     @property
     def readonly_preprocess_fields(self):
         # Форма только для чтения (просмотр из корзины): HTML-тексты — как на сайте, а не исходником.
-        # Unfold отдаёт значение экранированным — возвращаем как было и очищаем ещё раз (nh3, как при сохранении).
-        return {field.name: _readonly_html for field in self.model._meta.fields if isinstance(field, ProseEditorField)}
+        # Unfold отдаёт значение экранированным — возвращаем как было и очищаем ещё раз очисткой самого поля
+        # (у инфо-страниц свой набор: таблицы, выноска).
+        return {
+            field.name: _readonly_html(field.sanitize)
+            for field in self.model._meta.fields
+            if isinstance(field, ProseEditorField)
+        }
 
     def get_urls(self):
         opts = self.model._meta

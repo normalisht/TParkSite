@@ -1,6 +1,9 @@
+{# Плашка просмотра из корзины: change_form_outer_before_template — вне <form> записи (вложенную форму браузер выбросил бы). #}
 {% load static %}
+{% if trash_preview %}
 <div class="mb-4 flex flex-wrap items-center gap-4 rounded-md bg-red-100 px-4 py-3 text-red-700 dark:bg-red-500/20 dark:text-red-400">
   <p class="font-semibold">В корзине с {{ trash_preview.deleted_at|date:"j E" }}, удалится навсегда {{ trash_preview.purge_date|date:"j E" }}</p>
   {% include "admin/trash/buttons.html" with pk=original.pk action=trash_preview.trash_url can_restore=trash_preview.can_restore can_purge=trash_preview.can_purge %}
 </div>
 <script src="{% static 'js/admin_trash.js' %}" defer></script>
+{% endif %}

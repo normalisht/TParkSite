@@ -248,3 +248,20 @@ def test_restore_from_read_only_view_opens_form(admin_client, service):
     assert "/admin/r/" not in page  # «На сайте» (admin:view_on_site) — 404 для записи в корзине
     response = admin_client.post(trash_url, {"pk": service.pk, "restore": "1"})
     assert response.url == reverse("admin:catalog_service_change", args=[service.pk])
+
+
+def test_read_only_banner_form_is_outside_change_form(admin_client, service):
+    # Вложенный <form> браузер выбрасывает — кнопки плашки слали бы POST в форму записи (403).
+    service.move_to_trash()
+    page = admin_client.get(reverse("admin:catalog_service_trash_detail", args=[service.pk])).content.decode()
+    banner = page.index(f'action="{reverse("admin:catalog_service_trash")}"')
+    assert banner < page.index('id="service_form"')
+
+
+def test_read_only_info_page_keeps_tables(admin_client):
+    # Очистка — своим набором расширений поля (у инфо-страниц есть таблицы и выноска).
+    body = "<table><tbody><tr><td><p>Ячейка</p></td></tr></tbody></table><blockquote><p>Важно</p></blockquote>"
+    page = InfoPage.objects.create(title="Правила", body=body)
+    page.move_to_trash()
+    html = admin_client.get(reverse("admin:core_infopage_trash_detail", args=[page.pk])).content.decode()
+    assert "<td>" in html and "<blockquote>" in html
