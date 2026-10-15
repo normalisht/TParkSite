@@ -6,6 +6,7 @@ from unfold.admin import ModelAdmin
 
 from apps.core import search
 from apps.core.images import safe_spec_url
+from apps.core.models import next_order
 from apps.core.request_cache import cached_on_request
 
 
@@ -50,6 +51,18 @@ SEO_FIELDSET = (
 )
 
 
+class OrderedInlineMixin:
+    """Новая строка inline встаёт в конец: начальное значение порядка — после последней записи родителя.
+    Без этого у новой строки order=0, и после сохранения она оказывается первой: перетаскивание Unfold
+    переписывает порядок строк, только если их двигали."""
+
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+        scope = {formset.fk.name: obj} if obj is not None and obj.pk else None
+        formset.form.base_fields["order"].initial = next_order(self.model, **scope) if scope else 1
+        return formset
+
+
 class SiteModelAdmin(ModelAdmin):
     """Базовая админка проекта: предупреждает при уходе со страницы с несохранёнными изменениями,
     у SEO-полей показывает счётчики символов и превью сниппета (admin_seo.js), над списком — вводную
@@ -72,6 +85,12 @@ class SiteModelAdmin(ModelAdmin):
             else (title, options)
             for title, options in super().get_fieldsets(request, obj)
         ]
+
+    def save_model(self, request, obj, form, change):
+        # Поля «Порядок» в формах нет — порядок задают перетаскиванием в списке, новая запись встаёт в конец.
+        if not change and "order" not in form.fields and any(f.name == "order" for f in obj._meta.fields):
+            obj.order = next_order(type(obj))
+        super().save_model(request, obj, form, change)
 
     def get_search_results(self, request, queryset, search_term):
         # Без учёта регистра и «ё»/«е» (apps/core/search.py); кроме SQLite — как в Django.

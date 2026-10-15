@@ -4,7 +4,7 @@ from datetime import date
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db import models, transaction
-from django.db.models import Q
+from django.db.models import Max, Q
 from django.urls import reverse
 
 from apps.core import about_defaults, seasons
@@ -20,6 +20,11 @@ class OrderedModel(models.Model):
     class Meta:
         abstract = True
         ordering = ["order", "id"]
+
+
+def next_order(model, **scope) -> int:
+    """Порядок для новой записи — после последней (в пределах `scope`, например `category=…`)."""
+    return (model._default_manager.filter(**scope).aggregate(m=Max("order"))["m"] or 0) + 1
 
 
 PARK_ADDRESS = "Калужская область, Жуковский район, село Восход"

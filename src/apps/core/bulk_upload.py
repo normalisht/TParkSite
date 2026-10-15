@@ -1,10 +1,10 @@
 """Загрузка нескольких фото одним полем: валидация всей пачки, добавление в конец списка."""
 
 from django import forms
-from django.db.models import Max
 from unfold.widgets import UnfoldAdminImageFieldWidget
 
 from apps.core.fields import validate_image_upload
+from apps.core.models import next_order
 
 
 class MultipleImageInput(UnfoldAdminImageFieldWidget):
@@ -43,5 +43,5 @@ class BulkUploadForm(forms.Form):
 
 def append_images(model, files, **parent) -> list:
     """Создаёт записи `model(image=file, order=…, **parent)` после текущего максимума order."""
-    start = (model.objects.filter(**parent).aggregate(m=Max("order"))["m"] or 0) + 1
+    start = next_order(model, **parent)
     return [model.objects.create(image=file, order=start + i, **parent) for i, file in enumerate(files)]

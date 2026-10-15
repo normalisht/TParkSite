@@ -116,7 +116,7 @@ class PartnerAdmin(OrderedPhotoAdmin):
     help_anchor = "gallery"
     list_display = ["preview", "name", "link"]
     list_display_links = ["preview", "name"]
-    fields = ["name", "link", "logo", "order"]
+    fields = ["name", "link", "logo"]
     preview = image_preview("logo_small")
 
 
@@ -129,7 +129,7 @@ class GalleryPhotoAdmin(OrderedPhotoAdmin):
     help_anchor = "gallery"
     list_display = ["preview", "caption"]
     list_display_links = ["preview", "caption"]
-    fields = ["image", "caption", "order"]
+    fields = ["image", "caption"]
     actions_list = ["bulk_upload"]
     preview = image_preview("thumb", size=96)
 

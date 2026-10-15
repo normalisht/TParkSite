@@ -2,14 +2,16 @@ from django import forms
 from django.contrib import admin, messages
 from django.db.models import Count
 from unfold.admin import TabularInline
+from unfold.forms import PaginationInlineFormSet
 from unfold.widgets import UnfoldAdminCheckboxSelectMultipleWidget
 
 from apps.catalog.models import Category, CategoryGroup, CategoryPhoto, CategoryService, Service, ServicePhoto
-from apps.core.admin_utils import SEO_FIELDSET, SiteModelAdmin, image_preview
+from apps.core.admin_utils import SEO_FIELDSET, OrderedInlineMixin, SiteModelAdmin, image_preview
 from apps.core.bulk_upload import MultipleImageField, append_images
+from apps.core.models import next_order
 
 
-class CategoryPhotoInline(TabularInline):
+class CategoryPhotoInline(OrderedInlineMixin, TabularInline):
     model = CategoryPhoto
     extra = 0
     tab = True
@@ -24,7 +26,7 @@ class ServicePhotoInline(CategoryPhotoInline):
     model = ServicePhoto
 
 
-class CategoryServiceInline(TabularInline):
+class CategoryServiceInline(OrderedInlineMixin, TabularInline):
     model = CategoryService
     extra = 0
     tab = True
@@ -35,8 +37,17 @@ class CategoryServiceInline(TabularInline):
     verbose_name_plural = "Услуги"
 
 
+class AppendToCategoryFormSet(PaginationInlineFormSet):
+    """Услуга, добавленная в категорию из формы услуги, встаёт в конец категории (а не в начало с order=0)."""
+
+    def save_new(self, form, commit=True):
+        form.instance.order = next_order(CategoryService, category=form.instance.category)
+        return super().save_new(form, commit)
+
+
 class ServiceCategoryInline(TabularInline):
     model = CategoryService
+    formset = AppendToCategoryFormSet
     extra = 0
     tab = True
     autocomplete_fields = ["category"]
@@ -97,7 +108,7 @@ class CategoryGroupAdmin(SiteModelAdmin):
     ordering_field = "order"
     hide_ordering_field = True
     filter_horizontal = ["categories"]
-    fields = ["name", "categories", "is_published", "order"]
+    fields = ["name", "categories", "is_published"]
 
 
 @admin.register(Category)
@@ -123,7 +134,7 @@ class CategoryAdmin(BulkPhotosAdminMixin, SiteModelAdmin):
             "Основное",
             {
                 "classes": ["tab"],
-                "fields": ["name", "slug", "menu_groups", "description", "preview", "is_published", "order"],
+                "fields": ["name", "slug", "menu_groups", "description", "preview", "is_published"],
             },
         ),
         ("Загрузка фото", {"classes": ["tab"], "fields": ["bulk_photos"]}),
