@@ -18,6 +18,7 @@ from apps.core.admin_utils import (
     OrderedInlineMixin,
     SiteModelAdmin,
     TrashAdminMixin,
+    TrashLabelsMixin,
     copy_url_button,
     seo_help,
 )
@@ -77,7 +78,7 @@ class PhoneInline(OrderedInlineMixin, TabularInline):
     tab = True  # своя вкладка: без неё таблица телефонов видна под любой вкладкой полей
 
 
-class ParkFormatInline(OrderedInlineMixin, TabularInline):
+class ParkFormatInline(TrashLabelsMixin, OrderedInlineMixin, TabularInline):
     model = ParkFormat
     extra = 0
     tab = True

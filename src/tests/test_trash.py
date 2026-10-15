@@ -295,3 +295,49 @@ def test_bulk_trash_of_categories_warns_about_orphans(admin_client):
     warning = next(t for t in texts if t.startswith("Без категории остались"))
     assert "Батут" in warning and "Зиплайн" in warning and "Каяк" not in warning
     assert Category.objects.filter(deleted_at__isnull=False).count() == 2
+
+
+def _labels(field):
+    return {str(label) for value, label in field.choices if value}
+
+
+def test_trashed_choices_are_labelled(admin_client):
+    from apps.catalog.models import CategoryGroup
+
+    live, trashed = Category.objects.create(name="Сплавы"), Category.objects.create(name="Старая")
+    old_group = CategoryGroup.objects.create(name="Летом")
+    old_group.categories.add(live, trashed)
+    CategoryGroup.objects.create(name="Зимой")
+    trashed.move_to_trash()
+    old_group.move_to_trash()
+
+    form = admin_client.get(reverse("admin:catalog_category_change", args=[live.pk])).context["adminform"].form
+    assert _labels(form.fields["menu_groups"]) == {"Зимой", "Летом (в корзине)"}
+
+    group = CategoryGroup.objects.get(name="Зимой")
+    form = admin_client.get(reverse("admin:catalog_categorygroup_change", args=[group.pk])).context["adminform"].form
+    assert _labels(form.fields["categories"]) == {"Сплавы", "Старая (в корзине)"}
+
+
+def test_service_category_filter_hides_trashed(admin_client):
+    Category.objects.create(name="Сплавы")
+    Category.objects.create(name="Зима")
+    Category.objects.create(name="Старая").move_to_trash()
+    cl = admin_client.get(reverse("admin:catalog_service_changelist")).context["cl"]
+    spec = next(s for s in cl.filter_specs if getattr(s, "field_path", "") == "category_links__category")
+    assert [name for _pk, name in spec.lookup_choices] == ["Сплавы", "Зима"]
+
+
+def test_settings_label_trashed_choices(admin_client):
+    # Выбранная страница в корзине остаётся в списке (форма настроек сохраняется), но с пометкой.
+    page = InfoPage.objects.create(title="Политика", body="<p>Текст</p>")
+    site = SiteSettings.load()
+    site.privacy_page = page
+    site.save()
+    page.move_to_trash()
+    Category.objects.create(name="Старая").move_to_trash()
+    response = admin_client.get(reverse("admin:core_sitesettings_change", args=[site.pk]))
+    form = response.context["adminform"].form
+    assert "Политика (в корзине)" in _labels(form.fields["privacy_page"])
+    formats = next(f for f in response.context["inline_admin_formsets"] if f.formset.prefix == "park_formats")
+    assert "Старая (в корзине)" in _labels(formats.formset.form.base_fields["category"])

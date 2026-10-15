@@ -11,9 +11,11 @@ from apps.catalog.models import Category, CategoryGroup, CategoryPhoto, Category
 from apps.core.admin_utils import (
     SEO_TAB,
     DuplicateAdminMixin,
+    LiveRelatedFieldListFilter,
     OrderedInlineMixin,
     SiteModelAdmin,
     TrashAdminMixin,
+    TrashLabelMultipleChoiceField,
     image_preview,
     thumbnail_html,
 )
@@ -93,7 +95,7 @@ class BulkPhotosAdminMixin:
 
 
 class CategoryAdminForm(BulkPhotosForm):
-    menu_groups = forms.ModelMultipleChoiceField(
+    menu_groups = TrashLabelMultipleChoiceField(
         CategoryGroup.objects.order_by("order", "id"),
         required=False,
         label="Группы меню",
@@ -267,7 +269,13 @@ class ServiceAdmin(DuplicateAdminMixin, TrashAdminMixin, BulkPhotosAdminMixin, S
     list_display = ["photo", "name", "price_display", "categories", "is_published", "has_page"]
     list_display_links = ["photo", "name"]
     list_editable = ["is_published"]
-    list_filter = [ServicePlacementFilter, ServiceGapsFilter, "is_published", "has_page", "category_links__category"]
+    list_filter = [
+        ServicePlacementFilter,
+        ServiceGapsFilter,
+        "is_published",
+        "has_page",
+        ("category_links__category", LiveRelatedFieldListFilter),
+    ]
     search_fields = ["name"]
     prepopulated_fields = {"slug": ("name",)}
     slug_source_fields = ("name",)

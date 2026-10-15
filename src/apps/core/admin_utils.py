@@ -3,6 +3,7 @@ import html
 import re
 from dataclasses import replace
 
+from django import forms
 from django.contrib import admin, messages
 from django.contrib.admin.options import ActionLocation
 from django.contrib.admin.utils import unquote
@@ -22,7 +23,7 @@ from unfold.decorators import action
 
 from apps.core import search
 from apps.core.images import safe_spec_url
-from apps.core.models import Redirect, next_order
+from apps.core.models import Redirect, TrashableModel, next_order
 from apps.core.request_cache import cached_on_request
 from apps.core.slugs import slugify_ru
 from apps.core.trash import TRASH_DAYS, purge_date, purge_expired
@@ -76,6 +77,44 @@ SEO_FIELDS = ["seo_title", "seo_description"]
 SEO_TAB = (None, {"classes": [SEO_PANE], "description": seo_help("object"), "fields": SEO_FIELDS})
 
 
+def trash_label(obj) -> str:
+    return f"{obj} (в корзине)" if getattr(obj, "deleted_at", None) else str(obj)
+
+
+class TrashLabelChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return trash_label(obj)
+
+
+class TrashLabelMultipleChoiceField(forms.ModelMultipleChoiceField):
+    def label_from_instance(self, obj):
+        return trash_label(obj)
+
+
+class TrashLabelsMixin:
+    """В выпадающих списках и галочках связей записи из корзины подписаны «(в корзине)». Из выбора их не убираем:
+    M2M при сохранении перезаписывается целиком (`set()`) — связи с ними пропали бы и не вернулись бы после
+    восстановления, а выбранное в FK значение из корзины не прошло бы проверку и форма бы не сохранилась."""
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if issubclass(db_field.related_model, TrashableModel):
+            kwargs.setdefault("form_class", TrashLabelChoiceField)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        if issubclass(db_field.related_model, TrashableModel):
+            kwargs.setdefault("form_class", TrashLabelMultipleChoiceField)
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
+
+
+class LiveRelatedFieldListFilter(admin.RelatedFieldListFilter):
+    """Фильтр списка по связанной записи — без записей из корзины."""
+
+    def field_choices(self, field, request, model_admin):
+        ordering = self.field_admin_ordering(field, request, model_admin)
+        return field.get_choices(include_blank=False, ordering=ordering, limit_choices_to={"deleted_at__isnull": True})
+
+
 class OrderedInlineMixin:
     """Новая строка inline встаёт в конец: начальное значение порядка — после последней записи родителя.
     Без этого у новой строки order=0, и после сохранения она оказывается первой: перетаскивание Unfold
@@ -88,11 +127,12 @@ class OrderedInlineMixin:
         return formset
 
 
-class SiteModelAdmin(ModelAdmin):
+class SiteModelAdmin(TrashLabelsMixin, ModelAdmin):
     """Базовая админка проекта: предупреждает при уходе со страницы с несохранёнными изменениями,
     у SEO-полей показывает счётчики символов и превью сниппета (admin_seo.js), над списком — вводную
     `help_intro`, над формой — ссылку на раздел справки `help_anchor` (apps/core/admin_help.py).
-    Поиск — без учёта регистра и «ё»/«е» (apps/core/search.py)."""
+    Поиск — без учёта регистра и «ё»/«е» (apps/core/search.py). Записи из корзины в выборе связей — с пометкой
+    (`TrashLabelsMixin`)."""
 
     help_intro = ""  # 1–2 предложения над списком; доверенный HTML (выводится через |safe)
     help_anchor = ""  # якорь раздела справки из HELP_SECTIONS
