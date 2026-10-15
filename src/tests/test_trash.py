@@ -341,3 +341,18 @@ def test_settings_label_trashed_choices(admin_client):
     assert "Политика (в корзине)" in _labels(form.fields["privacy_page"])
     formats = next(f for f in response.context["inline_admin_formsets"] if f.formset.prefix == "park_formats")
     assert "Старая (в корзине)" in _labels(formats.formset.form.base_fields["category"])
+
+
+def test_slug_taken_by_trashed_record_explains(admin_client, service):
+    service.move_to_trash()
+    data = {"name": "Батут", "slug": service.slug, "is_published": "on"}
+    for prefix in ("photos", "category_links"):
+        data.update({f"{prefix}-TOTAL_FORMS": "0", f"{prefix}-INITIAL_FORMS": "0"})
+    response = admin_client.post(reverse("admin:catalog_service_add"), data)
+    assert response.status_code == 200
+    assert response.context["adminform"].form.errors["slug"] == [
+        "Этот адрес занят записью в корзине «Батут» — восстановите её или удалите навсегда, либо выберите другой адрес."
+    ]
+    response = admin_client.post(reverse("admin:catalog_service_add"), {**data, "slug": ""})
+    assert response.status_code == 302  # пустой адрес соберётся сам и не совпадёт с записью в корзине
+    assert Service.objects.get(deleted_at__isnull=True, name="Батут").slug == "batut-2"

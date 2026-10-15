@@ -48,6 +48,19 @@ class TrashableModel(models.Model):
         self.deleted_at = None
         self.save()
 
+    def unique_error_message(self, model_class, unique_check):
+        # Адрес страницы занят записью из корзины: в списке её не видно — объясняем, где она и что делать.
+        if tuple(unique_check) == ("slug",) and self.slug:
+            trashed = model_class._default_manager.filter(slug=self.slug, deleted_at__isnull=False)
+            clash = trashed.exclude(pk=self.pk).first()
+            if clash is not None:
+                return ValidationError(
+                    f"Этот адрес занят записью в корзине «{clash}» — восстановите её или удалите навсегда, "
+                    "либо выберите другой адрес.",
+                    code="unique",
+                )
+        return super().unique_error_message(model_class, unique_check)
+
 
 def next_order(model, **scope) -> int:
     """Порядок для новой записи — после последней (в пределах `scope`, например `category=…`)."""
