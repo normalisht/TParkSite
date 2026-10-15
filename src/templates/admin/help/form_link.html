@@ -1,3 +1,4 @@
 {% with model_admin=adminform.model_admin %}{% if model_admin.help_anchor %}
 <p class="mb-4 text-sm"><a href="{% url 'admin_help' %}#{{ model_admin.help_anchor }}" class="text-primary-600 underline dark:text-primary-500">Справка по разделу →</a></p>
 {% endif %}{% endwith %}
+{% if trash_preview %}{% include "admin/trash/preview_banner.html" %}{% endif %}

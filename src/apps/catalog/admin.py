@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib import admin, messages
-from django.db.models import Count
+from django.db.models import Count, Q
 from unfold.admin import TabularInline
 from unfold.forms import PaginationInlineFormSet
 from unfold.widgets import UnfoldAdminCheckboxSelectMultipleWidget
@@ -157,7 +157,11 @@ class CategoryAdmin(TrashAdminMixin, BulkPhotosAdminMixin, SiteModelAdmin):
         return (
             super()
             .get_queryset(request)
-            .annotate(services_total=Count("service_links", distinct=True))
+            .annotate(
+                services_total=Count(
+                    "service_links", filter=Q(service_links__service__deleted_at__isnull=True), distinct=True
+                )
+            )
             .prefetch_related("groups", "photos")
         )
 
@@ -170,7 +174,12 @@ class CategoryAdmin(TrashAdminMixin, BulkPhotosAdminMixin, SiteModelAdmin):
 
     @admin.display(description="Группы меню")
     def menu_groups_display(self, obj):
-        return ", ".join(group.name for group in obj.groups.all()) or "— нет в меню"
+        # Группы в корзине не считаются (фильтр в Python: prefetch «groups» нужен форме целиком).
+        groups = [group.name for group in obj.groups.all() if group.deleted_at is None]
+        return ", ".join(groups) or "— нет в меню"
+
+    # Поле формы «Группы меню» в форме только для чтения (просмотр из корзины) показывается этим методом.
+    menu_groups = menu_groups_display
 
     @admin.display(description="Услуг", ordering="services_total")
     def services_count(self, obj):
@@ -205,8 +214,10 @@ class ServicePlacementFilter(admin.SimpleListFilter):
         ]
 
     def queryset(self, request, queryset):
-        if self.value() == "none":
-            return queryset.filter(category_links__isnull=True)
+        if self.value() == "none":  # категории в корзине не считаются
+            return queryset.exclude(
+                pk__in=CategoryService.objects.filter(category__deleted_at__isnull=True).values("service")
+            )
         if self.value() == "hidden":
             return queryset.exclude(category_links__category__is_published=True)
         return queryset
@@ -275,7 +286,8 @@ class ServiceAdmin(TrashAdminMixin, BulkPhotosAdminMixin, SiteModelAdmin):
 
     @admin.display(description="Категории")
     def categories(self, obj):
-        return ", ".join(link.category.name for link in obj.category_links.all()) or "—"
+        links = obj.category_links.all()  # prefetch_related в get_queryset
+        return ", ".join(link.category.name for link in links if link.category.deleted_at is None) or "—"
 
     @admin.display(description="Цена")
     def price_display(self, obj):

@@ -1,11 +1,11 @@
 {% extends "admin/base_site.html" %}
-{% load static %}
+{% load static admin_urls %}
 
 {% block extrahead %}{{ block.super }}<script src="{% static 'js/admin_trash.js' %}" defer></script>{% endblock %}
 
 {% block content %}
 <div class="flex max-w-3xl flex-col gap-4">
-  <p>Записи, удалённые кнопкой «Удалить». На сайте их нет. Через {{ trash_days }} дней после удаления они стираются навсегда вместе с фото. <a href="{{ changelist_url }}" class="underline">Вернуться к списку</a></p>
+  <p>Записи, перенесённые сюда кнопкой «В корзину». На сайте их нет. Через {{ trash_days }} дней после удаления они стираются навсегда вместе с фото. Название открывает запись для просмотра. <a href="{{ changelist_url }}" class="underline">Вернуться к списку</a></p>
   {% if items %}
   <table class="w-full">
     <thead>
@@ -14,16 +14,9 @@
     <tbody>
       {% for obj, expires in items %}
       <tr class="border-t border-base-200">
-        <td class="py-2 pr-4 font-semibold">{{ obj }}</td>
+        <td class="py-2 pr-4 font-semibold"><a href="{% url opts|admin_urlname:'trash_detail' obj.pk %}" class="text-primary-600 underline dark:text-primary-500">{{ obj }}</a></td>
         <td class="py-2 pr-4">{{ expires|date:"j E" }}</td>
-        <td class="py-2">
-          <form method="post" class="flex flex-wrap gap-2">
-            {% csrf_token %}
-            <input type="hidden" name="pk" value="{{ obj.pk }}">
-            <button type="submit" name="restore" value="1" class="bg-primary-600 rounded-md px-3 py-1 font-semibold text-white">Восстановить</button>
-            <button type="submit" name="purge" value="1" class="rounded-md border border-base-200 px-3 py-1 text-red-600">Удалить навсегда</button>
-          </form>
-        </td>
+        <td class="py-2">{% include "admin/trash/buttons.html" with pk=obj.pk can_restore=1 can_purge=1 %}</td>
       </tr>
       {% endfor %}
     </tbody>

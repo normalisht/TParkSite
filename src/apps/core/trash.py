@@ -10,6 +10,11 @@ from django.utils import timezone
 TRASH_DAYS = 30
 
 
+def purge_date(obj):
+    """Когда запись из корзины удалится навсегда."""
+    return obj.deleted_at + timedelta(days=TRASH_DAYS)
+
+
 def purge_expired(model, now=None) -> int:
     limit = (now or timezone.now()) - timedelta(days=TRASH_DAYS)
     # QuerySet.delete шлёт post_delete по каждой записи — файлы фото удаляются после коммита (apps/core/files.py).

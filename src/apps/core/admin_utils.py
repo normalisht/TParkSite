@@ -1,23 +1,29 @@
-from datetime import timedelta
+import html
+from dataclasses import replace
 
 from django.contrib import admin, messages
 from django.contrib.admin.options import ActionLocation
 from django.contrib.admin.utils import unquote
-from django.core.exceptions import PermissionDenied
-from django.db import connections
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.db import connections, transaction
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
+from django.urls import path as url_path
 from django.urls import reverse
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
+from django_prose_editor.fields import ProseEditorField
 from unfold.admin import ModelAdmin
 from unfold.decorators import action
 
 from apps.core import search
+from apps.core.fields import sanitize_html
 from apps.core.images import safe_spec_url
 from apps.core.models import next_order
 from apps.core.request_cache import cached_on_request
-from apps.core.trash import TRASH_DAYS, purge_expired
+from apps.core.trash import TRASH_DAYS, purge_date, purge_expired
 
 
 def _render_seo_help(name: str, request=None) -> str:
@@ -126,18 +132,74 @@ class SiteModelAdmin(ModelAdmin):
         return search.search(queryset, search_fields, search_term)
 
 
+def _readonly_html(contents: str) -> str:
+    return mark_safe(sanitize_html(html.unescape(contents)))  # очищено nh3 — как при сохранении
+
+
 class TrashAdminMixin:
-    """«Удалить» переносит запись в корзину (`TrashableModel`). Над списком — кнопка «Корзина»
-    (добавьте "trash" в `actions_list`): там «Восстановить» и «Удалить навсегда»."""
+    """«Удалить» переносит запись в корзину (`TrashableModel`). Над списком — кнопка «Корзина (N)»
+    (добавьте "trash" в `actions_list`): там «Восстановить» и «Удалить навсегда», по названию — просмотр записи
+    (`trash/<pk>/`: обычная форма только для чтения)."""
 
     trash_enabled = True  # подпись «В корзину» вместо «Удалить» (templates/admin/submit_line.html)
 
+    @staticmethod
+    def _trash_preview(request) -> bool:
+        # Запрос открыт через trash_detail_view: видны только записи в корзине, править нельзя.
+        return getattr(request, "_trash_preview", False)
+
     def get_queryset(self, request):
-        return super().get_queryset(request).filter(deleted_at__isnull=True)
+        return super().get_queryset(request).filter(deleted_at__isnull=not self._trash_preview(request))
+
+    def has_add_permission(self, request):
+        return not self._trash_preview(request) and super().has_add_permission(request)
+
+    def has_change_permission(self, request, obj=None):
+        return not self._trash_preview(request) and super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        return not self._trash_preview(request) and super().has_delete_permission(request, obj)
+
+    def _url_name(self, view: str) -> str:
+        opts = self.model._meta
+        return f"admin:{opts.app_label}_{opts.model_name}_{view}"
 
     def _changelist_url(self):
+        return reverse(self._url_name("changelist"))
+
+    def _trashed(self):
+        return self.model._default_manager.filter(deleted_at__isnull=False)
+
+    def _get_trashed_or_404(self, pk):
+        try:
+            pk = self.model._meta.pk.to_python(pk)
+        except ValidationError:
+            raise Http404 from None
+        return get_object_or_404(self._trashed(), pk=pk)
+
+    @property
+    def readonly_preprocess_fields(self):
+        # Форма только для чтения (просмотр из корзины): HTML-тексты — как на сайте, а не исходником.
+        # Unfold отдаёт значение экранированным — возвращаем как было и очищаем ещё раз (nh3, как при сохранении).
+        return {field.name: _readonly_html for field in self.model._meta.fields if isinstance(field, ProseEditorField)}
+
+    def get_urls(self):
         opts = self.model._meta
-        return reverse(f"admin:{opts.app_label}_{opts.model_name}_changelist")
+        detail = url_path(
+            "trash/<path:object_id>/",
+            self.admin_site.admin_view(self.trash_detail_view),
+            name=f"{opts.app_label}_{opts.model_name}_trash_detail",
+        )
+        return [detail, *super().get_urls()]  # раньше «<path:object_id>/» формы записи
+
+    def get_actions_list(self, request):
+        # Число записей в корзине — на кнопке над списком.
+        actions = super().get_actions_list(request)
+        name = self._url_name("trash").removeprefix("admin:")
+        for index, unfold_action in enumerate(actions):
+            if unfold_action.action_name == name and (count := self._trashed().count()):
+                actions[index] = replace(unfold_action, description=f"{unfold_action.description} ({count})")
+        return actions
 
     def get_actions(self, request, action_location=ActionLocation.CHANGE_LIST):
         actions = super().get_actions(request, action_location=action_location)
@@ -149,12 +211,13 @@ class TrashAdminMixin:
 
     @admin.action(description="Переместить в корзину")
     def move_selected_to_trash(self, request, queryset):
-        moved = 0
-        for obj in queryset:
-            obj.move_to_trash()
-            self.log_change(request, obj, "Перемещено в корзину")
-            moved += 1
-        purge_expired(self.model)
+        with transaction.atomic():
+            moved = 0
+            for obj in queryset:
+                obj.move_to_trash()
+                self.log_change(request, obj, "Перемещено в корзину")
+                moved += 1
+            purge_expired(self.model)
         self.message_user(
             request, f"В корзину перемещено: {moved}. Восстановить — кнопка «Корзина» над списком.", messages.SUCCESS
         )
@@ -166,9 +229,10 @@ class TrashAdminMixin:
         if not self.has_delete_permission(request, obj):
             raise PermissionDenied
         if request.method == "POST":
-            obj.move_to_trash()
-            self.log_change(request, obj, "Перемещено в корзину")
-            purge_expired(self.model)
+            with transaction.atomic():
+                obj.move_to_trash()
+                self.log_change(request, obj, "Перемещено в корзину")
+                purge_expired(self.model)
             self.message_user(
                 request,
                 f"«{obj}» — в корзине. Восстановить можно {TRASH_DAYS} дней: кнопка «Корзина» над списком.",
@@ -188,33 +252,52 @@ class TrashAdminMixin:
 
     @action(description="Корзина", url_path="trash", permissions=["delete"], icon="delete")
     def trash(self, request):
-        trashed = self.model._default_manager.filter(deleted_at__isnull=False).order_by("-deleted_at")
         if request.method == "POST":
-            obj = get_object_or_404(trashed, pk=request.POST.get("pk"))
+            obj = self._get_trashed_or_404(request.POST.get("pk"))
             if "restore" in request.POST:
                 if not self.has_change_permission(request, obj):
                     raise PermissionDenied
-                obj.restore()
-                self.log_change(request, obj, "Восстановлено из корзины")
+                with transaction.atomic():
+                    obj.restore()
+                    self.log_change(request, obj, "Восстановлено из корзины")
                 self.message_user(
                     request, f"«{obj}» восстановлено черновиком — проверьте и опубликуйте.", messages.SUCCESS
                 )
             elif "purge" in request.POST:
                 name = str(obj)
-                self.log_deletions(request, trashed.filter(pk=obj.pk))
-                obj.delete()
+                with transaction.atomic():
+                    self.log_deletions(request, self._trashed().filter(pk=obj.pk))
+                    obj.delete()
                 self.message_user(request, f"«{name}» удалено навсегда.", messages.SUCCESS)
             return redirect(request.path)
         purge_expired(self.model)
+        items = [(obj, purge_date(obj)) for obj in self._trashed().order_by("-deleted_at")]
+        title = f"Корзина: {self.model._meta.verbose_name_plural}"
         context = {
             **self.admin_site.each_context(request),
-            "title": f"Корзина: {self.model._meta.verbose_name_plural}",
+            "title": f"{title} ({len(items)})" if items else title,
             "opts": self.model._meta,
-            "items": [(obj, obj.deleted_at + timedelta(days=TRASH_DAYS)) for obj in trashed],
+            "items": items,
             "trash_days": TRASH_DAYS,
             "changelist_url": self._changelist_url(),
         }
         return render(request, "admin/trash/list.html", context)
+
+    def trash_detail_view(self, request, object_id):
+        """Запись из корзины в обычной форме, только для чтения, с плашкой и кнопками корзины сверху."""
+        if not self.has_view_permission(request):
+            raise PermissionDenied
+        obj = self._get_trashed_or_404(object_id)
+        trash_preview = {
+            "deleted_at": obj.deleted_at,
+            "purge_date": purge_date(obj),
+            "trash_url": reverse(self._url_name("trash")),
+            "can_restore": self.has_delete_permission(request) and self.has_change_permission(request, obj),
+            "can_purge": self.has_delete_permission(request),
+        }
+        request._trash_preview = True
+        extra_context = {"title": f"«{obj}» — в корзине", "trash_preview": trash_preview}
+        return self.changeform_view(request, str(obj.pk), extra_context=extra_context)
 
 
 def move_to_top(model, selected) -> int:
