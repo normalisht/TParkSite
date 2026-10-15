@@ -1,6 +1,8 @@
 import re
+from datetime import date
 
 import pytest
+from django.contrib.messages import get_messages
 from django.urls import reverse
 
 from apps.catalog.models import Category, Service
@@ -68,3 +70,32 @@ def test_phones_have_own_tab(admin_client):
 
 def test_site_settings_name():
     assert str(SiteSettings()) == "Основные"
+
+
+def test_change_form_wording(admin_client):
+    service = Service.objects.create(name="Батут")
+    page = admin_client.get(reverse("admin:catalog_service_change", args=[service.pk])).content.decode()
+    for awkward in (
+        "Удалить Услуга",
+        "Добавить еще один",
+        "Сохранить и добавить другой объект",
+        "Choose file to upload",
+    ):
+        assert awkward not in page
+
+
+def test_saved_message_wording(admin_client):
+    response = admin_client.post(
+        reverse("admin:content_review_add"),
+        {"text": "<p>Отлично</p>", "date": date(2026, 7, 14).strftime("%d.%m.%Y"), "is_published": "on", "link": ""},
+    )
+    assert response.status_code == 302
+    texts = [str(m) for m in get_messages(response.wsgi_request)]
+    assert any(t.endswith("— добавлено.") for t in texts), texts
+
+
+def test_changelist_total_wording(admin_client):
+    Category.objects.create(name="А")
+    Category.objects.create(name="Б")
+    page = admin_client.get(reverse("admin:catalog_category_changelist")).content.decode()
+    assert "Всего: 2" in page

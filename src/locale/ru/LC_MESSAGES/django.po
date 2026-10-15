@@ -134,4 +134,31 @@ msgid "You have been successfully logged out from the administration"
 msgstr "Вы успешно вышли из системы администрирования"
 
 msgid "Choose file to upload"
-msgstr "Выберите файл для загрузки"
+msgstr "Выберите файл или перетащите сюда"
+
+
+
+msgid "Add another %(verbose_name)s"
+msgstr "Добавить ещё"
+
+msgid "Add another %(model)s"
+msgstr "Добавить"
+
+msgid "Add %(name)s"
+msgstr "Добавить"
+
+msgid "Save and add another"
+msgstr "Сохранить и добавить ещё"
+msgid "The {name} “{obj}” was added successfully."
+msgstr "«{obj}» — добавлено."
+
+msgid "The {name} “{obj}” was changed successfully."
+msgstr "«{obj}» — сохранено."
+
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr "«%(obj)s» — удалено."
+
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
+"below."
+msgstr "«{obj}» — сохранено. Ниже можно добавить ещё."

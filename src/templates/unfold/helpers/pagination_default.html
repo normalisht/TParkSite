@@ -1,0 +1,18 @@
+{# Копия unfold/templates/unfold/helpers/pagination_default.html: «Всего: N» без названия раздела. Сверять при обновлении Unfold. #}
+{% load unfold_list %}
+
+{% if pagination_required %}
+    {% for i in page_range %}
+        <div class="{% if forloop.last %}pr-2{% else %}pr-4{% endif %}">
+            {% paginator_number cl i %}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="py-4">
+    {% if pagination_required %}
+        -
+    {% endif %}
+
+    Всего: {{ cl.result_count }}
+</div>
