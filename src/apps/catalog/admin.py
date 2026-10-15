@@ -214,7 +214,7 @@ class ServiceGapsFilter(admin.SimpleListFilter):
         if self.value() == "price":
             return queryset.filter(price="")
         if self.value() == "short":
-            return queryset.filter(short_description="")
+            return queryset.filter(short_description__in=["", "<p></p>"])  # пустой prose-editor сохраняет <p></p>
         return queryset
 
 
