@@ -1,11 +1,12 @@
 from django.db import connection
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect, render
 from django.templatetags.static import static
 
 from apps.core import structured_data as ld
 from apps.core.images import safe_spec_url
 from apps.core.models import InfoPage
+from apps.core.preview import finish, get_for_view, preview_context
 from apps.core.rich_text import parse_info_body
 from apps.core.seo import absolute_url, make_seo
 
@@ -31,21 +32,24 @@ def healthz(request):
 
 
 def info_page(request, slug):
-    page = get_object_or_404(InfoPage.objects.published(), slug=slug)
+    page, preview = get_for_view(request, InfoPage.objects.all(), slug=slug)
     crumbs = [ld.home_crumb(), (page.title, "")]
-    return render(
+    seo = make_seo(page.title, page.lead or page.body, absolute_url(request, safe_spec_url(page, "cover_og")), obj=page)
+    if preview:
+        seo["noindex"] = True
+    response = render(
         request,
         "core/info.html",
         {
             "page": page,
             "body": parse_info_body(page.body, questions=page.layout == InfoPage.Layout.FAQ),
             "breadcrumbs": crumbs,
-            "seo": make_seo(
-                page.title, page.lead or page.body, absolute_url(request, safe_spec_url(page, "cover_og")), obj=page
-            ),
+            "seo": seo,
             "structured_data": [ld.breadcrumbs(request, crumbs)],
+            **preview_context(page, preview),
         },
     )
+    return finish(response, preview)
 
 
 def robots_txt(request):

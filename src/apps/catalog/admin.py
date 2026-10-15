@@ -276,6 +276,18 @@ class ServiceAdmin(TrashAdminMixin, BulkPhotosAdminMixin, SiteModelAdmin):
         SEO_TAB,
     )
 
+    def view_on_site(self, obj):
+        # У услуги без отдельной страницы адреса нет — ведём на её категорию; без категории кнопки нет.
+        if obj.has_page:
+            return obj.get_absolute_url()
+        link = (
+            obj.category_links.filter(category__deleted_at__isnull=True)
+            .select_related("category")
+            .order_by("category__order", "category__id")
+            .first()
+        )
+        return link.category.get_absolute_url() if link else None
+
     def get_queryset(self, request):
         return super().get_queryset(request).prefetch_related("category_links__category", "photos")
 

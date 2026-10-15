@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.formats import date_format
@@ -8,6 +8,7 @@ from apps.core import structured_data as ld
 from apps.core.images import safe_spec_url
 from apps.core.maps import route_links
 from apps.core.models import PARK_ADDRESS, SiteSettings
+from apps.core.preview import finish, get_for_view, preview_context
 from apps.core.seo import absolute_url, make_seo, page_seo
 
 PAST_EVENTS_SHOWN = 6
@@ -33,7 +34,7 @@ def events(request):
 
 
 def event_detail(request, slug):
-    event = get_object_or_404(Event.objects.published(), slug=slug)
+    event, preview = get_for_view(request, Event.objects.all(), slug=slug)
     when = date_format(event.date, "j E Y")
     # Место проведения вне парка: описание не должно утверждать, что событие в Т-Парке (как «Где» и JSON-LD на странице).
     default_description = (
@@ -49,10 +50,10 @@ def event_detail(request, slug):
         default_description=default_description,
     )
     # Прошедшее без «Показывать после даты»: по прямой ссылке открывается, в поиск не попадает.
-    seo["noindex"] = event.is_past and not event.show_after_date
+    seo["noindex"] = preview or (event.is_past and not event.show_after_date)
     crumbs = [ld.home_crumb(), ("Мероприятия", reverse("content:events")), (event.title, "")]
     site = SiteSettings.load()
-    return render(
+    response = render(
         request,
         "content/event.html",
         {
@@ -67,8 +68,10 @@ def event_detail(request, slug):
                 ld.breadcrumbs(request, crumbs),
                 ld.event(request, event, seo),
             ],
+            **preview_context(event, preview),
         },
     )
+    return finish(response, preview)
 
 
 def about(request):
