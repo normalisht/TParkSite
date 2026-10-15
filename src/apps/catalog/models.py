@@ -164,20 +164,23 @@ class Service(TrashableModel, SeoModel):
         # С ценой: в автодополнении админки варианты одной услуги («Фрироуп» на час и на день) различимы.
         return f"{self.name} — {self.price_display}" if self.price_display else self.name
 
+    def slug_source(self) -> str:
+        return self.name
+
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = unique_slug(self, self.name)
+            self.slug = unique_slug(self, self.slug_source())
         with transaction.atomic():
             remember_slug_change(self)
             super().save(*args, **kwargs)
 
     def duplicate(self) -> Service:
         """Черновик-копия: те же тексты и цена, копии фото, те же категории (в конце каждой; из корзины — нет).
-        SEO-поля пустые — одинаковые заголовки у двух страниц мешают поиску."""
+        SEO-поля пустые — одинаковые заголовки у двух страниц мешают поиску. Адрес — из названия «… (копия)»:
+        пока копия не опубликована, он следует за названием (`SiteModelAdmin._draft_slug_follows`)."""
         with transaction.atomic():
             copy = Service.objects.create(
                 name=f"{self.name[:120]} (копия)",
-                slug=unique_slug(Service(), self.name),
                 short_description=self.short_description,
                 description=self.description,
                 price=self.price,

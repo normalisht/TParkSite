@@ -136,3 +136,83 @@ def test_trashed_event_has_no_duplicate(admin_client):
     assert preview.status_code == 200
     assert url not in preview.content.decode()
     assert Event.objects.count() == 1
+
+
+@pytest.mark.parametrize("method", ["get", "post"])
+@pytest.mark.parametrize("url_name", ["admin:catalog_service_duplicate", "admin:content_event_duplicate"])
+def test_duplicate_bad_id_is_404(admin_client, url_name, method):
+    for object_id in ("abc", "999"):
+        response = getattr(admin_client, method)(reverse(url_name, args=[object_id]))
+        assert response.status_code == 404
+
+
+def _event_data(event, **changes):
+    data = {
+        "title": event.title,
+        "slug": event.slug,
+        "date": event.date.isoformat(),
+        "price": event.price,
+        "description": event.description,
+        **({"is_published": "on"} if event.is_published else {}),
+    }
+    return {**data, **changes}
+
+
+def _service_data(service, **changes):
+    data = {"name": service.name, "slug": service.slug, "price": service.price, "price_unit": service.price_unit}
+    for prefix in ("photos", "category_links"):
+        data.update({f"{prefix}-TOTAL_FORMS": "0", f"{prefix}-INITIAL_FORMS": "0"})
+    return {**data, **({"is_published": "on"} if service.is_published else {}), **changes}
+
+
+def _save(admin_client, obj, data):
+    opts = obj._meta
+    url = reverse(f"admin:{opts.app_label}_{opts.model_name}_change", args=[obj.pk])
+    response = admin_client.post(url, data)
+    assert response.status_code == 302, response.context["adminform"].form.errors
+    obj.refresh_from_db()
+    return obj
+
+
+def _copy(admin_client, obj):
+    opts = obj._meta
+    admin_client.post(reverse(f"admin:{opts.app_label}_{opts.model_name}_duplicate", args=[obj.pk]))
+    return type(obj).objects.latest("pk")
+
+
+def test_event_copy_slug_follows_title_and_year(admin_client):
+    from apps.core.models import Redirect
+
+    event = Event.objects.create(title="Клубная встреча", date=date(2026, 11, 1))
+    copy = _copy(admin_client, event)
+    assert copy.slug == "klubnaia-vstrecha-kopiia-2026"
+    copy = _save(admin_client, copy, _event_data(copy, title="Клубная встреча", date="2027-11-07"))
+    assert copy.slug == "klubnaia-vstrecha-2027"
+    copy = _save(admin_client, copy, _event_data(copy, title="Клубная встреча летом", is_published="on"))
+    assert copy.slug == "klubnaia-vstrecha-letom-2027"  # публикуют вместе с переименованием — адрес новый
+    assert not Redirect.objects.exists()  # адрес черновика никто не видел
+
+
+def test_service_copy_slug_follows_name(admin_client, service):
+    from apps.core.models import Redirect
+
+    copy = _copy(admin_client, service)
+    copy = _save(admin_client, copy, _service_data(copy, name="Фрироуп на день"))
+    assert copy.slug == "friroup-na-den"
+    assert not Redirect.objects.exists()
+
+
+def test_published_slug_stays_on_rename(admin_client, service):
+    event = Event.objects.create(title="Клубная встреча", date=date(2026, 11, 1))
+    _save(admin_client, event, _event_data(event, title="Клубный вечер", date="2027-01-10"))
+    assert event.slug == "klubnaia-vstrecha-2026"
+    _save(admin_client, service, _service_data(service, name="Фрироуп на день"))
+    assert service.slug == "friroup"
+
+
+def test_hand_edited_draft_slug_stays(admin_client, service):
+    copy = _copy(admin_client, service)
+    copy = _save(admin_client, copy, _service_data(copy, name="Фрироуп на день", slug="den"))
+    assert copy.slug == "den"
+    copy = _save(admin_client, copy, _service_data(copy, name="Фрироуп на сутки"))  # адрес задан руками раньше
+    assert copy.slug == "den"

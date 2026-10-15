@@ -102,9 +102,12 @@ class Event(TrashableModel, SeoModel):
         if self.end_date == self.date:
             self.end_date = None
 
+    def slug_source(self) -> str:
+        return f"{self.title} {self.date:%Y}"
+
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = unique_slug(self, f"{self.title} {self.date:%Y}")
+            self.slug = unique_slug(self, self.slug_source())
         with transaction.atomic():
             remember_slug_change(self)
             super().save(*args, **kwargs)

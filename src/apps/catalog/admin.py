@@ -259,6 +259,7 @@ class ServiceAdmin(DuplicateAdminMixin, TrashAdminMixin, BulkPhotosAdminMixin, S
     list_filter = [ServicePlacementFilter, ServiceGapsFilter, "is_published", "has_page", "category_links__category"]
     search_fields = ["name"]
     prepopulated_fields = {"slug": ("name",)}
+    slug_source_fields = ("name",)
     inlines = [ServicePhotoInline, ServiceCategoryInline]
     actions_list = ["trash"]
     actions_detail = ["duplicate"]
@@ -283,7 +284,11 @@ class ServiceAdmin(DuplicateAdminMixin, TrashAdminMixin, BulkPhotosAdminMixin, S
     # а у стандартного has_add_permission второго аргумента нет.
     @action(description="Дублировать", url_path="duplicate", permissions=["catalog.add_service"], icon="content_copy")
     def duplicate(self, request, object_id):
-        return self.duplicate_view(request, object_id, "Поменяйте название и цену и опубликуйте.")
+        return self.duplicate_view(
+            request,
+            object_id,
+            "Поменяйте название и цену и опубликуйте — адрес страницы подстроится под новое название.",
+        )
 
     def view_on_site(self, obj):
         # У услуги без отдельной страницы адреса нет — ведём на её категорию; без категории кнопки нет.

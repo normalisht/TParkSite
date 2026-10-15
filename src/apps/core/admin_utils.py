@@ -1,4 +1,6 @@
+import copy
 import html
+import re
 from dataclasses import replace
 
 from django.contrib import admin, messages
@@ -20,8 +22,9 @@ from unfold.decorators import action
 
 from apps.core import search
 from apps.core.images import safe_spec_url
-from apps.core.models import next_order
+from apps.core.models import Redirect, next_order
 from apps.core.request_cache import cached_on_request
+from apps.core.slugs import slugify_ru
 from apps.core.trash import TRASH_DAYS, purge_date, purge_expired
 
 
@@ -93,6 +96,8 @@ class SiteModelAdmin(ModelAdmin):
 
     help_intro = ""  # 1–2 предложения над списком; доверенный HTML (выводится через |safe)
     help_anchor = ""  # якорь раздела справки из HELP_SECTIONS
+    # Поля, из которых модель собирает адрес (`slug_source()`): у черновика адрес следует за ними (`_draft_slug_follows`).
+    slug_source_fields: tuple[str, ...] = ()
     list_before_template = "admin/help/list_intro.html"
     change_form_before_template = "admin/help/form_link.html"
 
@@ -121,7 +126,26 @@ class SiteModelAdmin(ModelAdmin):
         # Поля «Порядок» в формах нет — порядок задают перетаскиванием в списке, новая запись встаёт в конец.
         if not change and "order" not in form.fields and any(f.name == "order" for f in obj._meta.fields):
             obj.order = next_order(type(obj))
+        draft_url = obj.get_absolute_url() if change and self._draft_slug_follows(obj, form) else None
+        if draft_url:
+            obj.slug = ""  # save() соберёт адрес заново — из нового названия
         super().save_model(request, obj, form, change)
+        if draft_url:
+            Redirect.objects.filter(old_path=draft_url).delete()  # адрес черновика на сайте не открывался
+
+    def _draft_slug_follows(self, obj, form) -> bool:
+        """Адрес черновика следует за названием (и годом мероприятия): у копии «Встреча (копия)» после правки
+        названия и даты адрес «vstrecha-2027», а не «vstrecha-kopiia-2026». Не трогаем адрес опубликованной
+        записи (он уже может быть в поиске) и заданный руками — не похожий на собранный из прежнего названия."""
+        if not self.slug_source_fields or "slug" in form.changed_data or form.initial.get("is_published"):
+            return False
+        if not any(name in form.changed_data for name in self.slug_source_fields):
+            return False
+        before = copy.copy(obj)
+        for name in self.slug_source_fields:
+            setattr(before, name, form.initial.get(name))
+        base = re.escape(slugify_ru(before.slug_source()))
+        return re.fullmatch(rf"{base}(-\d+)?", form.initial.get("slug") or "") is not None
 
     def get_search_results(self, request, queryset, search_term):
         # Без учёта регистра и «ё»/«е» (apps/core/search.py); кроме SQLite — как в Django.
@@ -323,7 +347,9 @@ class DuplicateAdminMixin:
     (иначе любая страница могла бы создать запись в браузере администратора — CSRF). Модель задаёт `duplicate()`."""
 
     def duplicate_view(self, request, object_id, hint: str):
-        original = get_object_or_404(self.get_queryset(request), pk=object_id)
+        original = self.get_object(request, unquote(object_id))  # None и для «abc», и для записи в корзине
+        if original is None:
+            raise Http404
         opts = self.model._meta
         change_name = f"admin:{opts.app_label}_{opts.model_name}_change"
         if request.method != "POST":

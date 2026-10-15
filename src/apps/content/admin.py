@@ -50,6 +50,7 @@ class EventAdmin(DuplicateAdminMixin, TrashAdminMixin, SiteModelAdmin):
     list_filter = [EventPeriodFilter, "is_published", "show_after_date"]
     # date_hierarchy убран: годы 2022/2023/2027 сверху списка не помогали найти мероприятие
     search_fields = ["title"]
+    slug_source_fields = ("title", "date")
     actions_list = ["trash"]
     actions_detail = ["duplicate"]
     fieldsets = (
@@ -76,7 +77,9 @@ class EventAdmin(DuplicateAdminMixin, TrashAdminMixin, SiteModelAdmin):
     # Право — строкой: см. ServiceAdmin.duplicate.
     @action(description="Дублировать", url_path="duplicate", permissions=["content.add_event"], icon="content_copy")
     def duplicate(self, request, object_id):
-        return self.duplicate_view(request, object_id, "Поменяйте дату и опубликуйте.")
+        return self.duplicate_view(
+            request, object_id, "Поменяйте дату и опубликуйте — адрес страницы подстроится под название и год."
+        )
 
     @admin.display(description="Фото")
     def photo(self, obj):
