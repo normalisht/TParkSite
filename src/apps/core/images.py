@@ -13,6 +13,7 @@ from django.utils.html import format_html, format_html_join
 from django.utils.safestring import mark_safe
 from imagekit.cachefiles.backends import CacheFileState, Simple
 from imagekit.cachefiles.strategies import JustInTime
+from imagekit.models import ImageSpecField
 from imagekit.utils import generate
 from PIL import features
 
@@ -41,18 +42,44 @@ def end_request_budget(**kwargs) -> None:
     _request.deadline = None
 
 
+# URL готовых миниатюр на процесс: (модель, спека, файл-исходник) → URL. imagekit на каждый показ заново считает
+# имя миниатюры (хеш параметров спеки через pickle) и спрашивает кеш, есть ли файл, — в галерее (сотни фото × 5 спек)
+# это три четверти времени страницы. Имя миниатюры зависит только от ключа: параметры спек заданы в коде, а имена
+# исходников случайные (UploadTo), поэтому у заменённого фото — новый ключ. «Файл есть» imagekit и так запоминает
+# навсегда (IMAGEKIT_CACHE_TIMEOUT); пустой URL (ещё не создана, битый исходник) не запоминаем.
+_spec_urls: dict[tuple, str] = {}
+SPEC_URLS_LIMIT = 20_000
+
+
+def _spec_url_key(obj, spec_name: str) -> tuple | None:
+    field = getattr(type(obj), spec_name, None)
+    source_field = getattr(field, "source", None)
+    if not isinstance(field, ImageSpecField) or not source_field:
+        return None
+    source_name = getattr(getattr(obj, source_field, None), "name", None)
+    return (type(obj), spec_name, source_name) if source_name else None
+
+
 def safe_spec_url(obj, spec_name: str) -> str:
     """URL миниатюры imagekit или пустая строка, если объекта или исходника нет, он битый или миниатюра ещё не создана."""
     if obj is None:
         return ""
+    key = _spec_url_key(obj, spec_name)
+    if key and (url := _spec_urls.get(key)):
+        return url
     try:
         spec = getattr(obj, spec_name)
-        return spec.url if spec else ""
+        url = spec.url if spec else ""
     except GenerationDeferred:
         return ""
     except Exception:
         logger.warning("Не удалось получить %s для %r", spec_name, obj, exc_info=True)
         return ""
+    if key and url:
+        if len(_spec_urls) >= SPEC_URLS_LIMIT:
+            _spec_urls.clear()
+        _spec_urls[key] = url
+    return url
 
 
 def lightbox_url(photo) -> str:

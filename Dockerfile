@@ -55,8 +55,8 @@ ENV FILE_UPLOAD_TEMP_DIR=/data/db/upload-tmp
 USER app
 EXPOSE 8000
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-# --timeout 120: загрузка фото пачкой пережимает их прямо в запросе (у nginx proxy_read_timeout тоже 120 с).
-CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--timeout", "120", "--access-logfile", "-", "--no-control-socket"]
+# Настройки (порт, таймаут, воркеры, preload) — gunicorn.conf.py из рабочего каталога, общий с systemd.
+CMD ["gunicorn"]
 
 
 # compose.dev.yaml (target: dev): тот же образ + бинарник Tailwind для `tailwind runserver`.

@@ -6,6 +6,7 @@ from types import SimpleNamespace
 import pytest
 from django.core.management import call_command
 from django.template import Context, Template
+from imagekit.cachefiles import ImageCacheFile
 from PIL import Image
 
 from apps.catalog.models import Category, CategoryPhoto, Service, ServicePhoto
@@ -131,6 +132,31 @@ def test_picture_tag_as_variable():
 def test_lightbox_url_prefers_full_spec(make_image):
     photo = GalleryPhoto.objects.create(image=make_image())
     assert lightbox_url(photo) == photo.full.url and photo.full.url.endswith(".webp")
+
+
+def test_spec_url_remembered_per_source(monkeypatch, make_image):
+    """Повторный показ того же фото не идёт в imagekit (хеш спеки и проверка файла), новое фото — свой URL."""
+    photo = GalleryPhoto.objects.create(image=make_image())
+    url = images.safe_spec_url(photo, "thumb")
+    assert url
+
+    with monkeypatch.context() as patch:
+        patch.setattr(ImageCacheFile, "url", property(lambda self: pytest.fail("imagekit не должен вызываться")))
+        assert images.safe_spec_url(GalleryPhoto.objects.get(pk=photo.pk), "thumb") == url
+
+    photo.image = make_image()
+    photo.save()
+    new_url = images.safe_spec_url(GalleryPhoto.objects.get(pk=photo.pk), "thumb")
+    assert new_url and new_url != url
+
+
+def test_spec_url_not_remembered_while_deferred(monkeypatch, make_image):
+    """Миниатюру отложили (кончился бюджет запроса) — пустой URL не запоминается, следующий показ её создаст."""
+    photo = GalleryPhoto.objects.create(image=make_image())
+    with monkeypatch.context() as patch:
+        patch.setattr(images._request, "deadline", 0, raising=False)
+        assert images.safe_spec_url(photo, "thumb") == ""
+    assert images.safe_spec_url(GalleryPhoto.objects.get(pk=photo.pk), "thumb")
 
 
 def test_thumbnails_generated_after_commit(monkeypatch, django_capture_on_commit_callbacks, make_image):

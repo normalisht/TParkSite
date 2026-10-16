@@ -123,7 +123,7 @@ backup: ## Бэкап БД и медиа в backups/
 service-install: ## Установить systemd-юнит (SERVICE=tpark, пользователь — текущий)
 	@test -f $(SRC)/.env || (echo "Нет $(SRC)/.env: cp .env.example $(SRC)/.env и заполнить (DEBUG=0, SECRET_KEY, пути к БД и медиа)" && exit 1)
 	sed -e 's|@SERVICE@|$(SERVICE)|g' -e 's|@USER@|$(SERVICE_USER)|g' -e 's|@GROUP@|$(SERVICE_GROUP)|g' \
-		-e 's|@SRC_DIR@|$(CURDIR)/$(SRC)|g' -e 's|@DEPLOY_DIR@|$(CURDIR)/deploy|g' deploy/tpark.service.in \
+		-e 's|@SRC_DIR@|$(CURDIR)/$(SRC)|g' deploy/tpark.service.in \
 		| sudo tee /etc/systemd/system/$(SERVICE).service > /dev/null
 	sudo systemctl daemon-reload
 	sudo systemctl enable $(SERVICE)

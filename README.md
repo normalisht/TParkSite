@@ -53,7 +53,7 @@ Django-проект — в [src/](src/), в корне — инфраструк�
 
 ### Вариант без Docker (systemd)
 
-Как у старого сайта (`systemctl` + uwsgi-ini), только gunicorn: сервис `tpark` слушает unix-сокет `/run/tpark/gunicorn.sock`, nginx на хосте проксирует в него и сам отдаёт `/media/`. Конфиг gunicorn — `deploy/gunicorn.conf.py`, шаблон юнита — `deploy/tpark.service.in`, шаблон сайта nginx — `deploy/nginx-site.conf.in`. Все команды — от пользователя, от которого работает сайт (ему же принадлежат БД и медиа), `sudo` нужен только для `systemctl`.
+Как у старого сайта (`systemctl` + uwsgi-ini), только gunicorn: сервис `tpark` слушает unix-сокет `/run/tpark/gunicorn.sock`, nginx на хосте проксирует в него и сам отдаёт `/media/`. Конфиг gunicorn — `src/gunicorn.conf.py` (общий с Docker), шаблон юнита — `deploy/tpark.service.in`, шаблон сайта nginx — `deploy/nginx-site.conf.in`. Все команды — от пользователя, от которого работает сайт (ему же принадлежат БД и медиа), `sudo` нужен только для `systemctl`.
 
 1. На сервере: [uv](https://docs.astral.sh/uv/) (Python 3.14 он скачает сам), репозиторий, например в `/srv/tpark`.
 2. `cp .env.example src/.env` и заполнить как для Docker (`SECRET_KEY`, `ALLOWED_HOSTS`, `CSRF_TRUSTED_ORIGINS`, `DEBUG=0`), плюс абсолютные пути `DATABASE_PATH` и `MEDIA_ROOT` (по умолчанию — `src/db.sqlite3` и `src/media/`). `PROXY_NETWORK` и строки для compose не нужны. Настройки читают `src/.env` и в сервисе, и в командах `make service-*`.

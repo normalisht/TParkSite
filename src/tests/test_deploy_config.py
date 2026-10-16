@@ -1,6 +1,7 @@
 """Проверки конфигурации развёртывания, которые иначе всплыли бы только на сервере."""
 
 import re
+import runpy
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]  # корень репозитория (src/tests → корень)
@@ -134,10 +135,43 @@ def test_web_has_memory_limit():
         assert "mem_limit: ${WEB_MEM_LIMIT:-1g}" in (ROOT / name).read_text(encoding="utf-8"), name
 
 
-def test_gunicorn_timeout_covers_bulk_upload():
+def _gunicorn_config(monkeypatch, runtime_dir=None):
+    """Настройки из src/gunicorn.conf.py так, как их прочитает gunicorn (в Docker или под systemd)."""
+    from gunicorn.config import Config
+
+    if runtime_dir:
+        monkeypatch.setenv("RUNTIME_DIRECTORY", runtime_dir)
+    else:
+        monkeypatch.delenv("RUNTIME_DIRECTORY", raising=False)
+    monkeypatch.delenv("WEB_CONCURRENCY", raising=False)
+    namespace = runpy.run_path(str(ROOT / "src/gunicorn.conf.py"))
+    config = Config()
+    for key, value in namespace.items():
+        if key in config.settings:
+            config.set(key, value)
+    return config
+
+
+def test_gunicorn_in_docker(monkeypatch):
+    config = _gunicorn_config(monkeypatch)
+    assert config.bind == ["0.0.0.0:8000"]
     # Пачка фото пережимается прямо в запросе; 30 с по умолчанию мало, у nginx — 120 с.
-    dockerfile = (ROOT / "Dockerfile").read_text(encoding="utf-8")
-    assert '"--timeout", "120"' in dockerfile
+    assert config.timeout == 120
+    assert config.max_requests == 1000
+    assert config.preload_app
+    assert config.control_socket_disable  # образ только для чтения
+    assert 'CMD ["gunicorn"]' in (ROOT / "Dockerfile").read_text(encoding="utf-8")
+
+
+def test_gunicorn_under_systemd(monkeypatch):
+    config = _gunicorn_config(monkeypatch, runtime_dir="/run/tpark")
+    assert config.bind == ["unix:/run/tpark/gunicorn.sock"]
+    assert config.timeout == 120
+    assert config.max_requests == 1000
+    # make service-deploy перезапускает воркеры по HUP: с preload они остались бы со старым кодом.
+    assert not config.preload_app
+    unit = (ROOT / "deploy/tpark.service.in").read_text(encoding="utf-8")
+    assert "--config @SRC_DIR@/gunicorn.conf.py" in unit
 
 
 def test_env_example_starts_with_short_hsts():

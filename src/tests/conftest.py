@@ -20,6 +20,12 @@ def no_background_thumbnails(monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def fresh_spec_urls(monkeypatch):
+    """Запомненные URL миниатюр живут весь процесс; каждый тест начинает с пустыми (у него свой MEDIA_ROOT)."""
+    monkeypatch.setattr("apps.core.images._spec_urls", {})
+
+
+@pytest.fixture(autouse=True)
 def off_season(monkeypatch):
     """Сезонное оформление выбирается по сегодняшней дате — тесты идут в «обычный» день, сезонные подменяют дату сами."""
     monkeypatch.setattr("apps.core.seasons.today", lambda: date(2026, 7, 14))

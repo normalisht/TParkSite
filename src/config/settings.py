@@ -9,6 +9,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.templatetags.static import static
 from django.urls import reverse_lazy
 from django.utils.csp import CSP
+from whitenoise.compress import Compressor
 
 from apps.core.map_hosts import WIDGET_HOSTS
 
@@ -177,6 +178,11 @@ STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
     "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
 }
+# Сайт ссылается только на копии с хешем в имени ({% static %}, importmap prose-editor): оригиналы не храним
+# и не сжимаем — collectstatic втрое быстрее, статика вдвое меньше. Source map нужны только DevTools, а их сжатие
+# (2 МБ у prose-editor) — почти половина времени сборки.
+WHITENOISE_KEEP_ONLY_HASHED_FILES = True
+WHITENOISE_SKIP_COMPRESS_EXTENSIONS = [*Compressor.SKIP_COMPRESS_EXTENSIONS, "map"]
 
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
