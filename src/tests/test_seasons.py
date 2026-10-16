@@ -345,7 +345,8 @@ def test_uploaded_main_logo_beats_drawn_season_logo(client, monkeypatch, make_im
 def test_drawn_season_logos_match_default(kind):
     """Есть вариант для каждого сезона, размер — как у стандартного (3× от 119×44), лёгкий: грузится вместе с LCP."""
     path = Path(settings.BASE_DIR) / f"static/img/logo-header-{kind}.png"
-    assert Image.open(path).size == (357, 132)
+    with Image.open(path) as image:
+        assert image.size == (357, 132)
     assert path.stat().st_size < 8 * 1024
 
 

@@ -25,9 +25,12 @@ uv run manage.py migrate
 uv run manage.py tailwind runserver       # dev-сервер + пересборка Tailwind (бинарник скачается в src/.django_tailwind_cli/)
 uv run pytest                             # все тесты (settings: config.settings_test)
 uv run pytest tests/test_pages.py::test_info_page   # один тест
+uv run pytest --cov                       # с покрытием (make coverage; порог — fail_under в pyproject.toml)
 uv run ruff check . && uv run ruff format .
 uv run manage.py import_legacy --db ../old_version/T_Park.db --images <папка images со старого сервера> [--flush]
 ```
+
+pytest в строгом режиме (`strict = true`: неизвестный маркер, дубль id в `parametrize`, прошедший xfail — ошибка), любое предупреждение — ошибка (`filterwarnings = ["error", …]`): незакрытые файлы и соединения закрывать (`with Image.open(...)`, `closing(sqlite3.connect(...))`), а не глушить. У пакетов, чьи шаблоны или внутренности мы копируем (Unfold, prose-editor, imagekit, simple-history), в `pyproject.toml` верхняя граница версии — обновление только намеренно, со сверкой копий.
 
 Из корня репозитория:
 

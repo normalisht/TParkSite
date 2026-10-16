@@ -5,11 +5,11 @@ requires-python = ">=3.14"
 dependencies = [
     "django>=6.1.2,<6.2",
     "django-axes[ipware]>=8.3.1",
-    "django-imagekit>=6.1.1",
-    "django-prose-editor>=0.27.3",
-    "django-simple-history>=3.13",
+    "django-imagekit>=6.1.1,<7",
+    "django-prose-editor>=0.27.3,<0.28",
+    "django-simple-history>=3.13,<4",
     "django-tailwind-cli>=4.8.1",
-    "django-unfold>=0.108.0",
+    "django-unfold>=0.108.0,<0.109",
     "gunicorn>=26.2.0",
     "nh3>=0.3.7",
     "pillow>=12.3.0",
@@ -35,11 +35,30 @@ pythonpath = ["."]
 testpaths = ["tests"]
 addopts = "-q -m 'not e2e'"
 markers = ["e2e: браузерные тесты вёрстки (make e2e)"]
+# strict_config + strict_markers + strict_xfail + strict_parametrization_ids
+strict = true
 filterwarnings = [
+    # Новое предупреждение (в т. ч. об устаревании в Django) валит тесты; известные — ниже.
+    "error",
     "ignore:No directory at:UserWarning",
     "ignore:Overriding get_action_choices",
     # django-simple-history 3.13 вызывает select_related() без аргументов (устареет в Django 2028)
     "ignore:Calling select_related\\(\\) with no arguments:PendingDeprecationWarning:simple_history",
+]
+
+[tool.coverage.run]
+source = ["apps", "config"]
+omit = ["*/migrations/*", "config/wsgi.py"]
+branch = true
+
+[tool.coverage.report]
+skip_covered = true
+show_missing = true
+fail_under = 95
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    'if __name__ == "__main__":',
 ]
 
 [tool.ruff]
@@ -48,5 +67,11 @@ line-length = 120
 extend-exclude = ["*/migrations/*"]
 
 [tool.ruff.lint]
+# Сверх правил ruff по умолчанию: Django-правила и лишние `# noqa`.
+extend-select = ["DJ", "RUF100"]
 # Списки в Meta и в миграциях — стандартная идиома Django.
 ignore = ["RUF012"]
+
+[tool.ruff.lint.per-file-ignores]
+# В формах админки набор полей задают fieldsets ModelAdmin, `fields = "__all__"` в Meta — только формальность.
+"**/admin.py" = ["DJ007"]

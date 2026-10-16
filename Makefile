@@ -15,7 +15,7 @@ NGINX_CONF := deploy/nginx-site.conf
 NGINX_SERVER_NAME ?= t-camp.ru www.t-camp.ru
 
 .DEFAULT_GOAL := help
-.PHONY: help install env migrate run superuser shell test lint format check e2e pre-commit \
+.PHONY: help install env migrate run superuser shell test coverage lint format check e2e pre-commit \
 	messages tailwind collectstatic import-legacy \
 	dev dev-down dev-logs dev-superuser \
 	build up down restart logs prod-superuser backup \
@@ -48,6 +48,9 @@ shell: ## Django shell
 
 test: ## Тесты (make test ARGS="tests/test_pages.py -x")
 	cd $(SRC) && uv run pytest $(ARGS)
+
+coverage: ## Тесты с покрытием: отчёт в терминале и src/htmlcov/index.html
+	cd $(SRC) && uv run pytest --cov --cov-report=term --cov-report=html $(ARGS)
 
 lint: ## Проверка ruff
 	cd $(SRC) && uv run ruff check . && uv run ruff format --check .

@@ -1,6 +1,7 @@
 import os
 import re
 import time
+from types import SimpleNamespace
 
 import pytest
 from django.core.management import call_command
@@ -17,7 +18,9 @@ pytestmark = pytest.mark.django_db
 
 
 def _open(spec):
-    return Image.open(spec.path)
+    """Формат и размер миниатюры; файл закрывается сразу (иначе ResourceWarning)."""
+    with Image.open(spec.path) as image:
+        return SimpleNamespace(format=image.format, size=image.size)
 
 
 def test_slide_is_cut_to_16_9_so_srcset_widths_are_true(make_image):
