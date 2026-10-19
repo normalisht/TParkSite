@@ -1,0 +1,13 @@
+{# Оформление «Правила»: вступление, затем каждый раздел (H2) — карточкой с номером. #}
+{% if body.intro.html %}<div class="rich-text rich-text-rules mb-6">{{ body.intro.html|safe }}</div>{% endif %}
+<div class="space-y-4 md:space-y-6">
+  {% for section in body.sections %}
+  <section id="{{ section.anchor }}" class="card scroll-mt-24 p-5 md:p-8" aria-labelledby="{{ section.anchor }}-title">
+    <div class="flex items-start gap-4">
+      <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-pine-100 text-lg font-extrabold text-pine-700" aria-hidden="true">{{ forloop.counter }}</span>
+      <h2 id="{{ section.anchor }}-title" class="pt-1 text-xl font-bold md:text-2xl">{{ section.title|safe }}</h2>
+    </div>
+    {% if section.html %}<div class="rich-text rich-text-rules mt-5">{{ section.html|safe }}</div>{% endif %}
+  </section>
+  {% endfor %}
+</div>

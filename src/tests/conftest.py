@@ -1,4 +1,5 @@
 import io
+from datetime import date
 
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -16,6 +17,18 @@ def media_root(settings, tmp_path):
 def no_background_thumbnails(monkeypatch):
     """Миниатюры после сохранения создаются в фоновом потоке; в тестах — нет (по требованию тест подменяет сам)."""
     monkeypatch.setattr("apps.core.images.run_in_background", lambda fn: None)
+
+
+@pytest.fixture(autouse=True)
+def fresh_spec_urls(monkeypatch):
+    """Запомненные URL миниатюр живут весь процесс; каждый тест начинает с пустыми (у него свой MEDIA_ROOT)."""
+    monkeypatch.setattr("apps.core.images._spec_urls", {})
+
+
+@pytest.fixture(autouse=True)
+def off_season(monkeypatch):
+    """Сезонное оформление выбирается по сегодняшней дате — тесты идут в «обычный» день, сезонные подменяют дату сами."""
+    monkeypatch.setattr("apps.core.seasons.today", lambda: date(2026, 7, 14))
 
 
 @pytest.fixture

@@ -248,15 +248,16 @@ def _footer(client):
     return html[html.index("<footer") : html.index("</footer>")]
 
 
-@pytest.mark.parametrize(
-    ("field", "title"),
-    [("privacy_page", "Политика конфиденциальности"), ("safety_page", "Правила безопасности")],
-)
-def test_footer_legal_link_only_when_published(client, field, title):
+def test_footer_link_by_checkbox_and_only_when_published(client):
+    title = "Правила безопасности"
     page = InfoPage.objects.create(title=title, body="<p>x</p>")
     site = SiteSettings.load()
-    setattr(site, field, page)
+    site.safety_page = page  # выбор в настройках на подвал не влияет
     site.save()
+    assert title not in _footer(client)
+
+    page.show_in_footer = True
+    page.save()
     footer = _footer(client)
     assert f'href="{page.get_absolute_url()}"' in footer
     assert title in footer
@@ -276,11 +277,16 @@ def test_footer_legal_links_without_pages(client):
 
 
 def test_footer_legal_links_separated(client):
-    site = SiteSettings.load()
-    site.privacy_page = InfoPage.objects.create(title="Политика конфиденциальности", body="<p>x</p>")
-    site.safety_page = InfoPage.objects.create(title="Правила безопасности", body="<p>y</p>")
-    site.save()
+    InfoPage.objects.create(title="Политика конфиденциальности", body="<p>x</p>", show_in_footer=True)
+    InfoPage.objects.create(title="Правила безопасности", body="<p>y</p>", show_in_footer=True)
     assert _footer(client).count("·") == 2
+
+
+def test_footer_links_in_admin_order(client):
+    second = InfoPage.objects.create(title="А — вторая", body="<p>x</p>", show_in_footer=True, order=2)
+    first = InfoPage.objects.create(title="Я — первая", body="<p>y</p>", show_in_footer=True, order=1)
+    footer = _footer(client)
+    assert footer.index(first.get_absolute_url()) < footer.index(second.get_absolute_url())
 
 
 def test_reviews_newest_first_and_published(client):
@@ -299,6 +305,14 @@ def test_review_signed_as_guest(client):
         assert "Гость Т-Парка" in client.get(url).content.decode()
 
 
+def test_review_card_uses_animated_component(client):
+    Review.objects.create(text="<p>Отзыв</p>")
+    html = client.get("/reviews/").content.decode()
+    assert 'x-data="reviewCard"' in html and '@click="toggle()"' in html and ':aria-expanded="open"' in html
+    head = html.split("</head>")[0]
+    assert head.index("js/review_card") < head.index("vendor/alpine")  # компонент регистрируется до старта Alpine
+
+
 def test_review_card_links_to_source_when_link_set(client):
     Review.objects.create(text="<p>a</p>", link="https://reviews.yandex.ru/u/1", date=date(2022, 7, 20))
     Review.objects.create(text="<p>b</p>")
@@ -314,6 +328,64 @@ def test_reviews_page_photo_strip(client, make_image):
     GalleryPhoto.objects.create(image=make_image(), caption="Закат")
     html = client.get("/reviews/").content.decode()
     assert "Как это выглядит" in html and 'alt="Закат"' in html
+
+
+def _strip_gallery(make_image, count):
+    """count фото с подписями «Фото 0…»: по alt видно, какие попали в полосу."""
+    first = GalleryPhoto.objects.create(image=make_image(), caption="Фото 0")
+    GalleryPhoto.objects.bulk_create(
+        [GalleryPhoto(image=first.image.name, caption=f"Фото {i}", order=i) for i in range(1, count)]
+    )
+
+
+def _strip_alts(html):
+    strip = html.split("Как это выглядит")[1].split("</section>")[0]
+    return re.findall(r'alt="(Фото \d+)"', strip)
+
+
+@pytest.mark.parametrize("url", ["/", "/about/", "/reviews/"])
+def test_photo_strip_rotates_daily(client, make_image, monkeypatch, url):
+    _strip_gallery(make_image, 15)
+    seen = set()
+    for shift in range(10):
+        day = date(2026, 10, 1) + timedelta(days=shift)
+        monkeypatch.setattr("django.utils.timezone.localdate", lambda day=day: day)
+        alts = _strip_alts(client.get(url).content.decode())
+        assert len(alts) == GalleryPhoto.STRIP_SIZE
+        assert alts == sorted(alts, key=lambda alt: int(alt.split()[1]))  # порядок — как в галерее
+        seen.update(alts)
+    assert len(seen) > GalleryPhoto.STRIP_SIZE  # не всегда первые шесть
+
+
+@pytest.mark.parametrize("url", ["/", "/about/", "/reviews/"])
+def test_photo_strip_opens_lightbox(client, make_image, url):
+    _strip_gallery(make_image, 3)
+    html = client.get(url).content.decode()
+    strip = html.split("Как это выглядит")[1].split("</section>")[0]
+    # Фото открывается на весь экран и листается в пределах полосы, а не уводит в галерею.
+    assert strip.count('data-gallery="strip"') == 3 and 'class="glightbox' in strip
+    assert 'data-title="Фото 0"' in strip
+    assert 0 < html.find("vendor/glightbox.min.js") < html.index("js/site.js")  # site.js запускает GLightbox
+    assert "vendor/glightbox.min.css" not in html.split("</head>")[0]  # стили — перед полосой, не блокируют отрисовку
+
+
+def test_pages_without_photos_skip_lightbox(client):
+    for url in ("/", "/about/", "/reviews/"):
+        assert "glightbox" not in client.get(url).content.decode()
+
+
+def test_photo_strip_differs_between_pages(client, make_image, monkeypatch):
+    _strip_gallery(make_image, 15)
+    monkeypatch.setattr("django.utils.timezone.localdate", lambda: date(2026, 10, 11))
+    home, about = (_strip_alts(client.get(url).content.decode()) for url in ("/", "/about/"))
+    assert home != about
+
+
+def test_photo_strip_stable_within_day_keeps_304(client, make_image):
+    _strip_gallery(make_image, 15)
+    first = client.get("/")
+    assert first.has_header("ETag")
+    assert client.get("/", HTTP_IF_NONE_MATCH=first["ETag"]).status_code == 304
 
 
 def test_gallery_page(client, make_image):
@@ -374,6 +446,59 @@ def test_info_page(client):
     assert "Текст правил" in client.get(page.get_absolute_url()).content.decode()
     hidden = InfoPage.objects.create(title="Черновик", is_published=False)
     assert client.get(hidden.get_absolute_url()).status_code == 404
+
+
+INFO_BODY = (
+    "<p>Вступление</p><h2>Допуск</h2><ul><li><p>Инструктаж</p></li></ul><h2>Порядок</h2><p>a</p><h2>Вещи</h2><p>b</p>"
+)
+
+
+def test_info_page_text_layout_sections_and_toc(client):
+    page = InfoPage.objects.create(title="Правила", lead="Что важно знать", body=INFO_BODY)
+    html = client.get(page.get_absolute_url()).content.decode()
+    assert '<p class="page-lead">Что важно знать</p>' in html
+    assert '<h2 id="dopusk" class="scroll-mt-24">Допуск</h2>' in html
+    assert html.count('href="#dopusk"') == 2  # оглавление: на телефоне и на ПК
+    assert 'name="description" content="Что важно знать"' in html  # подзаголовок — описание по умолчанию
+    assert "rich-text-rules" not in html
+
+
+def test_info_page_without_toc_for_few_sections(client):
+    page = InfoPage.objects.create(title="Правила", body="<h2>Один</h2><p>a</p><h2>Два</h2><p>b</p>")
+    html = client.get(page.get_absolute_url()).content.decode()
+    assert 'href="#odin"' not in html
+    assert '<h2 id="odin"' in html
+
+
+def test_info_page_rules_layout(client):
+    page = InfoPage.objects.create(title="Правила", body=INFO_BODY, layout=InfoPage.Layout.RULES)
+    html = client.get(page.get_absolute_url()).content.decode()
+    assert re.search(r'<section id="dopusk" class="card[^"]*" aria-labelledby="dopusk-title">', html)
+    assert html.count('class="rich-text rich-text-rules') == 4  # вступление и три раздела
+
+
+def test_info_page_faq_layout(client):
+    page = InfoPage.objects.create(
+        title="Вопросы", body="<h3>Можно с собакой?</h3><p>Да, на поводке.</p>", layout=InfoPage.Layout.FAQ
+    )
+    html = client.get(page.get_absolute_url()).content.decode()
+    assert re.search(r"<details class=\"group card\" data-smooth>\s*<summary[^>]*>\s*<h3>Можно с собакой\?</h3>", html)
+    assert "<p>Да, на поводке.</p>" in html
+
+
+def test_info_page_cover_and_og_image(client, make_image):
+    page = InfoPage.objects.create(title="Правила", body="<p>x</p>", cover=make_image())
+    html = client.get(page.get_absolute_url()).content.decode()
+    assert 'fetchpriority="high"' in html and "/media/CACHE/images/" in html
+    assert 'property="og:image" content="http://testserver/media/CACHE/images/' in html
+
+
+def test_info_page_contacts_card(client):
+    site = SiteSettings.load()
+    page = InfoPage.objects.create(title="Правила", body="<p>x</p>")
+    assert "Остались вопросы?" not in client.get(page.get_absolute_url()).content.decode()
+    Phone.objects.create(settings=site, number="9029856594")
+    assert "Остались вопросы?" in client.get(page.get_absolute_url()).content.decode()
 
 
 def test_nav_has_all_sections(client):
@@ -531,6 +656,48 @@ def test_service_related_skips_same_name_variants(client):
     assert services[2].get_absolute_url() in related
     assert services[3].get_absolute_url() not in related  # одинаковые названия — одна карточка
     assert services[4].get_absolute_url() in related
+
+
+def _category_with_services(count):
+    category = Category.objects.create(name="Высота", is_published=True)
+    services = [Service.objects.create(name=f"Услуга {i}", has_page=True) for i in range(count)]
+    for order, service in enumerate(services):
+        CategoryService.objects.create(category=category, service=service, order=order)
+    return services
+
+
+def _related_urls(html):
+    return re.findall(r'<a href="(/service/[^"]+)" class="card', html.split("Ещё в категории")[1])
+
+
+def test_related_services_rotate_daily(client, monkeypatch):
+    services = _category_with_services(8)
+    current = services[0]
+    urls_in_order = [s.get_absolute_url() for s in services]
+    seen = set()
+    for shift in range(20):
+        day = date(2026, 10, 1) + timedelta(days=shift)
+        monkeypatch.setattr("django.utils.timezone.localdate", lambda day=day: day)
+        urls = _related_urls(client.get(current.get_absolute_url()).content.decode())
+        assert len(urls) == 3
+        assert current.get_absolute_url() not in urls
+        positions = [urls_in_order.index(url) for url in urls]
+        assert positions == sorted(positions)  # порядок — как в категории
+        seen.update(urls)
+    assert seen == set(urls_in_order[1:])  # ссылки получают все, не только первые три
+
+
+def test_related_services_differ_between_services(client, monkeypatch):
+    services = _category_with_services(8)
+    monkeypatch.setattr("django.utils.timezone.localdate", lambda: date(2026, 10, 11))
+    shown = [frozenset(_related_urls(client.get(s.get_absolute_url()).content.decode())) for s in services[4:]]
+    assert len(set(shown)) > 1  # без ротации все четыре показывают первые три услуги
+
+
+def test_related_services_stable_within_day(client):
+    services = _category_with_services(8)
+    first = client.get(services[0].get_absolute_url())
+    assert client.get(services[0].get_absolute_url(), HTTP_IF_NONE_MATCH=first["ETag"]).status_code == 304
 
 
 def test_whatsapp_prefilled_with_service_name(client):

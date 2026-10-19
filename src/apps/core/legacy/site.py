@@ -2,7 +2,7 @@ from pathlib import Path
 
 from apps.core.about_defaults import fill_about_defaults, strip_founder_heading
 from apps.core.legacy.html import clean_html, extract_title, phone_digits
-from apps.core.models import PARK_ADDRESS, FounderFact, InfoPage, ParkFormat, Phone, SiteSettings
+from apps.core.models import PARK_ADDRESS, FounderFact, InfoPage, ParkFormat, Phone, Season, SiteSettings
 from apps.core.privacy_defaults import PRIVACY_SLUG, ensure_privacy_page
 
 TEXT_FIELDS = {
@@ -22,6 +22,7 @@ def import_site(db, images: Path, report) -> None:
             info_rows.append(row)
 
     site = SiteSettings.load()
+    Season.ensure_for(site)  # сброс перед импортом удаляет сезоны вместе с настройками
     main_text = clean_html(texts.get("main_text"))
     site.home_intro = site.events_intro = main_text
     for key, field in TEXT_FIELDS.items():
@@ -68,3 +69,5 @@ def import_site(db, images: Path, report) -> None:
         report.add("Инфо-страницы")
 
     ensure_privacy_page(InfoPage, SiteSettings)
+    # В старой версии ссылок на инфо-страницы нигде не было; в подвал — только политика конфиденциальности.
+    InfoPage.objects.filter(slug=PRIVACY_SLUG).update(show_in_footer=True)

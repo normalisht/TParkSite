@@ -9,7 +9,15 @@ from unfold.decorators import action
 
 from apps.content.models import Event, GalleryPhoto, Partner, Review
 from apps.content.yandex import ReviewFetchError, fetch_review
-from apps.core.admin_utils import SEO_FIELDSET, SiteModelAdmin, image_preview
+from apps.core.admin_utils import (
+    SEO_FIELDSET,
+    DuplicateAdminMixin,
+    SiteModelAdmin,
+    TrashAdminMixin,
+    image_preview,
+    move_to_top,
+    thumbnail_html,
+)
 from apps.core.bulk_upload import BulkUploadForm, append_images
 
 
@@ -30,12 +38,21 @@ class EventPeriodFilter(admin.SimpleListFilter):
 
 
 @admin.register(Event)
-class EventAdmin(SiteModelAdmin):
-    list_display = ["title", "date", "is_published", "show_after_date"]
+class EventAdmin(DuplicateAdminMixin, TrashAdminMixin, SiteModelAdmin):
+    help_intro = (
+        "Предстоящие — на странице «Мероприятия» и до трёх на главной. "
+        "На следующий день после окончания мероприятие становится прошедшим."
+    )
+    help_anchor = "events"
+    list_display = ["photo", "title", "date", "status", "is_published", "show_after_date"]
+    list_display_links = ["photo", "title"]
     list_editable = ["is_published"]
     list_filter = [EventPeriodFilter, "is_published", "show_after_date"]
-    date_hierarchy = "date"
+    # date_hierarchy убран: годы 2022/2023/2027 сверху списка не помогали найти мероприятие
     search_fields = ["title"]
+    slug_source_fields = ("title", "date")
+    actions_list = ["trash"]
+    actions_detail = ["duplicate"]
     fieldsets = (
         (
             "Основное",
@@ -57,6 +74,24 @@ class EventAdmin(SiteModelAdmin):
         SEO_FIELDSET,
     )
 
+    @action(description="Дублировать", url_path="duplicate", permissions=["duplicate"], icon="content_copy")
+    def duplicate(self, request, object_id):
+        return self.duplicate_view(
+            request, object_id, "Поменяйте дату и опубликуйте — адрес страницы подстроится под название и год."
+        )
+
+    @admin.display(description="Фото")
+    def photo(self, obj):
+        return thumbnail_html(obj, "card_small")
+
+    @admin.display(description="Статус")
+    def status(self, obj):
+        if not obj.is_published:
+            return "Черновик"
+        if not obj.is_past:
+            return "Предстоящее"
+        return "Прошедшее, в архиве" if obj.show_after_date else "Прошедшее, скрыто"
+
 
 class OrderedPhotoAdmin(SiteModelAdmin):
     ordering = ["order", "id"]
@@ -65,12 +100,17 @@ class OrderedPhotoAdmin(SiteModelAdmin):
 
 
 @admin.register(Review)
-class ReviewAdmin(SiteModelAdmin):
+class ReviewAdmin(TrashAdminMixin, SiteModelAdmin):
+    help_intro = "Новые сверху — по дате отзыва. Ссылка на отзыв с Яндекса и кнопка «Подтянуть» заполнят текст и дату."
+    help_anchor = "reviews"
     # Порядок — по дате (Meta.ordering), без перетаскивания.
     list_display = ["__str__", "date", "is_published"]
+    list_editable = ["is_published"]
+    search_fields = ["text"]
     list_filter = ["is_published"]
     date_hierarchy = "date"
     fields = ["link", "date", "text", "photo", "is_published"]
+    actions_list = ["trash"]
 
     class Media:
         js = ["js/admin_review_fetch.js"]
@@ -105,19 +145,33 @@ class ReviewAdmin(SiteModelAdmin):
 
 @admin.register(Partner)
 class PartnerAdmin(OrderedPhotoAdmin):
+    help_intro = "Логотипы в блоке «Партнёры» на странице «О нас». Порядок — перетаскиванием."
+    help_anchor = "gallery"
     list_display = ["preview", "name", "link"]
     list_display_links = ["preview", "name"]
-    fields = ["name", "link", "logo", "order"]
+    fields = ["name", "link", "logo"]
     preview = image_preview("logo_small")
 
 
 @admin.register(GalleryPhoto)
 class GalleryPhotoAdmin(OrderedPhotoAdmin):
+    help_intro = (
+        "Фото для страницы «Галерея» и полосы «Как это выглядит» на главной, «О нас» и «Отзывах». "
+        "Порядок — перетаскиванием; новые фото встают в конец — отметьте их и выберите «Поставить в начало»."
+    )
+    help_anchor = "gallery"
     list_display = ["preview", "caption"]
     list_display_links = ["preview", "caption"]
-    fields = ["image", "caption", "order"]
+    list_per_page = 400  # все фото на одной странице: перетаскивание работает только в пределах страницы
+    fields = ["image", "caption"]
+    actions = ["move_to_top"]
     actions_list = ["bulk_upload"]
     preview = image_preview("thumb", size=96)
+
+    @admin.action(description="Поставить в начало", permissions=["change"])
+    def move_to_top(self, request, queryset):
+        moved = move_to_top(GalleryPhoto, queryset)
+        messages.success(request, f"Поставлено в начало: {moved}.")
 
     @action(description="Загрузить фото пачкой", url_path="bulk-upload", permissions=["add"])
     def bulk_upload(self, request):

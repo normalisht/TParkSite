@@ -1,0 +1,18 @@
+{# Оформление «Вопросы и ответы»: каждый H3 — вопрос, ответ раскрывается по нажатию; H2 — группы вопросов. #}
+{% for section in body.parts %}
+{% if section.title %}<h2 id="{{ section.anchor }}" class="scroll-mt-24 {% if forloop.counter > 2 or body.intro.html or body.intro.questions %}mt-10 {% endif %}mb-4 text-2xl font-bold">{{ section.title|safe }}</h2>{% endif %}
+{% if section.html %}<div class="rich-text mb-4">{{ section.html|safe }}</div>{% endif %}
+{% if section.questions %}
+<div class="space-y-3">
+  {% for question in section.questions %}
+  <details class="group card" data-smooth>
+    <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 font-semibold [&::-webkit-details-marker]:hidden">
+      <h3>{{ question.title|safe }}</h3>
+      <span class="icon h-5 w-5 text-ink/65 transition-transform group-open:rotate-180 group-data-closing:rotate-0">{% include "icons/chevron-down.svg" %}</span>
+    </summary>
+    <div data-details-body><div class="rich-text px-5 pb-5">{{ question.answer|safe }}</div></div>
+  </details>
+  {% endfor %}
+</div>
+{% endif %}
+{% endfor %}

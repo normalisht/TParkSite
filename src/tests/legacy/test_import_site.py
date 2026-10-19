@@ -116,6 +116,7 @@ def test_import_keeps_privacy_page(legacy):
     privacy = InfoPage.objects.get(slug=PRIVACY_SLUG)
     assert not privacy.is_published
     assert SiteSettings.load().privacy_page == privacy
+    assert privacy.show_in_footer and not InfoPage.objects.get(id=taken_id).show_in_footer
 
 
 def test_founder_text_without_repeated_heading(legacy):

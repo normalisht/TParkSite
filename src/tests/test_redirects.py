@@ -64,6 +64,7 @@ def test_new_objects_and_unchanged_slugs_create_nothing():
         lambda: Event.objects.create(title="Слёт", slug="slet-old", date=timezone.localdate()),
         lambda: InfoPage.objects.create(title="Правила", slug="pravila-old"),
     ],
+    ids=["service", "event", "info_page"],
 )
 def test_other_pages_remember_slug_change(make):
     obj = make()

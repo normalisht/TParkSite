@@ -1,14 +1,17 @@
 import re
+from datetime import date
 
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db import models, transaction
-from django.db.models import Q
+from django.db.models import Max, Q
 from django.urls import reverse
+from django.utils import timezone
 
-from apps.core import about_defaults
-from apps.core.fields import HtmlField, image_specs, og_spec, photo_field
+from apps.core import about_defaults, seasons
+from apps.core.fields import INFO_HTML_EXTENSIONS, HtmlField, image_specs, logo_spec, og_spec, photo_field
 from apps.core.maps import MapEmbedURLField
+from apps.core.seasons import format_day_month, validate_day_month, validate_site_link
 from apps.core.slugs import SLUG_HELP, unique_slug
 
 
@@ -20,8 +23,65 @@ class OrderedModel(models.Model):
         ordering = ["order", "id"]
 
 
+class TrashableModel(models.Model):
+    """Запись, которую «Удалить» в админке переносит в корзину (apps/core/trash.py), а не стирает.
+
+    В корзине запись снята с публикации — сайт её не показывает через обычные `published()`, — и скрыта из
+    списков админки (`TrashAdminMixin`). Фото, привязки и адрес страницы сохраняются."""
+
+    deleted_at = models.DateTimeField("В корзине с", null=True, blank=True, editable=False, db_index=True)
+
+    class Meta:
+        abstract = True
+
+    @property
+    def in_trash(self) -> bool:
+        return self.deleted_at is not None
+
+    def move_to_trash(self) -> None:
+        self.deleted_at = timezone.now()
+        self.is_published = False
+        self.save()
+
+    def restore(self) -> None:
+        # Возвращается черновиком: администратор проверит и опубликует сам.
+        self.deleted_at = None
+        self.save()
+
+    def unique_error_message(self, model_class, unique_check):
+        # Адрес страницы занят записью из корзины: в списке её не видно — объясняем, где она и что делать.
+        if tuple(unique_check) == ("slug",) and self.slug:
+            trashed = model_class._default_manager.filter(slug=self.slug, deleted_at__isnull=False)
+            clash = trashed.exclude(pk=self.pk).first()
+            if clash is not None:
+                return ValidationError(
+                    f"Этот адрес занят записью в корзине «{clash}» — восстановите её или удалите навсегда, "
+                    "либо выберите другой адрес.",
+                    code="unique",
+                )
+        return super().unique_error_message(model_class, unique_check)
+
+
+# Окончание названия копии («Дублировать»): по нему админка узнаёт черновик, адрес которого на сайте не открывался.
+COPY_SUFFIX = " (копия)"
+
+
+def next_order(model, **scope) -> int:
+    """Порядок для новой записи — после последней (в пределах `scope`, например `category=…`)."""
+    return (model._default_manager.filter(**scope).aggregate(m=Max("order"))["m"] or 0) + 1
+
+
 PARK_ADDRESS = "Калужская область, Жуковский район, село Восход"
 DEFAULT_TITLE_SUFFIX = "Т-Парк, Калужская область"
+# Высота логотипа в шапке, px (класс h-11 в partials/header.html и 500.html).
+HEADER_LOGO_HEIGHT = 44
+
+
+def logo_display_width(width: int | None, height: int | None) -> int | None:
+    """Ширина логотипа в шапке при высоте `HEADER_LOGO_HEIGHT` — для width/height у <img> (без сдвига вёрстки)."""
+    if not (width and height):
+        return None
+    return round(HEADER_LOGO_HEIGHT * width / height)
 
 
 class SeoModel(models.Model):
@@ -58,14 +118,40 @@ def _seo_pair(page: str):
 
 class SiteSettings(models.Model):
     updated_at = models.DateTimeField("Изменено", auto_now=True)
-    address = models.CharField("Адрес", max_length=255, blank=True, default=PARK_ADDRESS)
+    header_logo = photo_field(
+        "Логотип",
+        "logo",
+        size=(3000, 1000),
+        fmt=None,
+        width_field="header_logo_width",
+        height_field="header_logo_height",
+        help_text="PNG с прозрачным фоном, горизонтальный, высотой от 132 px. В шапке — высотой 44 px, по центру "
+        "между краями картинки: если над надписью что-то выступает (как солнце), оставьте снизу прозрачное поле той же "
+        "высоты, иначе надпись окажется ниже кнопок. Ещё логотип попадает в разметку для поисковиков. "
+        "Пусто — стандартный логотип.",
+    )
+    header_logo_width = models.PositiveIntegerField(null=True, editable=False)
+    header_logo_height = models.PositiveIntegerField(null=True, editable=False)
+    header_logo_img = logo_spec("header_logo", HEADER_LOGO_HEIGHT * 3)
+    address = models.CharField(
+        "Адрес",
+        max_length=255,
+        blank=True,
+        default=PARK_ADDRESS,
+        help_text="Главная, подвал, «Контакты», «О нас» и место мероприятий без своего адреса.",
+    )
     map_embed_url = MapEmbedURLField(
         "Яндекс Карта на странице контактов",
         max_length=1000,
         blank=True,
         help_text="В Яндекс Картах: «Поделиться» → «Встроить карту» → скопируйте код и вставьте сюда целиком.",
     )
-    vk_url = models.URLField("ВКонтакте", max_length=500, blank=True)
+    vk_url = models.URLField(
+        "ВКонтакте",
+        max_length=500,
+        blank=True,
+        help_text="Кнопка в «Связаться», в подвале и на «Контактах». Пусто — кнопки нет.",
+    )
     max_url = models.URLField(
         "MAX", max_length=500, blank=True, help_text="Ссылка на профиль или канал в MAX. Пусто — кнопки нет."
     )
@@ -73,16 +159,22 @@ class SiteSettings(models.Model):
         "Отзывы на Яндекс Картах",
         max_length=500,
         blank=True,
-        help_text="Страница отзывов о Т-Парке: кнопки «Все отзывы» и «Оставить отзыв» на странице отзывов.",
+        help_text=(
+            "Страница отзывов о Т-Парке: кнопка «Все отзывы на Яндекс Картах» на странице отзывов и «Оставить отзыв» — "
+            "там же, на «Контактах» и на главной. Пусто — кнопок нет."
+        ),
     )
-    home_intro = HtmlField("Вступление на главной")
+    home_intro = HtmlField(
+        "Вступление на главной",
+        help_text="Текст в начале главной. Он же — описание сайта для поисковиков и соцсетей по умолчанию.",
+    )
     home_show_events = models.BooleanField(
         "Ближайшие мероприятия на главной",
         default=True,
         help_text="Блок появляется, только если есть предстоящие мероприятия.",
     )
-    events_intro = HtmlField("Вступление на странице мероприятий")
-    contacts_text = HtmlField("Текст на странице контактов")
+    events_intro = HtmlField("Вступление на странице мероприятий", help_text="Текст в начале страницы «Мероприятия».")
+    contacts_text = HtmlField("Текст на странице контактов", help_text="Дополнительный текст на странице «Контакты».")
 
     # Страница «О нас»
     about_motto = models.CharField(
@@ -103,7 +195,7 @@ class SiteSettings(models.Model):
     founder_photo = photo_field("Основатель: фото", "about", help_text="Портрет, лучше вертикальный.")
     founder_card, founder_card_avif = image_specs("founder_photo", 600, 750)
     founder_text = HtmlField("Основатель: о нём", help_text="Регалии и роли — удобнее списком.")
-    nearby_text = HtmlField("Что рядом")
+    nearby_text = HtmlField("Что рядом", help_text="Блок «Что рядом» на «О нас»: достопримечательности, жильё, кафе.")
     safety_page = models.ForeignKey(
         "InfoPage",
         verbose_name="Правила безопасности",
@@ -111,7 +203,10 @@ class SiteSettings(models.Model):
         null=True,
         blank=True,
         related_name="+",
-        help_text="Инфо-страница, на которую ведёт плашка «Правила безопасности» на странице «О нас».",
+        help_text=(
+            "Инфо-страница, на которую ведёт плашка «Правила безопасности» на «О нас». "
+            "Ссылка в подвале — галочкой «В подвале» у самой страницы."
+        ),
     )
     privacy_page = models.ForeignKey(
         "InfoPage",
@@ -120,7 +215,10 @@ class SiteSettings(models.Model):
         null=True,
         blank=True,
         related_name="+",
-        help_text="Инфо-страница, на которую ведёт ссылка в подвале сайта. Пока не указана или не опубликована — ссылки нет.",
+        help_text=(
+            "Инфо-страница, на которую ведёт ссылка в баннере cookie. Пока не указана или не опубликована — ссылки нет. "
+            "Ссылка в подвале — галочкой «В подвале» у самой страницы."
+        ),
     )
 
     # Разметка организации (schema.org LocalBusiness)
@@ -187,7 +285,7 @@ class SiteSettings(models.Model):
         verbose_name_plural = "Настройки сайта"
 
     def __str__(self):
-        return "Настройки сайта"
+        return "Основные"
 
     def save(self, *args, **kwargs):
         self.pk = 1
@@ -214,10 +312,15 @@ class Phone(models.Model):
         "Номер",
         max_length=10,
         validators=[RegexValidator(r"^\d{10}$", "10 цифр без +7 и 8, например 9029856594.")],
+        help_text="10 цифр без +7, 8 и пробелов. Первый номер — главный в кнопке «Связаться».",
     )
     order = models.PositiveIntegerField("Порядок", default=0, db_index=True)
-    is_whatsapp = models.BooleanField("WhatsApp", default=False)
-    is_telegram = models.BooleanField("Telegram", default=False)
+    is_whatsapp = models.BooleanField(
+        "WhatsApp", default=False, help_text="Кнопка WhatsApp ведёт на этот номер. Можно отметить только у одного."
+    )
+    is_telegram = models.BooleanField(
+        "Telegram", default=False, help_text="Кнопка Telegram ведёт на этот номер. Можно отметить только у одного."
+    )
 
     class Meta:
         verbose_name = "Телефон"
@@ -294,18 +397,180 @@ class FounderFact(models.Model):
         return f"{self.value} {self.label}"
 
 
-class InfoPage(SeoModel):
+class Season(models.Model):
+    """Сезонное оформление (apps/core/seasons.py): по записи на сезон, набор сезонов фиксирован (`Kind`)."""
+
+    Kind = seasons.Kind
+    Mode = seasons.Mode
+    DEFAULT_DATES = {
+        Kind.NEW_YEAR: ("15.12", "14.01"),
+        Kind.WINTER: ("01.12", "28.02"),
+        Kind.AUTUMN: ("01.09", "31.10"),
+    }
+
+    settings = models.ForeignKey(SiteSettings, on_delete=models.CASCADE, related_name="seasons")
+    kind = models.CharField("Сезон", max_length=16, choices=Kind.choices, unique=True, editable=False)
+    mode = models.CharField(
+        "Показ",
+        max_length=8,
+        choices=Mode.choices,
+        default=Mode.AUTO,
+        help_text="«По датам» — тема сама включается и выключается каждый год. «Включено» — сразу для всех "
+        "посетителей и без учёта дат, пока не вернёте «По датам» (например, ранний снег). Если подходят несколько "
+        "сезонов, показывается старший: «Новый год», затем «Зима», затем «Осень» — даже когда младший включён вручную.",
+    )
+    start = models.CharField("С", max_length=5, validators=[validate_day_month], help_text="День и месяц: 15.12.")
+    end = models.CharField(
+        "По",
+        max_length=5,
+        validators=[validate_day_month],
+        help_text="Включительно. Может быть в следующем году: 15.12 — 14.01.",
+    )
+    logo = photo_field(
+        "Логотип на сезон",
+        "logo",
+        size=(3000, 1000),
+        fmt=None,
+        width_field="logo_width",
+        height_field="logo_height",
+        help_text="Заменяет логотип в шапке, пока тема показывается; требования — как у основного логотипа "
+        "(вкладка «Логотип и политика»). В разметку для поисковиков не попадает. Пусто — стандартный логотип в сезонном "
+        "варианте (зимой — со снегом, на Новый год — ещё с шариками и звездой, осенью — с листьями), а если загружен "
+        "свой основной логотип — он.",
+    )
+    logo_width = models.PositiveIntegerField(null=True, editable=False)
+    logo_height = models.PositiveIntegerField(null=True, editable=False)
+    logo_img = logo_spec("logo", HEADER_LOGO_HEIGHT * 3)
+
+    class Meta:
+        verbose_name = "Сезонное оформление"
+        verbose_name_plural = "Сезонное оформление"
+        ordering = ["kind"]  # new_year < winter — как в seasons.PRIORITY
+
+    def __str__(self):
+        return self.get_kind_display()
+
+    def clean(self):
+        for field in ("start", "end"):
+            try:
+                setattr(self, field, format_day_month(getattr(self, field)))
+            except ValueError:
+                pass  # ошибку покажет валидатор поля
+
+    @classmethod
+    def ensure_for(cls, site: SiteSettings) -> None:
+        """Создаёт недостающие сезоны: импорт со сбросом удаляет их вместе с настройками, а добавлять в админке нельзя."""
+        for kind, (start, end) in cls.DEFAULT_DATES.items():
+            cls.objects.get_or_create(kind=kind, defaults={"settings": site, "start": start, "end": end})
+
+
+class AnnouncementQuerySet(models.QuerySet):
+    def current(self, day: date) -> Announcement | None:
+        """Плашка для показа в этот день: первая по порядку включённая, у которой подходят даты."""
+        return (
+            self.filter(is_published=True)
+            .filter(Q(starts_on__isnull=True) | Q(starts_on__lte=day))
+            .filter(Q(ends_on__isnull=True) | Q(ends_on__gte=day))
+            .order_by("order", "id")
+            .first()
+        )
+
+
+class Announcement(TrashableModel, OrderedModel):
+    """Плашка под шапкой на всех страницах (partials/site_banner.html); одновременно показывается одна."""
+
+    text = models.CharField(
+        "Текст",
+        max_length=160,
+        help_text="Одна фраза в полосе под шапкой на всех страницах сайта, например «Новогодние корпоративы — "
+        "бронируйте даты заранее».",
+    )
+    link = models.CharField(
+        "Ссылка",
+        max_length=500,
+        blank=True,
+        validators=[validate_site_link],
+        help_text="Куда ведёт плашка: адрес страницы сайта (/events/…) или полная ссылка (https://…). "
+        "Пусто — плашка без ссылки.",
+    )
+    is_published = models.BooleanField(
+        "Показывать",
+        default=True,
+        help_text="Снимите галочку, чтобы убрать плашку с сайта, не удаляя её. Одновременно показывается одна плашка — "
+        "первая по порядку в списке из тех, что включены и подходят по датам.",
+    )
+    starts_on = models.DateField(
+        "Показывать с", null=True, blank=True, help_text="Необязательно: до этой даты плашки на сайте нет."
+    )
+    ends_on = models.DateField(
+        "по", null=True, blank=True, help_text="Включительно. Необязательно: после этой даты плашка пропадёт сама."
+    )
+
+    objects = AnnouncementQuerySet.as_manager()
+
+    class Meta(OrderedModel.Meta):
+        verbose_name = "Плашка"
+        verbose_name_plural = "Плашки"
+
+    def __str__(self):
+        return self.text
+
+    def clean(self):
+        if self.starts_on and self.ends_on and self.ends_on < self.starts_on:
+            raise ValidationError({"ends_on": "Дата окончания раньше даты начала."})
+
+
+class InfoPage(TrashableModel, SeoModel, OrderedModel):
+    class Layout(models.TextChoices):
+        TEXT = "text", "Текст"
+        RULES = "rules", "Правила"
+        FAQ = "faq", "Вопросы и ответы"
+
     title = models.CharField("Заголовок", max_length=255)
     slug = models.SlugField("Адрес страницы", max_length=255, unique=True, blank=True, help_text=SLUG_HELP)
-    body = HtmlField("Текст")
-    is_published = models.BooleanField("Опубликовано", default=True)
+    lead = models.CharField(
+        "Подзаголовок",
+        max_length=300,
+        blank=True,
+        help_text="Одна-две фразы под заголовком страницы. Он же — описание для поисковиков, если на вкладке SEO оно пустое.",
+    )
+    cover = photo_field("Фото в шапке", "info", help_text="Необязательно. Справа от заголовка, обрезается до 4:3.")
+    cover_card, cover_card_avif = image_specs("cover", 960, 720)
+    cover_og = og_spec("cover")
+    layout = models.CharField(
+        "Оформление",
+        max_length=8,
+        choices=Layout.choices,
+        default=Layout.TEXT,
+        help_text=(
+            "«Текст» — обычная статья. «Правила» — каждый раздел (заголовок H2) карточкой с номером, пункты списков "
+            "с галочками. «Вопросы и ответы» — каждый заголовок H3 — вопрос, ответ раскрывается по нажатию."
+        ),
+    )
+    body = HtmlField(
+        "Текст",
+        extensions=INFO_HTML_EXTENSIONS,
+        help_text=(
+            "Заголовки H2 делят текст на разделы (от трёх разделов появляется оглавление). "
+            "Кнопка «Цитата» — выноска «Важно», таблица — кнопкой редактора."
+        ),
+    )
+    is_published = models.BooleanField(
+        "Опубликовано",
+        default=True,
+        help_text="Снятая — страница не откроется, ссылок на неё в подвале и на «О нас» не будет.",
+    )
+    show_in_footer = models.BooleanField(
+        "В подвале",
+        default=False,
+        help_text="Ссылка на страницу внизу каждой страницы сайта, рядом с «© Т-Парк». Только у опубликованной.",
+    )
 
     objects = PublishedQuerySet.as_manager()
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         verbose_name = "Инфо-страница"
         verbose_name_plural = "Инфо-страницы"
-        ordering = ["title"]
 
     def __str__(self):
         return self.title

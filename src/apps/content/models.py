@@ -11,8 +11,10 @@ from django.utils.html import strip_tags
 from django.utils.text import Truncator
 
 from apps.core.fields import HtmlField, full_spec, image_spec, image_specs, og_spec, photo_field
-from apps.core.models import OrderedModel, PublishedQuerySet, SeoModel
+from apps.core.files import clone_file
+from apps.core.models import COPY_SUFFIX, OrderedModel, PublishedQuerySet, SeoModel, TrashableModel
 from apps.core.redirects import remember_slug_change
+from apps.core.rotation import daily_pick
 from apps.core.slugs import unique_slug
 
 
@@ -48,7 +50,7 @@ def _days(n: int) -> str:
     return f"{n} дней"
 
 
-class Event(SeoModel):
+class Event(TrashableModel, SeoModel):
     title = models.CharField("Заголовок", max_length=128)
     slug = models.SlugField(
         "Адрес страницы",
@@ -100,12 +102,31 @@ class Event(SeoModel):
         if self.end_date == self.date:
             self.end_date = None
 
+    def slug_source(self) -> str:
+        return f"{self.title} {self.date:%Y}"
+
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = unique_slug(self, f"{self.title} {self.date:%Y}")
+            self.slug = unique_slug(self, self.slug_source())
         with transaction.atomic():
             remember_slug_change(self)
             super().save(*args, **kwargs)
+
+    def duplicate(self) -> Event:
+        """Черновик-копия для повторяющихся мероприятий: дату и описание администратор поправит."""
+        return Event.objects.create(
+            title=f"{self.title[:120]}{COPY_SUFFIX}",
+            date=self.date,
+            end_date=self.end_date,
+            start_time=self.start_time,
+            venue=self.venue,
+            price=self.price,
+            description=self.description,
+            link=self.link,
+            image=clone_file(self.image) or "",
+            show_after_date=self.show_after_date,
+            is_published=False,
+        )
 
     def get_absolute_url(self) -> str:
         return reverse("content:event", args=[self.slug])
@@ -156,7 +177,7 @@ class Event(SeoModel):
 REVIEW_SOURCES = {"yandex.": "Яндекс Карты", "vk.com": "ВКонтакте", "2gis.": "2ГИС", "google.": "Google"}
 
 
-class Review(models.Model):
+class Review(TrashableModel):
     text = HtmlField("Текст")
     link = models.URLField(
         "Ссылка на отзыв",
@@ -164,10 +185,19 @@ class Review(models.Model):
         blank=True,
         help_text="Например, на отзыв в Яндекс Картах: открывается по клику на подпись источника под отзывом.",
     )
-    date = models.DateField("Дата отзыва", null=True, blank=True)
-    photo = photo_field("Фото", "reviews")
+    date = models.DateField(
+        "Дата отзыва",
+        null=True,
+        blank=True,
+        help_text="От неё зависит порядок: новые сверху, без даты — в конце. «Подтянуть» заполнит её сама.",
+    )
+    photo = photo_field(
+        "Фото",
+        "reviews",
+        help_text="Маленький кружок рядом с подписью «Гость Т-Парка», кадр обрезается до квадрата. Необязательно.",
+    )
     avatar, avatar_avif = image_specs("photo", 160, 160)
-    is_published = models.BooleanField("Опубликовано", default=True)
+    is_published = models.BooleanField("Опубликовано", default=True, help_text="Снимите, чтобы скрыть отзыв на сайте.")
 
     objects = PublishedQuerySet.as_manager()
 
@@ -189,9 +219,22 @@ class Review(models.Model):
 
 
 class Partner(OrderedModel):
-    name = models.CharField("Название", max_length=128, blank=True)
-    link = models.URLField("Ссылка", max_length=500, blank=True)
-    logo = photo_field("Логотип", "partners", size=(800, 800), fmt=None)
+    name = models.CharField(
+        "Название",
+        max_length=128,
+        blank=True,
+        help_text="Описание логотипа для поисковиков; без логотипа на сайте будет плитка с этим названием.",
+    )
+    link = models.URLField(
+        "Ссылка", max_length=500, blank=True, help_text="Откроется в новой вкладке. Пусто — логотип без ссылки."
+    )
+    logo = photo_field(
+        "Логотип",
+        "partners",
+        size=(800, 800),
+        fmt=None,
+        help_text="На «О нас» — целиком, без обрезки. Лучше PNG с прозрачным или белым фоном.",
+    )
     logo_small = image_spec("logo", 600, 600, crop=False)
 
     class Meta(OrderedModel.Meta):
@@ -203,8 +246,17 @@ class Partner(OrderedModel):
 
 
 class GalleryPhoto(OrderedModel):
-    image = photo_field("Фото", "gallery", blank=False)
-    caption = models.CharField("Подпись", max_length=255, blank=True)
+    STRIP_SIZE = 6  # фото в полосе «Как это выглядит» (главная, «О нас», отзывы)
+
+    image = photo_field(
+        "Фото", "gallery", blank=False, help_text="В галерее — квадратом с обрезкой краёв, по клику — целиком."
+    )
+    caption = models.CharField(
+        "Подпись",
+        max_length=255,
+        blank=True,
+        help_text="Видна при просмотре фото на весь экран и описывает фото для поисковиков.",
+    )
     thumb, thumb_avif = image_specs("image", 600, 600)
     thumb_small, thumb_small_avif = image_specs("image", 400, 400)  # сетка на телефоне: srcset с thumb
     full = full_spec("image")
@@ -215,3 +267,10 @@ class GalleryPhoto(OrderedModel):
 
     def __str__(self):
         return self.caption or f"Фото #{self.pk}"
+
+    @classmethod
+    def strip_photos(cls, key: str, size: int = STRIP_SIZE) -> list[GalleryPhoto]:
+        """Фото для полосы «Как это выглядит»: на каждой странице (key) свои, меняются раз в сутки."""
+        ids = daily_pick(list(cls.objects.values_list("pk", flat=True)), size, key)
+        photos = cls.objects.in_bulk(ids)
+        return [photos[pk] for pk in ids]

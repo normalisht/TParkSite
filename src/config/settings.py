@@ -9,6 +9,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.templatetags.static import static
 from django.urls import reverse_lazy
 from django.utils.csp import CSP
+from whitenoise.compress import Compressor
 
 from apps.core.map_hosts import WIDGET_HOSTS
 
@@ -168,6 +169,8 @@ FILE_UPLOAD_TEMP_DIR = os.environ.get("FILE_UPLOAD_TEMP_DIR") or None
 IMAGEKIT_DEFAULT_CACHEFILE_STRATEGY = "apps.core.images.GenerateAfterCommit"
 IMAGEKIT_DEFAULT_CACHEFILE_BACKEND = "apps.core.images.AtomicBackend"
 
+# Версия закреплена: с "latest" CSS продакшена собирался бы той версией, что вышла к моменту сборки образа.
+TAILWIND_CLI_VERSION = "4.3.3"
 TAILWIND_CLI_SRC_CSS = "tailwind/source.css"
 TAILWIND_CLI_DIST_CSS = "css/tailwind.css"
 
@@ -175,6 +178,11 @@ STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
     "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
 }
+# Сайт ссылается только на копии с хешем в имени ({% static %}, importmap prose-editor): оригиналы не храним
+# и не сжимаем — collectstatic втрое быстрее, статика вдвое меньше. Source map нужны только DevTools, а их сжатие
+# (2 МБ у prose-editor) — почти половина времени сборки.
+WHITENOISE_KEEP_ONLY_HASHED_FILES = True
+WHITENOISE_SKIP_COMPRESS_EXTENSIONS = [*Compressor.SKIP_COMPRESS_EXTENSIONS, "map"]
 
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
@@ -224,6 +232,7 @@ UNFOLD = {
     "SITE_TITLE": "Т-Парк",
     "SITE_HEADER": "Т-Парк",
     "SITE_URL": "/",
+    "STYLES": [lambda request: static("css/admin.css")],
     "SCRIPTS": [lambda request: static("js/admin_dropzone.js")],  # перетаскивание файлов во все поля загрузки
     "SITE_FAVICONS": [
         {"rel": "icon", "sizes": "48x48", "href": lambda request: static("img/favicon.ico")},
@@ -263,6 +272,7 @@ UNFOLD = {
         "show_search": False,
         "show_all_applications": False,
         "navigation": [
+            {"items": [_nav("Справка", "help", "admin_help")]},
             {
                 "title": "Каталог",
                 "items": [
@@ -287,6 +297,7 @@ UNFOLD = {
                 "items": [
                     _nav("Настройки сайта", "settings", "admin:core_sitesettings_changelist"),
                     _nav("Тексты сайта", "text_fields", "admin:texts_sitetext_changelist"),
+                    _nav("Плашки", "campaign", "admin:core_announcement_changelist"),
                     _nav("Инфо-страницы", "description", "admin:core_infopage_changelist"),
                     _nav("Редиректы", "alt_route", "admin:core_redirect_changelist"),
                 ],

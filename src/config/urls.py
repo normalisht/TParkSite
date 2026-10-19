@@ -6,10 +6,12 @@ from django.urls import include, path
 from django.views.generic import RedirectView
 
 from apps.core import legacy_redirects
+from apps.core.admin_help import help_view
 from apps.core.sitemaps import SITEMAPS
 from apps.core.views import favicon, healthz, robots_txt
 
 urlpatterns = [
+    path("admin/help/", admin.site.admin_view(help_view), name="admin_help"),
     path("admin/", admin.site.urls),
     path("healthz/", healthz, name="healthz"),
     path("sitemap.xml", sitemap, {"sitemaps": SITEMAPS}, name="sitemap"),

@@ -1,0 +1,27 @@
+{% load i18n static unfold %}
+{% comment %}
+Копия шаблона Unfold (сверять при обновлении) + кнопка «Открыть сайт» справа в шапке на всех страницах:
+в меню профиля её было не найти. На телефоне — только иконка.
+{% endcomment %}
+
+{% if not is_popup %}
+    <div class="flex flex-row gap-3 items-center ml-auto">
+        {% if environment %}
+            {% include "unfold/helpers/label.html" with text=environment.0 type=environment.1 %}
+        {% endif %}
+
+        {% action_list %}
+
+        {% if nav_global_side %}
+            {{ nav_global_side }}
+        {% endif %}
+
+        {% if site_url %}
+            <a href="{{ site_url }}" target="_blank" rel="noopener" title="Открыть сайт в новой вкладке"
+               class="bg-white border border-base-200 flex font-medium gap-2 items-center px-3 py-2 rounded-default shadow-xs text-sm whitespace-nowrap hover:text-primary-600 dark:bg-base-900 dark:border-base-700 dark:hover:text-primary-500">
+                <span class="material-symbols-outlined" aria-hidden="true">open_in_new</span>
+                <span class="hidden md:block">Открыть сайт</span>
+            </a>
+        {% endif %}
+    </div>
+{% endif %}

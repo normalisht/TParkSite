@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible
 from django_prose_editor.fields import ProseEditorField, create_sanitizer
 from imagekit.models import ImageSpecField, ProcessedImageField
+from imagekit.models.fields.files import ProcessedImageFieldFile
 from imagekit.processors import ResizeToFill, ResizeToFit
 from PIL import Image
 
@@ -21,6 +22,16 @@ HTML_EXTENSIONS = {
     "Link": {"enableTarget": True, "protocols": ["http", "https", "mailto", "tel"]},
 }
 
+# Инфо-страницы: ещё выноска «Важно» (цитата) и таблицы.
+INFO_HTML_EXTENSIONS = {
+    **HTML_EXTENSIONS,
+    "Blockquote": True,
+    "Table": True,
+    "TableRow": True,
+    "TableHeader": True,
+    "TableCell": True,
+}
+
 _sanitizer = create_sanitizer(HTML_EXTENSIONS)
 
 
@@ -29,9 +40,9 @@ def sanitize_html(html: str) -> str:
     return _sanitizer(html or "")
 
 
-def HtmlField(verbose_name: str, **kwargs) -> ProseEditorField:
+def HtmlField(verbose_name: str, *, extensions=HTML_EXTENSIONS, **kwargs) -> ProseEditorField:
     kwargs.setdefault("blank", True)
-    return ProseEditorField(verbose_name, extensions=HTML_EXTENSIONS, sanitize=True, **kwargs)
+    return ProseEditorField(verbose_name, extensions=extensions, sanitize=True, **kwargs)
 
 
 MAX_UPLOAD_BYTES = 20 * 1024 * 1024
@@ -76,9 +87,26 @@ class UploadTo:
         return hash(self.prefix)
 
 
+class _NamedProcessedImageFieldFile(ProcessedImageFieldFile):
+    def _set_instance_attribute(self, name, content):
+        content.name = name
+        super()._set_instance_attribute(name, content)
+
+
+class SizedProcessedImageField(ProcessedImageField):
+    """`ProcessedImageField`, у которого работают `width_field`/`height_field`.
+
+    Django 6 берёт размеры из сохраняемого содержимого, а imagekit отдаёт пережатое как `File` без имени — Django
+    считает такой файл пустым и обнуляет размеры. Даём содержимому имя сохранённого файла.
+    """
+
+    attr_class = _NamedProcessedImageFieldFile
+
+
 def photo_field(verbose_name: str, prefix: str, *, size=(1920, 1080), fmt="JPEG", **kwargs):
     kwargs.setdefault("blank", True)
-    return ProcessedImageField(
+    field_class = SizedProcessedImageField if "width_field" in kwargs else ProcessedImageField
+    return field_class(
         verbose_name=verbose_name,
         upload_to=UploadTo(prefix),
         processors=[ResizeToFit(*size, upscale=False)],
@@ -120,6 +148,17 @@ def full_spec(source: str) -> ImageSpecField:
         processors=[ResizeToFit(1920, 1080, upscale=False)],
         format="WEBP",
         options={"quality": 75},
+    )
+
+
+def logo_spec(source: str, height: int) -> ImageSpecField:
+    """Логотип заданной высоты (ширина — по пропорциям) в WebP без потерь: сжатие с потерями мылит контуры
+    и плоские заливки, а без потерь логотип такой высоты весит ~10 КБ, с прозрачностью."""
+    return ImageSpecField(
+        source=source,
+        processors=[ResizeToFit(height * 10, height, upscale=False)],
+        format="WEBP",
+        options={"lossless": True},
     )
 
 

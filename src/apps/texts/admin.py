@@ -4,6 +4,7 @@ from django.core.exceptions import PermissionDenied
 from simple_history.admin import SimpleHistoryAdmin
 
 from apps.core.admin_utils import SiteModelAdmin
+from apps.texts.hints import texts_intro
 from apps.texts.models import SiteText
 from apps.texts.registry import BY_KEY
 
@@ -29,7 +30,8 @@ class SiteTextAdmin(SimpleHistoryAdmin, SiteModelAdmin):
     search_fields = ["label", "text", "key"]
     fields = ["label", "page", "where", "text", "default_text", "key"]
     readonly_fields = ["label", "page", "where", "default_text", "key"]
-    list_before_template = "admin/texts/list_before.html"
+    help_intro = texts_intro
+    help_anchor = "texts"
 
     @admin.display(description="Текст")
     def short_text(self, obj):

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load site_tags site_texts %}
-{# Swiper нужен только карусели отзывов внизу страницы: стили подключаются в body перед ней, чтобы не задерживать первую отрисовку. #}
-{% block vendor_js %}{% if reviews %}{% include "partials/vendor.html" with part="js" swiper=1 %}{% endif %}{% endblock %}
+{# Swiper — карусели отзывов, GLightbox — полосе фото; оба ниже первого экрана: стили подключаются в body перед блоками, чтобы не задерживать первую отрисовку. #}
+{% block vendor_js %}{% include "partials/vendor.html" with part="js" swiper=reviews glightbox=photos %}{% endblock %}
 {% block content %}
 <section class="page-hero">
   {% include "partials/hero_decor.html" %}

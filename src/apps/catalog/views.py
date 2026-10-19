@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import render
 
 from apps.catalog.models import Category, Service
 from apps.content.models import Event, GalleryPhoto, Review
@@ -6,11 +6,12 @@ from apps.core import structured_data as ld
 from apps.core.images import lightbox_url, safe_spec_url
 from apps.core.maps import route_links
 from apps.core.models import PARK_ADDRESS, SiteSettings
+from apps.core.preview import finish, get_for_view, preview_context
+from apps.core.rotation import daily_pick
 from apps.core.seo import absolute_url, make_seo, page_seo
 
 HOME_REVIEWS = 8
 HOME_EVENTS = 3
-HOME_PHOTOS = 6
 
 
 def home(request):
@@ -25,7 +26,7 @@ def home(request):
             "lcp_card": not hero,
             "route": route_links(site.latitude, site.longitude),
             "events": list(Event.objects.published().upcoming()[:HOME_EVENTS]) if site.home_show_events else [],
-            "photos": list(GalleryPhoto.objects.all()[:HOME_PHOTOS]),
+            "photos": GalleryPhoto.strip_photos("home"),
             "reviews": list(Review.objects.published()[:HOME_REVIEWS]),
             "seo": page_seo("home"),
             "structured_data": [ld.organization(request)],
@@ -34,7 +35,7 @@ def home(request):
 
 
 def category_detail(request, slug):
-    category = get_object_or_404(Category.objects.published(), slug=slug)
+    category, preview = get_for_view(request, Category.objects.all(), slug=slug)
     photos = list(category.photos.all())
     services = category.published_services()
     # Шапка: превью категории, без него — первое фото. Полноразмерное — для просмотра на весь экран.
@@ -45,7 +46,16 @@ def category_detail(request, slug):
     else:
         hero, hero_srcset, hero_full = None, "", ""
     crumbs = [ld.home_crumb(), (category.name, "")]
-    return render(
+    seo = make_seo(
+        category.name,
+        category.description,
+        absolute_url(request, safe_spec_url(hero, "og")),
+        obj=category,
+        default_description=f"{category.name} в Т-Парке: услуги и цены. {PARK_ADDRESS}.",
+    )
+    if preview:
+        seo["noindex"] = True
+    response = render(
         request,
         "catalog/category.html",
         {
@@ -62,41 +72,37 @@ def category_detail(request, slug):
             "hero_full": hero_full,
             "related": category.related_categories(),
             "breadcrumbs": crumbs,
-            "seo": make_seo(
-                category.name,
-                category.description,
-                absolute_url(request, safe_spec_url(hero, "og")),
-                obj=category,
-                default_description=f"{category.name} в Т-Парке: услуги и цены. {PARK_ADDRESS}.",
-            ),
+            "seo": seo,
             "structured_data": [
                 ld.organization(request),
                 ld.breadcrumbs(request, crumbs),
                 ld.service_list(request, category, services),
             ],
+            **preview_context(category, preview),
         },
     )
+    return finish(response, preview)
 
 
 RELATED_SERVICES = 3
 
 
 def related_services(category, service, limit: int = RELATED_SERVICES) -> list:
-    """Другие услуги категории со своей страницей; варианты с тем же названием (в т. ч. текущей услуги) — один раз."""
+    """Другие услуги категории со своей страницей: у каждой услуги свой набор, меняется раз в сутки — иначе ссылки
+    получали бы только первые услуги категории. Варианты с тем же названием (в т. ч. текущей услуги) — один раз.
+    """
     seen = {service.name.casefold()}
-    result = []
+    candidates = []
     for item in category.published_services():
         name = item.name.casefold()
         if item.has_page and name not in seen:
             seen.add(name)
-            result.append(item)
-            if len(result) == limit:
-                break
-    return result
+            candidates.append(item)
+    return daily_pick(candidates, limit, key=f"service:{service.pk}")
 
 
 def service_detail(request, slug):
-    service = get_object_or_404(Service.objects.published().filter(has_page=True), slug=slug)
+    service, preview = get_for_view(request, Service.objects.filter(has_page=True), slug=slug)
     photos = list(service.photos.all())
     link = (
         service.category_links.filter(category__is_published=True)
@@ -112,7 +118,18 @@ def service_detail(request, slug):
     ]
     image = safe_spec_url(photos[0], "og") if photos else ""
     related = related_services(category, service) if category else []
-    return render(
+    seo = make_seo(
+        service.name,
+        service.short_description or service.description,
+        absolute_url(request, image),
+        obj=service,
+        default_description=" ".join(
+            filter(None, [f"{service.name} в Т-Парке.", service.price_display, f"{PARK_ADDRESS}."])
+        ),
+    )
+    if preview:
+        seo["noindex"] = True
+    response = render(
         request,
         "catalog/service.html",
         {
@@ -122,19 +139,13 @@ def service_detail(request, slug):
             "category": category,
             "related": related,
             "breadcrumbs": crumbs,
-            "seo": make_seo(
-                service.name,
-                service.short_description or service.description,
-                absolute_url(request, image),
-                obj=service,
-                default_description=" ".join(
-                    filter(None, [f"{service.name} в Т-Парке.", service.price_display, f"{PARK_ADDRESS}."])
-                ),
-            ),
+            "seo": seo,
             "structured_data": [
                 ld.organization(request),
                 ld.breadcrumbs(request, crumbs),
                 ld.service(request, service),
             ],
+            **preview_context(service, preview),
         },
     )
+    return finish(response, preview)

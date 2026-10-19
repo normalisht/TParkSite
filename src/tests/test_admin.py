@@ -38,7 +38,7 @@ def _settings_post(phones):
         "phones-MIN_NUM_FORMS": "0",
         "phones-MAX_NUM_FORMS": "1000",
     }
-    for prefix in ("park_formats", "founder_facts"):
+    for prefix in ("park_formats", "founder_facts", "seasons"):
         data.update({f"{prefix}-TOTAL_FORMS": "0", f"{prefix}-INITIAL_FORMS": "0", f"{prefix}-MIN_NUM_FORMS": "0"})
     for i, phone in enumerate(phones):
         for key, value in phone.items():
@@ -231,13 +231,14 @@ def test_every_admin_warns_about_unsaved_changes(admin_client):
 
 
 @pytest.mark.parametrize(
-    ("model", "create_kwargs"),
+    ("model", "create_kwargs", "extra"),
     [
-        (Service, {"name": "Баня", "slug": "banya"}),
-        (InfoPage, {"title": "Правила", "slug": "pravila", "body": "<p>Текст</p>"}),
+        (Service, {"name": "Баня", "slug": "banya"}, {}),
+        # У инфо-страниц в списке ещё скрытое поле порядка (перетаскивание).
+        (InfoPage, {"title": "Правила", "slug": "pravila", "body": "<p>Текст</p>"}, {"form-0-order": "0"}),
     ],
 )
-def test_is_published_editable_in_changelist(admin_client, model, create_kwargs):
+def test_is_published_editable_in_changelist(admin_client, model, create_kwargs, extra):
     obj = model.objects.create(is_published=True, **create_kwargs)
     url = reverse(f"admin:{model._meta.app_label}_{model._meta.model_name}_changelist")
     response = admin_client.post(
@@ -247,6 +248,7 @@ def test_is_published_editable_in_changelist(admin_client, model, create_kwargs)
             "form-INITIAL_FORMS": "1",
             "form-0-id": str(obj.pk),
             "_save": "Сохранить",
+            **extra,
         },
     )
     assert response.status_code == 302
@@ -317,12 +319,21 @@ def test_seo_help_in_admin_forms(admin_client):
     assert "Координаты" in html
 
 
-@pytest.mark.parametrize("model", ["catalog_category", "catalog_service", "content_event", "core_infopage"])
+@pytest.mark.parametrize("model", ["content_event", "core_infopage"])
 def test_seo_is_separate_tab(admin_client, model):
     html = admin_client.get(reverse(f"admin:{model}_add")).content.decode()
     tabs = re.findall(r"activeFieldsetTab = '([^']+)'\"", html)
     assert tabs[0] == "основное"
     assert "seo" in tabs
+
+
+@pytest.mark.parametrize("model", ["catalog_category", "catalog_service"])
+def test_catalog_seo_is_top_level_tab(admin_client, model):
+    # У категории и услуги вкладки — inline, поэтому SEO — вкладка верхнего уровня, а не второй ряд внутри «Основного».
+    html = admin_client.get(reverse(f"admin:{model}_add")).content.decode()
+    assert "activeFieldsetTab" not in html
+    assert re.search(r'<a href="#seo"[^>]*>\s*SEO\s*</a>', html)
+    assert html.index("x-show=\"activeTab == 'seo'\"") < html.index('name="seo_title"')
 
 
 def test_service_changelist_finds_services_hidden_from_navigation(admin_client):
@@ -420,10 +431,18 @@ def test_delete_warns_only_about_services_left_without_category(admin_client):
     assert "Каяк" not in html.split("Без категории останутся", 1)[1].split("<", 1)[0]
 
 
-def test_admin_index_has_instructions(admin_client):
+def test_admin_index_has_quick_start(admin_client):
     html = admin_client.get(reverse("admin:index")).content.decode()
-    for heading in ("Как добавить услугу", "Как показать категорию в меню", "Фото", "Адрес страницы"):
-        assert heading in html
+    assert "Быстрый старт" in html
+    assert reverse("admin_help") in html
+    for name in (
+        "admin:catalog_service_add",
+        "admin:content_event_add",
+        "admin:content_review_add",
+        "admin:content_galleryphoto_bulk_upload",
+        "admin:core_sitesettings_changelist",
+    ):
+        assert f'href="{reverse(name)}"' in html, name
 
 
 def test_photo_fields_explain_cropping():
@@ -467,7 +486,8 @@ def test_delete_confirmation_and_forms_are_russian(admin_client):
             assert phrase not in html, (url, phrase)
         # «Select» — отдельное слово в подсказке командного поиска (в других местах встречается как часть фраз)
         assert not re.search(r">\s*Select\s*<", html), url
+    # «Удалить» у категории переносит её в корзину (apps/core/trash.py): своя страница вместо подтверждения Django.
     html = admin_client.get(pages[0]).content.decode()
-    assert "в группе «Активный отдых»" in html
+    assert "Переместить в корзину?" in html
     assert "Удалить: категория «Парк»" not in html
-    assert "Вместе с этим будут удалены" in html
+    assert "Вместе с этим будут удалены" not in html

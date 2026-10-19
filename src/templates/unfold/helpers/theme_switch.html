@@ -1,0 +1,25 @@
+{% load i18n %}
+{% comment %}
+Переключатель темы в меню профиля (замена шаблона Unfold, сверять при обновлении). У Unfold три пункта в строку,
+и русские подписи в ширину меню не влезали: здесь — сегменты с иконкой над подписью, а в узкой боковой панели
+(меньше 240 px) — только иконки с подсказкой.
+{% endcomment %}
+
+{% if not theme %}
+    <div class="border-b border-base-200 mb-1 pb-2 pt-1 px-2 dark:border-base-700">
+        <div class="mb-1 px-2 py-1 text-xs text-subtle select-none">Тема</div>
+
+        <div class="@container">
+            <div class="bg-base-100 gap-1 grid grid-cols-3 p-1 rounded-default dark:bg-base-900" role="group" aria-label="Тема">
+                {% translate "Light" as light_label %}
+                {% include "unfold/helpers/theme_switch_option.html" with value="light" icon="light_mode" label=light_label hint="Светлая тема" %}
+
+                {% translate "Dark" as dark_label %}
+                {% include "unfold/helpers/theme_switch_option.html" with value="dark" icon="dark_mode" label=dark_label hint="Тёмная тема" %}
+
+                {% translate "System" as system_label %}
+                {% include "unfold/helpers/theme_switch_option.html" with value="auto" icon="computer" label=system_label hint="Как в настройках устройства" %}
+            </div>
+        </div>
+    </div>
+{% endif %}

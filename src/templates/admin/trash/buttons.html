@@ -1,0 +1,7 @@
+{# «Восстановить» и «Удалить навсегда»: POST в корзину (TrashAdminMixin.trash), подтверждение — admin_trash.js. #}
+<form method="post"{% if action %} action="{{ action }}"{% endif %} class="flex flex-wrap gap-2">
+  {% csrf_token %}
+  <input type="hidden" name="pk" value="{{ pk }}">
+  {% if can_restore %}<button type="submit" name="restore" value="1" class="cursor-pointer bg-primary-600 rounded-md px-3 py-1 font-semibold text-white">Восстановить</button>{% endif %}
+  {% if can_purge %}<button type="submit" name="purge" value="1" class="cursor-pointer rounded-md border border-base-200 px-3 py-1 text-red-600">Удалить навсегда</button>{% endif %}
+</form>
