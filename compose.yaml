@@ -12,8 +12,8 @@ services:
     env_file: .env
     restart: unless-stopped
     volumes:
-      - db:/data/db
-      - media:/data/media
+      - ${DB_DIR:-./data/db}:/data/db
+      - ${MEDIA_DIR:-./data/media}:/data/media
     networks: [proxy]
     # Пережатие фото держит их в памяти; без лимита OOM-killer может положить весь сервер.
     mem_limit: ${WEB_MEM_LIMIT:-1g}
@@ -36,7 +36,7 @@ services:
     image: nginx:stable-alpine@sha256:0985e772fb9f729e6fa0980da05fca5d9c468e870eed43071545afa9d2e27d94
     restart: unless-stopped
     volumes:
-      - media:/data/media:ro
+      - ${MEDIA_DIR:-./data/media}:/data/media
       - ./docker/nginx-media.conf:/etc/nginx/conf.d/default.conf:ro
     networks: [proxy]
     logging: *logging
