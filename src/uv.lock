@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.14"
 
 [[package]]
@@ -218,27 +218,27 @@ wheels = [
 
 [[package]]
 name = "django-js-asset"
-version = "4.2.0"
+version = "5.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/0f/36/cb9448f35d7e0727c90ca110a16fc506811292853ee7083f03aaf389f7a1/django_js_asset-4.2.0.tar.gz", hash = "sha256:73fdf6f65cf725b538c75c8996d0f19a862649b8add0a6fdc5517af17e194dc0", size = 39532, upload-time = "2026-09-24T08:39:26.633Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/eb/26/3ee84cd766d8abb0685cec3eef6dbbe7aa1ae2ad39999ffa725452fd70d5/django_js_asset-5.0.0.tar.gz", hash = "sha256:06ce0ab4746575ac62e3b91f1a6a5457e8bec8adbce44eb831074bf80d67ab40", size = 39584, upload-time = "2026-10-26T13:32:28.629Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e2/0d/5c37278ff870a99c9bfc2bcd6397cf1f998c7b2cf267eda0d211143aa554/django_js_asset-4.2.0-py3-none-any.whl", hash = "sha256:1013213eaee948fbfe32f8b575bafa299da3049f6bb777d0c1c9c0ae656133f6", size = 16157, upload-time = "2026-09-24T08:39:24.997Z" },
+    { url = "https://files.pythonhosted.org/packages/9a/f0/7672844ad66764c68eae0b0854d1f03f39f561c7a538079cddc551eb16ab/django_js_asset-5.0.0-py3-none-any.whl", hash = "sha256:d8de7e074dc8fa87e9354e642c0d78238f8967752a4617c2a2b9df752a86f5bf", size = 18547, upload-time = "2026-10-26T13:32:27.416Z" },
 ]
 
 [[package]]
 name = "django-prose-editor"
-version = "0.27.3"
+version = "0.28.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django" },
     { name = "django-js-asset" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/22/05/ca64f16737110950adcdf3013164d79e8552e6c8242b67915c9592397723/django_prose_editor-0.27.3.tar.gz", hash = "sha256:26d2a9d8f1fb9d07f041de909de26f68c1a3872680be24c1c9287064a172fba0", size = 858983, upload-time = "2026-09-21T12:10:17.819Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/93/c8/48e50b9f7e28218decba107d57205e7844055f08745ff231f1ee3bbb01ad/django_prose_editor-0.28.0.tar.gz", hash = "sha256:06ebf65ce82c36e4d2e43bfc733fb3c7747ca277d6b7d72bcb0d6f00a9f5112c", size = 871857, upload-time = "2026-10-26T13:32:47.288Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/28/a8/aae7abc56c51f88aa8e53e62216dc4243562ea8236842262d7b5f3df8d79/django_prose_editor-0.27.3-py3-none-any.whl", hash = "sha256:4be9801e0cf55b870dc13fa74af3df0cdfba5ed201d954c672649ee983094eae", size = 879218, upload-time = "2026-09-21T12:10:16.119Z" },
+    { url = "https://files.pythonhosted.org/packages/84/10/14f20f9f6bcf38909e97e9467f1081531542e3bbc8280cae7ca9227b3a0a/django_prose_editor-0.28.0-py3-none-any.whl", hash = "sha256:37fd98d7bf4250d535bec24c4f5ad3dc195b22cced9650dcd35a4f8777de71e2", size = 895299, upload-time = "2026-10-26T13:32:45.381Z" },
 ]
 
 [[package]]
@@ -754,7 +754,7 @@ requires-dist = [
     { name = "django", specifier = ">=6.1.2,<6.2" },
     { name = "django-axes", extras = ["ipware"], specifier = ">=8.3.1" },
     { name = "django-imagekit", specifier = ">=6.1.1,<7" },
-    { name = "django-prose-editor", specifier = ">=0.27.3,<0.28" },
+    { name = "django-prose-editor", specifier = ">=0.28.0,<0.29" },
     { name = "django-simple-history", specifier = ">=3.13,<4" },
     { name = "django-tailwind-cli", specifier = ">=4.8.1" },
     { name = "django-unfold", specifier = ">=0.110.0,<0.111" },
