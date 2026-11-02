@@ -255,7 +255,7 @@ wheels = [
 
 [[package]]
 name = "django-tailwind-cli"
-version = "4.8.1"
+version = "4.8.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
@@ -263,9 +263,9 @@ dependencies = [
     { name = "django-click" },
     { name = "semver" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b8/33/31713a0ffcdf9ebda53787bb5da44d8e741b80a200ccc55ee7f193221640/django_tailwind_cli-4.8.1.tar.gz", hash = "sha256:25f6362d64c19dd363d6a720eaf8cbfc1b05699190e9f73fb7c378138bc7675b", size = 165198, upload-time = "2026-09-18T12:49:32.667Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/77/4e/014cad8b6b66f021025383d93998f86e722b8735770cd7c06c8284b9669d/django_tailwind_cli-4.8.2.tar.gz", hash = "sha256:9ef2455e491ab9f2686af26f2cd2491ae24ed4c2957e82ac0d75265bb469a2d1", size = 165545, upload-time = "2026-10-27T21:01:09.847Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a2/61/f8317c8dcdc7f25741c7dfd81d1f376f4f29d587ae1d5cb97980fc4946cb/django_tailwind_cli-4.8.1-py3-none-any.whl", hash = "sha256:804268c985729582c4e633b176178b5aad104bcc1507fcaac8e6002f031b93ac", size = 50588, upload-time = "2026-09-18T12:49:31.016Z" },
+    { url = "https://files.pythonhosted.org/packages/db/7e/1c79351b909a5f39c0b03b783d5d56e54e1e7482ea81f90f6b80746a8d4e/django_tailwind_cli-4.8.2-py3-none-any.whl", hash = "sha256:42d4ead7efb1b1fec92c82ef49c1426a72ef369f87f2d76a25eead42cb6634ea", size = 50675, upload-time = "2026-10-27T21:01:07.197Z" },
 ]
 
 [[package]]
@@ -756,7 +756,7 @@ requires-dist = [
     { name = "django-imagekit", specifier = ">=6.1.1,<7" },
     { name = "django-prose-editor", specifier = ">=0.28.0,<0.29" },
     { name = "django-simple-history", specifier = ">=3.13,<4" },
-    { name = "django-tailwind-cli", specifier = ">=4.8.1" },
+    { name = "django-tailwind-cli", specifier = ">=4.8.2" },
     { name = "django-unfold", specifier = ">=0.110.0,<0.111" },
     { name = "gunicorn", specifier = ">=26.2.0" },
     { name = "nh3", specifier = ">=0.3.7" },
