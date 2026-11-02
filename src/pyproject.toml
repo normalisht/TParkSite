@@ -44,6 +44,8 @@ filterwarnings = [
     "ignore:Overriding get_action_choices",
     # django-simple-history 3.13 вызывает select_related() без аргументов (устареет в Django 2028)
     "ignore:Calling select_related\\(\\) with no arguments:PendingDeprecationWarning:simple_history",
+    # pytest-playwright 0.10 объявляет сессионную фикстуру base_url методом экземпляра (перестанет работать в pytest 10)
+    "ignore:Session-scoped fixtures defined as instance methods:pytest.PytestRemovedIn10Warning",
 ]
 
 [tool.coverage.run]
