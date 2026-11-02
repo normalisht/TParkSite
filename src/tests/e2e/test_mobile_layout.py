@@ -496,6 +496,29 @@ def test_service_card_does_not_lift_on_hover(live_server, browser, content):
     context.close()
 
 
+@pytest.mark.parametrize("count", [1, 2, 3, 4, 5, 6, 7])
+@pytest.mark.parametrize("width", [1280, 800])
+def test_home_category_rows_have_no_empty_space(live_server, browser, count, width):
+    group = CategoryGroup.objects.create(name="Группа")
+    for i in range(count):
+        group.categories.add(Category.objects.create(name=f"Категория {i}", is_published=True))
+    context = browser.new_context(viewport={"width": width, "height": 800})
+    page = context.new_page()
+    page.goto(live_server.url + "/")
+    page.wait_for_load_state("networkidle")
+    cards = page.locator(".category-card")
+    boxes = [cards.nth(i).bounding_box() for i in range(count)]
+    rows = {}
+    for box in boxes:
+        rows.setdefault(round(box["y"]), []).append(box)
+    right_edge = max(box["x"] + box["width"] for box in boxes)
+    for row in rows.values():
+        assert abs(max(box["x"] + box["width"] for box in row) - right_edge) < 1
+        assert len({round(box["height"]) for box in row}) == 1
+    assert all(len(row) <= (3 if width >= 1024 else 2) for row in rows.values())
+    context.close()
+
+
 def test_category_page_related_cards_three_in_row_on_desktop(live_server, browser):
     group = CategoryGroup.objects.create(name="Группа")
     current = Category.objects.create(name="Текущая", is_published=True)
