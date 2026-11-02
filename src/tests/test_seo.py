@@ -9,6 +9,7 @@ from django.utils import timezone
 from apps.catalog.models import Category, CategoryService, Service, ServicePhoto
 from apps.content.models import Event, GalleryPhoto, Review
 from apps.core.models import InfoPage, Phone, SiteSettings
+from apps.core.seo import STATIC_PAGES
 
 pytestmark = pytest.mark.django_db
 
@@ -300,6 +301,79 @@ def test_fill_seo_content_fills_only_empty(db):
     assert rope.seo_title == "Верёвочный парк под Обнинском — цены | Т-Парк"
     assert boats.seo_title == "Своё" and boats.seo_description.startswith("Лодочная станция")
     assert other.seo_title == ""
+
+
+def test_seo_texts_fit_the_snippet_and_are_unique():
+    from apps.core import seo_content as sc
+
+    pairs = [*sc.CATEGORIES.values(), *sc.SERVICES.values(), *sc.EVENTS.values(), *sc.INFO_PAGES.values()]
+    pairs += [
+        (sc.SITE_SETTINGS[f"seo_{key}_title"], sc.SITE_SETTINGS[f"seo_{key}_description"]) for key in STATIC_PAGES
+    ]
+    titles, descriptions = zip(*pairs, strict=True)
+    assert [title for title in titles if len(title) > 60] == []
+    assert [text for text in descriptions if not 110 <= len(text) <= 160] == []
+    assert len(set(titles)) == len(titles)
+    assert len(set(descriptions)) == len(descriptions)
+
+
+def test_refresh_seo_content_keeps_admin_edits():
+    from apps.core.seo_content import CATEGORIES, EVENTS, INFO_PAGES, OUTDATED_CATEGORIES, SERVICES, refresh_seo_content
+
+    site = SiteSettings.load()
+    site.seo_events_title = "Мероприятия и праздники в Т-Парке — афиша"
+    site.seo_gallery_title = "Свой заголовок"
+    site.price_range = "от 100 ₽"
+    site.save()
+    old_title, old_description = OUTDATED_CATEGORIES["splavy-i-pokhody"]
+    outdated = Category.objects.create(
+        name="Сплавы", slug="splavy-i-pokhody", seo_title=old_title, seo_description=old_description
+    )
+    edited = Category.objects.create(
+        name="Лодки", slug="lodochnaia-stantsiia", seo_title="Своё", seo_description="Своё"
+    )
+    service = Service.objects.create(name="Скалодром", slug="skalodrom")
+    custom = Service.objects.create(name="Костёр", slug="kostrovoe-mesto", seo_title="Своё")
+    other = Service.objects.create(name="Другое")
+    event = Event.objects.create(
+        title="Квест", slug="sorevnovaniia-po-friroupu-2023", date=timezone.localdate() + timedelta(days=5)
+    )
+    page = InfoPage.objects.create(title="Правила", slug="pravila-bezopasnosti-t-parka")
+
+    refresh_seo_content(SiteSettings, Category, Service, Event, InfoPage)
+
+    for obj in (site, outdated, edited, service, custom, other, event, page):
+        obj.refresh_from_db()
+    assert site.seo_events_title == "Мероприятия и праздники в Т-Парке под Обнинском — афиша"
+    assert site.seo_gallery_title == "Свой заголовок"
+    assert site.price_range == "от 100 ₽"
+    assert (outdated.seo_title, outdated.seo_description) == CATEGORIES["splavy-i-pokhody"]
+    assert (edited.seo_title, edited.seo_description) == ("Своё", "Своё")
+    assert (service.seo_title, service.seo_description) == SERVICES["skalodrom"]
+    assert custom.seo_title == "Своё" and custom.seo_description == SERVICES["kostrovoe-mesto"][1]
+    assert (other.seo_title, other.seo_description) == ("", "")
+    assert (event.seo_title, event.seo_description) == EVENTS["sorevnovaniia-po-friroupu-2023"]
+    assert (page.seo_title, page.seo_description) == INFO_PAGES["pravila-bezopasnosti-t-parka"]
+
+
+def test_default_og_image_is_own_copy_of_the_gallery_file(client, make_image):
+    from django.core.files.storage import default_storage
+
+    from apps.core.seo_content import DEFAULT_OG_IMAGE_SOURCE, fill_default_og_image
+
+    fill_default_og_image(SiteSettings)  # файла нет — другая база: поле остаётся пустым
+    assert not SiteSettings.load().og_image
+
+    default_storage.save(DEFAULT_OG_IMAGE_SOURCE, make_image(size=(1300, 700)))
+    fill_default_og_image(SiteSettings)
+    site = SiteSettings.load()
+    assert site.og_image.name.startswith("seo/")
+    assert default_storage.exists(site.og_image.name)
+    assert OG_JPEG.search(client.get("/contacts/").content.decode())
+
+    copied = site.og_image.name
+    fill_default_og_image(SiteSettings)  # заданную картинку не заменяем
+    assert SiteSettings.load().og_image.name == copied
 
 
 def test_metrika_tracks_contact_clicks(client, settings):
