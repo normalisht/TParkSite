@@ -20,6 +20,12 @@ def no_background_thumbnails(monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def no_background_seo(monkeypatch):
+    """SEO-поля после сохранения заполняются в фоновом потоке через внешний сервис; в тестах — нет."""
+    monkeypatch.setattr("apps.core.seo_generation.run_in_background", lambda fn: None, raising=False)
+
+
+@pytest.fixture(autouse=True)
 def fresh_spec_urls(monkeypatch):
     """Запомненные URL миниатюр живут весь процесс; каждый тест начинает с пустыми (у него свой MEDIA_ROOT)."""
     monkeypatch.setattr("apps.core.images._spec_urls", {})

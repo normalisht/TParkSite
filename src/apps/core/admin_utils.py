@@ -2,29 +2,35 @@ import copy
 import html
 import re
 from dataclasses import replace
+from functools import partial
 
 from django import forms
+from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.admin.options import ActionLocation
 from django.contrib.admin.utils import unquote
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import connections, transaction
-from django.http import Http404
+from django.http import Http404, HttpResponseNotAllowed, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
 from django.urls import path as url_path
 from django.urls import reverse
+from django.utils.formats import localize_input
 from django.utils.html import format_html
+from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django_prose_editor.fields import ProseEditorField
 from unfold.admin import ModelAdmin
 from unfold.decorators import action
 
-from apps.core import search
+from apps.core import search, seo_generation
 from apps.core.images import safe_spec_url
 from apps.core.models import COPY_SUFFIX, Redirect, TrashableModel, next_order
 from apps.core.request_cache import cached_on_request
+from apps.core.seo import plaintext
+from apps.core.seo_generation import FACT_LIMIT, SeoGenerationError, generate_seo
 from apps.core.slugs import slugify_ru
 from apps.core.trash import TRASH_DAYS, purge_date, purge_expired
 
@@ -417,6 +423,85 @@ class DuplicateAdminMixin:
         self.log_addition(request, copy, f"Копия «{original}»")
         messages.success(request, f"Создана копия «{original}» — черновик. {hint}")
         return redirect(reverse(change_name, args=[copy.pk]))
+
+
+class SeoGenerateMixin:
+    """Кнопка «Сгенерировать» на вкладке SEO (её добавляет admin_seo.js): черновик полей по текущим значениям формы —
+    запись может быть ещё не сохранена. У существующей записи пустые поля сразу пишутся в базу — текст не теряется,
+    даже если страницу закрыли, не дождавшись ответа. Сохранение формы с пустыми SEO-полями заполняет их в фоне.
+    `seo_source_fields` — поля с фактами о странице, первое — название."""
+
+    seo_source_fields: tuple[str, ...] = ()
+
+    def _seo_generate_name(self) -> str:
+        opts = self.model._meta
+        return f"{opts.app_label}_{opts.model_name}_seo_generate"
+
+    def get_urls(self):
+        generate = url_path(
+            "seo-generate/", self.admin_site.admin_view(self.seo_generate_view), name=self._seo_generate_name()
+        )
+        return [generate, *super().get_urls()]  # раньше «<path:object_id>/» формы записи
+
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        field = super().formfield_for_dbfield(db_field, request, **kwargs)
+        if db_field.name == "seo_title" and settings.OPENROUTER_API_KEY:
+            url = reverse(f"admin:{self._seo_generate_name()}")
+            object_id = request.resolver_match.kwargs.get("object_id")
+            field.widget.attrs["data-seo-generate-url"] = (
+                f"{url}?{urlencode({'object': object_id})}" if object_id else url
+            )
+            field.widget.attrs["data-seo-source-fields"] = ",".join(self.seo_source_fields)
+        return field
+
+    def _seo_facts(self, value_of) -> dict[str, str] | None:
+        """Подпись поля → значение без HTML. None — фактов мало: только по названию модель выдумала бы содержание."""
+        values = {name: plaintext(value_of(name), FACT_LIMIT) for name in self.seo_source_fields}
+        if not values[self.seo_source_fields[0]] or sum(map(bool, values.values())) < 2:
+            return None
+        return {self.model._meta.get_field(name).verbose_name: value for name, value in values.items() if value}
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        # Форма строки списка (list_editable) SEO-полей не содержит: переключение галочек не расходует лимит сервиса.
+        if not settings.OPENROUTER_API_KEY or "seo_title" not in form.fields or (obj.seo_title and obj.seo_description):
+            return
+        facts = self._seo_facts(lambda name: localize_input(getattr(obj, name)))
+        if facts is None:
+            return
+        # После коммита: запрос к сервису не должен держать транзакцию, а поток — читать ещё не записанное.
+        fill = partial(seo_generation.fill_empty_seo, type(obj), obj.pk, facts)
+        transaction.on_commit(lambda: seo_generation.run_in_background(fill))
+        self.message_user(
+            request,
+            "Пустые SEO-поля заполнит нейросеть в течение минуты, и текст сразу появится на сайте. "
+            "Проверьте его на вкладке «SEO».",
+            messages.INFO,
+        )
+
+    def _seo_generate_target(self, request):
+        """Запись, в которую кнопка может записать текст; None — новая запись, корзина или нет права на правку."""
+        object_id = request.GET.get("object")
+        obj = self.get_object(request, unquote(object_id)) if object_id else None
+        return obj if obj is not None and self.has_change_permission(request, obj) else None
+
+    def seo_generate_view(self, request):
+        """JSON для кнопки. Только POST: тексты страницы длинные, а запрос расходует лимит сервиса."""
+        if request.method != "POST":
+            return HttpResponseNotAllowed(["POST"])
+        if not (self.has_add_permission(request) or self.has_change_permission(request)):
+            raise PermissionDenied
+        facts = self._seo_facts(lambda name: request.POST.get(name, ""))
+        if facts is None:
+            return JsonResponse({"error": "Сначала заполните название и текст страницы."}, status=400)
+        target = self._seo_generate_target(request)
+        try:
+            draft = generate_seo(self.model._meta.verbose_name, facts)
+        except SeoGenerationError as exc:
+            return JsonResponse({"error": str(exc)}, status=400)
+        # До ответа браузеру: закрытие страницы не прерывает обработку запроса, и текст всё равно сохранится.
+        saved = seo_generation.save_empty_seo(type(target), target.pk, draft) if target is not None else []
+        return JsonResponse({"title": draft.title, "description": draft.description, "saved": saved})
 
 
 def move_to_top(model, selected) -> int:

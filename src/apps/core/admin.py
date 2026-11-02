@@ -17,6 +17,7 @@ from apps.core import seasons
 from apps.core.admin_utils import (
     SEO_FIELDSET,
     OrderedInlineMixin,
+    SeoGenerateMixin,
     SiteModelAdmin,
     TrashAdminMixin,
     TrashLabelsMixin,
@@ -289,7 +290,7 @@ class SpecialDayAdmin(SiteModelAdmin):
 
 
 @admin.register(InfoPage)
-class InfoPageAdmin(TrashAdminMixin, SiteModelAdmin):
+class InfoPageAdmin(SeoGenerateMixin, TrashAdminMixin, SiteModelAdmin):
     help_intro = (
         "Отдельные страницы с текстом: правила, политика конфиденциальности, вопросы и ответы. В меню их нет; "
         "ссылка внизу сайта — галочка «В подвале», другие ссылки — в «Настройках сайта» или копируются из формы. "
@@ -327,6 +328,7 @@ class InfoPageAdmin(TrashAdminMixin, SiteModelAdmin):
     )
     readonly_fields = ["page_url"]
     actions_list = ["trash"]
+    seo_source_fields = ("title", "lead", "body")
 
     class Media:
         js = ["js/admin_copy.js"]
