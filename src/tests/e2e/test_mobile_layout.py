@@ -368,6 +368,154 @@ FIND_CLIPPED_RINGS = """
 """
 
 
+# Слова в названиях карточек, разорванные переносом посередине: подпись в вырезе фото узкая. Перенос по дефису — норма.
+FIND_BROKEN_WORDS = """
+() => {
+  const broken = [];
+  for (const title of document.querySelectorAll(".category-card h3")) {
+    const node = title.firstChild;
+    for (const match of node.textContent.matchAll(/[^\\s-]+/g)) {
+      const range = document.createRange();
+      range.setStart(node, match.index);
+      range.setEnd(node, match.index + match[0].length);
+      const tops = new Set([...range.getClientRects()].map((r) => Math.round(r.top)));
+      if (tops.size > 1) broken.push(match[0]);
+    }
+  }
+  return broken;
+}
+"""
+
+
+@pytest.mark.parametrize("width", [320, 340, 360, 375, 414])
+def test_category_card_titles_keep_words_whole(live_server, browser, width):
+    group = CategoryGroup.objects.create(name="Групповые приключения")
+    for name in ("Школа инструкторов 2026", "Корпоративы и тренинги", "Квесты и мастер-классы", "Корпоративные выезды"):
+        group.categories.add(Category.objects.create(name=name, is_published=True))
+    context = browser.new_context(viewport={"width": width, "height": 800}, is_mobile=True, has_touch=True)
+    page = context.new_page()
+    page.goto(live_server.url + "/")
+    page.wait_for_load_state("networkidle")
+    assert page.locator(".category-card h3").count() == 4
+    assert page.evaluate(FIND_BROKEN_WORDS) == []
+    context.close()
+
+
+# По каждой карточке с переносом: поле справа от текста и число строк (с заданной компонентом шириной и без неё).
+MEASURE_WRAPPED_LABELS = """
+() => [...document.querySelectorAll(".category-card")].flatMap((card) => {
+  const label = card.querySelector(".category-card-label");
+  const range = document.createRange();
+  range.selectNodeContents(card.querySelector("h3"));
+  const lines = () => new Set([...range.getClientRects()].map((r) => Math.round(r.top))).size;
+  const fitted = lines();
+  if (fitted < 2) return [];
+  const gap = label.getBoundingClientRect().right - range.getBoundingClientRect().right;
+  const padding = parseFloat(getComputedStyle(label).paddingRight);
+  const width = label.style.width;
+  label.style.width = "";
+  const natural = lines();
+  label.style.width = width;
+  return [{ name: card.querySelector("h3").textContent, extra: gap - padding, fitted, natural }];
+})
+"""
+
+
+def _assert_labels_hug_text(page, min_cards):
+    labels = page.evaluate(MEASURE_WRAPPED_LABELS)
+    assert len(labels) >= min_cards
+    for label in labels:
+        assert abs(label["extra"]) <= 1.5, label  # справа только отступ, пустого поля нет
+        assert label["fitted"] == label["natural"], label  # ужатие не добавило строк
+
+
+LONG_CATEGORY_NAMES = (
+    "Корпоративные мероприятия и тимбилдинг",
+    "Школа инструкторов и детские программы 2026",
+    "Дни рождения, выпускные и другие праздники",
+)
+
+
+@pytest.mark.parametrize("width", [320, 375, 1280])
+def test_wrapped_category_card_label_hugs_text(live_server, browser, width):
+    group = CategoryGroup.objects.create(name="Групповые приключения")
+    for name in LONG_CATEGORY_NAMES:
+        group.categories.add(Category.objects.create(name=name, is_published=True))
+    context = browser.new_context(
+        viewport={"width": width, "height": 800}, is_mobile=width < 640, has_touch=width < 640
+    )
+    page = context.new_page()
+    page.goto(live_server.url + "/")
+    page.wait_for_load_state("networkidle")
+    page.wait_for_function("document.fonts.status === 'loaded'")
+    page.wait_for_timeout(100)
+    _assert_labels_hug_text(page, min_cards=3)
+    context.close()
+
+
+def test_category_card_label_refits_on_resize(live_server, browser):
+    group = CategoryGroup.objects.create(name="Группа")
+    for name in LONG_CATEGORY_NAMES:
+        group.categories.add(Category.objects.create(name=name, is_published=True))
+    context = browser.new_context(viewport={"width": 1280, "height": 800})
+    page = context.new_page()
+    page.goto(live_server.url + "/")
+    page.wait_for_load_state("networkidle")
+    page.set_viewport_size({"width": 700, "height": 800})
+    page.wait_for_timeout(200)
+    _assert_labels_hug_text(page, min_cards=2)  # первая карточка из трёх — широкая, название в одну строку
+    context.close()
+
+
+def test_category_card_does_not_lift_on_hover(live_server, browser):
+    group = CategoryGroup.objects.create(name="Группа")
+    group.categories.add(Category.objects.create(name="Сплавы", is_published=True))
+    context = browser.new_context(viewport={"width": 1280, "height": 800})
+    page = context.new_page()
+    page.goto(live_server.url + "/")
+    card = page.locator(".category-card").first
+    # В координатах документа: hover() прокручивает страницу к карточке.
+    top_on_page = "el => el.getBoundingClientRect().top + window.scrollY"
+    top = card.evaluate(top_on_page)
+    card.hover()
+    page.wait_for_timeout(300)
+    assert card.evaluate(top_on_page) == top
+    context.close()
+
+
+def test_service_card_does_not_lift_on_hover(live_server, browser, content):
+    context = browser.new_context(viewport={"width": 1280, "height": 800})
+    page = context.new_page()
+    page.goto(live_server.url + content["category"].get_absolute_url())
+    card = page.locator(f'a.card-link[href="{content["service"].get_absolute_url()}"]').first
+    top_on_page = "el => el.getBoundingClientRect().top + window.scrollY"
+    top = card.evaluate(top_on_page)
+    card.hover()
+    page.wait_for_timeout(300)
+    assert card.evaluate(top_on_page) == top
+    context.close()
+
+
+def test_category_page_related_cards_three_in_row_on_desktop(live_server, browser):
+    group = CategoryGroup.objects.create(name="Группа")
+    current = Category.objects.create(name="Текущая", is_published=True)
+    group.categories.add(current, *[Category.objects.create(name=f"Соседняя {i}", is_published=True) for i in range(4)])
+    context = browser.new_context(viewport={"width": 1280, "height": 800})
+    page = context.new_page()
+    page.goto(live_server.url + current.get_absolute_url())
+    page.wait_for_load_state("networkidle")
+    cards = page.locator("section:has(.scroll-strip) .category-card")
+    assert cards.count() == 4
+    boxes = [box for box in (cards.nth(i).bounding_box() for i in range(4)) if box]
+    assert len(boxes) == 3  # четвёртая скрыта, а не стоит одна во втором ряду
+    assert len({round(box["y"]) for box in boxes}) == 1
+    assert all(box["width"] > 340 for box in boxes)
+    page.set_viewport_size({"width": 800, "height": 800})
+    page.wait_for_timeout(100)
+    assert sum(1 for i in range(4) if cards.nth(i).bounding_box()) == 4  # на планшете — сетка 2×2
+    context.close()
+
+
 def test_card_rings_not_clipped(live_server, browser, content):
     site = SiteSettings.load()
     site.founder_text = "<ul>" + "<li><p>Педагог, тренер, инструктор по туризму.</p></li>" * 3 + "</ul>"

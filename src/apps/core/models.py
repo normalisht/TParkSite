@@ -2,17 +2,19 @@ import re
 from datetime import date
 
 from django.core.exceptions import ValidationError
-from django.core.validators import RegexValidator
+from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 from django.db import models, transaction
 from django.db.models import Max, Q
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.formats import date_format
 
 from apps.core import about_defaults, seasons
 from apps.core.fields import INFO_HTML_EXTENSIONS, HtmlField, image_specs, logo_spec, og_spec, photo_field
 from apps.core.maps import MapEmbedURLField
 from apps.core.seasons import format_day_month, validate_day_month, validate_site_link
 from apps.core.slugs import SLUG_HELP, unique_slug
+from apps.texts.models import SiteText
 
 
 class OrderedModel(models.Model):
@@ -163,6 +165,13 @@ class SiteSettings(models.Model):
             "Страница отзывов о Т-Парке: кнопка «Все отзывы на Яндекс Картах» на странице отзывов и «Оставить отзыв» — "
             "там же, на «Контактах» и на главной. Пусто — кнопок нет."
         ),
+    )
+    special_days_shown = models.PositiveSmallIntegerField(
+        "Сколько особых дней показывать",
+        default=3,
+        validators=[MinValueValidator(1), MaxValueValidator(10)],
+        help_text="От 1 до 10: ближайшие даты из «Особых дней» на главной, в «Контактах» и в подвале. "
+        "Длинный список отодвинет остальное содержимое первого экрана главной.",
     )
     home_intro = HtmlField(
         "Вступление на главной",
@@ -518,6 +527,76 @@ class Announcement(TrashableModel, OrderedModel):
     def clean(self):
         if self.starts_on and self.ends_on and self.ends_on < self.starts_on:
             raise ValidationError({"ends_on": "Дата окончания раньше даты начала."})
+
+
+class SpecialDayQuerySet(models.QuerySet):
+    def shown(self, day: date, limit: int):
+        """Ближайшие особые дни начиная с `day`: запрос ленивый, выполнится только при выводе на витрине."""
+        return self.filter(day__gte=day).order_by("day")[:limit]
+
+
+class SpecialDay(models.Model):
+    """День не по обычному графику: другие часы или событие на весь день (главная, «Контакты», подвал)."""
+
+    day = models.DateField("Дата", unique=True)
+    is_all_day = models.BooleanField(
+        "Событие на весь день",
+        default=False,
+        help_text="Отметьте, если особый весь день: парк закрыт, проходит мероприятие. Время не указывайте.",
+    )
+    all_day_text = models.CharField(
+        "Текст события",
+        max_length=120,
+        blank=True,
+        help_text="На сайте — после даты: «8 ноября — корпоратив, парк закрыт». Только с галочкой выше. "
+        "Пусто — «закрыты весь день» (меняется в «Текстах сайта»).",
+    )
+    opens_at = models.TimeField(
+        "Работаем с", null=True, blank=True, help_text="Заполните, если в этот день открываемся позже обычного."
+    )
+    closes_at = models.TimeField(
+        "Закрыты с", null=True, blank=True, help_text="Заполните, если в этот день закрываемся раньше обычного."
+    )
+
+    objects = SpecialDayQuerySet.as_manager()
+
+    class Meta:
+        ordering = ["day"]
+        verbose_name = "Особый день"
+        verbose_name_plural = "Особые дни"
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(is_all_day=True, opens_at__isnull=True, closes_at__isnull=True)
+                | Q(is_all_day=False) & (Q(opens_at__isnull=False) | Q(closes_at__isnull=False)),
+                name="special_day_all_day_or_has_time",
+                violation_error_message="Отметьте «Событие на весь день» или укажите время — что-то одно.",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{date_format(self.day, 'j E Y')} — {self.hours_text}"
+
+    def clean(self):
+        if self.opens_at and self.closes_at and self.closes_at <= self.opens_at:
+            raise ValidationError({"closes_at": "Время закрытия должно быть позже времени открытия."})
+        # Иначе текст молча не появился бы на сайте.
+        if self.all_day_text and not self.is_all_day:
+            raise ValidationError({"all_day_text": "Текст показывается только с галочкой «Событие на весь день»."})
+
+    @property
+    def day_text(self) -> str:
+        delta = (self.day - seasons.today()).days
+        return {0: "Сегодня", 1: "Завтра"}.get(delta) or date_format(self.day, "j E")
+
+    @property
+    def hours_text(self) -> str:
+        if self.is_all_day:
+            # Для админки; витрина выводит текст по умолчанию тегом (partials/special_day_hours.html) — без запроса на каждый день.
+            return self.all_day_text or SiteText.current("common.closed_all_day")
+        opens, closes = (value.strftime("%H:%M") if value else "" for value in (self.opens_at, self.closes_at))
+        if opens and closes:
+            return f"работаем с {opens} до {closes}"
+        return f"работаем с {opens}" if opens else f"закрыты с {closes}"
 
 
 class InfoPage(TrashableModel, SeoModel, OrderedModel):

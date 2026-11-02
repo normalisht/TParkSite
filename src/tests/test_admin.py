@@ -33,6 +33,7 @@ def _settings_post(phones):
     data = {
         "address": "село Восход",
         "vk_url": "",
+        "special_days_shown": "3",
         "phones-TOTAL_FORMS": str(len(phones)),
         "phones-INITIAL_FORMS": str(sum(1 for p in phones if p.get("id"))),
         "phones-MIN_NUM_FORMS": "0",

@@ -29,11 +29,13 @@
   --color-brand-500: #ffa300;
   --color-brand-600: #e08600;
   --color-brand-700: #a85802;
+  --color-brand-800: #8f4a02; /* текст прямо на фоне шапки: на сезонных фонах brand-700 не дотягивает до 4.5:1 */
   /* Зелёный ели из логотипа (тот же тон, что primary в админке Unfold) */
   --color-pine-50: oklch(98.2% .018 143);
   --color-pine-100: oklch(96.2% .044 143);
   --color-pine-300: oklch(87.1% .15 143);
   --color-pine-700: oklch(52.7% .154 143);
+  --color-pine-800: oklch(45% .13 143); /* текст прямо на фоне шапки: на сезонных фонах pine-700 не дотягивает до 4.5:1 */
   /* Тёплый серо-бежевый — третий тон карточек отзывов (между кремовым оранжевым и зелёным, без синевы) */
   --color-sand-100: #f8f5f0;
   --color-sand-200: #ede7dd;
@@ -239,9 +241,33 @@ html[data-season="autumn"] .season-particles::after {
   .eyebrow { @apply text-sm font-bold uppercase tracking-widest text-pine-700; }
   .field-label { @apply text-sm font-bold uppercase tracking-widest text-ink/65; }
 
+  /* Метка рядом с часами работы: зелёный — статус. */
+  .hours-note { @apply inline-flex items-center gap-1 font-semibold text-pine-800; }
+
   /* Карточка; .card-link — карточка-ссылка целиком (подъём и тень при наведении, видимый фокус). */
   .card { @apply rounded-2xl bg-white shadow-sm ring-1 ring-ink/10; }
   .card-link { @apply transition outline-none hover:-translate-y-1 hover:shadow-lg focus-visible:ring-4 focus-visible:ring-brand-500; }
+
+  /* Карточка категории: название в вырезе угла фото. Вырез — подпись цвета страницы, скругления внутренних углов — ::before и ::after. Без тени: вокруг выреза она легла бы прямоугольником. */
+  .category-card {
+    @apply relative block rounded-[.875rem] outline-none transition [--cut:.75rem] focus-visible:ring-4 focus-visible:ring-brand-500 active:scale-[.98] sm:rounded-[1.25rem] sm:[--cut:1.125rem];
+  }
+  /* Сдвиг на 1 px прячет край фото, просвечивающий по границе выреза при сглаживании. Уже 360 px — запас меньше, иначе длинные слова рвутся посередине. */
+  .category-card-label {
+    @apply absolute -bottom-px -left-px max-w-[calc(100%-1.5rem)] bg-white pt-1.5 pr-2.5 pl-px max-[359px]:max-w-[calc(100%-1rem)] max-[359px]:pr-1.5 sm:max-w-[calc(100%-4.5rem)] sm:pt-2.5 sm:pr-4 sm:pb-0.5 sm:pl-0.5;
+    border-top-right-radius: var(--cut);
+  }
+  .category-card-label::before,
+  .category-card-label::after {
+    content: "";
+    position: absolute;
+    width: var(--cut);
+    height: var(--cut);
+    background: radial-gradient(circle at 100% 0, transparent calc(var(--cut) - .5px), #fff var(--cut));
+  }
+  /* Нахлёст на 1 px: при дробной ширине подписи между ней и скруглением оставалась волосная линия. */
+  .category-card-label::before { left: 0; top: calc(1px - var(--cut)); }
+  .category-card-label::after { right: calc(1px - var(--cut)); bottom: 0; }
 
   /* Лента карточек со свайпом на телефоне (с sm — сетка, колонки и отступы задаёт шаблон). Прокрутка по x включает
      обрезку и по y, поэтому py-2/-my-2 — запас под обводку, тень и кольцо фокуса карточек, не меняющий раскладку. */

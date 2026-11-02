@@ -10,6 +10,7 @@ from apps.catalog.models import Category, CategoryGroup
 from apps.content.models import Event, Review
 from apps.core.models import InfoPage, Phone, SiteSettings
 from apps.core.seo import plaintext
+from apps.texts.models import SiteText
 
 pytestmark = pytest.mark.django_db
 
@@ -297,12 +298,45 @@ def test_home_categories_grid_on_phone(client):
     assert "scroll-strip" not in section and "overflow-x-auto" not in section
 
 
-def test_category_card_shade_covers_card_on_phone(client):
-    """На телефоне подпись бывает в три строки и начинается почти у верха — затемнение на всю высоту, с sm — на 3/4."""
+def test_category_card_has_no_shade_and_title_in_cutout(client):
     group = CategoryGroup.objects.create(name="Группа")
     group.categories.add(Category.objects.create(name="Дни рождения и выпускные", is_published=True))
     html = client.get("/").content.decode()
-    assert re.search(r'<div class="absolute inset-x-0 bottom-0 h-full sm:h-3/4 bg-linear-to-t', html)
+    section = html.split("Группа</h2>", 1)[1].split("</section>", 1)[0]
+    assert re.search(r'class="category-card-label"[^>]*>\s*<h3[^>]*>Дни рождения и выпускные</h3>', section)
+    assert "bg-linear-to-t" not in section and "text-white" not in section
+    assert 'x-data="cardLabel"' in section
+    head = html[: html.index("</head>")]
+    assert head.index("js/card_label") < head.index("vendor/alpine")  # компонент регистрируется до старта Alpine
+
+
+def test_hours_note_on_home_and_contacts_but_not_in_footer(client):
+    site = SiteSettings.load()
+    site.opening_hours = "Mo-Su 10:00-18:00"
+    site.save()
+    for url in ("/", "/contacts/"):
+        html = client.get(url).content.decode()
+        main = html[html.index("<main") : html.index("</main>")]
+        assert 'class="hours-note"' in main and "без записи" in main
+    footer = html[html.index("<footer") :]
+    assert "без записи" not in footer
+
+
+def test_hours_note_follows_admin_text_and_hides_when_empty(client):
+    site = SiteSettings.load()
+    site.opening_hours = "Mo-Su 10:00-18:00"
+    site.save()
+    SiteText.objects.filter(key="common.hours_note").update(text="вход свободный")
+    assert "вход свободный" in client.get("/").content.decode()
+    SiteText.objects.filter(key="common.hours_note").update(text="")
+    assert 'class="hours-note"' not in client.get("/").content.decode()
+
+
+def test_hours_note_needs_hours(client):
+    site = SiteSettings.load()
+    site.opening_hours = ""
+    site.save()
+    assert 'class="hours-note"' not in client.get("/contacts/").content.decode()
 
 
 def _cookie_notice(html: str) -> str:

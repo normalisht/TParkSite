@@ -3,7 +3,15 @@ from django.templatetags.static import static
 
 from apps.core import seasons
 from apps.core.images import safe_spec_url
-from apps.core.models import HEADER_LOGO_HEIGHT, Announcement, InfoPage, Season, SiteSettings, logo_display_width
+from apps.core.models import (
+    HEADER_LOGO_HEIGHT,
+    Announcement,
+    InfoPage,
+    Season,
+    SiteSettings,
+    SpecialDay,
+    logo_display_width,
+)
 from apps.core.opening_hours import human_opening_hours
 from apps.core.request_cache import cached_on_request
 from apps.core.seo import SITE_DESCRIPTION, absolute_url, plaintext
@@ -53,6 +61,8 @@ def _site_context(request):
         "phones": phones,
         # Часы работы по-русски: для подвала, главной и страницы контактов.
         "hours": human_opening_hours(settings_obj.opening_hours),
+        # Дни с особыми часами; запрос — только при выводе витрины (в админке подвала и этих блоков нет).
+        "special_days": SpecialDay.objects.shown(today, settings_obj.special_days_shown),
         # Политика (баннер cookie) и правила (плашка на «О нас»): только опубликованные страницы.
         "privacy_page": privacy_page,
         "safety_page": safety_page,

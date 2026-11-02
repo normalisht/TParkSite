@@ -93,7 +93,7 @@ def test_category_related_is_strip_on_phone(client, category):
     html = client.get(category.get_absolute_url()).content.decode()
     related = html.split("Другие категории</h2>")[1].split("</section>")[0]
     # На телефоне — горизонтальная лента, с sm — сетка; карточка в обёртке заданной ширины.
-    assert "scroll-strip" in related and "sm:grid-cols-2" in related
+    assert "scroll-strip" in related and "sm:grid-cols-2" in related and "lg:grid-cols-3" in related
     assert re.search(
         r'<div class="w-\[44%\] [^"]*sm:w-auto">\s*<a href="' + re.escape(neighbour.get_absolute_url()), related
     )

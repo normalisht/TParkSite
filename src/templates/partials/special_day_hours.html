@@ -1,0 +1,1 @@
+{% load site_tags site_texts %}{% if special.is_all_day %}{% if special.all_day_text %}{{ special.all_day_text|nobr }}{% else %}{% text "common.closed_all_day" %}{% endif %}{% else %}{{ special.hours_text }}{% endif %}

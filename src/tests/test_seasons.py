@@ -268,7 +268,7 @@ SETTINGS_URL = reverse("admin:core_sitesettings_change", args=[1])
 
 def _season_post(seasons_data):
     """Форма настроек: пустые прочие инлайны + вкладка сезонов."""
-    data = {"address": "село Восход"}
+    data = {"address": "село Восход", "special_days_shown": "3"}
     for prefix in ("phones", "park_formats", "founder_facts"):
         data.update({f"{prefix}-TOTAL_FORMS": "0", f"{prefix}-INITIAL_FORMS": "0", f"{prefix}-MIN_NUM_FORMS": "0"})
     data.update(
