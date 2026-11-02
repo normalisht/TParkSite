@@ -17,7 +17,7 @@ NGINX_SERVER_NAME ?= t-camp.ru www.t-camp.ru
 .DEFAULT_GOAL := help
 .PHONY: help install env migrate run superuser shell test coverage lint format check e2e pre-commit \
 	messages tailwind collectstatic import-legacy \
-	dev dev-down dev-logs dev-superuser \
+	dev dev-down dev-logs dev-superuser dev-restore-db \
 	build up down restart logs prod-superuser backup \
 	service-install service-deploy service-restart service-status service-logs service-superuser service-backup \
 	nginx-install nginx-update nginx-uninstall nginx-render
@@ -92,6 +92,17 @@ dev-logs: ## Логи dev-контейнера
 
 dev-superuser: ## Создать администратора в dev-контейнере
 	$(DEV_COMPOSE) exec tpark-dev python manage.py createsuperuser
+
+dev-restore-db: ## Заменить БД в dev-томе файлом: make dev-restore-db FILE=<db.sqlite3>
+	@test -n "$(FILE)" || (echo "Укажите FILE=<путь к db.sqlite3>" && exit 1)
+	@test -f "$(FILE)" || (echo "Нет файла $(FILE)" && exit 1)
+	@# Непустой -wal — часть данных ещё не в основном файле, копия без него потеряла бы их.
+	@test ! -s "$(FILE)-wal" || (echo "Рядом с $(FILE) непустой $(FILE)-wal: остановите сайт, использующий эту базу, или снимите копию через manage.py backup_db" && exit 1)
+	$(DEV_COMPOSE) stop tpark-dev
+	@# Старые -wal и -shm нельзя оставлять рядом с новым файлом, а владелец должен быть пользователем контейнера: иначе «readonly database».
+	$(DEV_COMPOSE) run --rm -T --user root --entrypoint sh -v "$(abspath $(FILE)):/restore.sqlite3:ro" tpark-dev \
+		-c 'rm -f /data/db/db.sqlite3-wal /data/db/db.sqlite3-shm && cp /restore.sqlite3 /data/db/db.sqlite3 && chown app:app /data/db/db.sqlite3'
+	@echo "База заменена. Запуск и миграции: make dev"
 
 ## --- Продакшен (корневой .env) ---
 
