@@ -7,6 +7,7 @@ from django.conf import settings
 from django.utils import timezone
 
 from apps.catalog.models import Category, CategoryGroup
+from apps.catalog.tiles import category_tiles
 from apps.content.models import Event, Review
 from apps.core.models import InfoPage, Phone, SiteSettings
 from apps.core.seo import plaintext
@@ -459,4 +460,38 @@ def test_home_full_width_cards_get_full_width_sizes(client, make_image):
     sizes = _card_sizes(client.get("/").content.decode())
     assert [s.endswith("calc(100vw - 32px)") for s in sizes] == [True, False, False, True]
     assert sizes[0].startswith("(min-width: 1152px) 357px")  # с lg — в ряд по три
-    assert sizes[3].startswith("(min-width: 1152px) 548px")  # с sm — половина ширины
+    assert sizes[3].startswith("(min-width: 1152px) 1120px")  # единственная — во всю ширину
+
+
+@pytest.mark.parametrize("count", range(1, 14))
+def test_category_tiles_fill_every_row(count):
+    """Ни при каком числе категорий в рядах нет пустых мест: на ПК 6 колонок, ниже — 2."""
+    tiles = category_tiles(list(range(count)))
+    assert [tile.category for tile in tiles] == list(range(count))
+    desktop_spans = [int(re.search(r"lg:col-span-(\d)", tile.span).group(1)) for tile in tiles]
+    phone_spans = [2 if tile.span.startswith("col-span-2") else 1 for tile in tiles]
+    for spans, columns in ((desktop_spans, 6), (phone_spans, 2)):
+        filled = 0
+        for span in spans:
+            assert filled + span <= columns  # карточка не переносится, оставив дыру в конце ряда
+            filled = (filled + span) % columns
+        assert filled == 0
+
+
+@pytest.mark.parametrize(
+    ("count", "rows"),
+    [(1, [1]), (2, [2]), (3, [3]), (4, [2, 2]), (5, [2, 3]), (6, [3, 3]), (7, [2, 2, 3]), (8, [2, 3, 3])],
+)
+def test_category_tiles_desktop_rows(count, rows):
+    spans = [re.search(r"lg:col-span-(\d)", tile.span).group(1) for tile in category_tiles(list(range(count)))]
+    assert spans == [str(6 // in_row) for in_row in rows for _ in range(in_row)]
+
+
+def test_home_cards_in_row_share_aspect(client):
+    """Карточки одного ряда — одной высоты: у половинных своё соотношение сторон, у третей — обычное."""
+    group = CategoryGroup.objects.create(name="Пять")
+    for i in range(5):
+        group.categories.add(Category.objects.create(name=f"Пять {i}", is_published=True))
+    aspects = [tile.aspect for tile in category_tiles(list(range(5)))]
+    assert aspects == ["lg:aspect-[16/9]"] * 2 + [""] * 3
+    assert client.get("/").content.decode().count("lg:aspect-[16/9]") == 2
