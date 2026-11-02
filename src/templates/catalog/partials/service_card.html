@@ -1,6 +1,6 @@
 {% load static site_tags %}
 {# На телефоне — строка с квадратной миниатюрой (длинный список не растягивается), с sm — карточка с фото сверху. #}
-<a href="{{ service.get_absolute_url }}" class="card card-link group flex overflow-hidden sm:flex-col">
+<a href="{{ service.get_absolute_url }}" class="card card-link group flex overflow-hidden hover:translate-y-0 sm:flex-col">
   <div class="relative w-28 shrink-0 overflow-hidden bg-sand-200 sm:aspect-[4/3] sm:w-full">
     {% picture service.cover "row" wide="card" media="(min-width: 640px)" alt="" width=640 height=480 loading="lazy" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105" as image %}
     {% if image %}{{ image }}{% else %}<img src="{% static 'img/logo.png' %}" alt="" class="absolute inset-0 m-auto w-2/3 opacity-30">{% endif %}

@@ -28,7 +28,7 @@
       <p class="text-sm font-bold uppercase tracking-widest text-white/70">Разделы</p>
       <div class="mt-1 grid grid-cols-2 gap-x-6 md:grid-cols-1"><a href="{% url 'catalog:home' %}" class="inline-flex min-h-11 items-center hover:text-brand-300">Главная</a>{% include "partials/nav_links.html" with link_class="inline-flex min-h-11 items-center hover:text-brand-300" %}</div>
     </nav>
-    {% if phones or hours %}
+    {% if phones or hours or special_days %}
     <div>
       <p class="text-sm font-bold uppercase tracking-widest text-white/70">Контакты</p>
       <ul class="mt-1">
@@ -37,6 +37,9 @@
         {% endfor %}
         {% for line in hours %}
         <li class="flex min-h-11 items-center gap-2"><span class="icon h-4 w-4">{% include "icons/clock.svg" %}</span>{{ line }}</li>
+        {% endfor %}
+        {% for special in special_days %}
+        <li class="flex min-h-11 items-center gap-2"><span class="icon h-4 w-4 shrink-0">{% include "icons/calendar.svg" %}</span><span><span class="font-semibold text-white">{{ special.day_text }}</span> — {% include "partials/special_day_hours.html" %}</span></li>
         {% endfor %}
       </ul>
     </div>

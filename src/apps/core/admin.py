@@ -3,6 +3,7 @@ from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ValidationError
+from django.db import models
 from django.db.models import Case, When
 from django.forms.models import BaseInlineFormSet, ModelForm
 from django.shortcuts import redirect
@@ -10,7 +11,7 @@ from django.urls import reverse
 from django.utils.text import format_lazy
 from unfold.admin import StackedInline, TabularInline
 from unfold.forms import AdminPasswordChangeForm, UserChangeForm, UserCreationForm
-from unfold.widgets import UnfoldAdminTextareaWidget
+from unfold.widgets import UnfoldAdminSingleTimeWidget, UnfoldAdminTextareaWidget
 
 from apps.core import seasons
 from apps.core.admin_utils import (
@@ -23,7 +24,17 @@ from apps.core.admin_utils import (
     seo_help,
 )
 from apps.core.maps import MapEmbedURLField
-from apps.core.models import Announcement, FounderFact, InfoPage, ParkFormat, Phone, Redirect, Season, SiteSettings
+from apps.core.models import (
+    Announcement,
+    FounderFact,
+    InfoPage,
+    ParkFormat,
+    Phone,
+    Redirect,
+    Season,
+    SiteSettings,
+    SpecialDay,
+)
 from apps.texts.hints import texts_hint
 from apps.texts.registry import Page
 
@@ -135,7 +146,13 @@ class SiteSettingsAdmin(SiteModelAdmin):
     # Unfold ставит URL-полям <input type="url">: браузер не пропустит вставленный код <iframe>.
     formfield_overrides = {MapEmbedURLField: {"widget": UnfoldAdminTextareaWidget(attrs={"rows": 3})}}
     fieldsets = (
-        ("Контакты", {"classes": ["tab"], "fields": ["address", "map_embed_url", "vk_url", "max_url", "reviews_url"]}),
+        (
+            "Контакты",
+            {
+                "classes": ["tab"],
+                "fields": ["address", "map_embed_url", "vk_url", "max_url", "reviews_url", "special_days_shown"],
+            },
+        ),
         ("Логотип и политика", {"classes": ["tab"], "fields": ["header_logo", "privacy_page"]}),
         (
             "Главная",
@@ -243,6 +260,32 @@ class AnnouncementAdmin(TrashAdminMixin, SiteModelAdmin):
     def status(self, obj):
         current = Announcement.objects.current(seasons.today())
         return "Показывается" if current is not None and current.pk == obj.pk else "—"
+
+
+@admin.register(SpecialDay)
+class SpecialDayAdmin(SiteModelAdmin):
+    help_intro = (
+        "Дни не по обычному графику: другие часы или событие на весь день. На сайте — рядом с часами работы, "
+        "пока дата не пройдёт: на главной, в «Контактах» и в подвале."
+    )
+    help_anchor = "special-days"
+    list_display = ["day", "site_text", "status"]
+    ordering = ["-day"]
+    fields = ["day", ("opens_at", "closes_at"), "is_all_day", "all_day_text"]
+    # В русской локали Django показывает время с секундами: «16:00:00».
+    formfield_overrides = {models.TimeField: {"widget": UnfoldAdminSingleTimeWidget(format="%H:%M")}}
+
+    @admin.display(description="На сайте")
+    def site_text(self, obj):
+        return f"{obj.day_text} — {obj.hours_text}"
+
+    @admin.display(description="Сейчас")
+    def status(self, obj):
+        today = seasons.today()
+        if obj.day < today:
+            return "Прошёл"
+        shown = SpecialDay.objects.shown(today, SiteSettings.load().special_days_shown)
+        return "Показывается" if obj in shown else "Появится позже"
 
 
 @admin.register(InfoPage)

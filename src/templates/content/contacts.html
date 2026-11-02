@@ -32,11 +32,12 @@
         </div>
         {% endif %}
 
-        {% if hours %}
+        {% if hours or special_days %}
         <div>
           <h2 class="field-label">{% text "contacts.hours_title" %}</h2>
           <ul class="mt-3 space-y-1">
-            {% for line in hours %}<li class="flex items-center gap-3"><span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-sand-100 text-navy"><span class="icon h-5 w-5">{% include "icons/clock.svg" %}</span></span>{{ line }}</li>{% endfor %}
+            {% for line in hours %}<li class="flex items-center gap-3"><span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-sand-100 text-navy"><span class="icon h-5 w-5">{% include "icons/clock.svg" %}</span></span><span class="flex flex-wrap items-center gap-x-2 gap-y-1">{{ line }}{% if forloop.last %}{% include "partials/hours_note.html" %}{% endif %}</span></li>{% endfor %}
+            {% for special in special_days %}<li class="flex items-center gap-3"><span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-heather-100 text-heather-700"><span class="icon h-5 w-5">{% include "icons/calendar.svg" %}</span></span><span><span class="font-semibold">{{ special.day_text }}</span> — {% include "partials/special_day_hours.html" %}</span></li>{% endfor %}
           </ul>
         </div>
         {% endif %}

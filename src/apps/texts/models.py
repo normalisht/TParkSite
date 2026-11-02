@@ -1,7 +1,7 @@
 from django.db import models
 from simple_history.models import HistoricalRecords
 
-from apps.texts.registry import Page
+from apps.texts.registry import BY_KEY, Page
 
 
 class SiteText(models.Model):
@@ -22,3 +22,10 @@ class SiteText(models.Model):
 
     def __str__(self) -> str:
         return f"{self.get_page_display()}: {self.label}"
+
+    @classmethod
+    def current(cls, key: str) -> str:
+        """Текст вне шаблона, по правилам `{% text %}`: нет записи или пустой обязательный — текст по умолчанию."""
+        item = BY_KEY[key]
+        value = cls.objects.filter(key=key).values_list("text", flat=True).first()
+        return item.default if value is None or (item.required and not value) else value

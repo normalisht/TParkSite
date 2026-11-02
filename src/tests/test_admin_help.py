@@ -88,6 +88,7 @@ EXPECTED_SECTIONS = [
     "gallery",
     "settings",
     "announcements",
+    "special-days",
     "texts",
     "info-pages",
     "seo",
@@ -120,7 +121,7 @@ def _sidebar_admins():
 
 def test_every_sidebar_section_has_help():
     admins = list(_sidebar_admins())
-    assert len(admins) == 14
+    assert len(admins) == 15
     for model_admin in admins:
         assert model_admin.help_anchor in HELP_ANCHORS, model_admin
         if not isinstance(model_admin, SiteSettingsAdmin):
