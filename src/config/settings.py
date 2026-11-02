@@ -51,6 +51,9 @@ ALLOWED_HOSTS = [*env_list("ALLOWED_HOSTS"), "localhost", "127.0.0.1"]
 CSRF_TRUSTED_ORIGINS = env_list("CSRF_TRUSTED_ORIGINS")
 # Главный домен сайта: с www.<CANONICAL_HOST> — 301 сюда (apps.core.middleware). Пусто — без редиректа.
 CANONICAL_HOST = os.environ.get("CANONICAL_HOST", "").strip().lower()
+# Кнопка «Сгенерировать» на вкладке SEO (apps/core/seo_generation.py). Без ключа кнопки нет.
+OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "").strip()
+OPENROUTER_MODEL = os.environ.get("OPENROUTER_MODEL", "").strip() or "openrouter/free"
 
 INSTALLED_APPS = [
     "unfold",

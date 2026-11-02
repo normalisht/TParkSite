@@ -13,6 +13,7 @@ from apps.core.admin_utils import (
     DuplicateAdminMixin,
     LiveRelatedFieldListFilter,
     OrderedInlineMixin,
+    SeoGenerateMixin,
     SiteModelAdmin,
     TrashAdminMixin,
     TrashLabelMultipleChoiceField,
@@ -134,13 +135,14 @@ class CategoryGroupAdmin(TrashAdminMixin, SiteModelAdmin):
 
 
 @admin.register(Category)
-class CategoryAdmin(TrashAdminMixin, BulkPhotosAdminMixin, SiteModelAdmin):
+class CategoryAdmin(SeoGenerateMixin, TrashAdminMixin, BulkPhotosAdminMixin, SiteModelAdmin):
     help_intro = (
         "Страницы с услугами. В меню и на главной категория появится, когда опубликованы и она, и её группа. "
         "Новая категория — черновик."
     )
     help_anchor = "catalog"
     form = CategoryAdminForm
+    seo_source_fields = ("name", "description")
     photo_model = CategoryPhoto
     photo_owner = "category"
     list_display = ["photo", "name", "menu_groups_display", "services_count", "is_published"]
@@ -256,7 +258,7 @@ class ServiceGapsFilter(admin.SimpleListFilter):
 
 
 @admin.register(Service)
-class ServiceAdmin(DuplicateAdminMixin, TrashAdminMixin, BulkPhotosAdminMixin, SiteModelAdmin):
+class ServiceAdmin(SeoGenerateMixin, DuplicateAdminMixin, TrashAdminMixin, BulkPhotosAdminMixin, SiteModelAdmin):
     help_intro = (
         "Услуги показываются на страницах категорий, в которые добавлены. "
         "Фильтр «Видна на сайте» находит услуги, которых посетители не увидят, "
@@ -264,6 +266,7 @@ class ServiceAdmin(DuplicateAdminMixin, TrashAdminMixin, BulkPhotosAdminMixin, S
     )
     help_anchor = "catalog"
     form = ServiceAdminForm
+    seo_source_fields = ("name", "price", "price_unit", "short_description", "description")
     photo_model = ServicePhoto
     photo_owner = "service"
     list_display = ["photo", "name", "price_display", "categories", "is_published", "has_page"]

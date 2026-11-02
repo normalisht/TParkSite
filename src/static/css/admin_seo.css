@@ -159,3 +159,45 @@
   font-size: 12px;
   opacity: 0.7;
 }
+
+/* Кнопка «Сгенерировать» на время ответа нейросети: значок-спиннер и пульсация полей, куда придёт текст. */
+.seo-generate-button.is-generating {
+  cursor: wait;
+}
+
+.seo-generate-button.is-generating::before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  vertical-align: -2px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: seo-generate-spin 0.8s linear infinite;
+}
+
+.seo-generating {
+  cursor: wait;
+  animation: seo-generate-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes seo-generate-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes seo-generate-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seo-generate-button.is-generating::before,
+  .seo-generating {
+    animation: none;
+  }
+}

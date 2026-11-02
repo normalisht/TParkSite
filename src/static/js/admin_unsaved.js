@@ -7,21 +7,27 @@
   let snapshot = null;
   let submitting = false;
 
-  const serialize = () =>
-    [...document.querySelectorAll('form[method="post" i]')]
-      .map((form, i) =>
-        [...new FormData(form)]
-          .filter(([name]) => !IGNORED.has(name))
-          .map(([name, value]) => {
-            const text = value instanceof File ? `${value.name}:${value.size}` : value;
-            return `${i}:${name}=${text}`;
-          })
-          .join("\n"),
-      )
-      .join("\n");
+  const readFields = () =>
+    [...document.querySelectorAll('form[method="post" i]')].flatMap((form, i) =>
+      [...new FormData(form)]
+        .filter(([name]) => !IGNORED.has(name))
+        .map(([name, value]) => {
+          const text = value instanceof File ? `${value.name}:${value.size}` : value;
+          return { name, line: `${i}:${name}=${text}` };
+        }),
+    );
+  const serialize = (fields) => fields.map(({ line }) => line).join("\n");
 
   window.addEventListener("load", () => {
-    snapshot = serialize();
+    snapshot = readFields();
+  });
+
+  // Поля уже записаны на сервере без отправки формы (кнопка «Сгенерировать»): их потеря не грозит, но остальные
+  // несохранённые правки предупреждение должно ловить по-прежнему, поэтому снимок обновляем только для этих полей.
+  document.addEventListener("admin-unsaved:saved", ({ detail }) => {
+    if (snapshot === null) return;
+    const saved = readFields().filter(({ name }) => detail.names.includes(name));
+    snapshot = snapshot.map((field) => saved.find(({ name }) => name === field.name) ?? field);
   });
 
   // Отправка формы (сохранение, действие над записями) — уход со страницы ожидаем.
@@ -30,7 +36,7 @@
   });
 
   window.addEventListener("beforeunload", (event) => {
-    if (submitting || snapshot === null || serialize() === snapshot) return;
+    if (submitting || snapshot === null || serialize(readFields()) === serialize(snapshot)) return;
     event.preventDefault();
     event.returnValue = "";
   });

@@ -12,6 +12,7 @@ from apps.content.yandex import ReviewFetchError, fetch_review
 from apps.core.admin_utils import (
     SEO_FIELDSET,
     DuplicateAdminMixin,
+    SeoGenerateMixin,
     SiteModelAdmin,
     TrashAdminMixin,
     image_preview,
@@ -38,7 +39,7 @@ class EventPeriodFilter(admin.SimpleListFilter):
 
 
 @admin.register(Event)
-class EventAdmin(DuplicateAdminMixin, TrashAdminMixin, SiteModelAdmin):
+class EventAdmin(SeoGenerateMixin, DuplicateAdminMixin, TrashAdminMixin, SiteModelAdmin):
     help_intro = (
         "Предстоящие — на странице «Мероприятия» и до трёх на главной. "
         "На следующий день после окончания мероприятие становится прошедшим."
@@ -53,6 +54,7 @@ class EventAdmin(DuplicateAdminMixin, TrashAdminMixin, SiteModelAdmin):
     slug_source_fields = ("title", "date")
     actions_list = ["trash"]
     actions_detail = ["duplicate"]
+    seo_source_fields = ("title", "date", "end_date", "start_time", "venue", "price", "description")
     fieldsets = (
         (
             "Основное",
