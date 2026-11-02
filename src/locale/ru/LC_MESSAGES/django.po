@@ -173,3 +173,6 @@ msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr "«{obj}» — сохранено. Ниже можно добавить ещё."
+
+msgid "This page yielded into no results."
+msgstr "На этой странице нет результатов."
