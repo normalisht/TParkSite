@@ -13,7 +13,7 @@ from apps.core.legacy.reader import LegacyDB
 from apps.core.legacy.report import Report
 from apps.core.legacy.site import import_site
 from apps.core.models import InfoPage, Phone, Redirect, SiteSettings
-from apps.core.seo_content import fill_seo_content
+from apps.core.seo_content import fill_seo_content, refresh_seo_content
 from apps.texts.models import SiteText
 from apps.texts.registry import sync_texts
 
@@ -79,6 +79,7 @@ def run_import(db_path: Path, images_dir: Path, *, flush: bool = False, price_cs
                 import_catalog(db, images_dir, report)
                 import_content(db, images_dir, report)
                 fill_seo_content(SiteSettings, Category)
+                refresh_seo_content(SiteSettings, Category, Service, Event, InfoPage)
                 sync_texts(SiteText, SiteText.history.model)
         except Exception:
             # БД откатилась — удаляем файлы, которые успел записать импорт.
