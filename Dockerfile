@@ -1,6 +1,6 @@
 # Сборка в два этапа: в build — uv, бинарник Tailwind (~105 МБ) и сборка CSS/статики, в итоговый образ
 # переносятся только .venv, код и собранная статика. Оба этапа — от одного образа Python: .venv ссылается на его интерпретатор.
-FROM python:3.14-slim-bookworm@sha256:48b13b003dda20b16f9442b8475aa05fe21bf6579a8c881db92ffb4d8fd20f83 AS base
+FROM python:3.15-slim-bookworm@sha256:4e03260adeeebafccd084f3584e6b84823aba5651cfb53ef8a078ed441ddf9cd AS base
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
