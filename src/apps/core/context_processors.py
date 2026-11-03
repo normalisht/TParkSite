@@ -6,6 +6,7 @@ from apps.core.images import safe_spec_url
 from apps.core.models import (
     HEADER_LOGO_HEIGHT,
     Announcement,
+    ContactChannel,
     InfoPage,
     Season,
     SiteSettings,
@@ -46,6 +47,8 @@ def header_logo(site: SiteSettings, season: Season | None = None) -> dict:
 def _site_context(request):
     settings_obj = SiteSettings.for_request(request)
     phones = list(settings_obj.phones.all())
+    whatsapp_phone = next((p for p in phones if p.is_whatsapp), None)
+    telegram_phone = next((p for p in phones if p.is_telegram), None)
     today = seasons.today()
     # Сезонное оформление (apps/core/seasons.py): одна выборка на запрос, None — обычное.
     season = seasons.pick(settings_obj.seasons.all(), today)
@@ -68,8 +71,19 @@ def _site_context(request):
         "safety_page": safety_page,
         # Инфо-страницы с галочкой «В подвале»; запрос — только при выводе подвала (в админке его нет).
         "footer_pages": InfoPage.objects.published().filter(show_in_footer=True).only("title", "slug"),
-        "whatsapp_phone": next((p for p in phones if p.is_whatsapp), None),
-        "telegram_phone": next((p for p in phones if p.is_telegram), None),
+        "whatsapp_phone": whatsapp_phone,
+        "telegram_phone": telegram_phone,
+        # Какие кнопки связи показывать и в каком порядке.
+        "contact_channels": ContactChannel.shown_kinds(
+            settings_obj,
+            {
+                ContactChannel.Kind.WHATSAPP: whatsapp_phone,
+                ContactChannel.Kind.TELEGRAM: telegram_phone,
+                ContactChannel.Kind.VK: settings_obj.vk_url,
+                ContactChannel.Kind.MAX: settings_obj.max_url,
+                ContactChannel.Kind.INSTAGRAM: settings_obj.instagram_url,
+            },
+        ),
         "default_description": plaintext(settings_obj.home_intro) or SITE_DESCRIPTION,
         "default_og_image": absolute_url(request, safe_spec_url(settings_obj, "og_card")),
         # Адрес страницы без параметров (utm и т. п.): канонический для поисковиков.

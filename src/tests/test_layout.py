@@ -6,6 +6,8 @@ from pathlib import Path
 import pytest
 from django.conf import settings
 
+from apps.core.models import ContactChannel
+
 TEMPLATES = Path(settings.BASE_DIR) / "templates"
 
 # Шапка секции «Заголовок … ссылка справа»: без flex-wrap длинный заголовок выталкивает ссылку за край экрана.
@@ -66,11 +68,43 @@ def test_past_event_badge_is_readable(client):
     assert "text-sm" in badge and "text-xs" not in badge
 
 
+SOCIAL_ICONS = Path(settings.BASE_DIR) / "static/img/social"
+
+
 def test_max_icon_is_official_mark():
-    """Знак MAX — контур из брендбука max.ru (st.max.ru/brandbook/max-dark.zip), а не самодельный рисунок."""
-    svg = (TEMPLATES / "icons/max.svg").read_text()
-    assert 'viewBox="0 0 100 100"' in svg and svg.count("<path") == 1
-    assert 'd="M50.7571 0.261719C78.2929' in svg
+    """Знак MAX — цветной файл из брендбука (st.max.ru/brandbook/max-colored.zip), а не самодельный рисунок;
+    геометрия округлена до 0,1 (сдвиг контура — доли пикселя), смещения и прозрачность градиентов — как в оригинале."""
+    svg = (SOCIAL_ICONS / "max.svg").read_text()
+    assert 'viewBox="0 0 100 100"' in svg and 'd="M50.8 0.3C78.3 0.3 99.9 22.6' in svg
+    assert 'offset="0.01"' in svg
+    assert svg.count("<linearGradient") == 154
+
+
+def test_vk_icon_is_official_mark():
+    """Знак ВКонтакте — из брендбука vk.ru/brand (компонент vk_logo_48)."""
+    svg = (SOCIAL_ICONS / "vk.svg").read_text()
+    assert 'viewBox="0 0 48 48"' in svg and 'fill="#0077FF"' in svg
+    assert 'd="M25.54 34.58c-10.94 0-17.18-7.5-17.44-19.98h5.48' in svg
+
+
+def test_meta_and_telegram_icons_are_official_marks():
+    """WhatsApp и Telegram — файлы из паков meta.com/brand и telegram.org/tour/screenshots без правок."""
+    whatsapp = (SOCIAL_ICONS / "whatsapp.svg").read_text()
+    assert 'viewBox="0 0 720 720"' in whatsapp and "fill: #25d366" in whatsapp
+    telegram = (SOCIAL_ICONS / "telegram.svg").read_text()
+    assert 'stop-color="#2AABEE"' in telegram and 'stop-color="#229ED9"' in telegram
+
+
+def test_instagram_icon_is_small_raster():
+    """У Instagram в паке Meta только растровый градиентный знак (SVG — обёртка над картинкой 10 МБ): WebP 96 px без потерь."""
+    from PIL import Image
+
+    with Image.open(SOCIAL_ICONS / "instagram.webp") as image:
+        assert image.size == (96, 96) and image.mode == "RGBA"
+
+
+def test_every_contact_channel_has_icon():
+    assert {path.stem for path in SOCIAL_ICONS.iterdir()} == set(ContactChannel.Kind.values)
 
 
 def test_vk_is_called_vkontakte_everywhere():

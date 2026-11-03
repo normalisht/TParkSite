@@ -7,6 +7,8 @@ import pytest
 
 pytest.importorskip("playwright")
 
+from apps.core.models import ContactChannel
+
 pytestmark = [pytest.mark.e2e, pytest.mark.django_db(transaction=True)]
 
 
@@ -99,3 +101,22 @@ def test_seo_tab_switches_and_survives_save(admin_page, live_server):
     page.locator("#id_seo_title").wait_for(state="visible")
     assert page.input_value("#id_seo_title") == "Прыжок над лесом"
     page.locator("#id_name").wait_for(state="hidden")
+
+
+def test_contact_channels_reorder_by_drag(admin_page, live_server):
+    page = admin_page
+    page.set_viewport_size({"width": 1280, "height": 900})
+    page.goto(f"{live_server.url}/admin/core/sitesettings/1/change/#contact_channels")
+    rows = page.locator("#contact_channels-data tbody.form-group")
+    rows.first.wait_for()
+    assert rows.count() == len(ContactChannel.Kind.values)
+    first, second = (rows.nth(i).get_by_text("drag_indicator").bounding_box() for i in (0, 1))
+    page.mouse.move(first["x"] + 10, first["y"] + 10)
+    page.mouse.down()
+    # Перетаскивание срабатывает только на промежуточных движениях мыши.
+    page.mouse.move(first["x"] + 10, second["y"], steps=5)
+    page.mouse.move(first["x"] + 10, second["y"] + 30, steps=5)
+    page.mouse.up()
+    with page.expect_navigation():
+        page.locator('button[name="_continue"]').click()
+    assert list(ContactChannel.objects.values_list("kind", flat=True))[:2] == ["telegram", "whatsapp"]

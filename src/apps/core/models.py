@@ -157,6 +157,17 @@ class SiteSettings(models.Model):
     max_url = models.URLField(
         "MAX", max_length=500, blank=True, help_text="Ссылка на профиль или канал в MAX. Пусто — кнопки нет."
     )
+    instagram_url = models.URLField(
+        "Instagram",
+        max_length=500,
+        blank=True,
+        help_text="Ссылка на профиль: кнопка в «Связаться», в подвале и на «Контактах». Пусто — кнопки нет.",
+    )
+    instagram_show_logo = models.BooleanField(
+        "Логотип Instagram",
+        default=True,
+        help_text="Показ символики Meta в России рискован (ст. 20.3 КоАП). Без галочки — кнопка только с надписью.",
+    )
     reviews_url = models.URLField(
         "Отзывы на Яндекс Картах",
         max_length=500,
@@ -359,6 +370,44 @@ class Phone(models.Model):
     def display(self) -> str:
         n = self.number
         return f"+7 ({n[:3]}) {n[3:6]}-{n[6:8]}-{n[8:]}" if len(n) == 10 else n
+
+
+class ContactChannel(models.Model):
+    """Порядок кнопок связи. Адреса — в настройках и у телефонов, здесь только позиция; набор фиксирован."""
+
+    class Kind(models.TextChoices):
+        WHATSAPP = "whatsapp", "WhatsApp"
+        TELEGRAM = "telegram", "Telegram"
+        VK = "vk", "ВКонтакте"
+        MAX = "max", "MAX"
+        INSTAGRAM = "instagram", "Instagram"
+
+    settings = models.ForeignKey(SiteSettings, on_delete=models.CASCADE, related_name="contact_channels")
+    kind = models.CharField("Соцсеть", max_length=20, choices=Kind.choices, unique=True)
+    order = models.PositiveIntegerField("Порядок", default=0, db_index=True)
+
+    class Meta:
+        verbose_name = "Соцсеть"
+        verbose_name_plural = "Порядок соцсетей"
+        ordering = ["order", "id"]
+
+    def __str__(self):
+        return self.get_kind_display()
+
+    @classmethod
+    def ensure_for(cls, site: SiteSettings) -> None:
+        """Создаёт недостающие строки, новые — в конец: перетаскивать можно только то, что есть в базе."""
+        order = next_order(cls)
+        for kind in cls.Kind.values:
+            _, created = cls.objects.get_or_create(kind=kind, defaults={"settings": site, "order": order})
+            order += created
+
+    @classmethod
+    def shown_kinds(cls, site: SiteSettings, available: dict[str, object]) -> list[str]:
+        """Каналы с заполненным адресом в заданном порядке; без строки в базе — в конец, чтобы кнопка не пропала."""
+        saved = [channel.kind for channel in site.contact_channels.all()]
+        kinds = saved + [kind for kind in cls.Kind.values if kind not in saved]
+        return [kind for kind in kinds if available.get(kind)]
 
 
 class ParkFormat(models.Model):

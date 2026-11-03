@@ -9,7 +9,7 @@ from django.utils import timezone
 from apps.catalog.models import Category, CategoryGroup
 from apps.catalog.tiles import category_tiles
 from apps.content.models import Event, Review
-from apps.core.models import InfoPage, Phone, SiteSettings
+from apps.core.models import ContactChannel, InfoPage, Phone, SiteSettings
 from apps.core.seo import plaintext
 from apps.texts.models import SiteText
 
@@ -287,6 +287,94 @@ def test_contact_links_include_vk_and_max(client):
     assert 'href="https://max.ru/u/tpark"' in _contact_menu(html)
     assert 'href="https://max.ru/u/tpark"' in html.split("<footer", 1)[1]
     assert 'href="https://max.ru/u/tpark"' in client.get("/contacts/").content.decode()
+
+
+def test_contact_links_include_instagram_with_logo_by_default(client):
+    site = SiteSettings.load()
+    Phone.objects.create(settings=site, number="9029856594")
+    assert "Instagram" not in client.get("/").content.decode()  # ссылка не указана — кнопки нет
+    site.instagram_url = "https://www.instagram.com/tpark"
+    site.save()
+    link = 'href="https://www.instagram.com/tpark"'
+    logo = "img/social/instagram"
+    html = client.get("/").content.decode()
+    menu = _contact_menu(html)
+    assert link in menu and logo in menu
+    footer = html.split("<footer", 1)[1]
+    assert link in footer and logo in footer and 'aria-label="Instagram"' in footer
+    contacts = client.get("/contacts/").content.decode()
+    assert link in contacts and logo in contacts
+
+
+def test_contact_links_show_instagram_as_text_without_logo(client):
+    site = SiteSettings.load()
+    Phone.objects.create(settings=site, number="9029856594")
+    site.instagram_url = "https://www.instagram.com/tpark"
+    site.instagram_show_logo = False
+    site.save()
+    link = 'href="https://www.instagram.com/tpark"'
+    logo = "img/social/instagram"
+    html = client.get("/").content.decode()
+    assert logo not in html
+    assert link in _contact_menu(html)
+    footer = html.split("<footer", 1)[1]
+    # В подвале — строкой в колонке «Контакты»: в ряду значков надпись переносилась одна.
+    footer_contacts = footer.split("Контакты</p>", 1)[1]
+    assert link in footer_contacts and ">Instagram</a>" in footer_contacts
+    assert footer.split("</footer>", 1)[0].count(link) == 1  # после подвала — плавающая кнопка «Связаться»
+    contacts = client.get("/contacts/").content.decode()
+    assert link in contacts and logo not in contacts
+
+
+def test_footer_instagram_text_without_phones(client):
+    site = SiteSettings.load()
+    site.instagram_url = "https://www.instagram.com/tpark"
+    site.instagram_show_logo = False
+    site.save()
+    footer = client.get("/").content.decode().split("<footer", 1)[1]
+    assert 'href="https://www.instagram.com/tpark"' in footer.split("Контакты</p>", 1)[1]
+
+
+def test_contact_channels_follow_saved_order(client):
+    site = SiteSettings.load()
+    Phone.objects.create(settings=site, number="9029856594", is_whatsapp=True, is_telegram=True)
+    site.vk_url = "https://vk.com/tpark"
+    site.max_url = "https://max.ru/u/tpark"
+    site.instagram_url = "https://www.instagram.com/tpark"
+    site.save()
+    links = ["instagram.com/tpark", "vk.com/tpark", "t.me/", "max.ru/u/tpark", "wa.me/"]
+
+    def positions(html):
+        return [html.index(link) for link in links]
+
+    # Без сохранённого порядка — как в ContactChannel.Kind: WhatsApp, Telegram, ВКонтакте, MAX, Instagram.
+    html = client.get("/").content.decode()
+    menu = _contact_menu(html)
+    default = [
+        menu.index(link) for link in ("wa.me/", "t.me/", "vk.com/tpark", "max.ru/u/tpark", "instagram.com/tpark")
+    ]
+    assert default == sorted(default)
+
+    for order, kind in enumerate(["instagram", "vk", "telegram", "max", "whatsapp"]):
+        ContactChannel.objects.create(settings=site, kind=kind, order=order)
+    html = client.get("/").content.decode()
+    # На «Контактах» — от заголовка: выше шапка и JSON-LD со ссылкой на ВКонтакте.
+    contacts = client.get("/contacts/").content.decode().split("Контакты</h1>", 1)[1]
+    for block in (_contact_menu(html), html.split("<footer", 1)[1], contacts):
+        assert positions(block) == sorted(positions(block))
+
+
+def test_contact_channel_without_address_is_hidden(client):
+    site = SiteSettings.load()
+    ContactChannel.objects.create(settings=site, kind="vk", order=0)
+    assert "ВКонтакте</a>" not in client.get("/contacts/").content.decode()
+
+
+def test_contacts_write_block_with_only_instagram(client):
+    site = SiteSettings.load()
+    site.instagram_url = "https://www.instagram.com/tpark"
+    site.save()
+    assert 'href="https://www.instagram.com/tpark"' in client.get("/contacts/").content.decode()
 
 
 def test_home_categories_grid_on_phone(client):
