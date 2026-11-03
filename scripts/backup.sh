@@ -12,7 +12,8 @@ mkdir -p "$DEST"
 if [ "${1:-}" = "--host" ]; then
   ROOT="$(pwd)"
   (cd src && uv run --frozen --no-dev manage.py backup_db "$ROOT/$DEST/db.sqlite3")
-  MEDIA="$(cd src && uv run --frozen --no-dev manage.py shell -c 'from django.conf import settings; print(settings.MEDIA_ROOT)')"
+  # --no-imports: иначе shell (Django 5.2+) печатает в stdout отчёт об автоимпорте моделей, и он попадает в путь.
+  MEDIA="$(cd src && uv run --frozen --no-dev manage.py shell --no-imports -c 'from django.conf import settings; print(settings.MEDIA_ROOT)')"
   tar -czf "$DEST/media.tar.gz" -C "$(dirname "$MEDIA")" "$(basename "$MEDIA")"
 else
   docker compose exec -T tpark-web python manage.py backup_db /data/db/backup.sqlite3
