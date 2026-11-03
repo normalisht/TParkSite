@@ -86,17 +86,16 @@ def test_category_page_without_services_has_no_prices_anchor(client, category):
     assert 'href="#prices"' not in html
 
 
-def test_category_related_is_strip_on_phone(client, category):
+def test_category_related_uses_home_tiles(client, category):
     group = CategoryGroup.objects.create(name="Активный отдых")
-    neighbour = Category.objects.create(name="Походы", is_published=True)
-    group.categories.add(category, neighbour)
+    neighbours = [Category.objects.create(name=name, is_published=True) for name in ("Походы", "Квесты")]
+    group.categories.add(category, *neighbours)
     html = client.get(category.get_absolute_url()).content.decode()
     related = html.split("Другие категории</h2>")[1].split("</section>")[0]
-    # На телефоне — горизонтальная лента, с sm — сетка; карточка в обёртке заданной ширины.
-    assert "scroll-strip" in related and "sm:grid-cols-2" in related and "lg:grid-cols-3" in related
-    assert re.search(
-        r'<div class="w-\[44%\] [^"]*sm:w-auto">\s*<a href="' + re.escape(neighbour.get_absolute_url()), related
-    )
+    # Та же сетка, что на главной; размер — от числа карточек: две стоят половинками и на планшете, не лентой.
+    assert "lg:grid-cols-6" in related and "scroll-strip" not in related
+    assert related.count('<div class="lg:col-span-3">') == 2
+    assert related.count("sm:aspect-[16/9]") == 2
 
 
 def test_category_hero_photo_is_wide_on_phone(client, category):

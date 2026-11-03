@@ -328,6 +328,75 @@ def test_services_panel_fades_in(live_server, browser, content):
     context.close()
 
 
+# Покадрово после клика по бургеру: левый край панели меню и что лежит сверху в центре элемента (кнопка, баннер).
+RECORD_MENU_OVER = """
+async (selector) => {
+  const target = document.querySelector(selector);
+  const panel = document.querySelector("header > div.absolute");
+  const box = target.getBoundingClientRect();
+  const x = box.left + box.width / 2, y = box.top + box.height / 2;
+  const frames = [];
+  document.querySelector("header button[aria-expanded]:not([aria-controls])").click();
+  const start = performance.now();
+  while (performance.now() - start < 500) {
+    await new Promise((done) => requestAnimationFrame(done));
+    const top = document.elementFromPoint(x, y);
+    const shown = getComputedStyle(panel).display !== "none";
+    frames.push({
+      panelLeft: shown ? panel.getBoundingClientRect().left : null,
+      top: target.contains(top) ? "target" : panel.contains(top) ? "panel" : "other",
+      display: getComputedStyle(target).display,
+    });
+  }
+  return { x, frames };
+}
+"""
+
+
+def _assert_panel_covers(recorded):
+    x, frames = recorded["x"], recorded["frames"]
+    assert any(frame["panelLeft"] is not None and frame["panelLeft"] > 0 for frame in frames), frames  # панель едет
+    for frame in frames:
+        assert frame["display"] != "none", frames  # элемент не выключается рывком
+        covered = frame["panelLeft"] is not None and frame["panelLeft"] < x
+        assert frame["top"] == ("panel" if covered else "target"), frames
+
+
+def _assert_slides_under_menu(page, selector, z_index):
+    target = page.locator(selector)
+    assert target.evaluate("(el) => getComputedStyle(el).zIndex") == z_index
+
+    _assert_panel_covers(page.evaluate(RECORD_MENU_OVER, selector))
+    # Под открытым меню элемент не получает фокус с клавиатуры.
+    assert target.evaluate("(el) => getComputedStyle(el).visibility") == "hidden"
+
+    _assert_panel_covers(page.evaluate(RECORD_MENU_OVER, selector))
+    assert target.evaluate("(el) => getComputedStyle(el).visibility") == "visible"
+    assert target.evaluate("(el) => getComputedStyle(el).zIndex") == z_index
+
+
+def test_contact_button_slides_under_mobile_menu(live_server, browser, content):
+    context = browser.new_context(viewport={"width": 375, "height": 800}, is_mobile=True, has_touch=True)
+    page = context.new_page()
+    page.goto(live_server.url + "/")
+    page.wait_for_load_state("networkidle")
+    _assert_slides_under_menu(page, ".contact-fab", "50")
+    context.close()
+
+
+def test_cookie_notice_slides_under_mobile_menu(live_server, browser, content):
+    site = SiteSettings.load()
+    site.yandex_metrika_id = "12345678"
+    site.save()
+    context = browser.new_context(viewport={"width": 375, "height": 800}, is_mobile=True, has_touch=True)
+    page = context.new_page()
+    page.route("**/mc.yandex.ru/**", lambda route: route.abort())
+    page.goto(live_server.url + "/")
+    page.wait_for_load_state("networkidle")
+    _assert_slides_under_menu(page, ".cookie-notice", "55")
+    context.close()
+
+
 def test_contact_button_icon_morphs(live_server, browser, content):
     context = browser.new_context(viewport={"width": 375, "height": 800}, is_mobile=True, has_touch=True)
     page = context.new_page()
@@ -519,23 +588,29 @@ def test_home_category_rows_have_no_empty_space(live_server, browser, count, wid
     context.close()
 
 
-def test_category_page_related_cards_three_in_row_on_desktop(live_server, browser):
+@pytest.mark.parametrize("count", [1, 2, 3, 4])
+@pytest.mark.parametrize("width", [1280, 800, 375])
+def test_category_page_related_rows_have_no_empty_space(live_server, browser, count, width):
     group = CategoryGroup.objects.create(name="Группа")
     current = Category.objects.create(name="Текущая", is_published=True)
-    group.categories.add(current, *[Category.objects.create(name=f"Соседняя {i}", is_published=True) for i in range(4)])
-    context = browser.new_context(viewport={"width": 1280, "height": 800})
+    neighbours = [Category.objects.create(name=f"Соседняя {i}", is_published=True) for i in range(count)]
+    group.categories.add(current, *neighbours)
+    context = browser.new_context(viewport={"width": width, "height": 800})
     page = context.new_page()
     page.goto(live_server.url + current.get_absolute_url())
     page.wait_for_load_state("networkidle")
-    cards = page.locator("section:has(.scroll-strip) .category-card")
-    assert cards.count() == 4
-    boxes = [box for box in (cards.nth(i).bounding_box() for i in range(4)) if box]
-    assert len(boxes) == 3  # четвёртая скрыта, а не стоит одна во втором ряду
-    assert len({round(box["y"]) for box in boxes}) == 1
-    assert all(box["width"] > 340 for box in boxes)
-    page.set_viewport_size({"width": 800, "height": 800})
-    page.wait_for_timeout(100)
-    assert sum(1 for i in range(4) if cards.nth(i).bounding_box()) == 4  # на планшете — сетка 2×2
+    cards = page.locator("main .category-card")
+    assert cards.count() == count
+    rows = {}
+    for box in (cards.nth(i).bounding_box() for i in range(count)):
+        rows.setdefault(round(box["y"]), []).append(box)
+    # Контейнер 1152 px с полями 16 px: все ряды — от левого поля до правого.
+    left = max((width - 1152) / 2, 0) + 16
+    for row in rows.values():
+        assert abs(min(box["x"] for box in row) - left) < 1
+        assert abs(max(box["x"] + box["width"] for box in row) - (width - left)) < 1
+        assert len({round(box["height"]) for box in row}) == 1
+    assert all(len(row) <= (3 if width >= 1024 else 2) for row in rows.values())
     context.close()
 
 

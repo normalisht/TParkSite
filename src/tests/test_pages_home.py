@@ -384,9 +384,9 @@ def test_contact_button_hidden_while_cookie_notice_open():
 
 
 def test_cookie_notice_hidden_while_menu_open():
-    """Баннер не закрывает нижние пункты открытого мобильного меню."""
+    """Баннер не закрывает нижние пункты открытого мобильного меню — уходит под панель (e2e: покадровая проверка)."""
     css = (Path(settings.BASE_DIR) / "tailwind/source.css").read_text()
-    assert "html.menu-open .cookie-notice { display: none; }" in css
+    assert "html.menu-open .cookie-notice {" in css
 
 
 def _footer(html: str) -> str:
