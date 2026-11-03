@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load site_tags site_texts %}
+{% load catalog_tags site_tags site_texts %}
 {% block vendor_css %}{% include "partials/vendor.html" with part="css" swiper=1 glightbox=1 %}{% endblock %}
 {% block vendor_js %}{% include "partials/vendor.html" with part="js" swiper=1 glightbox=1 %}{% endblock %}
 {% block content %}
@@ -46,12 +46,10 @@
 {% if related %}
 <section class="mx-auto max-w-6xl px-4 pt-10 md:pt-16">
   <h2 class="mb-4 text-2xl font-bold md:mb-6 md:text-3xl">{% text "category.other_title" %}</h2>
-  {# На телефоне — лента из двух с хвостиком карточек, с sm — сетка 2×2, на ПК — один ряд из трёх: четвёртая осталась бы одна во втором ряду. #}
-  <div class="scroll-strip sm:grid sm:grid-cols-2 sm:gap-4 md:gap-6 lg:grid-cols-3">
-    {% for category in related %}
-    <div class="w-[44%] shrink-0 snap-start scroll-ml-4 lg:nth-[n+4]:hidden sm:w-auto">
-      {% include "catalog/partials/category_card.html" with sizes="(min-width: 1152px) 357px, (min-width: 1024px) calc((100vw - 80px) / 3), (min-width: 640px) calc(50vw - 28px), 44vw" %}
-    </div>
+  {# Как на главной: размер карточек зависит от их числа, ряды всегда заполнены (apps/catalog/tiles.py). #}
+  <div class="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 lg:grid-cols-6">
+    {% for tile in related|category_tiles %}
+    <div class="{{ tile.span }}">{% include "catalog/partials/category_card.html" with category=tile.category aspect=tile.aspect sizes=tile.sizes %}</div>
     {% endfor %}
   </div>
 </section>
