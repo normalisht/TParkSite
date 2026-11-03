@@ -10,7 +10,8 @@ SERVICE ?= tpark
 SERVICE_USER ?= $(shell id -un)
 SERVICE_GROUP ?= $(shell id -gn)
 # nginx на хосте: deploy/nginx-site.conf собирается из шаблона, в sites-available — symlink на него.
-NGINX_SITE ?= $(SERVICE)
+# Суффикс .conf: nginx.conf некоторых панелей (FASTPANEL) подключает только sites-enabled/*.conf.
+NGINX_SITE ?= $(SERVICE).conf
 NGINX_CONF := deploy/nginx-site.conf
 NGINX_SERVER_NAME ?= t-camp.ru www.t-camp.ru
 
@@ -172,6 +173,7 @@ nginx-install: ## Подключить сайт к nginx: symlink в sites-avail
 		if [ -e "$$f" ] && [ ! -L "$$f" ]; then echo "$$f — обычный файл, а не symlink: перенесите его и повторите"; exit 1; fi; \
 	done
 	$(MAKE) --no-print-directory nginx-render
+	sudo mkdir -p /etc/nginx/sites-available
 	sudo ln -sfn $(CURDIR)/$(NGINX_CONF) /etc/nginx/sites-available/$(NGINX_SITE)
 	sudo ln -sfn /etc/nginx/sites-available/$(NGINX_SITE) /etc/nginx/sites-enabled/$(NGINX_SITE)
 	@if sudo nginx -t; then sudo systemctl reload nginx; \
