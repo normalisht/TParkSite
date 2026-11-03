@@ -65,7 +65,7 @@ chmod 440 /etc/sudoers.d/tpark && visudo -c
 
 Тогда разовые `make service-install` и `make nginx-install` выполняет root: первый — с `SERVICE_USER=…`/`SERVICE_GROUP=…` (иначе сервис запустится от root), второй вызывает uv, поэтому после него — `chown -R <пользователь>: .` в каталоге репозитория.
 
-1. На сервере: [uv](https://docs.astral.sh/uv/) (Python 3.14 он скачает сам), репозиторий, например в `/srv/tpark`.
+1. На сервере: [uv](https://docs.astral.sh/uv/) (Python 3.14 из `src/.python-version` он скачает сам), репозиторий, например в `/srv/tpark`.
 2. `cp .env.example src/.env` и заполнить как для Docker (`SECRET_KEY`, `ALLOWED_HOSTS`, `CSRF_TRUSTED_ORIGINS`, `DEBUG=0`), плюс абсолютные пути `DATABASE_PATH` и `MEDIA_ROOT` (по умолчанию — `src/db.sqlite3` и `src/media/`). `PROXY_NETWORK` и строки для compose не нужны. Настройки читают `src/.env` и в сервисе, и в командах `make service-*`.
 3. `make service-install` — кладёт юнит в `/etc/systemd/system/tpark.service` и включает автозапуск (другое имя — `SERVICE=…`, другой пользователь — `SERVICE_USER=…`/`SERVICE_GROUP=…`).
 4. `make service-deploy` — зависимости (`uv sync --no-dev`), Tailwind и `collectstatic`, бэкап работающего сайта, миграции, плавный перезапуск (`systemctl reload` — воркеры gunicorn перезапускаются с новым кодом без обрыва запросов), обновление конфига nginx (если подключён, см. ниже), затем недостающие миниатюры и очистка ненужных. Обновление сайта — `git pull && make service-deploy`.
