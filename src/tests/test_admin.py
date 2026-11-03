@@ -8,7 +8,7 @@ from django.urls import reverse
 from apps.catalog.admin import ServiceAdmin
 from apps.catalog.models import Category, CategoryGroup, CategoryPhoto, CategoryService, Service, ServicePhoto
 from apps.content.models import GalleryPhoto
-from apps.core.models import InfoPage, Phone, SiteSettings
+from apps.core.models import ContactChannel, InfoPage, Phone, SiteSettings
 
 pytestmark = pytest.mark.django_db
 
@@ -39,7 +39,7 @@ def _settings_post(phones):
         "phones-MIN_NUM_FORMS": "0",
         "phones-MAX_NUM_FORMS": "1000",
     }
-    for prefix in ("park_formats", "founder_facts", "seasons"):
+    for prefix in ("contact_channels", "park_formats", "founder_facts", "seasons"):
         data.update({f"{prefix}-TOTAL_FORMS": "0", f"{prefix}-INITIAL_FORMS": "0", f"{prefix}-MIN_NUM_FORMS": "0"})
     for i, phone in enumerate(phones):
         for key, value in phone.items():
@@ -66,6 +66,37 @@ def test_two_whatsapp_flags_rejected(admin_client):
     assert response.status_code == 200
     assert "WhatsApp можно отметить только у одного номера" in response.content.decode()
     assert Phone.objects.count() == 0
+
+
+def test_contact_channels_reorder_from_settings_form(admin_client):
+    url = reverse("admin:core_sitesettings_change", args=[1])
+    assert "Порядок соцсетей" in admin_client.get(url).content.decode()  # открытие формы создаёт строки
+    channels = list(ContactChannel.objects.all())
+    assert [c.kind for c in channels] == ContactChannel.Kind.values
+    data = _settings_post([])
+    data.update(
+        {"contact_channels-TOTAL_FORMS": str(len(channels)), "contact_channels-INITIAL_FORMS": str(len(channels))}
+    )
+    for i, channel in enumerate(reversed(channels)):
+        data.update(
+            {
+                f"contact_channels-{i}-id": str(channel.pk),
+                f"contact_channels-{i}-settings": "1",
+                f"contact_channels-{i}-order": str(i),
+            }
+        )
+    response = admin_client.post(url, data)
+    assert response.status_code == 302, response.content.decode()[:2000]
+    assert [c.kind for c in ContactChannel.objects.all()] == list(reversed(ContactChannel.Kind.values))
+
+
+def test_contact_channels_fixed_set(admin_client):
+    url = reverse("admin:core_sitesettings_change", args=[1])
+    admin_client.get(url)
+    ContactChannel.objects.filter(kind="instagram").delete()
+    admin_client.get(url)  # недостающая строка возвращается в конец
+    assert list(ContactChannel.objects.values_list("kind", flat=True))[-1] == "instagram"
+    assert ContactChannel.objects.count() == len(ContactChannel.Kind.values)
 
 
 def test_phone_flag_can_move_between_numbers(admin_client):

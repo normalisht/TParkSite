@@ -27,6 +27,7 @@ from apps.core.admin_utils import (
 from apps.core.maps import MapEmbedURLField
 from apps.core.models import (
     Announcement,
+    ContactChannel,
     FounderFact,
     InfoPage,
     ParkFormat,
@@ -108,6 +109,23 @@ class FounderFactInline(OrderedInlineMixin, TabularInline):
     fields = ["value", "label", "order"]
 
 
+class ContactChannelInline(TabularInline):
+    """Порядок кнопок связи: набор фиксирован (`ContactChannel.Kind`) — без добавления и удаления."""
+
+    model = ContactChannel
+    extra = 0
+    tab = True
+    can_delete = False
+    show_title = False  # название уже в единственной колонке
+    ordering_field = "order"
+    hide_ordering_field = True
+    fields = ["kind", "order"]
+    readonly_fields = ["kind"]
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
 class SeasonInline(StackedInline):
     """Сезонное оформление: набор сезонов фиксирован (apps/core/seasons.py) — без добавления и удаления."""
 
@@ -143,7 +161,7 @@ class SeasonInline(StackedInline):
 @admin.register(SiteSettings)
 class SiteSettingsAdmin(SiteModelAdmin):
     help_anchor = "settings"  # списка нет — сразу форма, вводная не нужна
-    inlines = [PhoneInline, SeasonInline, ParkFormatInline, FounderFactInline]
+    inlines = [PhoneInline, ContactChannelInline, SeasonInline, ParkFormatInline, FounderFactInline]
     # Unfold ставит URL-полям <input type="url">: браузер не пропустит вставленный код <iframe>.
     formfield_overrides = {MapEmbedURLField: {"widget": UnfoldAdminTextareaWidget(attrs={"rows": 3})}}
     fieldsets = (
@@ -151,7 +169,16 @@ class SiteSettingsAdmin(SiteModelAdmin):
             "Контакты",
             {
                 "classes": ["tab"],
-                "fields": ["address", "map_embed_url", "vk_url", "max_url", "reviews_url", "special_days_shown"],
+                "fields": [
+                    "address",
+                    "map_embed_url",
+                    "vk_url",
+                    "max_url",
+                    "instagram_url",
+                    "instagram_show_logo",
+                    "reviews_url",
+                    "special_days_shown",
+                ],
             },
         ),
         ("Логотип и политика", {"classes": ["tab"], "fields": ["header_logo", "privacy_page"]}),
@@ -237,7 +264,9 @@ class SiteSettingsAdmin(SiteModelAdmin):
         return redirect(reverse("admin:core_sitesettings_change", args=[SiteSettings.load().pk]))
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
-        Season.ensure_for(SiteSettings.load())  # после импорта со сбросом записей сезонов нет, а добавить их нельзя
+        site = SiteSettings.load()
+        Season.ensure_for(site)  # после импорта со сбросом записей сезонов нет, а добавить их нельзя
+        ContactChannel.ensure_for(site)
         return super().change_view(request, object_id, form_url, extra_context)
 
 

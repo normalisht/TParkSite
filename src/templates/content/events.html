@@ -37,7 +37,7 @@
       {% text "events.empty_vk_text" as empty_vk %}{% text "events.empty_text" as empty_text %}
       {% if site.vk_url and empty_vk or empty_text %}<p class="mt-2 text-ink/75">{% if site.vk_url and empty_vk %}{{ empty_vk|nobr }} {% endif %}{{ empty_text|nobr }}</p>{% endif %}
       <div class="mt-5 flex flex-wrap gap-3">
-        {% if site.vk_url %}<a href="{{ site.vk_url }}" class="btn btn-ghost" target="_blank" rel="noopener"><span class="icon icon-fill h-5 w-5 text-[#0077FF]">{% include "icons/vk.svg" %}</span>Группа ВКонтакте</a>{% endif %}
+        {% if site.vk_url %}<a href="{{ site.vk_url }}" class="btn btn-ghost" target="_blank" rel="noopener"><img src="{% static "img/social/vk.svg" %}" alt="" width="20" height="20" loading="lazy" class="h-5 w-5">Группа ВКонтакте</a>{% endif %}
         {% include "partials/contact_links.html" %}
       </div>
     </div>

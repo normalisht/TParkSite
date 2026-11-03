@@ -1,4 +1,4 @@
-{% load site_tags %}<footer class="mt-10 bg-navy text-white/80 md:mt-16">
+{% load site_tags static %}<footer class="mt-10 bg-navy text-white/80 md:mt-16">
   <div class="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:grid-cols-2 lg:grid-cols-4">
     <div>
       <p class="text-lg font-bold text-white">Т-Парк</p>
@@ -7,11 +7,16 @@
         <span class="icon mt-0.5 h-5 w-5">{% include "icons/map-pin.svg" %}</span>{{ site.address }}
       </a>
       {% endif %}
-      <div class="mt-4 -ml-1.5 flex gap-2">
-        {% if whatsapp_phone %}<a href="{{ whatsapp_phone|whatsapp_url:contact_topic }}" class="icon icon-fill h-11 w-11 p-1.5 hover:text-brand-300" target="_blank" rel="noopener" aria-label="WhatsApp">{% include "icons/whatsapp.svg" %}</a>{% endif %}
-        {% if telegram_phone %}<a href="{{ telegram_phone.telegram_url }}" class="icon icon-fill h-11 w-11 p-1.5 hover:text-brand-300" target="_blank" rel="noopener" aria-label="Telegram">{% include "icons/telegram.svg" %}</a>{% endif %}
-        {% if site.vk_url %}<a href="{{ site.vk_url }}" class="icon icon-fill h-11 w-11 p-1.5 hover:text-brand-300" target="_blank" rel="noopener" aria-label="ВКонтакте">{% include "icons/vk.svg" %}</a>{% endif %}
-        {% if site.max_url %}<a href="{{ site.max_url }}" class="icon icon-fill h-11 w-11 p-1.5 hover:text-brand-300" target="_blank" rel="noopener" aria-label="MAX">{% include "icons/max.svg" %}</a>{% endif %}
+      {# Белые круги: знаки Meta рассчитаны на белый фон, а контурные и залитые знаки выглядят одного веса. #}
+      <div class="mt-4 flex flex-wrap gap-2">
+        {% for channel in contact_channels %}
+        {% if channel == "whatsapp" %}<a href="{{ whatsapp_phone|whatsapp_url:contact_topic }}" class="flex h-11 w-11 items-center justify-center rounded-full bg-white ring-2 ring-transparent transition hover:ring-brand-300" target="_blank" rel="noopener" aria-label="WhatsApp"><img src="{% static "img/social/whatsapp.svg" %}" alt="" width="24" height="24" loading="lazy" class="h-6 w-6"></a>
+        {% elif channel == "telegram" %}<a href="{{ telegram_phone.telegram_url }}" class="flex h-11 w-11 items-center justify-center rounded-full bg-white ring-2 ring-transparent transition hover:ring-brand-300" target="_blank" rel="noopener" aria-label="Telegram"><img src="{% static "img/social/telegram.svg" %}" alt="" width="24" height="24" loading="lazy" class="h-6 w-6"></a>
+        {% elif channel == "vk" %}<a href="{{ site.vk_url }}" class="flex h-11 w-11 items-center justify-center rounded-full bg-white ring-2 ring-transparent transition hover:ring-brand-300" target="_blank" rel="noopener" aria-label="ВКонтакте"><img src="{% static "img/social/vk.svg" %}" alt="" width="24" height="24" loading="lazy" class="h-6 w-6"></a>
+        {% elif channel == "max" %}<a href="{{ site.max_url }}" class="flex h-11 w-11 items-center justify-center rounded-full bg-white ring-2 ring-transparent transition hover:ring-brand-300" target="_blank" rel="noopener" aria-label="MAX"><img src="{% static "img/social/max.svg" %}" alt="" width="24" height="24" loading="lazy" class="h-6 w-6"></a>
+        {% elif channel == "instagram" and site.instagram_show_logo %}<a href="{{ site.instagram_url }}" class="flex h-11 w-11 items-center justify-center rounded-full bg-white ring-2 ring-transparent transition hover:ring-brand-300" target="_blank" rel="noopener" aria-label="Instagram"><img src="{% static "img/social/instagram.webp" %}" alt="" width="24" height="24" loading="lazy" class="h-6 w-6"></a>
+        {% endif %}
+        {% endfor %}
       </div>
     </div>
     {% if footer_categories %}
@@ -28,13 +33,17 @@
       <p class="text-sm font-bold uppercase tracking-widest text-white/70">Разделы</p>
       <div class="mt-1 grid grid-cols-2 gap-x-6 md:grid-cols-1"><a href="{% url 'catalog:home' %}" class="inline-flex min-h-11 items-center hover:text-brand-300">Главная</a>{% include "partials/nav_links.html" with link_class="inline-flex min-h-11 items-center hover:text-brand-300" %}</div>
     </nav>
-    {% if phones or hours or special_days %}
+    {% if phones or hours or special_days or site.instagram_url and not site.instagram_show_logo %}
     <div>
       <p class="text-sm font-bold uppercase tracking-widest text-white/70">Контакты</p>
       <ul class="mt-1">
         {% for phone in phones %}
         <li><a href="{{ phone.tel_url }}" class="flex min-h-11 items-center gap-2 tabular-nums hover:text-brand-300"><span class="icon h-4 w-4">{% include "icons/phone.svg" %}</span>{{ phone.display }}</a></li>
         {% endfor %}
+        {% if site.instagram_url and not site.instagram_show_logo %}
+        {# Без логотипа — строкой здесь: в ряду кругов надпись не помещается и переносится одна. #}
+        <li><a href="{{ site.instagram_url }}" class="flex min-h-11 items-center gap-2 hover:text-brand-300" target="_blank" rel="noopener"><span class="icon h-4 w-4">{% include "icons/external-link.svg" %}</span>Instagram</a></li>
+        {% endif %}
         {% for line in hours %}
         <li class="flex min-h-11 items-center gap-2"><span class="icon h-4 w-4">{% include "icons/clock.svg" %}</span>{{ line }}</li>
         {% endfor %}

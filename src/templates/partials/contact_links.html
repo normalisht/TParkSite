@@ -1,15 +1,16 @@
-{% load site_tags %}{% if phones %}
+{% load site_tags static %}{% if phones %}
 <a href="{{ phones.0.tel_url }}" class="btn btn-primary"><span class="icon h-5 w-5">{% include "icons/phone.svg" %}</span>{{ phones.0.display }}</a>
 {% endif %}
-{% if whatsapp_phone %}
-<a href="{{ whatsapp_phone|whatsapp_url:contact_topic }}" class="btn btn-ghost" target="_blank" rel="noopener"><span class="icon icon-fill h-5 w-5 text-[#25D366]">{% include "icons/whatsapp.svg" %}</span>WhatsApp</a>
+{% for channel in contact_channels %}
+{% if channel == "whatsapp" %}
+<a href="{{ whatsapp_phone|whatsapp_url:contact_topic }}" class="btn btn-ghost" target="_blank" rel="noopener"><img src="{% static "img/social/whatsapp.svg" %}" alt="" width="20" height="20" loading="lazy" class="h-5 w-5">WhatsApp</a>
+{% elif channel == "telegram" %}
+<a href="{{ telegram_phone.telegram_url }}" class="btn btn-ghost" target="_blank" rel="noopener"><img src="{% static "img/social/telegram.svg" %}" alt="" width="20" height="20" loading="lazy" class="h-5 w-5">Telegram</a>
+{% elif channel == "vk" %}
+<a href="{{ site.vk_url }}" class="btn btn-ghost" target="_blank" rel="noopener"><img src="{% static "img/social/vk.svg" %}" alt="" width="20" height="20" loading="lazy" class="h-5 w-5">ВКонтакте</a>
+{% elif channel == "max" %}
+<a href="{{ site.max_url }}" class="btn btn-ghost" target="_blank" rel="noopener"><img src="{% static "img/social/max.svg" %}" alt="" width="20" height="20" loading="lazy" class="h-5 w-5">MAX</a>
+{% elif channel == "instagram" %}
+<a href="{{ site.instagram_url }}" class="btn btn-ghost" target="_blank" rel="noopener">{% if site.instagram_show_logo %}<img src="{% static "img/social/instagram.webp" %}" alt="" width="20" height="20" loading="lazy" class="h-5 w-5">Instagram{% else %}Instagram<span class="icon h-4 w-4">{% include "icons/external-link.svg" %}</span>{% endif %}</a>
 {% endif %}
-{% if telegram_phone %}
-<a href="{{ telegram_phone.telegram_url }}" class="btn btn-ghost" target="_blank" rel="noopener"><span class="icon icon-fill h-5 w-5 text-[#26A5E4]">{% include "icons/telegram.svg" %}</span>Telegram</a>
-{% endif %}
-{% if site.vk_url %}
-<a href="{{ site.vk_url }}" class="btn btn-ghost" target="_blank" rel="noopener"><span class="icon icon-fill h-5 w-5 text-[#0077FF]">{% include "icons/vk.svg" %}</span>ВКонтакте</a>
-{% endif %}
-{% if site.max_url %}
-<a href="{{ site.max_url }}" class="btn btn-ghost" target="_blank" rel="noopener"><span class="icon icon-fill h-5 w-5 text-[#8114FF]">{% include "icons/max.svg" %}</span>MAX</a>
-{% endif %}
+{% endfor %}
