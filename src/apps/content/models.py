@@ -12,6 +12,7 @@ from django.utils.text import Truncator
 
 from apps.core.fields import HtmlField, full_spec, image_spec, image_specs, og_spec, photo_field
 from apps.core.files import clone_file
+from apps.core.indexnow import remember_page_change
 from apps.core.models import COPY_SUFFIX, OrderedModel, PublishedQuerySet, SeoModel, TrashableModel
 from apps.core.redirects import remember_slug_change
 from apps.core.rotation import daily_pick
@@ -110,6 +111,7 @@ class Event(TrashableModel, SeoModel):
             self.slug = unique_slug(self, self.slug_source())
         with transaction.atomic():
             remember_slug_change(self)
+            remember_page_change(self)
             super().save(*args, **kwargs)
 
     def duplicate(self) -> Event:

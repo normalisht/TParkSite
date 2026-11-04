@@ -54,6 +54,8 @@ CANONICAL_HOST = os.environ.get("CANONICAL_HOST", "").strip().lower()
 # Кнопка «Сгенерировать» на вкладке SEO (apps/core/seo_generation.py). Без ключа кнопки нет.
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "").strip()
 OPENROUTER_MODEL = os.environ.get("OPENROUTER_MODEL", "").strip() or "openrouter/free"
+# IndexNow (apps/core/indexnow.py): Яндекс узнаёт об изменённых страницах сразу. Пусто или без CANONICAL_HOST — выключено.
+INDEXNOW_KEY = os.environ.get("INDEXNOW_KEY", "").strip()
 
 INSTALLED_APPS = [
     "unfold",
@@ -82,6 +84,7 @@ MIDDLEWARE = [
     "apps.core.middleware.PermissionsPolicyMiddleware",
     # ETag для HTML: повторный заход на неизменённую страницу — 304 без тела.
     "django.middleware.http.ConditionalGetMiddleware",
+    "apps.core.middleware.LastModifiedMiddleware",  # под ConditionalGet: тот сравнивает If-Modified-Since с его датой
     "apps.core.middleware.CanonicalHostMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",

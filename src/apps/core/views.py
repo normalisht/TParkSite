@@ -1,5 +1,6 @@
+from django.conf import settings
 from django.db import connection
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from django.shortcuts import redirect, render
 from django.templatetags.static import static
 
@@ -64,6 +65,13 @@ def robots_txt(request):
         f"Sitemap: {request.build_absolute_uri('/sitemap.xml')}",
     ]
     return HttpResponse("\n".join(lines) + "\n", content_type="text/plain; charset=utf-8")
+
+
+def indexnow_key(request, key):
+    # По этому файлу Яндекс проверяет, что адреса в IndexNow присылает владелец сайта (apps/core/indexnow.py).
+    if not settings.INDEXNOW_KEY or key != settings.INDEXNOW_KEY:
+        raise Http404
+    return HttpResponse(key, content_type="text/plain; charset=utf-8")
 
 
 def favicon(request):

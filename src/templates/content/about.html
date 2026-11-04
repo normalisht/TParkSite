@@ -9,6 +9,7 @@
   {% include "partials/hero_decor.html" %}
   <div class="mx-auto grid max-w-6xl items-center gap-8 px-4 py-10 md:py-14 {% if hero %}lg:grid-cols-2 lg:gap-12{% endif %}">
     <div class="min-w-0">
+      {% include "partials/breadcrumbs.html" %}
       <h1 class="page-title">О нас</h1>
       {% if site.about_motto %}<p class="mt-5 max-w-2xl border-l-4 border-brand-500 pl-4 text-xl font-medium leading-snug text-navy md:text-2xl">{{ site.about_motto }}</p>{% endif %}
     </div>

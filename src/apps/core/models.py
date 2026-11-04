@@ -1,9 +1,9 @@
 import re
-from datetime import date
+from datetime import date, datetime, timedelta
 
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
-from django.db import models, transaction
+from django.db import IntegrityError, models, transaction
 from django.db.models import Max, Q
 from django.urls import reverse
 from django.utils import timezone
@@ -706,10 +706,12 @@ class InfoPage(TrashableModel, SeoModel, OrderedModel):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = unique_slug(self, self.title)
+        from apps.core.indexnow import remember_page_change
         from apps.core.redirects import remember_slug_change
 
         with transaction.atomic():
             remember_slug_change(self)
+            remember_page_change(self)
             super().save(*args, **kwargs)
 
     def get_absolute_url(self) -> str:
@@ -760,3 +762,39 @@ class Redirect(models.Model):
             raise ValidationError({"old_path": "Старый адрес — только путь, без «?» и «#»."})
         if self.old_path == self.new_path:
             raise ValidationError({"new_path": "Новый адрес совпадает со старым — получится бесконечный редирект."})
+
+
+class PageVersion(models.Model):
+    """С какого момента страница отдаёт текущий HTML — заголовок Last-Modified (`middleware.LastModifiedMiddleware`).
+
+    Страница собирается из многих записей и меняется по дате (сезон, ротация подборок), поэтому дату считаем не по
+    данным, а по ETag: сменился — страница изменилась сейчас. Храним в базе, а не в памяти процесса: воркеры должны
+    видеть одну историю, иначе после возврата к прежнему HTML воркер, не видевший промежуточного, ответил бы роботу 304."""
+
+    MAX_PATH_LENGTH = 500
+
+    path = models.CharField(max_length=MAX_PATH_LENGTH, unique=True)
+    etag = models.CharField(max_length=64)
+    modified_at = models.DateTimeField()
+
+    def __str__(self):
+        return self.path
+
+    @classmethod
+    def modified_at_for(cls, path: str, etag: str) -> datetime:
+        row = cls.objects.filter(path=path).values_list("etag", "modified_at").first()
+        if row and row[0] == etag:
+            return row[1]
+        # Last-Modified — с точностью до секунды; две смены за секунду не должны дать одну дату.
+        now = timezone.now().replace(microsecond=0)
+        if row is None:
+            try:
+                with transaction.atomic():
+                    cls.objects.create(path=path, etag=etag, modified_at=now)
+            except IntegrityError:
+                pass  # другой воркер записал тот же HTML раньше: наша дата позже — робот просто получит 200
+            return now
+        modified_at = max(now, row[1] + timedelta(seconds=1))
+        # Условие на прежний ETag — в самом UPDATE: если другой воркер уже обновил строку, его запись не затираем.
+        cls.objects.filter(path=path, etag=row[0]).update(etag=etag, modified_at=modified_at)
+        return modified_at

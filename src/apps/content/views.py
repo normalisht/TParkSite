@@ -16,9 +16,15 @@ RELATED_EVENTS = 3
 GALLERY_PAGE = 24
 
 
+def page_crumbs(title: str) -> list[tuple[str, str]]:
+    """Крошки страницы первого уровня: «Главная / <заголовок>»."""
+    return [ld.home_crumb(), (title, "")]
+
+
 def events(request):
     today = timezone.localdate()
     upcoming = list(Event.objects.published().upcoming(today))
+    crumbs = page_crumbs("Мероприятия")
     return render(
         request,
         "content/events.html",
@@ -27,8 +33,13 @@ def events(request):
             "upcoming": upcoming[1:],
             "past": list(Event.objects.published().past_visible(today)),
             "past_shown": PAST_EVENTS_SHOWN,
+            "breadcrumbs": crumbs,
             "seo": page_seo("events"),
-            "structured_data": [n for n in (ld.organization(request), ld.event_list(request, upcoming)) if n],
+            "structured_data": [
+                n
+                for n in (ld.organization(request), ld.breadcrumbs(request, crumbs), ld.event_list(request, upcoming))
+                if n
+            ],
         },
     )
 
@@ -78,6 +89,7 @@ def about(request):
     site = SiteSettings.load()
     seo = page_seo("about")
     seo["image"] = absolute_url(request, safe_spec_url(site, "about_og"))
+    crumbs = page_crumbs("О нас")
     return render(
         request,
         "content/about.html",
@@ -87,42 +99,51 @@ def about(request):
             "route": route_links(site.latitude, site.longitude),
             "photos": GalleryPhoto.strip_photos("about"),
             "partners": list(Partner.objects.all()),
+            "breadcrumbs": crumbs,
             "seo": seo,
-            "structured_data": [ld.organization(request, with_founder=True)],
+            "structured_data": [ld.organization(request, with_founder=True), ld.breadcrumbs(request, crumbs)],
         },
     )
 
 
 def reviews(request):
+    crumbs = page_crumbs("Отзывы")
     return render(
         request,
         "content/reviews.html",
         {
             "reviews": Review.objects.published(),
             "photos": GalleryPhoto.strip_photos("reviews"),
+            "breadcrumbs": crumbs,
             "seo": page_seo("reviews"),
+            "structured_data": [ld.breadcrumbs(request, crumbs)],
         },
     )
 
 
 def gallery(request):
     photos = list(GalleryPhoto.objects.all())
+    crumbs = page_crumbs("Галерея")
     context = {
         "photos": photos,
         "page_size": GALLERY_PAGE,
+        "breadcrumbs": crumbs,
         "seo": page_seo("gallery"),
+        "structured_data": [ld.breadcrumbs(request, crumbs)],
     }
     return render(request, "content/gallery.html", context)
 
 
 def contacts(request):
     site = SiteSettings.load()
+    crumbs = page_crumbs("Контакты")
     return render(
         request,
         "content/contacts.html",
         {
             "route": route_links(site.latitude, site.longitude),
+            "breadcrumbs": crumbs,
             "seo": page_seo("contacts"),
-            "structured_data": [ld.organization(request)],
+            "structured_data": [ld.organization(request), ld.breadcrumbs(request, crumbs)],
         },
     )

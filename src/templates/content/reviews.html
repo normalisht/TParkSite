@@ -6,6 +6,7 @@
   {% include "partials/hero_decor.html" %}
   <div class="mx-auto flex max-w-6xl flex-wrap items-end justify-between gap-4 px-4 py-10 md:py-14">
     <div>
+      {% include "partials/breadcrumbs.html" %}
       <h1 class="page-title">Отзывы</h1>
       <p class="page-lead">{% text "reviews.lead" %}{% if reviews %} · <span class="font-semibold text-brand-700">{{ reviews|length|ru_plural:"отзыв,отзыва,отзывов" }}</span>{% endif %}</p>
     </div>

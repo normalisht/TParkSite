@@ -13,5 +13,6 @@ PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
 SECURE_SSL_REDIRECT = False
 CANONICAL_HOST = ""
 OPENROUTER_API_KEY = ""  # ключ из src/.env не должен включать кнопку и запросы к сервису в тестах
+INDEXNOW_KEY = ""
 # client.login() в тестах не передаёт request, а AxesStandaloneBackend его требует; тесты axes включают сами.
 AXES_ENABLED = False
