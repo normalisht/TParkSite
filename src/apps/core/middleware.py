@@ -1,5 +1,7 @@
 from django.conf import settings
 from django.http import HttpResponsePermanentRedirect
+from django.utils.cache import set_response_etag
+from django.utils.http import http_date
 
 
 class CanonicalHostMiddleware:
@@ -36,6 +38,41 @@ class RedirectFallbackMiddleware:
         query = request.META.get("QUERY_STRING", "")
         separator = "&" if "?" in target else "?"
         return HttpResponsePermanentRedirect(f"{target}{separator}{query}" if query else target)
+
+
+class LastModifiedMiddleware:
+    """Last-Modified у публичных страниц: робот Яндекса переобходит с If-Modified-Since, а ETag/If-None-Match
+    (`ConditionalGetMiddleware`) использует Google. Сам 304 отдаёт `ConditionalGetMiddleware` — этот стоит под ним.
+
+    Без заголовка: страницы с параметрами в адресе (из utm и т. п. в базе копились бы строки), админка и черновики
+    (`private`/`no-cache`, `Vary: Cookie` — HTML зависит от посетителя), ответы, где Last-Modified уже есть (sitemap).
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        from apps.core.models import PageVersion
+
+        response = self.get_response(request)
+        if self._applies(request, response) and len(request.path) <= PageVersion.MAX_PATH_LENGTH:
+            if not response.has_header("ETag"):
+                set_response_etag(response)
+            if response.has_header("ETag"):  # у пустого ответа ETag нет
+                modified_at = PageVersion.modified_at_for(request.path, response["ETag"])
+                response["Last-Modified"] = http_date(modified_at.timestamp())
+        return response
+
+    @staticmethod
+    def _applies(request, response) -> bool:
+        if request.method != "GET" or response.status_code != 200 or response.streaming:
+            return False
+        if request.META.get("QUERY_STRING") or response.has_header("Last-Modified"):
+            return False
+        cache_control = response.get("Cache-Control", "").lower()
+        if any(word in cache_control for word in ("private", "no-cache", "no-store")):
+            return False
+        return "cookie" not in response.get("Vary", "").lower()
 
 
 class PermissionsPolicyMiddleware:

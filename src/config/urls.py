@@ -2,13 +2,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
-from django.urls import include, path
+from django.urls import include, path, re_path
 from django.views.generic import RedirectView
 
 from apps.core import legacy_redirects
 from apps.core.admin_help import help_view
 from apps.core.sitemaps import SITEMAPS
-from apps.core.views import favicon, healthz, robots_txt
+from apps.core.views import favicon, healthz, indexnow_key, robots_txt
 
 urlpatterns = [
     path("admin/help/", admin.site.admin_view(help_view), name="admin_help"),
@@ -17,6 +17,7 @@ urlpatterns = [
     path("sitemap.xml", sitemap, {"sitemaps": SITEMAPS}, name="sitemap"),
     path("robots.txt", robots_txt, name="robots"),
     path("favicon.ico", favicon),
+    re_path(r"^(?P<key>[A-Za-z0-9-]{8,128})\.txt$", indexnow_key),
     # 301 со старых URL Flask-версии
     path("TPark", RedirectView.as_view(url="/", permanent=True)),
     path("about_2", RedirectView.as_view(pattern_name="content:about", permanent=True)),
