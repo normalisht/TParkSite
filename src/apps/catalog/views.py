@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from apps.catalog.models import Category, Service
+from apps.catalog.models import Category, CategoryService, Service
 from apps.content.models import Event, GalleryPhoto, Review
 from apps.core import structured_data as ld
 from apps.core.images import lightbox_url, safe_spec_url
@@ -12,6 +12,8 @@ from apps.core.seo import absolute_url, make_seo, page_seo
 
 HOME_REVIEWS = 8
 HOME_EVENTS = 3
+# Категория, из которой перешли на страницу услуги; в robots.txt — Clean-param, canonical — без него.
+CATEGORY_PARAM = "category"
 
 
 def home(request):
@@ -65,7 +67,7 @@ def category_detail(request, slug):
             # Тема первого сообщения в WhatsApp (фильтр whatsapp_url).
             "contact_topic": category.name,
             # Услуги со своей страницей — карточками, остальные — компактным списком.
-            "service_cards": [s for s in services if s.has_page],
+            "service_cards": with_page_urls([s for s in services if s.has_page], category),
             "service_rows": [s for s in services if not s.has_page],
             "hero": hero,
             "hero_srcset": hero_srcset,
@@ -87,6 +89,30 @@ def category_detail(request, slug):
 RELATED_SERVICES = 3
 
 
+def published_category_links(links):
+    """Связи с опубликованными категориями: первая у услуги — её категория по умолчанию."""
+    return links.filter(category__is_published=True).order_by("category__order", "category__id")
+
+
+def service_category(service, slug: str = "") -> Category | None:
+    """Категория из ссылки, если услуга в ней есть; иначе — по умолчанию (чужой адрес не должен давать 404)."""
+    categories = [link.category for link in published_category_links(service.category_links).select_related("category")]
+    return next((c for c in categories if c.slug == slug), categories[0] if categories else None)
+
+
+def with_page_urls(services: list, category) -> list:
+    """Заполняет `page_url` карточек. Параметр — только если категория услуги по умолчанию другая: адреса с параметром
+    не получают Last-Modified и уходят в canonical, поэтому их должно быть как можно меньше."""
+    defaults = {}
+    links = published_category_links(CategoryService.objects.filter(service__in=services))
+    for service_id, category_id in links.values_list("service_id", "category_id"):
+        defaults.setdefault(service_id, category_id)
+    for service in services:
+        url = service.get_absolute_url()
+        service.page_url = url if defaults.get(service.pk) == category.pk else f"{url}?{CATEGORY_PARAM}={category.slug}"
+    return services
+
+
 def related_services(category, service, limit: int = RELATED_SERVICES) -> list:
     """Другие услуги категории со своей страницей: у каждой услуги свой набор, меняется раз в сутки — иначе ссылки
     получали бы только первые услуги категории. Варианты с тем же названием (в т. ч. текущей услуги) — один раз.
@@ -104,20 +130,14 @@ def related_services(category, service, limit: int = RELATED_SERVICES) -> list:
 def service_detail(request, slug):
     service, preview = get_for_view(request, Service.objects.filter(has_page=True), slug=slug)
     photos = list(service.photos.all())
-    link = (
-        service.category_links.filter(category__is_published=True)
-        .select_related("category")
-        .order_by("category__order", "category__id")
-        .first()
-    )
-    category = link.category if link else None
+    category = service_category(service, request.GET.get(CATEGORY_PARAM, ""))
     crumbs = [
         ld.home_crumb(),
         *([(category.name, category.get_absolute_url())] if category else []),
         (service.name, ""),
     ]
     image = safe_spec_url(photos[0], "og") if photos else ""
-    related = related_services(category, service) if category else []
+    related = with_page_urls(related_services(category, service), category) if category else []
     seo = make_seo(
         service.name,
         service.short_description or service.description,
