@@ -4,6 +4,7 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import redirect, render
 from django.templatetags.static import static
 
+from apps.catalog.views import CATEGORY_PARAM
 from apps.core import structured_data as ld
 from apps.core.images import safe_spec_url
 from apps.core.models import InfoPage
@@ -61,6 +62,7 @@ def robots_txt(request):
         "",
         # Яндекс: метки рекламы и рассылок не плодят дубли страниц.
         f"Clean-param: {'&'.join(TRACKING_PARAMS)}",
+        f"Clean-param: {CATEGORY_PARAM} /service/",
         "",
         f"Sitemap: {request.build_absolute_uri('/sitemap.xml')}",
     ]

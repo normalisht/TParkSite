@@ -237,6 +237,10 @@ def test_robots_clean_param(client):
     assert "Clean-param: utm_source&utm_medium&utm_campaign" in body
 
 
+def test_robots_cleans_service_category_param(client):
+    assert "Clean-param: category /service/" in client.get("/robots.txt").content.decode().splitlines()
+
+
 def test_www_redirects_to_canonical_host(client, settings):
     settings.CANONICAL_HOST = "t-camp.ru"
     settings.ALLOWED_HOSTS = ["t-camp.ru", "www.t-camp.ru", "localhost"]

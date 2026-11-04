@@ -1,6 +1,7 @@
 import re
 from datetime import date, timedelta
 from decimal import Decimal
+from types import SimpleNamespace
 
 import pytest
 from django.utils import timezone
@@ -723,3 +724,77 @@ def test_whatsapp_topic_on_category_and_upcoming_event_only(client):
     past = Event.objects.create(title="Поход", date=today - timedelta(days=3), show_after_date=True)
     assert "?text=" in client.get(upcoming.get_absolute_url()).content.decode()
     assert "?text=" not in client.get(past.get_absolute_url()).content.decode()
+
+
+@pytest.fixture
+def two_categories():
+    """Услуга в двух категориях: по умолчанию — «Парк» (раньше по порядку), у каждой категории свой сосед."""
+    park = Category.objects.create(name="Парк", is_published=True, order=1)
+    hotel = Category.objects.create(name="Для гостей", is_published=True, order=2)
+    service = Service.objects.create(name="Зиплайн", has_page=True)
+    park_only = Service.objects.create(name="Скалодром", has_page=True)
+    hotel_only = Service.objects.create(name="Завтрак", has_page=True)
+    both = Service.objects.create(name="Тарзанка", has_page=True)
+    for category, services in [(park, [service, park_only, both]), (hotel, [service, hotel_only, both])]:
+        for order, item in enumerate(services):
+            CategoryService.objects.create(category=category, service=item, order=order)
+    return SimpleNamespace(
+        park=park, hotel=hotel, service=service, park_only=park_only, hotel_only=hotel_only, both=both
+    )
+
+
+def test_service_page_shows_category_from_link(client, two_categories):
+    data = two_categories
+    response = client.get(data.service.get_absolute_url(), {"category": data.hotel.slug})
+    html = response.content.decode()
+    assert "Ещё в категории «Для гостей»" in html
+    related = html.split("Ещё в категории")[1]
+    assert data.hotel_only.get_absolute_url() in related
+    assert data.park_only.get_absolute_url() not in related
+    assert (data.hotel.name, data.hotel.get_absolute_url()) in response.context["breadcrumbs"]
+
+
+def test_service_page_without_param_uses_default_category(client, two_categories):
+    html = client.get(two_categories.service.get_absolute_url()).content.decode()
+    assert "Ещё в категории «Парк»" in html
+
+
+@pytest.mark.parametrize("kind", ["unknown", "not_linked", "unpublished"])
+def test_service_page_ignores_invalid_category_param(client, two_categories, kind):
+    data = two_categories
+    if kind == "unknown":
+        slug = "net-takoi"
+    elif kind == "not_linked":
+        slug = Category.objects.create(name="Чужая", is_published=True).slug
+    else:
+        draft = Category.objects.create(name="Черновик", is_published=False, order=0)
+        CategoryService.objects.create(category=draft, service=data.service)
+        slug = draft.slug
+    response = client.get(data.service.get_absolute_url(), {"category": slug})
+    assert response.status_code == 200
+    assert "Ещё в категории «Парк»" in response.content.decode()
+
+
+def test_service_page_canonical_ignores_category_param(client, two_categories):
+    data = two_categories
+    html = client.get(data.service.get_absolute_url(), {"category": data.hotel.slug}).content.decode()
+    clean_url = f"http://testserver{data.service.get_absolute_url()}"
+    assert f'<link rel="canonical" href="{clean_url}">' in html
+    assert f'<meta property="og:url" content="{clean_url}">' in html
+
+
+def test_category_page_links_pass_category_unless_default(client, two_categories):
+    data = two_categories
+    park_html = client.get(data.park.get_absolute_url()).content.decode()
+    assert f'href="{data.service.get_absolute_url()}"' in park_html
+    hotel_html = client.get(data.hotel.get_absolute_url()).content.decode()
+    assert f'href="{data.service.get_absolute_url()}?category={data.hotel.slug}"' in hotel_html
+    assert f'href="{data.hotel_only.get_absolute_url()}"' in hotel_html  # другой категории у неё нет
+
+
+def test_related_cards_keep_category(client, two_categories):
+    data = two_categories
+    html = client.get(data.service.get_absolute_url(), {"category": data.hotel.slug}).content.decode()
+    urls = _related_urls(html)
+    assert f"{data.both.get_absolute_url()}?category={data.hotel.slug}" in urls
+    assert data.hotel_only.get_absolute_url() in urls
