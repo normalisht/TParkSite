@@ -40,7 +40,7 @@ docker compose -f compose.dev.yaml up --build --renew-anon-volumes  # локал
 docker compose -f compose.dev.yaml exec tpark-dev python manage.py createsuperuser
 docker compose up -d --build                      # продакшен (корневой .env из .env.example, нужна внешняя сеть PROXY_NETWORK); обновление — `make up` (сборка, бэкап работающего сайта, запуск)
 docker compose -f compose.nginx.yaml up -d --build # продакшен без общего прокси: свой nginx на 80/443, сам выпускает сертификат Let's Encrypt (README)
-make service-install && make service-deploy        # продакшен без Docker: systemd-юнит + gunicorn на unix-сокете (deploy/, README)
+make service-install && make service-deploy        # продакшен без Docker: systemd-юнит + gunicorn на unix-сокете (deploy/, README); обновление — `make service-update` (git pull + service-deploy, от root сам идёт через su от пользователя сайта)
 ```
 
 ## Architecture

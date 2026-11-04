@@ -195,6 +195,37 @@ def test_make_up_backs_up_only_running_site():
     assert "up -d --build" not in recipe
 
 
+def _make_recipe(target: str) -> str:
+    makefile = (ROOT / "Makefile").read_text(encoding="utf-8")
+    return makefile.split(f"\n{target}:", 1)[1].split("\n\n", 1)[0]
+
+
+def test_service_update_deploys_with_fresh_makefile():
+    # Деплой — в отдельном make: иначе шаги брались бы из Makefile, прочитанного до git pull.
+    recipe = _make_recipe("service-update-steps")
+    assert recipe.index("git pull --ff-only") < recipe.index("$(MAKE) --no-print-directory service-deploy-steps")
+
+
+def test_service_deploy_checks_site_right_after_reload():
+    recipe = _make_recipe("service-deploy-steps")
+    assert (
+        recipe.index("backup.sh --host")
+        < recipe.index("migrate --noinput")
+        < recipe.index("reload-or-restart")
+        < recipe.index("service-health")
+        < recipe.index("generate_missing_images")
+    )
+
+
+def test_service_commands_run_as_site_user():
+    # Файлы, созданные от root (.venv, -wal базы), сервис не прочитает; $(MAKE) выполнился бы и при make -n.
+    for target in ("service-update", "service-deploy", "service-superuser", "service-shell", "service-manage"):
+        recipe = _make_recipe(target)
+        assert "$(call as_site_user," in recipe, target
+        assert "$(MAKE)" not in recipe, target
+    assert "$(call as_site_user," in _make_recipe("service-backup")
+
+
 def test_backup_rotation_touches_only_dated_folders():
     # Папки вроде backups/legacy-source/ ротация удалять не должна: только backups/YYYY-MM-DD_HHMM.
     script = (ROOT / "scripts" / "backup.sh").read_text(encoding="utf-8")
