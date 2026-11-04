@@ -173,6 +173,12 @@ def test_default_address(db):
     assert SiteSettings.load().address == "Калужская область, Жуковский район, село Восход"
 
 
+def test_breadcrumb_list_named_after_current_page(client):
+    category = Category.objects.create(name="Сплавы", is_published=True)
+    nodes = ld_nodes(client.get(category.get_absolute_url()).content.decode())
+    assert nodes["BreadcrumbList"]["name"] == "Сплавы"
+
+
 def test_category_breadcrumbs_and_offers(client):
     category = Category.objects.create(name="Сплавы", is_published=True)
     priced = Service.objects.create(name="Сплав", price="2 000", price_unit="человек", has_page=True)

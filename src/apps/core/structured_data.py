@@ -5,9 +5,11 @@
 """
 
 import re
+from datetime import datetime, time
 
 from django.templatetags.static import static
 from django.urls import reverse
+from django.utils import timezone
 
 from apps.core.images import safe_spec_url
 from apps.core.models import SiteSettings
@@ -72,14 +74,15 @@ def organization(request, *, with_founder: bool = False) -> dict:
 def breadcrumbs(request, items: list[tuple[str, str]]) -> dict:
     """`BreadcrumbList` из [(название, путь)]; у последней крошки (текущей страницы) путь можно не указывать.
 
-    Адрес — в двух полях: Google читает `item`, навигационная цепочка Яндекса — `url`."""
+    Адрес — в двух полях: Google читает `item`, навигационная цепочка Яндекса — `url`.
+    `name` списка на витрине не виден: он нужен, чтобы отчёт Search Console не подписывал строки «Без названия»."""
     elements = []
     for position, (name, url) in enumerate(items, start=1):
         element = {"@type": "ListItem", "position": position, "name": name}
         if url:
             element["item"] = element["url"] = request.build_absolute_uri(url)
         elements.append(element)
-    return {"@type": "BreadcrumbList", "itemListElement": elements}
+    return {"@type": "BreadcrumbList", "name": items[-1][0], "itemListElement": elements}
 
 
 def home_crumb() -> tuple[str, str]:
@@ -121,7 +124,7 @@ def service_list(request, category, services) -> dict:
     }
 
 
-def price_offer(text: str, url: str, available: bool = True) -> dict | None:
+def price_offer(text: str, url: str, valid_from: str, available: bool = True) -> dict | None:
     """Цена из свободного текста («1000 ₽ с участника», «Бесплатно») — `Offer`; без числа — None.
 
     У прошедшего события `available=False`: предложение остаётся (цена видна), но «в наличии» не заявляем."""
@@ -131,10 +134,16 @@ def price_offer(text: str, url: str, available: bool = True) -> dict | None:
         amount = re.sub(r"\D", "", match.group())
     else:
         return None
-    offer = {"@type": "Offer", "price": amount, "priceCurrency": "RUB", "url": url}
+    offer = {"@type": "Offer", "price": amount, "priceCurrency": "RUB", "url": url, "validFrom": valid_from}
     if available:
         offer["availability"] = "https://schema.org/InStock"
     return offer
+
+
+def offer_valid_from(event) -> str:
+    """Цена действует с последней правки; правка прошедшего события не должна сдвигать дату позже его начала."""
+    start = event.starts_at or datetime.combine(event.date, time.min, tzinfo=timezone.get_current_timezone())
+    return min(timezone.localtime(event.updated_at), start).isoformat(timespec="seconds")
 
 
 def event(request, event, seo: dict) -> dict:
@@ -159,7 +168,11 @@ def event(request, event, seo: dict) -> dict:
             ),
             "organizer": {"@id": organization_id(request)},
             "performer": {"@id": organization_id(request)},
-            "offers": price_offer(event.price, url, available=not event.is_past) if event.price else None,
+            "offers": (
+                price_offer(event.price, url, offer_valid_from(event), available=not event.is_past)
+                if event.price
+                else None
+            ),
         }
     )
 

@@ -1,6 +1,6 @@
 import json
 import re
-from datetime import date, time, timedelta
+from datetime import UTC, date, datetime, time, timedelta
 
 import pytest
 from django.utils import timezone
@@ -82,6 +82,7 @@ def test_event_page_json_ld_time_period_and_offer(client):
         "priceCurrency": "RUB",
         "url": data["url"],
         "availability": "https://schema.org/InStock",
+        "validFrom": data["offers"]["validFrom"],
     }
 
 
@@ -245,3 +246,22 @@ def test_past_event_offer_has_no_availability(client):
     node = next(n for n in _graph(html) if n["@type"] == "Event")
     assert node["offers"]["price"] == "500"
     assert "availability" not in node["offers"]
+
+
+def test_offer_valid_from_is_last_edit_in_site_timezone(client):
+    event = Event.objects.create(title="Слёт", date=date(2099, 7, 1), price="500")
+    Event.objects.filter(pk=event.pk).update(updated_at=datetime(2026, 10, 1, 12, 0, 30, 500, tzinfo=UTC))
+    node = next(n for n in _graph(client.get(event.get_absolute_url()).content.decode()) if n["@type"] == "Event")
+    assert node["offers"]["validFrom"] == "2026-10-01T15:00:30+03:00"
+
+
+@pytest.mark.parametrize(
+    ("start_time", "expected"),
+    [(time(18, 0), "2020-07-01T18:00:00+03:00"), (None, "2020-07-01T00:00:00+03:00")],
+)
+def test_offer_valid_from_not_later_than_event_start(client, start_time, expected):
+    event = Event.objects.create(
+        title="Слёт", date=date(2020, 7, 1), start_time=start_time, price="500", show_after_date=True
+    )
+    node = next(n for n in _graph(client.get(event.get_absolute_url()).content.decode()) if n["@type"] == "Event")
+    assert node["offers"]["validFrom"] == expected
