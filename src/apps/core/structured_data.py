@@ -70,12 +70,14 @@ def organization(request, *, with_founder: bool = False) -> dict:
 
 
 def breadcrumbs(request, items: list[tuple[str, str]]) -> dict:
-    """`BreadcrumbList` из [(название, путь)]; у последней крошки (текущей страницы) путь можно не указывать."""
+    """`BreadcrumbList` из [(название, путь)]; у последней крошки (текущей страницы) путь можно не указывать.
+
+    Адрес — в двух полях: Google читает `item`, навигационная цепочка Яндекса — `url`."""
     elements = []
     for position, (name, url) in enumerate(items, start=1):
         element = {"@type": "ListItem", "position": position, "name": name}
         if url:
-            element["item"] = request.build_absolute_uri(url)
+            element["item"] = element["url"] = request.build_absolute_uri(url)
         elements.append(element)
     return {"@type": "BreadcrumbList", "itemListElement": elements}
 

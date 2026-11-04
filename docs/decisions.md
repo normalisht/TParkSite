@@ -103,7 +103,7 @@
   - `SECURE_SSL_REDIRECT` включается переменной: при прокси без `X-Forwarded-Proto` редиректы зациклятся.
 - **JSON-LD в `@graph`** (`apps/core/structured_data.py`):
   - `LocalBusiness` с адресом, телефонами, координатами и `sameAs` на VK и карточку Яндекс Карт;
-  - `BreadcrumbList`;
+  - `BreadcrumbList` — на всех страницах, кроме главной, вместе с видимыми крошками над заголовком; адрес крошки — в `item` (Google) и `url` (навигационная цепочка Яндекса читает только `name`, `url`, `position`);
   - `Service` / `Offer` (только для числовой цены, в RUB);
   - `Event` с `endDate`.
   - Услуги и мероприятия ссылаются на организацию по `@id`.

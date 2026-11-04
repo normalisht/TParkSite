@@ -182,7 +182,13 @@ def test_category_breadcrumbs_and_offers(client):
     html = client.get(category.get_absolute_url()).content.decode()
     nodes = ld_nodes(html)
     crumbs = nodes["BreadcrumbList"]["itemListElement"]
-    assert crumbs[0] == {"@type": "ListItem", "position": 1, "name": "Главная", "item": "http://testserver/"}
+    assert crumbs[0] == {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Главная",
+        "item": "http://testserver/",
+        "url": "http://testserver/",
+    }
     assert crumbs[1] == {"@type": "ListItem", "position": 2, "name": "Сплавы"}
     assert 'aria-label="Хлебные крошки"' in html
     first, second = (item["item"] for item in nodes["ItemList"]["itemListElement"])
@@ -191,6 +197,23 @@ def test_category_breadcrumbs_and_offers(client):
     assert first["offers"]["priceSpecification"]["unitText"] == "человек"
     assert first["url"] == f"http://testserver{priced.get_absolute_url()}"
     assert "offers" not in second and "url" not in second
+
+
+@pytest.mark.parametrize(
+    ("url", "title"),
+    [
+        ("/events/", "Мероприятия"),
+        ("/about/", "О нас"),
+        ("/reviews/", "Отзывы"),
+        ("/gallery/", "Галерея"),
+        ("/contacts/", "Контакты"),
+    ],
+)
+def test_static_pages_breadcrumbs(client, url, title):
+    html = client.get(url).content.decode()
+    crumbs = ld_nodes(html)["BreadcrumbList"]["itemListElement"]
+    assert [(c["name"], c.get("url")) for c in crumbs] == [("Главная", "http://testserver/"), (title, None)]
+    assert f'<span aria-current="page">{title}</span>' in html
 
 
 def test_service_page_ld(client):
