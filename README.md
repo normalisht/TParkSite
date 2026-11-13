@@ -74,4 +74,12 @@ chmod 440 /etc/sudoers.d/tpark && visudo -c
 
 Переход со старого сайта: оба сервиса могут работать одновременно (`t-camp.ru.service` и `tpark.service`) — поднять новый (`make service-install service-deploy`), убрать старый сайт из `/etc/nginx/sites-enabled/` (с тем же `server_name` nginx возьмёт только первый из двух), `make nginx-install`, проверить, затем `sudo systemctl disable --now t-camp.ru.service`.
 
+#### Автодеплой из GitHub Actions
+
+После вливания PR в `main` и зелёного CI запускается `.github/workflows/deploy.yml` (вручную — Actions → Deploy → Run workflow). Окружение `production` требует подтверждения: прогон ждёт кнопки «Review deployments → Approve and deploy». Дальше runner заходит по SSH ключом, который на сервере может выполнить только `deploy/ci-deploy.sh`: скрипт получает SHA прошедшего CI коммита, проверяет, что он есть в `origin/main`, делает fast-forward (более старый коммит после нового не выкатывает) и запускает `make service-deploy`. В `main` нельзя влить PR без зелёных проверок `test` и `image`.
+
+Настройка (один раз):
+- в `~/.ssh/authorized_keys` пользователя сайта — `command="<каталог репозитория>/deploy/ci-deploy.sh",restrict ssh-ed25519 … github-actions-deploy@TParkSite` (ключ — только для CI; не root: скрипт лежит в репозитории, который может менять пользователь сайта);
+- в окружении `production` репозитория — секреты `DEPLOY_SSH_KEY` (приватный ключ), `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_KNOWN_HOSTS` (`ssh-keyscan <хост>`, сверив отпечатки).
+
 Остальное: `make service-status`, `make service-logs` (journald), `make service-health` (сайт отвечает и видит БД), `make service-restart` (полный перезапуск — после обновления Python или gunicorn: `reload` их не подхватывает), `make service-shell` (Django shell), `make service-manage CMD="…"` (любая команда `manage.py`), разблокировка админки — `make service-manage CMD="axes_reset"`.

@@ -43,6 +43,8 @@ docker compose -f compose.nginx.yaml up -d --build # продакшен без �
 make service-install && make service-deploy        # продакшен без Docker: systemd-юнит + gunicorn на unix-сокете (deploy/, README); обновление — `make service-update` (git pull + service-deploy, от root сам идёт через su от пользователя сайта)
 ```
 
+Боевой сайт (systemd, пользователь `t_camp_ru_usr`) обновляется сам: после зелёного CI на `main` — `.github/workflows/deploy.yml`, ждёт подтверждения в окружении `production`, затем по SSH-ключу с принудительной командой `deploy/ci-deploy.sh` (только SHA из `origin/main`, fast-forward, `make service-deploy`). Влить PR в `main` можно только с зелёными `test` и `image` (README, «Автодеплой»).
+
 ## Architecture
 
 Пути ниже — относительно `src/`.
