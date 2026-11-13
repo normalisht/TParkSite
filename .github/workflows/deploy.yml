@@ -1,0 +1,54 @@
+# Деплой на сервер: после зелёного CI на push в main (вливание PR) или вручную (Actions → Deploy → Run workflow).
+# Окружение production требует подтверждения: прогон ждёт кнопки «Review deployments».
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Деплои — строго по очереди; начатый не отменяется, иначе сайт остался бы посреди миграций.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: production
+      url: https://t-camp.ru
+    env:
+      # Выкатывается коммит, прошедший CI, а не текущая голова main.
+      SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+    steps:
+      - name: SSH-ключ
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      # Ключ на сервере ограничен принудительной командой deploy/ci-deploy.sh: она получает только SHA.
+      - name: Деплой ${{ env.SHA }}
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+        run: >-
+          ssh -i ~/.ssh/deploy_key -o BatchMode=yes -o StrictHostKeyChecking=yes -o ServerAliveInterval=30
+          "$DEPLOY_USER@$DEPLOY_HOST" "$SHA"
+
+      - name: Сайт отвечает
+        run: curl -fsS -o /dev/null --retry 5 --retry-delay 5 --retry-all-errors --max-time 30 https://t-camp.ru/healthz/
