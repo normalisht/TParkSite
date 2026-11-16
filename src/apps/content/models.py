@@ -3,20 +3,22 @@ from urllib.parse import urlsplit
 
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.formats import date_format
+from django.utils.functional import cached_property
 from django.utils.html import strip_tags
 from django.utils.text import Truncator
 
+from apps.content.dzen import DzenEmbedURLField, format_duration
 from apps.core.fields import HtmlField, full_spec, image_spec, image_specs, og_spec, photo_field
 from apps.core.files import clone_file
 from apps.core.indexnow import remember_page_change
 from apps.core.models import COPY_SUFFIX, OrderedModel, PublishedQuerySet, SeoModel, TrashableModel
 from apps.core.redirects import remember_slug_change
 from apps.core.rotation import daily_pick
-from apps.core.slugs import unique_slug
+from apps.core.slugs import SLUG_HELP, unique_slug
 
 
 def _not_over(today) -> Q:
@@ -276,3 +278,106 @@ class GalleryPhoto(OrderedModel):
         ids = daily_pick(list(cls.objects.values_list("pk", flat=True)), size, key)
         photos = cls.objects.in_bulk(ids)
         return [photos[pk] for pk in ids]
+
+
+class Video(OrderedModel):
+    embed_url = DzenEmbedURLField("Видео с Дзена", max_length=255, unique=True)
+    title = models.CharField("Название", max_length=255)
+    description = models.TextField("Описание", blank=True)
+    duration = models.PositiveIntegerField("Длительность, сек", null=True, blank=True)
+    # Пустой в БД бывает только до сохранения формы: форма админки гарантирует обложку.
+    poster = photo_field("Обложка", "gallery/video", blank=True)
+    is_published = models.BooleanField("Опубликовано", default=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    collections = models.ManyToManyField(
+        "VideoCollection", through="VideoCollectionItem", related_name="videos", blank=True
+    )
+    card, card_avif = image_specs("poster", 800, 450)
+    card_small, card_small_avif = image_specs("poster", 480, 270)
+    square, square_avif = image_specs("poster", 400, 400)
+    og = og_spec("poster")
+
+    objects = PublishedQuerySet.as_manager()
+
+    class Meta(OrderedModel.Meta):
+        verbose_name = "Видео"
+        verbose_name_plural = "Видео"
+
+    def __str__(self):
+        return self.title
+
+    @property
+    def duration_text(self) -> str:
+        return format_duration(self.duration)
+
+
+class VideoCollectionQuerySet(PublishedQuerySet):
+    def shown(self):
+        """Опубликованные подборки, где есть хотя бы один опубликованный ролик."""
+        return (
+            self.published()
+            .annotate(video_count=Count("items", filter=Q(items__video__is_published=True), distinct=True))
+            .filter(video_count__gt=0)
+            .order_by("order", "id")
+        )
+
+
+class VideoCollection(SeoModel, OrderedModel):
+    title = models.CharField("Название", max_length=255)
+    slug = models.SlugField("Адрес страницы", max_length=255, unique=True, blank=True, help_text=SLUG_HELP)
+    description = models.TextField("Описание", blank=True)
+    cover = photo_field("Обложка", "gallery/collections")
+    is_published = models.BooleanField("Опубликовано", default=True)
+    cover_square, cover_square_avif = image_specs("cover", 400, 400)
+    cover_og = og_spec("cover")
+
+    objects = VideoCollectionQuerySet.as_manager()
+
+    class Meta(OrderedModel.Meta):
+        verbose_name = "Подборка видео"
+        verbose_name_plural = "Подборки видео"
+
+    def __str__(self):
+        return self.title
+
+    def slug_source(self) -> str:
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = unique_slug(self, self.slug_source())
+        with transaction.atomic():
+            remember_slug_change(self)
+            remember_page_change(self)
+            super().save(*args, **kwargs)
+
+    def get_absolute_url(self) -> str:
+        return reverse("content:video_collection", args=[self.slug])
+
+    def shown_videos(self) -> list[Video]:
+        return list(
+            Video.objects.published()
+            .filter(collection_items__collection=self)
+            .order_by("collection_items__order", "collection_items__id")
+        )
+
+    @cached_property
+    def cover_video(self) -> Video | None:
+        return next(iter(self.shown_videos()), None)
+
+
+class VideoCollectionItem(models.Model):
+    collection = models.ForeignKey(VideoCollection, on_delete=models.CASCADE, related_name="items")
+    video = models.ForeignKey(Video, on_delete=models.CASCADE, related_name="collection_items")
+    order = models.PositiveIntegerField("Порядок", default=0)
+
+    class Meta:
+        ordering = ["order", "id"]
+        verbose_name = "Видео в подборке"
+        verbose_name_plural = "Видео в подборках"
+        constraints = [
+            models.UniqueConstraint(fields=["collection", "video"], name="unique_video_in_collection"),
+        ]
+
+    def __str__(self):
+        return f"{self.collection_id}: {self.video_id}"
