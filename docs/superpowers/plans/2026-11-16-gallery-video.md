@@ -390,3 +390,31 @@ def test_caption_below_frame_on_phone(...): ...               # 390×844: descri
   роликами канала (несколько роликов и подборок, добавленных через админку на копии базы); показать пользователю.
 - [ ] **Step 3 (после выбора):** выбранный вариант — в основной шаблон, остальные шаблоны и переключатель удалить,
   тесты Task 4/5 поправить под выбранную разметку, снова Task 7 Step 2.
+
+### Task 9: Выбранный дизайн и теги ролика
+
+Выбор заказчика: карточка 1, подборки 3 (спецификация, «Варианты дизайна» → «Выбор заказчика», «Теги на карточке ролика»).
+
+**Files:**
+- Modify: `src/apps/content/views.py` (убрать `design_variants` и `variant_query`), шаблоны `content/gallery_video.html`,
+  `video_collection.html`, `partials/video_card.html` и др.: полки — основной вид подборок; удалить шаблоны вариантов
+  карточки 2/3 и подборок 1/2 и неиспользуемые partials; `src/apps/content/models.py` (`Video.show_collection_tags =
+  BooleanField("Показывать подборки на карточке", default=True, help_text=…)`, `Video.services =
+  ManyToManyField("catalog.Service", verbose_name="Услуги", related_name="videos", blank=True, help_text=…)`), миграция
+  `content`; `src/apps/content/admin.py` (поля в форме ролика, `autocomplete_fields = ["services"]`); справка
+  `templates/admin/help/sections/gallery.html`; тексты «Смотреть все» и др. — в «Тексты сайта» (реестр + data-миграция).
+- Test: `src/tests/test_gallery_video.py`, `src/tests/test_admin_video.py`, `src/tests/test_video_models.py`
+
+**Interfaces:** `Video.shown_collection_tags` (или аналог, вычисляемый во view) — подборки для тегов с учётом галочки
+и текущей подборки; `Video.shown_services` — услуги, страница которых открыта; полки — одним фиксированным числом
+запросов на страницу.
+
+- [ ] **Step 1: Тесты:** `test_collection_tags_hidden_when_unchecked`, `test_collection_page_excludes_current_collection_tag`,
+  `test_service_tags_link_to_service_pages`, `test_unpublished_or_pageless_service_tag_hidden`,
+  `test_service_tags_shown_when_collection_tags_off`, `test_video_tab_query_count_constant` (N подборок/роликов → то же
+  число запросов), `test_design_switch_removed` (`?card=2&collections=1` при DEBUG — та же страница, что без параметров),
+  админка: `test_video_form_saves_services_and_checkbox`.
+- [ ] **Step 2:** прогнать — FAIL.
+- [ ] **Step 3:** реализовать.
+- [ ] **Step 4:** `uv run pytest`, e2e `tests/e2e/test_video_lightbox.py`, ruff, `makemigrations --check`, `tailwind build` —
+  PASS; скриншоты `/gallery/video/` и подборки (1280×800, 390×844) на демо-базе — просмотреть.
