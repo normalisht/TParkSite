@@ -377,6 +377,11 @@ class VideoCollection(SeoModel, OrderedModel):
     def get_absolute_url(self) -> str:
         return reverse("content:video_collection", args=[self.slug])
 
+    @property
+    def has_page(self) -> bool:
+        """Страница подборки без опубликованных роликов — 404 (`views.video_collection`): IndexNow её не шлёт."""
+        return self.pk is not None and self.items.filter(video__is_published=True).exists()
+
     def shown_videos(self) -> list[Video]:
         return list(
             Video.objects.published()

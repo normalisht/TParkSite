@@ -33,7 +33,8 @@ def enabled() -> bool:
 
 
 def _is_public(obj) -> bool:
-    return obj.is_published and not obj.in_trash and getattr(obj, "has_page", True)
+    # Корзина и `has_page` есть не у всех моделей со страницами (у подборок видео корзины нет).
+    return obj.is_published and not getattr(obj, "in_trash", False) and getattr(obj, "has_page", True)
 
 
 def remember_page_change(instance) -> None:
