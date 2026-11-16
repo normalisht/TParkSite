@@ -206,7 +206,7 @@ DZEN_ERROR = (
 
 
 class VideoAdminForm(forms.ModelForm):
-    """При новом или сменённом коде ролика берёт с Дзена название, описание, длительность и обложку (`self.dzen`,
+    """При новом или сменённом коде ролика берёт с Дзена название, описание, адрес ролика, длительность и обложку (`self.dzen`,
     `self.dzen_poster`). Заполняет только поля, которые администратор не задал сам: у новой записи — пустые,
     при смене ролика — все, кроме изменённых в этой же отправке."""
 
@@ -263,11 +263,16 @@ class VideoAdminForm(forms.ModelForm):
             # Без Дзена сохранить можно, только если название и обложку администратор задал сам.
             if not (own_title and own_poster):
                 self.add_error("embed_url", DZEN_ERROR.format(exc))
+            # Адрес прежнего ролика к новому не подходит: как и длительность, без Дзена сбрасываем.
+            if not self._admin_value(cleaned, "dzen_url"):
+                cleaned["dzen_url"] = ""
             return
         if not own_title:
             cleaned["title"] = self.dzen.title
         if not self._admin_value(cleaned, "description"):
             cleaned["description"] = self.dzen.description
+        if not self._admin_value(cleaned, "dzen_url"):
+            cleaned["dzen_url"] = self.dzen.watch_url
         if own_poster:
             return
         try:
@@ -313,7 +318,16 @@ class VideoAdmin(OrderedPhotoAdmin):
     help_anchor = "gallery"
     form = VideoAdminForm
     formfield_overrides = {DzenEmbedURLField: {"widget": UnfoldAdminTextareaWidget(attrs={"rows": 3})}}
-    fields = ["embed_url", "title", "description", "poster", "services", "show_collection_tags", "is_published"]
+    fields = [
+        "embed_url",
+        "title",
+        "description",
+        "dzen_url",
+        "poster",
+        "services",
+        "show_collection_tags",
+        "is_published",
+    ]
     autocomplete_fields = ["services"]
     inlines = [VideoCollectionItemInline]
     list_display = ["preview", "title", "collections_list", "is_published"]

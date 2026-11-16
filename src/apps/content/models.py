@@ -11,7 +11,7 @@ from django.utils.functional import cached_property
 from django.utils.html import strip_tags
 from django.utils.text import Truncator
 
-from apps.content.dzen import DzenEmbedURLField, format_duration
+from apps.content.dzen import DzenEmbedURLField, format_duration, validate_dzen_page_url
 from apps.core.fields import HtmlField, full_spec, image_spec, image_specs, og_spec, photo_field
 from apps.core.files import clone_file
 from apps.core.indexnow import remember_page_change
@@ -285,6 +285,14 @@ class Video(OrderedModel):
     title = models.CharField("Название", max_length=255)
     description = models.TextField("Описание", blank=True)
     duration = models.PositiveIntegerField("Длительность, сек", null=True, blank=True)
+    dzen_url = models.URLField(
+        "Ролик на Дзене",
+        max_length=255,
+        blank=True,
+        validators=[validate_dzen_page_url],
+        help_text="Ссылка «Открыть на Дзене» под плеером в просмотре ролика. Пусто — сайт возьмёт адрес с Дзена "
+        "вместе с названием; без адреса ссылки нет.",
+    )
     # Пустой в БД бывает только до сохранения формы: форма админки гарантирует обложку.
     poster = photo_field("Обложка", "gallery/video", blank=True)
     is_published = models.BooleanField("Опубликовано", default=True)

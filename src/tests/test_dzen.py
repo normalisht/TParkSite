@@ -15,11 +15,13 @@ from apps.content.dzen import (
     fetch_video,
     format_duration,
     parse_video_page,
+    validate_dzen_page_url,
     validate_embed_url,
 )
 
 EMBED = "https://dzen.ru/embed/oakZI1TIPAAA"
 THUMB = "https://avatars.dzeninfra.ru/get-zen_doc/123/abc/smart_crop_516x290"
+WATCH = "https://dzen.ru/video/watch/6af4c9206275f93a7e1ff96b"
 
 
 @pytest.fixture
@@ -90,8 +92,40 @@ def test_form_field_extracts_iframe():
 
 def test_parse_video_page(fixture_page):
     assert parse_video_page(fixture_page) == DzenVideo(
-        "Т-парк. Фрироуп 3. Железный век", "Это третье видео…", 925, THUMB
+        "Т-парк. Фрироуп 3. Железный век", "Это третье видео…", 925, THUMB, WATCH
     )
+
+
+@pytest.mark.parametrize(
+    "fragment",
+    [
+        '"url":"https://dzen.ru/video/watch/6af4c9206275f93a7e1ff96b"',
+        '<link rel="canonical" href="https://dzen.ru/video/watch/6af4c9206275f93a7e1ff96b?from=embed">',
+        '"shareUrl":"https:\\/\\/dzen.ru\\/video\\/watch\\/6af4c9206275f93a7e1ff96b"',
+    ],
+    ids=["plain", "with-query", "escaped-slashes"],
+)
+def test_parse_video_page_watch_url(fragment):
+    page = f'<title>Ролик</title>{{"thumbnail":"https://avatars.dzeninfra.ru/x/y"}}{fragment}'
+    assert parse_video_page(page).watch_url == WATCH
+
+
+def test_parse_video_page_without_watch_url():
+    page = '<title>Ролик</title>{"thumbnail":"https://avatars.dzeninfra.ru/x/y"}'
+    assert parse_video_page(page).watch_url == ""
+
+
+@pytest.mark.parametrize("url", [WATCH, "https://dzen.ru/t_park"])
+def test_validate_dzen_page_url_accepts(url):
+    validate_dzen_page_url(url)
+
+
+@pytest.mark.parametrize(
+    "url", ["http://dzen.ru/video/watch/x", "https://evil.ru/video/watch/x", "https://dzen.ru.evil.ru/x"]
+)
+def test_validate_dzen_page_url_rejects(url):
+    with pytest.raises(ValidationError, match="dzen.ru"):
+        validate_dzen_page_url(url)
 
 
 def test_parse_video_page_strips_suffix_and_unescapes():

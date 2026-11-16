@@ -448,3 +448,38 @@ def test_design_switch_removed(client, make_video, make_collection, settings, pa
     plain = client.get(path).content.decode()
     assert client.get(f"{path}?card=2&collections=1").content.decode() == plain
     assert "?card=" not in plain and "collections=" not in plain
+
+
+CHANNEL = "https://dzen.ru/t_park"
+
+
+def channel_links(html):
+    return re.findall(r"<a [^>]*data-dzen-channel[^>]*>.*?</a>", html, re.DOTALL)
+
+
+@pytest.mark.parametrize("path", ["/gallery/video/", "/gallery/video/pervaia/"])
+def test_channel_button_from_settings(client, make_video, make_collection, path):
+    from apps.core.models import SiteSettings
+
+    add(make_collection("Первая"), make_video())
+    site = SiteSettings.load()
+    site.dzen_url = CHANNEL
+    site.save()
+    [link] = channel_links(client.get(path).content.decode())
+    assert f'href="{CHANNEL}"' in link and 'target="_blank"' in link and 'rel="noopener"' in link
+    assert "img/social/dzen" in link and "Канал на Дзене" in link
+    site.dzen_url = ""
+    site.save()
+    assert channel_links(client.get(path).content.decode()) == []
+
+
+def test_card_passes_dzen_url_to_lightbox(client, make_video):
+    make_video(title="С адресом", dzen_url="https://dzen.ru/video/watch/6af4c9206275f93a7e1ff96b")
+    make_video(title="Без адреса")
+    cards = {
+        re.search(r'data-title="([^"]*)"', c).group(1): c
+        for c in _cards(client.get("/gallery/video/").content.decode())
+    }
+    assert 'data-dzen-url="https://dzen.ru/video/watch/6af4c9206275f93a7e1ff96b"' in cards["С адресом"]
+    assert 'data-dzen-label="Открыть на Дзене"' in cards["С адресом"]
+    assert "data-dzen" not in cards["Без адреса"]

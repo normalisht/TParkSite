@@ -1,6 +1,6 @@
-{% load site_tags %}
-{# Карточка ролика: ссылка открывает просмотр (GLightbox, плеер Дзена — только по клику), теги (подборки, затем услуги) — отдельными ссылками под ней. sizes — сетка в 1/2/3 колонки (content/partials/video_grid.html). #}
-<a class="glightbox group block rounded-xl outline-none focus-visible:ring-4 focus-visible:ring-brand-500" href="{{ video.embed_url }}" data-type="external" data-gallery="{{ gallery }}" data-title="{{ video.title }}" aria-label="Видео: {{ video.title }}">
+{% load site_tags site_texts %}
+{# Карточка ролика: ссылка открывает просмотр (GLightbox, плеер Дзена — только по клику), теги (подборки, затем услуги) — отдельными ссылками под ней; data-dzen-* — ссылка «Открыть на Дзене» в просмотре (site.js). sizes — сетка в 1/2/3 колонки (content/partials/video_grid.html). #}
+<a class="glightbox group block rounded-xl outline-none focus-visible:ring-4 focus-visible:ring-brand-500" href="{{ video.embed_url }}" data-type="external" data-gallery="{{ gallery }}" data-title="{{ video.title }}"{% if video.dzen_url %} data-dzen-url="{{ video.dzen_url }}" data-dzen-label="{% text "gallery.open_on_dzen" %}"{% endif %} aria-label="Видео: {{ video.title }}">
   <span class="relative block aspect-video overflow-hidden rounded-xl bg-sand-200">
     {% picture video "card_small 480w, card 800w" sizes="(min-width: 1152px) 357px, (min-width: 1024px) calc((100vw - 80px) / 3), (min-width: 640px) calc(50vw - 28px), calc(100vw - 32px)" alt="" width=800 height=450 loading=loading fetchpriority=fetchpriority class="h-full w-full object-cover transition duration-500 group-hover:scale-105" %}
     <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span>

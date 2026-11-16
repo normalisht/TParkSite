@@ -1,6 +1,7 @@
 """Ролики с Дзена в галерее: нормализация кода «Встроить» и данные ролика для кнопки «Подтянуть» в админке.
 
-Официального API нет: название, описание, длительность и обложку берём со страницы плеера (https://dzen.ru/embed/<id>).
+Официального API нет: название, описание, длительность, обложку и адрес ролика на Дзене берём со страницы плеера
+(https://dzen.ru/embed/<id>).
 Если Дзен поменяет разметку, кнопка вернёт ошибку и поля заполняются вручную.
 """
 
@@ -40,6 +41,8 @@ _JSON_TITLE_RE = re.compile(r'"title":"((?:[^"\\]|\\.)*)"')
 _DESCRIPTION_RE = re.compile(r'"description":"((?:[^"\\]|\\.)*)"')
 _THUMBNAIL_RE = re.compile(r'"thumbnail":"((?:[^"\\]|\\.)*)"')
 _DURATION_RE = re.compile(r'"duration":(\d+)')
+# Адрес ролика на Дзене: в JSON страницы плеера косая черта бывает экранирована (\/).
+_WATCH_RE = re.compile(r"dzen\.ru(?:\\?/)video(?:\\?/)watch(?:\\?/)([0-9a-f]{24})(?![0-9a-f])")
 _TITLE_SUFFIX = " | Дзен"
 
 
@@ -57,6 +60,12 @@ def extract_embed_url(value: str) -> str:
 def validate_embed_url(value: str) -> None:
     if not _EMBED_URL_RE.fullmatch(value or ""):
         raise ValidationError(EMBED_ERROR)
+
+
+def validate_dzen_page_url(value: str) -> None:
+    parts = urlsplit(value or "")
+    if parts.scheme != "https" or parts.hostname != PAGE_HOST:
+        raise ValidationError("Нужна ссылка на страницу Дзена: https://dzen.ru/…")
 
 
 class DzenEmbedFormField(forms.URLField):
@@ -90,6 +99,7 @@ class DzenVideo:
     description: str
     duration: int | None
     thumbnail_url: str
+    watch_url: str = ""
 
 
 class HostOnlyRedirects(HTTPRedirectHandler):
@@ -134,11 +144,13 @@ def parse_video_page(page: str) -> DzenVideo:
         raise DzenFetchError("Не удалось найти данные ролика на странице Дзена.")
     description = _DESCRIPTION_RE.search(page)
     duration = _DURATION_RE.search(page)
+    watch = _WATCH_RE.search(page)
     return DzenVideo(
         title=title,
         description=_json_string(description.group(1)).strip() if description else "",
         duration=int(duration.group(1)) if duration else None,
         thumbnail_url=_json_string(thumbnail.group(1)),
+        watch_url=f"https://{PAGE_HOST}/video/watch/{watch.group(1)}" if watch else "",
     )
 
 

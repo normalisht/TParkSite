@@ -203,21 +203,29 @@ document.addEventListener("DOMContentLoaded", () => {
     const name = link.dataset.gallery;
     videoGalleries.set(name, [...(videoGalleries.get(name) || []), link]);
   });
+  // Кавычки тоже: результат попадает и в значение атрибута.
   const escapeHtml = (text) => {
     const span = document.createElement("span");
     span.textContent = text;
-    return span.innerHTML;
+    return span.innerHTML.replaceAll('"', "&quot;");
   };
+  // «Открыть на Дзене» под плеером — только у ролика с адресом на Дзене (data-dzen-* карточки).
+  const dzenLink = ({ dzenUrl, dzenLabel }) =>
+    dzenUrl
+      ? `<a class="video-dzen-link" href="${escapeHtml(dzenUrl)}" target="_blank" rel="noopener">${escapeHtml(dzenLabel || "")}</a>`
+      : "";
   if (window.GLightbox) videoGalleries.forEach((links) => {
     const lightbox = GLightbox({
       elements: links.map((link) => ({
         type: "inline",
         content: '<div class="video-frame"></div>',
         title: escapeHtml(link.dataset.title || ""), // подпись GLightbox вставляет как HTML, а название приходит с Дзена
+        description: dzenLink(link.dataset),
         width: "auto",
         height: "auto",
       })),
       loop: true,
+      moreLength: 0, // иначе на телефоне GLightbox обрезает описание и прячет ссылку за «See more»
     });
     // При закрытии GLightbox удаляет окно вместе с iframe, остаётся перелистывание. Уходящий ролик убираем в начале
     // анимации, иначе его звук идёт ещё ~0,5 с; slide_changed ниже дочищает остальное при быстром листании.

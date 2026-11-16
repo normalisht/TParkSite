@@ -20,11 +20,13 @@ IFRAME_CODE = (
     'picture-in-picture; encrypted-media" frameborder="0" scrolling="no" allowfullscreen></iframe>'
 )
 THUMB = "https://avatars.dzeninfra.ru/get-zen_doc/123/abc/smart_crop_516x290"
+WATCH = "https://dzen.ru/video/watch/6af4c9206275f93a7e1ff96b"
 DZEN_VIDEO = DzenVideo(
     title="Т-парк. Фрироуп 3. Железный век",
     description="Это третье видео о фрироупе в Т-Парке.",
     duration=925,
     thumbnail_url=THUMB,
+    watch_url=WATCH,
 )
 DZEN_POSTER_SIZE = (320, 180)
 
@@ -64,6 +66,7 @@ def video_data(collections=(), **fields):
         "embed_url": "",
         "title": "",
         "description": "",
+        "dzen_url": "",
         "is_published": "on",
         "show_collection_tags": "on",
         "collection_items-TOTAL_FORMS": str(len(collections)),
@@ -80,7 +83,12 @@ def post_add(client, collections=(), **fields):
 
 
 def post_change(client, video, **fields):
-    current = {"embed_url": video.embed_url, "title": video.title, "description": video.description}
+    current = {
+        "embed_url": video.embed_url,
+        "title": video.title,
+        "description": video.description,
+        "dzen_url": video.dzen_url,
+    }
     return client.post(reverse("admin:content_video_change", args=[video.pk]), video_data(**{**current, **fields}))
 
 
@@ -94,6 +102,7 @@ def test_add_video_fills_from_dzen(admin_client, fake_dzen):
     v = Video.objects.get()
     assert (v.embed_url, v.title, v.duration) == (EMBED, "Т-парк. Фрироуп 3. Железный век", 925)
     assert v.description.startswith("Это третье") and v.poster
+    assert v.dzen_url == WATCH
     assert v.poster.width == DZEN_POSTER_SIZE[0]
     assert fake_dzen.calls == [EMBED]
     assert fake_dzen.poster_calls == [THUMB]
@@ -203,6 +212,58 @@ def test_poster_download_error_is_poster_error(admin_client, fake_dzen, monkeypa
     assert Video.objects.count() == 0
 
 
+def test_add_video_keeps_admin_dzen_url(admin_client, fake_dzen):
+    response = post_add(admin_client, embed_url=EMBED, dzen_url="https://dzen.ru/video/watch/" + "a" * 24)
+    assert response.status_code == 302, form_errors(response)
+    assert Video.objects.get().dzen_url == "https://dzen.ru/video/watch/" + "a" * 24
+
+
+def test_change_video_url_replaces_dzen_url(admin_client, fake_dzen, make_video):
+    video = make_video(embed_url="https://dzen.ru/embed/old", dzen_url="https://dzen.ru/video/watch/old")
+    response = post_change(admin_client, video, embed_url=EMBED)
+    assert response.status_code == 302, form_errors(response)
+    video.refresh_from_db()
+    assert video.dzen_url == WATCH
+
+
+def test_change_video_url_keeps_dzen_url_changed_in_same_submit(admin_client, fake_dzen, make_video):
+    video = make_video(embed_url="https://dzen.ru/embed/old", dzen_url="https://dzen.ru/video/watch/old")
+    response = post_change(admin_client, video, embed_url=EMBED, dzen_url="https://dzen.ru/video/watch/own")
+    assert response.status_code == 302, form_errors(response)
+    video.refresh_from_db()
+    assert video.dzen_url == "https://dzen.ru/video/watch/own"
+
+
+def test_dzen_error_on_url_change_clears_old_dzen_url(admin_client, fake_dzen, make_video, make_image):
+    """Адрес прежнего ролика к новому не подходит — как и длительность, без Дзена он сбрасывается."""
+    video = make_video(embed_url="https://dzen.ru/embed/old", dzen_url="https://dzen.ru/video/watch/old")
+    fake_dzen.error = "Дзен не ответил."
+    response = post_change(admin_client, video, embed_url=EMBED, title="Новое", poster=make_image("new.jpg"))
+    assert response.status_code == 302, form_errors(response)
+    video.refresh_from_db()
+    assert video.dzen_url == ""
+
+
+def test_edit_dzen_url_without_fetch(admin_client, fake_dzen, make_video):
+    video = make_video(dzen_url=WATCH)
+    response = post_change(admin_client, video, dzen_url="https://dzen.ru/video/watch/" + "b" * 24)
+    assert response.status_code == 302, form_errors(response)
+    video.refresh_from_db()
+    assert video.dzen_url == "https://dzen.ru/video/watch/" + "b" * 24
+    assert fake_dzen.calls == []
+    response = post_change(admin_client, video, dzen_url="")
+    assert response.status_code == 302, form_errors(response)
+    video.refresh_from_db()
+    assert video.dzen_url == ""
+
+
+@pytest.mark.parametrize("url", ["https://youtube.com/watch?v=1", "http://dzen.ru/video/watch/abc"])
+def test_dzen_url_must_be_dzen(admin_client, fake_dzen, make_video, url):
+    response = post_change(admin_client, make_video(), dzen_url=url)
+    assert response.status_code == 200
+    assert "dzen_url" in form_errors(response)
+
+
 def test_watch_link_rejected_with_hint(admin_client, fake_dzen):
     response = post_add(admin_client, embed_url="https://dzen.ru/video/watch/6af4c9206275f93a7e1ff96b")
     assert response.status_code == 200
@@ -231,6 +292,7 @@ def test_collection_inline_reorders_videos(admin_client, make_video, make_collec
         "title": collection.title,
         "slug": collection.slug,
         "description": "",
+        "dzen_url": "",
         "is_published": "on",
         "seo_title": "",
         "seo_description": "",
@@ -311,6 +373,8 @@ def test_help_explains_video(admin_client):
         "Показывать подборки на карточке",
         "«Отдельная страница»",
         "своя полка",
+        "«Открыть на Дзене»",
+        "«Канал на Дзене»",
     ):
         assert phrase in gallery, phrase
     assert reverse("admin:content_video_changelist") in gallery

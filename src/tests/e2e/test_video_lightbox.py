@@ -143,3 +143,33 @@ def test_shelf_lists_only_its_videos(live_server, browser, make_video, make_coll
     page.locator('.gslide.current iframe[src="https://dzen.ru/embed/two"]').wait_for()
     page.locator(".gnext").click()  # в полке два ролика: «вперёд» возвращает к первому, а не к «three»
     page.locator('.gslide.current iframe[src="https://dzen.ru/embed/one"]').wait_for()
+
+
+WATCH = "https://dzen.ru/video/watch/6af4c9206275f93a7e1ff96b"
+DZEN_LINK = ".gslide.current .gslide-description a.video-dzen-link"
+
+
+@pytest.mark.parametrize("viewport", [DESKTOP, PHONE], ids=["desktop", "phone"])
+def test_open_on_dzen_link_under_player(live_server, browser, make_video, viewport):
+    make_video(title="С адресом", embed_url="https://dzen.ru/embed/one", dzen_url=WATCH)
+    make_video(title="Без адреса", embed_url="https://dzen.ru/embed/two")
+    page, hits = open_video_tab(browser, live_server, viewport=viewport, has_touch=viewport is PHONE)
+    page.locator('a[aria-label="Видео: С адресом"]').click()
+    iframe = page.locator(CURRENT_IFRAME)
+    iframe.wait_for()
+    page.wait_for_timeout(500)
+    link = page.locator(DZEN_LINK)
+    assert link.inner_text().strip() == "Открыть на Дзене"
+    assert (link.get_attribute("href"), link.get_attribute("target"), link.get_attribute("rel")) == (
+        WATCH,
+        "_blank",
+        "noopener",
+    )
+    frame, box = iframe.bounding_box(), link.bounding_box()
+    assert box["y"] >= frame["y"] + frame["height"] - 1 and box["y"] + box["height"] <= viewport["height"]
+    assert hits == ["https://dzen.ru/embed/one"]  # ссылку не загружают заранее
+
+    page.locator(".gnext").click()
+    page.locator('.gslide.current iframe[src="https://dzen.ru/embed/two"]').wait_for()
+    assert page.locator(DZEN_LINK).count() == 0
+    assert page.locator(".gslide.current .gslide-title").inner_text().strip() == "Без адреса"

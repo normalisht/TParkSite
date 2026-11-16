@@ -153,16 +153,45 @@ html.cookie-open .contact-fab { display: none; }
   padding: 12px 4px 0;
   background: none;
 }
-.glightbox-container .ginner-container:has(.video-frame) .gdesc-inner { padding: 0; }
+/* Подпись и «Открыть на Дзене» (.gslide-desc): на ПК в одну строку, ссылка справа; на телефоне — друг под другом. */
+.glightbox-container .ginner-container:has(.video-frame) .gdesc-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 24px;
+  padding: 0;
+}
 .glightbox-container .ginner-container:has(.video-frame) .gslide-title {
+  flex: 1 1 0;
+  min-width: 0;
   margin: 0;
   color: #fff;
   font-family: var(--font-sans);
   font-weight: 600;
   line-height: 1.4;
 }
+.glightbox-container .ginner-container:has(.video-frame) .gslide-desc {
+  flex: none;
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.4;
+}
+.glightbox-container .ginner-container:has(.video-frame) .video-dzen-link {
+  display: inline-block;
+  margin: -10px 0;
+  padding: 10px 0; /* зона нажатия ≥ 44 px без лишнего зазора под подписью */
+  color: var(--color-brand-300);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.glightbox-container .ginner-container:has(.video-frame) .video-dzen-link:hover { color: var(--color-brand-100); }
 @media (max-width: 768px) {
+  .glightbox-container .ginner-container:has(.video-frame) .gdesc-inner { flex-direction: column; align-items: center; }
   .glightbox-container .ginner-container:has(.video-frame) .gslide-title { font-size: 14px; text-align: center; }
+  .glightbox-container .ginner-container:has(.video-frame) .gslide-desc { font-size: 14px; }
 }
 
 /* Слайдер фото: точки в цвет бренда, стрелки на тёмной подложке — видны и на светлых фото. Без слоя: иначе vendored-CSS перебьёт. */

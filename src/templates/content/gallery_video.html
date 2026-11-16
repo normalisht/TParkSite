@@ -9,7 +9,10 @@
     {% include "partials/breadcrumbs.html" %}
     <h1 class="page-title">Галерея</h1>
     <p class="page-lead">{% text "gallery.video_lead" %} · <span class="whitespace-nowrap font-semibold text-pine-800">{{ videos|length }} видео</span>{% if collections %} · <span class="whitespace-nowrap font-semibold text-pine-800">{{ collections|length|ru_plural:"подборка,подборки,подборок" }}</span>{% endif %}</p>
-    {% include "content/partials/gallery_tabs.html" with active="video" %}
+    <div class="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 [&>nav]:mt-0">
+      {% include "content/partials/gallery_tabs.html" with active="video" %}
+      {% include "content/partials/dzen_channel.html" %}
+    </div>
   </div>
 </section>
 
