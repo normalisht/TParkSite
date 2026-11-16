@@ -186,6 +186,37 @@ def test_failed_poster_leaves_draft_and_rerun_publishes(data, services):
     assert report.posters_downloaded == 1 and report.posters_failed == []
 
 
+def test_poster_downloads_stop_after_three_failures_in_a_row(data, services):
+    """Дзен недоступен — не ждём таймаутов по каждому ролику: после трёх неудач подряд обложки не качаем."""
+    data["videos"] += [video_data(n) for n in (4, 5, 6)]
+    thumbs = [f"{THUMB}{n}" for n in range(1, 7)]
+    download = FakeDownload(fail=set(thumbs[1:]))
+    report, lines = run(data, download)
+    assert download.calls == thumbs[:4]  # первая удалась, следующие три — нет, дальше не качаем
+    assert report.posters_failed == ["Ролик 2", "Ролик 3", "Ролик 4"]
+    assert report.posters_skipped == ["Ролик 5", "Ролик 6"]
+    assert report.videos_created == 6
+    drafts = Video.objects.filter(is_published=False, poster="")
+    assert set(drafts.values_list("title", flat=True)) == {f"Ролик {n}" for n in range(2, 7)}
+    assert "без обложки 5 (пропущено 2)" in report.summary()
+    assert any("пропущ" in line for line in lines[:-1])
+
+    download = FakeDownload()
+    report, _ = run(data, download)
+    assert download.calls == thumbs[1:]
+    assert Video.objects.filter(is_published=True).count() == 6
+    assert report.posters_skipped == [] and report.posters_failed == []
+
+
+def test_successful_poster_resets_failure_streak(data, services):
+    data["videos"] += [video_data(n) for n in (4, 5, 6)]
+    thumbs = [f"{THUMB}{n}" for n in range(1, 7)]
+    download = FakeDownload(fail={thumbs[0], thumbs[1], thumbs[3], thumbs[4]})
+    report, _ = run(data, download)
+    assert download.calls == thumbs  # между неудачами была удача — серия не набралась
+    assert report.posters_skipped == []
+
+
 def test_unexpected_poster_error_propagates_only_as_dzen_error(data, services):
     """download_poster оборачивает сетевые ошибки в DzenFetchError; прочие исключения — баг, их не глотаем."""
 

@@ -15,6 +15,9 @@ from apps.content import dzen
 from apps.core.slugs import unique_slug
 
 CHANNEL_FILE = Path(__file__).resolve().parent / "data" / "dzen_channel.json"
+# Каждая неудачная обложка — до двух попыток по dzen.TIMEOUT: при недоступном Дзене миграция на деплое шла бы
+# десятки минут. После стольких неудач подряд обложки не качаем, остальное докачает import_dzen_channel.
+MAX_POSTER_FAILURES_IN_ROW = 3
 
 
 def load_channel(path: Path = CHANNEL_FILE) -> dict:
@@ -27,6 +30,8 @@ class ImportReport:
     videos_existing: int = 0
     posters_downloaded: int = 0
     posters_failed: list[str] = field(default_factory=list)
+    posters_skipped: list[str] = field(default_factory=list)
+    failures_in_row: int = 0
     collections_created: int = 0
     collections_existing: int = 0
     items_created: int = 0
@@ -36,8 +41,10 @@ class ImportReport:
     def summary(self) -> str:
         videos = self.videos_created + self.videos_existing
         collections = self.collections_created + self.collections_existing
+        without_poster = len(self.posters_failed) + len(self.posters_skipped)
+        skipped = f" (пропущено {len(self.posters_skipped)})" if self.posters_skipped else ""
         text = (
-            f"Дзен: роликов {videos} (новых {self.videos_created}), без обложки {len(self.posters_failed)}, "
+            f"Дзен: роликов {videos} (новых {self.videos_created}), без обложки {without_poster}{skipped}, "
             f"подборок {collections} (новых {self.collections_created}), добавлено в подборки {self.items_created}, "
             f"связей с услугами {self.service_links_created}"
         )
@@ -51,12 +58,22 @@ def _next_order(model, **scope) -> int:
 
 
 def _attach_poster(video, thumbnail_url, download, report, log) -> bool:
+    if report.failures_in_row >= MAX_POSTER_FAILURES_IN_ROW:
+        report.posters_skipped.append(video.title)
+        return False
     try:
         content = download(thumbnail_url)
     except dzen.DzenFetchError as exc:
         report.posters_failed.append(video.title)
+        report.failures_in_row += 1
         log(f"Дзен: нет обложки у «{video.title}» — {exc}")
+        if report.failures_in_row == MAX_POSTER_FAILURES_IN_ROW:
+            log(
+                f"Дзен: {MAX_POSTER_FAILURES_IN_ROW} обложки подряд не скачались — остальные пропущены, "
+                "докачайте командой import_dzen_channel"
+            )
         return False
+    report.failures_in_row = 0
     video.poster.save("poster.jpg", content, save=False)
     report.posters_downloaded += 1
     return True
@@ -64,7 +81,8 @@ def _attach_poster(video, thumbnail_url, download, report, log) -> bool:
 
 def import_channel(*, Video, VideoCollection, VideoCollectionItem, Service, data, download=None, log=print):
     """Создаёт недостающие ролики, подборки и связи; существующее (ролик — по адресу плеера, подборка — по названию)
-    не меняет, только докачивает обложку ролику без неё и тогда публикует его. Без обложки ролик — черновик."""
+    не меняет, только докачивает обложку ролику без неё и тогда публикует его. Без обложки ролик — черновик; после
+    MAX_POSTER_FAILURES_IN_ROW неудач подряд обложки больше не качаются (ролики — черновики, «пропущено»)."""
     download = download or dzen.download_poster
     report = ImportReport()
     slugs = {slug for item in data["videos"] for slug in item["services"]}
