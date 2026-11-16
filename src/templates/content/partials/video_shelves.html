@@ -1,10 +1,10 @@
 {% load site_tags site_texts %}
-{# Полки подборок на вкладке «Видео»: заголовок с числом роликов, описание, «Смотреть все →» и лента первых роликов (на ПК видно 4, на планшете 3, на телефоне — свайп). У каждой полки свой просмотр (data-gallery). Первая полка — первый экран: её первые 4 обложки без lazy, первая — LCP. #}
+{# Полки подборок на вкладке «Видео»: заголовок-ссылка на подборку, описание, «Смотреть все →» и лента первых роликов (на ПК видно 4, на планшете 3, на телефоне — свайп). У каждой полки свой просмотр (data-gallery). Первая полка — первый экран: её первые 4 обложки без lazy, первая — LCP. #}
 {% text "gallery.see_all" as see_all %}
 {% for collection in collections %}
 <section data-video-shelf="{{ collection.slug }}" class="pt-10 md:pt-12">
   <div class="flex items-baseline justify-between gap-4">
-    <h2 class="min-w-0 text-2xl font-bold md:text-3xl">{{ collection.title }}&nbsp;<span class="text-base font-semibold text-ink/65 tabular-nums md:text-lg">{{ collection.video_count }}</span></h2>
+    <h2 class="min-w-0 text-2xl font-bold md:text-3xl"><a href="{{ collection.get_absolute_url }}" class="rounded outline-none hover:text-brand-700 focus-visible:ring-4 focus-visible:ring-brand-500">{{ collection.title }}</a></h2>
     <a href="{{ collection.get_absolute_url }}" class="-my-2.5 inline-flex shrink-0 items-center gap-1 py-2.5 font-semibold text-brand-800 hover:text-brand-600">{{ see_all|nobr }}<span class="icon h-4 w-4">{% include "icons/chevron-right.svg" %}</span></a>
   </div>
   {% if collection.description %}<p class="mt-1 text-ink/65">{{ collection.description }}</p>{% endif %}

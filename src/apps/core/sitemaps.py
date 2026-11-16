@@ -94,7 +94,12 @@ class EventSitemap(ModelSitemap):
 
 class VideoCollectionSitemap(ModelSitemap):
     def items(self):
-        return VideoCollection.objects.shown()
+        # Страница подборки — это и её ролики: правка или снятие ролика сдвигает дату (снятый тоже, его updated_at —
+        # момент снятия). Добавление и удаление связи двигают updated_at самой подборки (apps/content/signals.py).
+        return VideoCollection.objects.shown().annotate(videos_updated_at=Max("items__video__updated_at"))
+
+    def lastmod(self, obj):
+        return max(obj.updated_at, obj.videos_updated_at)  # у показанной подборки ролики есть всегда
 
 
 SITEMAPS = {

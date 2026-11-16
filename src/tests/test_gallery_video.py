@@ -91,7 +91,7 @@ def test_collections_shelf_and_chips(client, make_video, make_collection):
     add(hidden, a)
     add(empty, make_video(is_published=False))
     html = client.get("/gallery/video/").content.decode()
-    assert html.count(f'href="{shown.get_absolute_url()}"') == 3  # «Смотреть все» + теги двух роликов
+    assert html.count(f'href="{shown.get_absolute_url()}"') == 4  # заголовок полки, «Смотреть все», теги двух роликов
     assert hidden.get_absolute_url() not in html and empty.get_absolute_url() not in html
     assert "Смотреть все" in html and "Все видео" in html
 
@@ -169,8 +169,26 @@ def test_video_counter(client, make_video, make_collection):
     first, second = make_collection("Первая"), make_collection("Вторая")
     add(first, *videos)
     add(second, videos[0])
-    text = re.sub(r"<[^>]+>", "", client.get("/gallery/video/").content.decode())
-    assert "3 видео · 2 подборки" in text
+    html = client.get("/gallery/video/").content.decode()
+    assert "3 видео · 2 подборки" in re.sub(r"<[^>]+>", "", html)
+    # Счётчики не кликабельны — зелёные, как на странице подборки, а не оранжевые.
+    lead = re.search(r'<p class="page-lead">(.*?)</p>', html, re.DOTALL).group(1)
+    counters = re.findall(r'<span class="[^"]*\btext-pine-800\b[^"]*">([^<]+)</span>', lead)
+    assert counters == ["3 видео", "2 подборки"] and "brand" not in lead
+
+
+def test_photo_counter_is_green(client, make_image):
+    GalleryPhoto.objects.create(image=make_image())
+    html = client.get("/gallery/").content.decode()
+    lead = re.search(r'<p class="page-lead">(.*?)</p>', html, re.DOTALL).group(1)
+    assert '<span class="font-semibold text-pine-800">1 фотография</span>' in lead and "brand" not in lead
+
+
+def test_collection_page_counter_is_green(client, make_video, make_collection):
+    c = make_collection("Услуги")
+    add(c, make_video(), make_video())
+    html = client.get(c.get_absolute_url()).content.decode()
+    assert '<span class="font-semibold text-pine-800">2 видео</span>' in html
 
 
 def test_videos_after_page_size_hidden(client, make_video):
@@ -218,6 +236,63 @@ def test_sitemap_has_video_pages(client, make_video, make_collection):
     assert "<lastmod>" in block
 
 
+def _collection_lastmod(client, collection) -> str:
+    xml = client.get("/sitemap.xml").content.decode()
+    block = xml.split(f"{collection.get_absolute_url()}</loc>", 1)[1].split("</url>", 1)[0]
+    return block.split("<lastmod>", 1)[1].split("</lastmod>", 1)[0]
+
+
+def _set_updated(*objects, day="2020-01-01"):
+    for obj in objects:
+        type(obj).objects.filter(pk=obj.pk).update(updated_at=f"{day}T12:00:00+00:00")
+
+
+def test_collection_lastmod_follows_its_videos(client, make_video, make_collection):
+    c = make_collection("Услуги")
+    first, second, outside = make_video(), make_video(), make_video()
+    add(c, first, second)
+    _set_updated(c, first, second, outside)
+    assert _collection_lastmod(client, c) == "2020-01-01"
+    _set_updated(outside, day="2025-05-05")  # чужой ролик дату подборки не двигает
+    assert _collection_lastmod(client, c) == "2020-01-01"
+    _set_updated(second, day="2024-04-04")
+    assert _collection_lastmod(client, c) == "2024-04-04"
+    second.is_published = False  # снятый с публикации ролик пропал со страницы подборки
+    second.save()
+    assert _collection_lastmod(client, c) > "2024-04-04"
+
+
+def test_collection_lastmod_follows_added_and_removed_videos(client, make_video, make_collection):
+    c = make_collection("Услуги")
+    kept, added = make_video(), make_video()
+    add(c, kept)
+    _set_updated(c, kept, added)
+    VideoCollectionItem.objects.create(collection=c, video=added, order=1)
+    assert _collection_lastmod(client, c) > "2020-01-01"
+    _set_updated(c)
+    c.items.get(video=added).delete()  # так удаляет inline админки
+    assert _collection_lastmod(client, c) > "2020-01-01"
+    VideoCollectionItem.objects.create(collection=c, video=added, order=1)
+    _set_updated(c)
+    added.delete()  # связь удаляется каскадом
+    assert _collection_lastmod(client, c) > "2020-01-01"
+
+
+def test_collection_sitemap_queries_do_not_grow(client, make_video, make_collection):
+    def count_queries():
+        with CaptureQueriesContext(connection) as ctx:
+            assert client.get("/sitemap.xml").status_code == 200
+        return len(ctx.captured_queries)
+
+    add(make_collection("Первая"), make_video())
+    count_queries()  # первый показ ещё и записывает версию страницы для Last-Modified
+    small = count_queries()
+    for n in range(3):
+        add(make_collection(f"Ещё {n}"), make_video(), make_video())
+    count_queries()
+    assert count_queries() == small
+
+
 @pytest.mark.parametrize("path", ["/gallery/video/", "/gallery/video/uslugi/"])
 def test_video_pages_etag_304(client, make_video, make_collection, path):
     add(make_collection("Услуги"), make_video())
@@ -240,8 +315,10 @@ def test_shelves_show_collections_in_order(client, make_video, make_collection):
     shelves = re.findall(r'<section data-video-shelf="([^"]+)"(.*?)</section>', html, re.DOTALL)
     assert [slug for slug, _ in shelves] == [first.slug, second.slug]
     body = shelves[0][1]
-    assert "Услуги" in body and "Чем заняться в парке" in body and ">8<" in body
-    assert f'href="{first.get_absolute_url()}"' in body and "Смотреть все" in body
+    assert "Чем заняться в парке" in body and "Смотреть все" in body
+    # Заголовок полки — ссылка на подборку, без числа роликов.
+    heading = re.search(r"<h2[^>]*>(.*?)</h2>", body, re.DOTALL).group(1)
+    assert re.fullmatch(rf'<a href="{first.get_absolute_url()}"[^>]*>Услуги</a>', heading.strip())
     titles = re.findall(r'aria-label="Видео: ([^"]+)"', body)
     assert titles == [f"Ролик {n}" for n in range(7, 1, -1)]  # первые 6 в порядке подборки
     assert body.count(f'data-gallery="shelf-{first.slug}"') == 6
