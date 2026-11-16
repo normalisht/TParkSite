@@ -375,6 +375,7 @@ def test_help_explains_video(admin_client):
         "своя полка",
         "«Открыть на Дзене»",
         "«Канал на Дзене»",
+        "блок «Видео»",
     ):
         assert phrase in gallery, phrase
     assert reverse("admin:content_video_changelist") in gallery

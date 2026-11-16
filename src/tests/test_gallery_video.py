@@ -483,3 +483,62 @@ def test_card_passes_dzen_url_to_lightbox(client, make_video):
     assert 'data-dzen-url="https://dzen.ru/video/watch/6af4c9206275f93a7e1ff96b"' in cards["С адресом"]
     assert 'data-dzen-label="Открыть на Дзене"' in cards["С адресом"]
     assert "data-dzen" not in cards["Без адреса"]
+
+
+def service_videos_block(html):
+    found = re.search(r"<section data-service-videos.*?</section>", html, re.DOTALL)
+    return found.group(0) if found else ""
+
+
+def test_service_page_shows_its_videos(client, make_video):
+    service = make_service("Зиплайн", description="<p>Описание услуги</p>")
+    other = make_service("Баня")
+    videos = [make_video(title=f"Ролик {n}") for n in range(5)]
+    hidden = make_video(title="Черновик", is_published=False)
+    for video in [*videos[1:], hidden]:
+        video.services.add(service)
+    videos[0].services.add(other)
+    html = client.get(service.get_absolute_url()).content.decode()
+    block = service_videos_block(html)
+    titles = re.findall(r'data-title="([^"]*)"', block)
+    assert titles == ["Ролик 1", "Ролик 2", "Ролик 3"]  # до трёх, в порядке роликов, без черновика и чужих
+    assert re.search(r"<h2[^>]*>\s*Видео\s*</h2>", block)
+    assert re.search(r'<a href="/gallery/video/"[^>]*>\s*Все видео', block)
+    assert 'data-gallery="service"' in block and "glightbox.min.js" in html
+    imgs = re.findall(r"<img [^>]*>", block)
+    assert imgs and all('loading="lazy"' in img for img in imgs) and 'fetchpriority="high"' not in block
+    assert html.index("Описание услуги") < html.index("<section data-service-videos")
+
+
+def test_service_videos_before_related(client, make_video):
+    service = make_service("Зиплайн")
+    category = service.category_links.get().category
+    sibling = make_service("Скалодром", category_published=None)
+    CategoryService.objects.create(category=category, service=sibling)
+    make_video().services.add(service)
+    html = client.get(service.get_absolute_url()).content.decode()
+    assert "Ещё в категории" in html
+    assert html.index("<section data-service-videos") < html.index("Ещё в категории")
+
+
+def test_service_page_without_videos_has_no_block(client, make_video):
+    service = make_service("Зиплайн")
+    make_video(is_published=False).services.add(service)
+    make_video()  # опубликованный, но не этой услуги
+    assert service_videos_block(client.get(service.get_absolute_url()).content.decode()) == ""
+
+
+def test_service_page_video_queries_do_not_grow(client, make_video):
+    def count_queries():
+        with CaptureQueriesContext(connection) as ctx:
+            assert client.get(service.get_absolute_url()).status_code == 200
+        return len(ctx.captured_queries)
+
+    service = make_service("Зиплайн")
+    make_video().services.add(service)
+    count_queries()  # первый показ ещё и записывает версию страницы для Last-Modified
+    small = count_queries()
+    for _ in range(4):
+        make_video(duration=60, dzen_url="https://dzen.ru/video/watch/" + "a" * 24).services.add(service)
+    count_queries()
+    assert count_queries() == small
