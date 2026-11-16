@@ -144,12 +144,12 @@ def test_edit_requires_title_and_poster_without_dzen(admin_client, fake_dzen, ma
 
 
 def test_dzen_error_is_form_error(admin_client, fake_dzen):
-    fake_dzen.error = "Дзен не ответил — попробуйте позже или заполните поля вручную."
+    fake_dzen.error = "Дзен не ответил."
     response = post_add(admin_client, embed_url=IFRAME_CODE, title="Своё название")
     assert response.status_code == 200
     assert form_errors(response)["embed_url"] == [
         (
-            "Не удалось получить данные ролика с Дзена: Дзен не ответил — попробуйте позже или заполните поля вручную. "
+            "Не удалось получить данные ролика с Дзена: Дзен не ответил. "
             "Попробуйте позже или заполните название и загрузите обложку вручную."
         )
     ]

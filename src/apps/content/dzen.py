@@ -5,6 +5,7 @@
 """
 
 import html
+import http.client
 import json
 import re
 from dataclasses import dataclass
@@ -79,7 +80,8 @@ class DzenEmbedURLField(models.URLField):
 
 
 class DzenFetchError(Exception):
-    """Текст исключения показывается в админке."""
+    """Текст исключения показывается в админке. У ошибок `fetch_video` — только причина: совет, что делать, добавляет
+    форма (`DZEN_ERROR` в `admin.py`), у ошибок `download_poster` — свой, они выводятся у поля обложки как есть."""
 
 
 @dataclass(frozen=True)
@@ -99,7 +101,7 @@ class HostOnlyRedirects(HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         parts = urlsplit(newurl)
         if parts.scheme != "https" or parts.hostname != self.host:
-            raise DzenFetchError("Дзен перенаправил на другой сайт — заполните поля вручную.")
+            raise DzenFetchError("Дзен перенаправил на другой сайт.")
         return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
@@ -110,7 +112,7 @@ _image_opener = build_opener(HostOnlyRedirects(IMAGE_HOST))
 def _read_limited(response, limit: int) -> bytes:
     data = response.read(limit + 1)
     if len(data) > limit:
-        raise DzenFetchError("Ответ Дзена слишком большой — заполните поля вручную.")
+        raise DzenFetchError("Ответ Дзена слишком большой.")
     return data
 
 
@@ -129,7 +131,7 @@ def parse_video_page(page: str) -> DzenVideo:
         title = _json_string(match.group(1)).strip()
     thumbnail = _THUMBNAIL_RE.search(page)
     if not title or not thumbnail:
-        raise DzenFetchError("Не удалось найти данные ролика на странице Дзена — заполните поля вручную.")
+        raise DzenFetchError("Не удалось найти данные ролика на странице Дзена.")
     description = _DESCRIPTION_RE.search(page)
     duration = _DURATION_RE.search(page)
     return DzenVideo(
@@ -144,13 +146,13 @@ def fetch_video(embed_url: str) -> DzenVideo:
     try:
         validate_embed_url(embed_url)
     except ValidationError as exc:
-        raise DzenFetchError(EMBED_ERROR) from exc
+        raise DzenFetchError(f"{EMBED_ERROR}.") from exc
     request = Request(embed_url, headers={"User-Agent": USER_AGENT, "Accept-Language": "ru"})
     try:
         with _opener.open(request, timeout=TIMEOUT) as response:
             page = _read_limited(response, MAX_PAGE_BYTES).decode("utf-8", "replace")
-    except OSError as exc:
-        raise DzenFetchError("Дзен не ответил — попробуйте позже или заполните поля вручную.") from exc
+    except (OSError, http.client.HTTPException) as exc:  # оборванный ответ (IncompleteRead) — не OSError
+        raise DzenFetchError("Дзен не ответил.") from exc
     return parse_video_page(page)
 
 
@@ -171,7 +173,7 @@ def download_poster(thumbnail_url: str) -> ContentFile:
         try:
             data = _download(url)
             break
-        except OSError, DzenFetchError:
+        except OSError, http.client.HTTPException, DzenFetchError:
             continue
     if data is None:
         raise DzenFetchError("Не удалось скачать обложку — загрузите её вручную.")

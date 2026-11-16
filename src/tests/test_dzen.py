@@ -1,3 +1,4 @@
+import http.client
 import io
 from pathlib import Path
 from urllib.request import Request
@@ -110,8 +111,9 @@ def test_parse_video_page_without_duration(fixture_page):
 
 
 def test_parse_video_page_garbage_raises():
-    with pytest.raises(DzenFetchError):
+    with pytest.raises(DzenFetchError) as exc:
         parse_video_page("<html></html>")
+    assert str(exc.value) == "Не удалось найти данные ролика на странице Дзена."
 
 
 def test_fetch_video(monkeypatch, fixture_page):
@@ -121,8 +123,9 @@ def test_fetch_video(monkeypatch, fixture_page):
 
 def test_fetch_video_rejects_redirect_off_dzen():
     handler = dzen.HostOnlyRedirects(dzen.PAGE_HOST)
-    with pytest.raises(DzenFetchError):
+    with pytest.raises(DzenFetchError) as exc:
         handler.redirect_request(Request(EMBED), None, 302, "Found", {}, "https://evil.ru/")
+    assert str(exc.value) == "Дзен перенаправил на другой сайт."
 
 
 def test_fetch_video_rejects_redirect_on_dzen():
@@ -131,17 +134,25 @@ def test_fetch_video_rejects_redirect_on_dzen():
     assert new.full_url == "https://dzen.ru/embed/other"
 
 
-def test_fetch_video_network_error(monkeypatch):
-    monkeypatch.setattr(dzen, "_opener", FakeOpener({EMBED: OSError("down")}))
-    with pytest.raises(DzenFetchError):
+@pytest.mark.parametrize(
+    "error",
+    [OSError("down"), http.client.IncompleteRead(b"x"), http.client.LineTooLong("header")],
+    ids=["os-error", "incomplete-read", "line-too-long"],
+)
+def test_fetch_video_network_error(monkeypatch, error):
+    monkeypatch.setattr(dzen, "_opener", FakeOpener({EMBED: error}))
+    with pytest.raises(DzenFetchError) as exc:
         fetch_video(EMBED)
+    # Только причина: совет «заполните вручную» добавляет форма админки (DZEN_ERROR).
+    assert str(exc.value) == "Дзен не ответил."
 
 
 def test_fetch_video_too_large(monkeypatch):
     monkeypatch.setattr(dzen, "MAX_PAGE_BYTES", 10)
     monkeypatch.setattr(dzen, "_opener", FakeOpener({EMBED: b"x" * 11}))
-    with pytest.raises(DzenFetchError):
+    with pytest.raises(DzenFetchError) as exc:
         fetch_video(EMBED)
+    assert str(exc.value) == "Ответ Дзена слишком большой."
 
 
 def test_fetch_video_rejects_foreign_url():
@@ -158,9 +169,12 @@ def test_download_poster_prefers_orig(monkeypatch, make_image):
     assert poster.name == "poster.jpg" and poster.read() == image
 
 
-def test_download_poster_falls_back_to_original(monkeypatch, make_image):
+@pytest.mark.parametrize(
+    "error", [OSError("404"), http.client.IncompleteRead(b"x")], ids=["os-error", "incomplete-read"]
+)
+def test_download_poster_falls_back_to_original(monkeypatch, make_image, error):
     image = make_image().read()
-    opener = FakeOpener({"https://avatars.dzeninfra.ru/get-zen_doc/123/abc/orig": OSError("404"), THUMB: image})
+    opener = FakeOpener({"https://avatars.dzeninfra.ru/get-zen_doc/123/abc/orig": error, THUMB: image})
     monkeypatch.setattr(dzen, "_image_opener", opener)
     assert download_poster(THUMB).read() == image
     assert opener.requested[-1] == THUMB
