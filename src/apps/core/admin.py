@@ -176,6 +176,7 @@ class SiteSettingsAdmin(SiteModelAdmin):
                     "max_url",
                     "instagram_url",
                     "instagram_show_logo",
+                    "dzen_url",
                     "reviews_url",
                     "special_days_shown",
                 ],

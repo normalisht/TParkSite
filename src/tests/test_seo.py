@@ -157,6 +157,7 @@ def test_no_canonical_on_404(client):
 def test_home_local_business(client):
     site = SiteSettings.load()
     site.vk_url = "https://vk.com/tpark"
+    site.dzen_url = "https://dzen.ru/id/abc"
     site.yandex_maps_url = "https://yandex.ru/maps/org/tpark/123/"
     site.latitude, site.longitude = "54.9", "36.6"
     site.save()
@@ -165,7 +166,11 @@ def test_home_local_business(client):
     assert business["address"]["addressRegion"] == "Калужская область"
     assert business["address"]["addressLocality"] == "Жуковский район, село Восход"
     assert business["telephone"] == ["+79029856594"]
-    assert business["sameAs"] == ["https://vk.com/tpark", "https://yandex.ru/maps/org/tpark/123/"]
+    assert business["sameAs"] == [
+        "https://vk.com/tpark",
+        "https://dzen.ru/id/abc",
+        "https://yandex.ru/maps/org/tpark/123/",
+    ]
     assert business["geo"] == {"@type": "GeoCoordinates", "latitude": 54.9, "longitude": 36.6}
 
 

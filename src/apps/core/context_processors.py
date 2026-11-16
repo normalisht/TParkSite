@@ -82,6 +82,7 @@ def _site_context(request):
                 ContactChannel.Kind.VK: settings_obj.vk_url,
                 ContactChannel.Kind.MAX: settings_obj.max_url,
                 ContactChannel.Kind.INSTAGRAM: settings_obj.instagram_url,
+                ContactChannel.Kind.DZEN: settings_obj.dzen_url,
             },
         ),
         "default_description": plaintext(settings_obj.home_intro) or SITE_DESCRIPTION,

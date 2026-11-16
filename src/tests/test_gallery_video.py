@@ -63,7 +63,7 @@ def test_video_card_markup(client, make_video):
     assert "15:25" in html and 'aria-label="Видео: Фрироуп"' in html
     assert 'data-gallery="video"' in html and 'data-title="Фрироуп"' in html
     assert "Железный век" in html and 'class="video-play' in html
-    assert "<iframe" not in html and html.count("dzen.ru") == html.count('href="https://dzen.ru/embed/')
+    assert "<iframe" not in html and html.count("dzen.ru/embed") == html.count('href="https://dzen.ru/embed/')
     assert "glightbox.min.js" in html
 
 

@@ -157,6 +157,12 @@ class SiteSettings(models.Model):
     max_url = models.URLField(
         "MAX", max_length=500, blank=True, help_text="Ссылка на профиль или канал в MAX. Пусто — кнопки нет."
     )
+    dzen_url = models.URLField(
+        "Дзен",
+        max_length=500,
+        blank=True,
+        help_text="Ссылка на канал в Дзене: кнопка в «Связаться», в подвале и на «Контактах». Пусто — кнопки нет.",
+    )
     instagram_url = models.URLField(
         "Instagram",
         max_length=500,
@@ -382,6 +388,7 @@ class ContactChannel(models.Model):
         VK = "vk", "ВКонтакте"
         MAX = "max", "MAX"
         INSTAGRAM = "instagram", "Instagram"
+        DZEN = "dzen", "Дзен"
 
     settings = models.ForeignKey(SiteSettings, on_delete=models.CASCADE, related_name="contact_channels")
     kind = models.CharField("Соцсеть", max_length=20, choices=Kind.choices, unique=True)

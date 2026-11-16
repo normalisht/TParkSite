@@ -63,7 +63,7 @@ def organization(request, *, with_founder: bool = False) -> dict:
         "image": request.build_absolute_uri(url) if (url := safe_spec_url(site, "og_card")) else None,
         "openingHoursSpecification": opening_hours_spec(site.opening_hours) or None,
         "priceRange": site.price_range or None,
-        "sameAs": [url for url in (site.vk_url, site.yandex_maps_url) if url] or None,
+        "sameAs": [url for url in (site.vk_url, site.dzen_url, site.yandex_maps_url) if url] or None,
         "founder": founder(request, site) if with_founder else None,
     }
     if site.latitude is not None and site.longitude is not None:
