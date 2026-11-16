@@ -20,7 +20,8 @@ pytest + playwright (e2e).
 - Команды Python — из `src/`: `uv run pytest`, `uv run ruff check . && uv run ruff format .`; e2e — `make e2e`
   (нужен `uv run manage.py tailwind build`).
 - pytest строгий, любое предупреждение — ошибка: файлы и соединения закрывать, сеть в тестах не трогать.
-- Не коммитить: коммиты, пуш и MR — только по просьбе пользователя (его `CLAUDE.md`). Шаги «commit» в плане нет.
+- Коммит после каждой задачи: одна строка по-русски в стиле проекта (простая фраза, без префикса), без
+  `Co-Authored-By` и упоминаний Claude/AI; не пушить.
 - Тексты витрины и админки — по-русски; комментарии — по-русски, объясняют «зачем», 1–3 строки.
 - Админки — от `apps.core.admin_utils.SiteModelAdmin`; новый упорядоченный inline — с `OrderedInlineMixin`.
 - Фото — `photo_field`, миниатюры — `image_specs`, вывод — `{% picture %}`; удаление файлов — `register_file_cleanup`.
