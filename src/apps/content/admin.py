@@ -393,7 +393,16 @@ class VideoCollectionAdmin(SeoGenerateMixin, OrderedPhotoAdmin):
     search_fields = ["title"]
 
     def get_queryset(self, request):
-        return super().get_queryset(request).annotate(video_total=Count("items"))
+        return super().get_queryset(request).annotate(video_total=Count("items")).with_first_video()
+
+    def get_changelist_instance(self, request):
+        # Обложки-ролики строк без своей обложки — одним запросом, как `views.shown_collections`.
+        changelist = super().get_changelist_instance(request)
+        rows = [c for c in changelist.result_list if not c.cover]
+        covers = Video.objects.in_bulk({c.first_video_id for c in rows if c.first_video_id})
+        for collection in rows:
+            collection.cover_video = covers.get(collection.first_video_id)
+        return changelist
 
     @admin.display(description="Обложка")
     def preview(self, obj):

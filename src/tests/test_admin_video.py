@@ -2,6 +2,8 @@ import io
 
 import pytest
 from django.core.files.base import ContentFile
+from django.db import connection
+from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 from PIL import Image
 
@@ -253,6 +255,22 @@ def test_collection_inline_new_row_starts_after_last(admin_client, make_video, m
     response = admin_client.get(reverse("admin:content_videocollection_change", args=[collection.pk]))
     formset = response.context["inline_admin_formsets"][0].formset
     assert formset.form.base_fields["order"].initial == 5
+
+
+def test_collection_list_queries_do_not_grow(admin_client, make_video, make_collection):
+    def count():
+        with CaptureQueriesContext(connection) as ctx:
+            response = admin_client.get(reverse("admin:content_videocollection_changelist"))
+        assert response.status_code == 200
+        return len(ctx)
+
+    VideoCollectionItem.objects.create(collection=make_collection("Первая"), video=make_video())
+    before = count()
+    for i in range(4):
+        collection = make_collection(f"Подборка {i}")
+        VideoCollectionItem.objects.create(collection=collection, video=make_video(is_published=False), order=1)
+        VideoCollectionItem.objects.create(collection=collection, video=make_video(), order=2)
+    assert count() == before
 
 
 def test_move_videos_to_top(admin_client, make_video):
