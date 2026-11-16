@@ -9,7 +9,7 @@ from django.utils import timezone
 from apps.catalog.models import Category, CategoryService, Service, ServicePhoto
 from apps.content.models import Event, GalleryPhoto, Review
 from apps.core.models import InfoPage, Phone, SiteSettings
-from apps.core.seo import STATIC_PAGES
+from apps.core.seo import PAGE_DEFAULTS, STATIC_PAGES
 
 pytestmark = pytest.mark.django_db
 
@@ -340,8 +340,12 @@ def test_seo_texts_fit_the_snippet_and_are_unique():
     from apps.core import seo_content as sc
 
     pairs = [*sc.CATEGORIES.values(), *sc.SERVICES.values(), *sc.EVENTS.values(), *sc.INFO_PAGES.values()]
+    # Страницы без начальных текстов в базе (вкладка «Видео») выводят умолчания из PAGE_DEFAULTS.
     pairs += [
-        (sc.SITE_SETTINGS[f"seo_{key}_title"], sc.SITE_SETTINGS[f"seo_{key}_description"]) for key in STATIC_PAGES
+        (sc.SITE_SETTINGS[f"seo_{key}_title"], sc.SITE_SETTINGS[f"seo_{key}_description"])
+        if f"seo_{key}_title" in sc.SITE_SETTINGS
+        else PAGE_DEFAULTS[key]
+        for key in STATIC_PAGES
     ]
     titles, descriptions = zip(*pairs, strict=True)
     assert [title for title in titles if len(title) > 60] == []

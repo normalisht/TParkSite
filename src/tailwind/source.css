@@ -278,6 +278,19 @@ html[data-season="autumn"] .season-particles::after {
      обрезку и по y, поэтому py-2/-my-2 — запас под обводку, тень и кольцо фокуса карточек, не меняющий раскладку. */
   .scroll-strip { @apply no-scrollbar -mx-4 -my-2 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 py-2 sm:mx-0 sm:my-0 sm:overflow-visible sm:px-0 sm:py-0; }
 
+  /* Карточка видео (content/partials/video_card.html): кнопка ▶ по центру обложки и плашка длительности.
+     Треугольник тёмный: белый на оранжевом не дотягивает до контраста 3:1. */
+  .video-play {
+    @apply pointer-events-none absolute inset-0 m-auto flex h-11 w-11 items-center justify-center rounded-full bg-brand-500 text-ink transition duration-200 md:h-14 md:w-14;
+    box-shadow: 0 4px 14px rgb(0 0 0 / .25);
+  }
+  .video-play svg { @apply h-1/2 w-1/2 fill-current; }
+  .group:hover .video-play { @apply scale-[1.08] bg-brand-600; }
+  .video-duration {
+    @apply pointer-events-none absolute right-2 bottom-2 inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[13px] leading-5 font-semibold text-white tabular-nums;
+    background: rgb(28 25 25 / .75);
+  }
+
   /* Длинный отзыв свёрнут до ~8 строк с плавным затуханием; «Читать полностью» снимает класс, высоту анимирует
      компонент reviewCard (static/js/review_card.js), затухание — переход --review-fade (100% — затухания нет). */
   .review-text {

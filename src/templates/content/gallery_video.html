@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load site_tags site_texts %}
+{% block vendor_css %}{% include "partials/vendor.html" with part="css" glightbox=1 %}{% endblock %}
+{% block vendor_js %}{% include "partials/vendor.html" with part="js" glightbox=1 %}{% endblock %}
+{% block content %}
+<section class="page-hero">
+  {% include "partials/hero_decor.html" %}
+  <div class="mx-auto max-w-6xl px-4 py-10 md:py-14">
+    {% include "partials/breadcrumbs.html" %}
+    <h1 class="page-title">Галерея</h1>
+    <p class="page-lead">{% text "gallery.video_lead" %} · <span class="font-semibold text-brand-800">{{ videos|length }} видео{% if collections %} · {{ collections|length|ru_plural:"подборка,подборки,подборок" }}{% endif %}</span></p>
+    {% include "content/partials/gallery_tabs.html" with active="video" %}
+  </div>
+</section>
+
+<div class="mx-auto max-w-6xl px-4">
+  {% if collections %}{% text "gallery.collections_title" as shelf_title %}{% include "content/partials/video_collections.html" with title=shelf_title %}{% endif %}
+  <section class="pt-10 md:pt-12">
+    <h2 class="mb-4 text-2xl font-bold md:mb-6 md:text-3xl">{% text "gallery.all_videos_title" %}</h2>
+    {% include "content/partials/video_grid.html" with gallery="video" %}
+  </section>
+</div>
+{% endblock %}

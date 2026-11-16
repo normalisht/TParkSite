@@ -46,15 +46,13 @@ def test_video_in_two_collections_keeps_own_order(make_video, make_collection):
     assert set(a.collections.all()) == {first, second}
 
 
-def test_collection_slug_from_title_and_redirect_on_change(make_collection, monkeypatch):
-    # Маршрут подборки появится вместе с витриной, адрес здесь подставлен.
-    monkeypatch.setattr(VideoCollection, "get_absolute_url", lambda self: f"/video/{self.slug}/")
+def test_collection_slug_from_title_and_redirect_on_change(make_collection):
     c = make_collection("Услуги")
     assert c.slug == "uslugi"
     assert c.slug_source() == "Услуги"
     c.slug = "services"
     c.save()
-    assert Redirect.objects.get(old_path="/video/uslugi/").new_path == "/video/services/"
+    assert Redirect.objects.get(old_path="/gallery/video/uslugi/").new_path == "/gallery/video/services/"
 
 
 def test_duplicate_video_rejected(make_video):

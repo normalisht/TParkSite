@@ -3,7 +3,7 @@ from urllib.parse import urlsplit
 
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
-from django.db.models import Count, Q
+from django.db.models import Count, OuterRef, Q, Subquery
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.formats import date_format
@@ -320,6 +320,15 @@ class VideoCollectionQuerySet(PublishedQuerySet):
             .filter(video_count__gt=0)
             .order_by("order", "id")
         )
+
+    def with_first_video(self):
+        """+ `first_video_id` — первый опубликованный ролик подборки по её порядку (обложка, если своей нет)."""
+        first = (
+            VideoCollectionItem.objects.filter(collection=OuterRef("pk"), video__is_published=True)
+            .order_by("order", "id")
+            .values("video_id")[:1]
+        )
+        return self.annotate(first_video_id=Subquery(first))
 
 
 class VideoCollection(SeoModel, OrderedModel):

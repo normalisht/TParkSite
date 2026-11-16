@@ -10,5 +10,7 @@ urlpatterns = [
     path("about/", views.about, name="about"),
     path("reviews/", views.reviews, name="reviews"),
     path("gallery/", views.gallery, name="gallery"),
+    path("gallery/video/", views.gallery_video, name="gallery_video"),
+    path("gallery/video/<slug:slug>/", views.video_collection, name="video_collection"),
     path("contacts/", views.contacts, name="contacts"),
 ]

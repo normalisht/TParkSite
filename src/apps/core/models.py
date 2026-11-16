@@ -282,6 +282,7 @@ class SiteSettings(models.Model):
     seo_about_title, seo_about_description = _seo_pair("О нас")
     seo_reviews_title, seo_reviews_description = _seo_pair("Отзывы")
     seo_gallery_title, seo_gallery_description = _seo_pair("Галерея")
+    seo_video_title, seo_video_description = _seo_pair("Видео")
     seo_contacts_title, seo_contacts_description = _seo_pair("Контакты")
 
     # Вебмастер и Метрика

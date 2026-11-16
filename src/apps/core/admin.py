@@ -225,7 +225,7 @@ class SiteSettingsAdmin(SiteModelAdmin):
                     "og_image",
                     *[
                         (f"seo_{page}_title", f"seo_{page}_description")
-                        for page in ("home", "events", "about", "reviews", "gallery", "contacts")
+                        for page in ("home", "events", "about", "reviews", "gallery", "video", "contacts")
                     ],
                 ],
             },

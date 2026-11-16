@@ -9,6 +9,7 @@
     {% include "partials/breadcrumbs.html" %}
     <h1 class="page-title">Галерея</h1>
     <p class="page-lead">{% text "gallery.lead" %}{% if photos %} · <span class="font-semibold text-brand-700">{{ photos|length|ru_plural:"фотография,фотографии,фотографий" }}</span>{% endif %}</p>
+    {% include "content/partials/gallery_tabs.html" with active="photo" %}
   </div>
 </section>
 
@@ -25,19 +26,7 @@
     {% endif %}{% endwith %}{% endwith %}{% endfor %}
   </div>
   {% if photos|length > page_size %}
-  {% comment %}
-    Догрузка при прокрутке: невидимая метка под сеткой за 800 px до экрана открывает следующую порцию.
-    После каждой порции наблюдение перезапускается — на высоком экране метка остаётся в зоне видимости,
-    и без перезапуска новых событий не было бы. Когда показано всё, наблюдение снимается.
-  {% endcomment %}
-  <div data-gallery-more class="h-px" aria-hidden="true"
-       x-init="const io = new IntersectionObserver(([entry]) => {
-                 if (!entry.isIntersecting) return;
-                 shown += {{ page_size }};
-                 io.unobserve($el);
-                 if (shown < total) $nextTick(() => io.observe($el));
-               }, { rootMargin: '0px 0px 800px 0px' });
-               io.observe($el)"></div>
+  {% include "content/partials/load_more.html" %}
   {% endif %}
   </div>
   {% else %}

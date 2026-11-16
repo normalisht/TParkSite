@@ -1,0 +1,7 @@
+{% load site_texts %}{# Вкладки галереи — ссылки на свои адреса (у каждой свой ETag и Last-Modified); без опубликованных роликов — не выводятся. active — "photo" | "video". #}
+{% if has_videos %}
+<nav aria-label="Разделы галереи" class="mt-6 inline-flex gap-1 rounded-full bg-white/70 p-1 ring-1 ring-ink/10">
+  <a href="{% url 'content:gallery' %}"{% if active == "photo" %} aria-current="page"{% endif %} class="inline-flex min-h-11 items-center rounded-full px-5 font-semibold transition {% if active == "photo" %}bg-white text-ink shadow-sm{% else %}text-brand-800 hover:bg-white/80{% endif %}">{% text "gallery.tab_photo" %}</a>
+  <a href="{% url 'content:gallery_video' %}"{% if active == "video" %} aria-current="page"{% endif %} class="inline-flex min-h-11 items-center rounded-full px-5 font-semibold transition {% if active == "video" %}bg-white text-ink shadow-sm{% else %}text-brand-800 hover:bg-white/80{% endif %}">{% text "gallery.tab_video" %}</a>
+</nav>
+{% endif %}

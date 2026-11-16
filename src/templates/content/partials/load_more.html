@@ -1,0 +1,14 @@
+{% comment %}
+  Догрузка при прокрутке: невидимая метка под сеткой за 800 px до экрана открывает следующую порцию.
+  После каждой порции наблюдение перезапускается — на высоком экране метка остаётся в зоне видимости,
+  и без перезапуска новых событий не было бы. Когда показано всё, наблюдение снимается.
+  Нужен x-data с shown и total вокруг сетки (content/gallery.html, content/partials/video_grid.html).
+{% endcomment %}
+<div data-gallery-more class="h-px" aria-hidden="true"
+     x-init="const io = new IntersectionObserver(([entry]) => {
+               if (!entry.isIntersecting) return;
+               shown += {{ page_size }};
+               io.unobserve($el);
+               if (shown < total) $nextTick(() => io.observe($el));
+             }, { rootMargin: '0px 0px 800px 0px' });
+             io.observe($el)"></div>

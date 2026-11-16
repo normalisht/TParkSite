@@ -343,7 +343,7 @@ def test_seo_help_in_admin_forms(admin_client):
     # Превью страниц в настройках: данные «по умолчанию» для каждой статической страницы.
     assert "data-seo-site-preview" in html
     pages = json.loads(re.search(r'id="seo-site-pages"[^>]*>(.*?)</script>', html, re.DOTALL).group(1))
-    assert [page["key"] for page in pages] == ["home", "events", "about", "reviews", "gallery", "contacts"]
+    assert [page["key"] for page in pages] == ["home", "events", "about", "reviews", "gallery", "video", "contacts"]
     assert pages[3]["title"] == "Отзывы о Т-Парке — Жуковский район, Калужская область"
     assert "css/admin_seo.css" in html
     assert 'class="seo-details"' in html and "seo-chevron" in html

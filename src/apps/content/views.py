@@ -1,9 +1,10 @@
+from django.http import Http404
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.formats import date_format
 
-from apps.content.models import Event, GalleryPhoto, Partner, Review
+from apps.content.models import Event, GalleryPhoto, Partner, Review, Video, VideoCollection, VideoCollectionItem
 from apps.core import structured_data as ld
 from apps.core.images import safe_spec_url
 from apps.core.maps import route_links
@@ -127,11 +128,95 @@ def gallery(request):
     context = {
         "photos": photos,
         "page_size": GALLERY_PAGE,
+        "has_videos": Video.objects.published().exists(),
         "breadcrumbs": crumbs,
         "seo": page_seo("gallery"),
         "structured_data": [ld.breadcrumbs(request, crumbs)],
     }
     return render(request, "content/gallery.html", context)
+
+
+def video_crumbs(*tail: tuple[str, str]) -> list[tuple[str, str]]:
+    return [ld.home_crumb(), ("Галерея", reverse("content:gallery")), *tail]
+
+
+def shown_collections(**exclude) -> list[VideoCollection]:
+    """Подборки для полки: обложки-ролики подставлены одним запросом — иначе `cover_video` у каждой подборки
+    загружал бы все её ролики."""
+    collections = list(VideoCollection.objects.shown().with_first_video().exclude(**exclude))
+    covers = Video.objects.in_bulk({c.first_video_id for c in collections if not c.cover})
+    for collection in collections:
+        if not collection.cover:
+            collection.cover_video = covers.get(collection.first_video_id)
+    return collections
+
+
+def attach_collections(videos: list[Video], collections: list[VideoCollection]) -> list[Video]:
+    """Чипы подборок на карточках: только показанные подборки, в их порядке; связи — одним запросом."""
+    position = {c.pk: i for i, c in enumerate(collections)}
+    links: dict[int, list[VideoCollection]] = {}
+    pairs = VideoCollectionItem.objects.filter(video__in=videos, collection__in=position).values_list(
+        "video_id", "collection_id"
+    )
+    for video_id, collection_id in pairs:
+        links.setdefault(video_id, []).append(collections[position[collection_id]])
+    for video in videos:
+        video.shown_collections = sorted(links.get(video.pk, []), key=lambda c: position[c.pk])
+    return videos
+
+
+def gallery_video(request):
+    videos = list(Video.objects.published())
+    if not videos:
+        raise Http404
+    collections = shown_collections()
+    crumbs = video_crumbs(("Видео", ""))
+    context = {
+        "videos": attach_collections(videos, collections),
+        "collections": collections,
+        "page_size": GALLERY_PAGE,
+        "has_videos": True,
+        "breadcrumbs": crumbs,
+        "seo": page_seo("video"),
+        "structured_data": [ld.breadcrumbs(request, crumbs)],
+    }
+    return render(request, "content/gallery_video.html", context)
+
+
+def video_collection(request, slug):
+    collection, preview = get_for_view(request, VideoCollection.objects.all(), slug=slug)
+    videos = collection.shown_videos()
+    if not videos:
+        raise Http404
+    if not collection.cover:
+        collection.cover_video = videos[0]
+    other_collections = shown_collections(pk=collection.pk)
+    image = safe_spec_url(collection, "cover_og") or safe_spec_url(collection.cover_video, "og")
+    seo = make_seo(
+        collection.title,
+        collection.description,
+        absolute_url(request, image),
+        obj=collection,
+        default_description=f"Видео Т-Парка — подборка «{collection.title}». {PARK_ADDRESS}.",
+    )
+    if preview:
+        seo["noindex"] = True
+    crumbs = video_crumbs(("Видео", reverse("content:gallery_video")), (collection.title, ""))
+    response = render(
+        request,
+        "content/video_collection.html",
+        {
+            "collection": collection,
+            "videos": attach_collections(videos, other_collections),
+            "other_collections": other_collections,
+            "page_size": GALLERY_PAGE,
+            "breadcrumbs": crumbs,
+            "seo": seo,
+            "structured_data": [ld.breadcrumbs(request, crumbs)],
+            **preview_context(collection, preview),
+        },
+    )
+    return finish(response, preview)
 
 
 def contacts(request):
