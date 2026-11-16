@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Бэкап продакшена: снимок SQLite + архив медиа. Снимков БД хранится BACKUP_KEEP (14), архив медиа — только
-# в BACKUP_MEDIA_KEEP (1) новейших копиях: видео и фото занимают много места на небольшом диске. Запуск из cron на хосте, например:
+# в BACKUP_MEDIA_KEEP (1, не меньше 1) новейших копиях: видео и фото занимают много места на небольшом диске.
+# Запуск из cron на хосте, например:
 #   15 3 * * * cd /srv/tpark && ./scripts/backup.sh >> backups/backup.log 2>&1
 # Сайт без Docker (systemd, make service-*) — с ключом --host: ./scripts/backup.sh --host
 set -euo pipefail
@@ -8,6 +9,7 @@ cd "$(dirname "$0")/.."
 
 KEEP="${BACKUP_KEEP:-14}"
 MEDIA_KEEP="${BACKUP_MEDIA_KEEP:-1}"
+[ "$MEDIA_KEEP" -ge 1 ] || MEDIA_KEEP=1  # 0 удалил бы и только что созданный архив медиа
 DEST="backups/$(date +%Y-%m-%d_%H%M)"
 mkdir -p "$DEST"
 

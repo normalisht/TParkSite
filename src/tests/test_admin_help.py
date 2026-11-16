@@ -10,6 +10,7 @@ from apps.catalog.models import Category, CategoryGroup, Service
 from apps.content.models import GalleryPhoto, Partner, Review
 from apps.core.admin import SiteSettingsAdmin
 from apps.core.admin_help import HELP_ANCHORS, HELP_SECTIONS
+from apps.core.admin_utils import SeoHelp
 from apps.core.models import Announcement, InfoPage, Phone, Season, SiteSettings
 from apps.texts.models import SiteText
 from apps.texts.registry import BY_KEY
@@ -204,3 +205,11 @@ def test_texts_intro_and_form_link(admin_client):
     text = SiteText.objects.first()
     html = admin_client.get(reverse("admin:texts_sitetext_change", args=[text.pk])).content.decode()
     assert f"{reverse('admin_help')}#texts" in html
+
+
+def test_seo_help_mentions_video(admin_client):
+    html = _help_html(admin_client)
+    seo = html.split('<section id="seo">', 1)[1].split("</section>", 1)[0]
+    assert "подборки видео" in seo and "«Видео»" in seo
+    site = SeoHelp("site").render()
+    assert "видео и контактов" in site and "подборок видео" in site
