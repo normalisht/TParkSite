@@ -113,6 +113,58 @@ html.cookie-open .contact-fab { display: none; }
   .glightbox-container.glightbox-clean .gnext svg { width: 20px; }
 }
 
+/* Просмотр ролика (site.js: слайд inline с .video-frame) — рамка 16:9 по размеру окна, подпись под ней белым, и на
+   телефоне тоже: там GLightbox кладёт подпись поверх медиа. Без слоя и с !important — vendored-CSS и инлайн-стили
+   GLightbox иначе перебьют. */
+.glightbox-container .ginner-container:has(.video-frame) {
+  --video-width: min(1100px, calc(100vw - 32px), calc((100dvh - 160px) * 16 / 9));
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: auto !important;
+  max-width: none !important;
+}
+.glightbox-container .gslide-media:has(.video-frame) {
+  width: var(--video-width) !important;
+  height: auto !important;
+  max-width: none;
+  max-height: none;
+  overflow: visible;
+  background: none;
+  flex: none;
+}
+.glightbox-container .ginlined-content:has(> .video-frame) { padding: 0; overflow: visible; }
+.video-frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 12px;
+  background-color: #000;
+  box-shadow: 0 20px 60px rgb(0 0 0 / 0.5);
+}
+.video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.glightbox-container .ginner-container:has(.video-frame) .gslide-description {
+  position: static !important;
+  width: var(--video-width) !important;
+  max-width: none !important;
+  max-height: none;
+  height: auto !important;
+  flex: none;
+  padding: 12px 4px 0;
+  background: none;
+}
+.glightbox-container .ginner-container:has(.video-frame) .gdesc-inner { padding: 0; }
+.glightbox-container .ginner-container:has(.video-frame) .gslide-title {
+  margin: 0;
+  color: #fff;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  line-height: 1.4;
+}
+@media (max-width: 768px) {
+  .glightbox-container .ginner-container:has(.video-frame) .gslide-title { font-size: 14px; text-align: center; }
+}
+
 /* Слайдер фото: точки в цвет бренда, стрелки на тёмной подложке — видны и на светлых фото. Без слоя: иначе vendored-CSS перебьёт. */
 .js-slider {
   --swiper-theme-color: var(--color-brand-500);
