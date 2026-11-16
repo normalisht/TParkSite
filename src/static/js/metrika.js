@@ -21,6 +21,7 @@
       : href.indexOf("t.me/") !== -1 ? "telegram"
       : href.indexOf("vk.com/") !== -1 ? "vk"
       : href.indexOf("max.ru/") !== -1 ? "max"
+      : (href.indexOf("dzen.ru/") !== -1 && href.indexOf("/embed/") === -1) ? "dzen"
       : href.indexOf("instagram.com/") !== -1 ? "instagram" : "";
     if (goal) ym(counterId, "reachGoal", goal);
   });

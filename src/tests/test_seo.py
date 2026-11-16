@@ -427,8 +427,10 @@ def test_metrika_tracks_contact_clicks(client, settings):
     assert 'js/metrika.js"' in html and 'data-counter-id="12345"' in html
     script = (Path(__file__).resolve().parents[1] / "static" / "js" / "metrika.js").read_text(encoding="utf-8")
     assert 'ym(counterId, "reachGoal", goal)' in script
-    for goal in ("call", "whatsapp", "telegram", "vk", "max", "instagram"):
+    for goal in ("call", "whatsapp", "telegram", "vk", "max", "dzen", "instagram"):
         assert f'"{goal}"' in script
+    # Карточки роликов (dzen.ru/embed/) открывают лайтбокс — в цель «dzen» не попадают.
+    assert 'href.indexOf("/embed/") === -1) ? "dzen"' in script
 
 
 def _graph(html: str) -> list[dict]:
