@@ -485,6 +485,16 @@ def test_card_passes_dzen_url_to_lightbox(client, make_video):
     assert "data-dzen" not in cards["Без адреса"]
 
 
+def test_dzen_label_with_brand_keeps_attribute(client, make_video):
+    """В тексте «Т-Парк» nobr добавил бы <span class="…">: в атрибуте его кавычки обрывали бы значение."""
+    from apps.texts.models import SiteText
+
+    SiteText.objects.filter(key="gallery.open_on_dzen").update(text="Смотреть на Дзене Т-Парка")
+    make_video(title="С адресом", dzen_url="https://dzen.ru/video/watch/6af4c9206275f93a7e1ff96b")
+    [card] = _cards(client.get("/gallery/video/").content.decode())
+    assert 'data-dzen-label="Смотреть на Дзене Т-Парка" aria-label="Видео: С адресом"' in card
+
+
 def service_videos_block(html):
     found = re.search(r"<section data-service-videos.*?</section>", html, re.DOTALL)
     return found.group(0) if found else ""

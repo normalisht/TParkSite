@@ -4,6 +4,8 @@ import pytest
 
 pytest.importorskip("playwright")
 
+from playwright.sync_api import expect
+
 pytestmark = [pytest.mark.e2e, pytest.mark.django_db(transaction=True)]
 
 DESKTOP = {"width": 1280, "height": 800}
@@ -153,12 +155,14 @@ DZEN_LINK = ".gslide.current .gslide-description a.video-dzen-link"
 def test_open_on_dzen_link_under_player(live_server, browser, make_video, viewport):
     make_video(title="С адресом", embed_url="https://dzen.ru/embed/one", dzen_url=WATCH)
     make_video(title="Без адреса", embed_url="https://dzen.ru/embed/two")
+    # Перенос пишет адрес без full_clean: чужую ссылку просмотр не показывает.
+    make_video(title="Чужой адрес", embed_url="https://dzen.ru/embed/three", dzen_url="https://evil.example/dzen.ru/")
     page, hits = open_video_tab(browser, live_server, viewport=viewport, has_touch=viewport is PHONE)
     page.locator('a[aria-label="Видео: С адресом"]').click()
     iframe = page.locator(CURRENT_IFRAME)
     iframe.wait_for()
-    page.wait_for_timeout(500)
     link = page.locator(DZEN_LINK)
+    link.wait_for()
     assert link.inner_text().strip() == "Открыть на Дзене"
     assert (link.get_attribute("href"), link.get_attribute("target"), link.get_attribute("rel")) == (
         WATCH,
@@ -169,7 +173,8 @@ def test_open_on_dzen_link_under_player(live_server, browser, make_video, viewpo
     assert box["y"] >= frame["y"] + frame["height"] - 1 and box["y"] + box["height"] <= viewport["height"]
     assert hits == ["https://dzen.ru/embed/one"]  # ссылку не загружают заранее
 
-    page.locator(".gnext").click()
-    page.locator('.gslide.current iframe[src="https://dzen.ru/embed/two"]').wait_for()
-    assert page.locator(DZEN_LINK).count() == 0
-    assert page.locator(".gslide.current .gslide-title").inner_text().strip() == "Без адреса"
+    for embed, title in (("two", "Без адреса"), ("three", "Чужой адрес")):
+        page.locator(".gnext").click()
+        page.locator(f'.gslide.current iframe[src="https://dzen.ru/embed/{embed}"]').wait_for()
+        expect(page.locator(".gslide.current .gslide-title")).to_have_text(title)
+        expect(page.locator(DZEN_LINK)).to_have_count(0, timeout=1000)

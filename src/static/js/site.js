@@ -209,9 +209,11 @@ document.addEventListener("DOMContentLoaded", () => {
     span.textContent = text;
     return span.innerHTML.replaceAll('"', "&quot;");
   };
-  // «Открыть на Дзене» под плеером — только у ролика с адресом на Дзене (data-dzen-* карточки).
+  // «Открыть на Дзене» под плеером — только у ролика с адресом на Дзене (data-dzen-* карточки). Адрес проверяем и здесь:
+  // перенос со старого сайта пишет его в базу без валидации поля.
+  const DZEN_PAGE = /^https:\/\/dzen\.ru\//;
   const dzenLink = ({ dzenUrl, dzenLabel }) =>
-    dzenUrl
+    DZEN_PAGE.test(dzenUrl || "")
       ? `<a class="video-dzen-link" href="${escapeHtml(dzenUrl)}" target="_blank" rel="noopener">${escapeHtml(dzenLabel || "")}</a>`
       : "";
   if (window.GLightbox) videoGalleries.forEach((links) => {
