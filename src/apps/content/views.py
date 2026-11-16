@@ -1,8 +1,10 @@
+from django.conf import settings
 from django.http import Http404
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.formats import date_format
+from django.utils.http import urlencode
 
 from apps.content.models import Event, GalleryPhoto, Partner, Review, Video, VideoCollection, VideoCollectionItem
 from apps.core import structured_data as ld
@@ -165,13 +167,34 @@ def attach_collections(videos: list[Video], collections: list[VideoCollection]) 
     return videos
 
 
+DESIGN_VARIANTS = ("1", "2", "3")
+SHELF_VIDEOS = 6
+
+
+def design_variants(request) -> dict:
+    """Временный переключатель вариантов дизайна вкладки «Видео» (?card=, ?collections=, только при DEBUG) —
+    удаляется, когда заказчик выберет вариант."""
+    picked = {name: request.GET.get(name) for name in ("card", "collections")} if settings.DEBUG else {}
+    picked = {name: value for name, value in picked.items() if value in DESIGN_VARIANTS}
+    return {
+        "variant_card": picked.get("card", "1"),
+        "variant_collections": picked.get("collections", "1"),
+        "variant_query": "?" + urlencode(picked) if picked else "",
+    }
+
+
 def gallery_video(request):
     videos = list(Video.objects.published())
     if not videos:
         raise Http404
     collections = shown_collections()
+    variants = design_variants(request)
+    if variants["variant_collections"] == "3":
+        for collection in collections:
+            collection.shelf_videos = collection.shown_videos()[:SHELF_VIDEOS]
     crumbs = video_crumbs(("Видео", ""))
     context = {
+        **variants,
         "videos": attach_collections(videos, collections),
         "collections": collections,
         "page_size": GALLERY_PAGE,
@@ -191,6 +214,7 @@ def video_collection(request, slug):
     if not collection.cover:
         collection.cover_video = videos[0]
     other_collections = shown_collections(pk=collection.pk)
+    variants = design_variants(request)
     image = safe_spec_url(collection, "cover_og") or safe_spec_url(collection.cover_video, "og")
     seo = make_seo(
         collection.title,
@@ -209,6 +233,8 @@ def video_collection(request, slug):
             "collection": collection,
             "videos": attach_collections(videos, other_collections),
             "other_collections": other_collections,
+            **variants,
+            "all_collections": shown_collections() if variants["variant_collections"] == "2" else [],
             "page_size": GALLERY_PAGE,
             "breadcrumbs": crumbs,
             "seo": seo,

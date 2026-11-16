@@ -1,0 +1,9 @@
+{# Вариант подборок 2 (временный): ряд чипов «Все · Услуги · …», каждый — ссылка на страницу подборки, активный — aria-current. На телефоне — лентой со свайпом. active — slug текущей подборки, пусто — «Все». #}
+<nav aria-label="Подборки видео" class="pt-8 md:pt-10">
+  <ul class="scroll-strip gap-2 sm:flex-wrap">
+    <li class="shrink-0"><a href="{% url 'content:gallery_video' %}{{ variant_query }}"{% if not active %} aria-current="page"{% endif %} class="inline-flex min-h-11 items-center gap-2 rounded-full px-5 font-semibold transition {% if not active %}bg-ink text-white{% else %}bg-brand-50 text-brand-800 hover:bg-brand-100{% endif %}">Все</a></li>
+    {% for collection in collections %}
+    <li class="shrink-0"><a href="{{ collection.get_absolute_url }}{{ variant_query }}"{% if active == collection.slug %} aria-current="page"{% endif %} class="inline-flex min-h-11 items-center gap-2 rounded-full px-5 font-semibold transition {% if active == collection.slug %}bg-ink text-white{% else %}bg-brand-50 text-brand-800 hover:bg-brand-100{% endif %}">{{ collection.title }}<span class="text-sm font-normal tabular-nums">{{ collection.video_count }}</span></a></li>
+    {% endfor %}
+  </ul>
+</nav>

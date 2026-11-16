@@ -1,0 +1,21 @@
+{% load site_tags %}
+{# Вариант карточки 2 (временный): строка «как подборка на Дзене» — обложка слева ≈ 40 %, справа название, описание и подборки; на телефоне обложка сверху. Ссылка просмотра растянута на всю строку (after:inset-0), чипы подборок — над ней. #}
+<article class="group relative grid gap-3 sm:grid-cols-[2fr_3fr] sm:items-start sm:gap-6">
+  <span class="relative block aspect-video overflow-hidden rounded-xl bg-sand-200">
+    {% picture video "card_small 480w, card 800w" sizes="(min-width: 1152px) 438px, (min-width: 640px) calc((100vw - 56px) * 0.4), calc(100vw - 32px)" alt="" width=800 height=450 loading=loading class="h-full w-full object-cover transition duration-500 group-hover:scale-105" %}
+    <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span>
+    {% if video.duration %}<span class="video-duration">{{ video.duration|duration }}</span>{% endif %}
+  </span>
+  <div class="min-w-0 sm:py-1">
+    <{{ heading|default:"h3" }} class="text-lg font-bold leading-snug [text-wrap:pretty] md:text-xl">
+      <a class="glightbox outline-none after:absolute after:inset-0 after:rounded-xl group-hover:text-brand-700 focus-visible:after:ring-4 focus-visible:after:ring-brand-500" href="{{ video.embed_url }}" data-type="external" data-gallery="{{ gallery }}" data-title="{{ video.title }}" aria-label="Видео: {{ video.title }}">{{ video.title }}</a>
+    </{{ heading|default:"h3" }}>
+    {% if video.duration %}<p class="mt-1 text-sm text-ink/65">{{ video.duration|duration }}</p>{% endif %}
+    {% if video.description %}<p class="mt-2 line-clamp-3 text-ink/75">{{ video.description }}</p>{% endif %}
+    {% if video.shown_collections %}
+    <ul class="relative mt-3 flex flex-wrap gap-1.5">
+      {% for collection in video.shown_collections %}<li><a href="{{ collection.get_absolute_url }}{{ variant_query }}" class="inline-flex rounded-full bg-brand-50 px-3 py-1 text-sm font-semibold text-brand-800 transition hover:bg-brand-100">{{ collection.title }}</a></li>{% endfor %}
+    </ul>
+    {% endif %}
+  </div>
+</article>

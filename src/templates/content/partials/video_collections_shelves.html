@@ -1,0 +1,25 @@
+{% load site_tags %}
+{# Вариант подборок 3 (временный): по ленте на подборку — заголовок, «Смотреть все →», до 6 роликов (на ПК видно 3–4, на телефоне — свайп). Карточка — компактная из варианта 1, у каждой полки свой просмотр (data-gallery). #}
+{% for collection in collections %}
+<section class="pt-10 md:pt-12">
+  <div class="flex items-baseline justify-between gap-4">
+    <h2 class="min-w-0 text-2xl font-bold md:text-3xl">{{ collection.title }}&nbsp;<span class="text-base font-semibold text-ink/65 tabular-nums md:text-lg">{{ collection.video_count }}</span></h2>
+    <a href="{{ collection.get_absolute_url }}{{ variant_query }}" class="-my-2.5 inline-flex shrink-0 items-center gap-1 py-2.5 font-semibold text-brand-800 hover:text-brand-600">Смотреть все<span class="icon h-4 w-4">{% include "icons/chevron-right.svg" %}</span></a>
+  </div>
+  {% if collection.description %}<p class="mt-1 text-ink/65">{{ collection.description }}</p>{% endif %}
+  <ul class="scroll-strip mt-4 sm:grid sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
+    {% for video in collection.shelf_videos %}
+    <li class="w-64 shrink-0 snap-start scroll-ml-4 sm:w-auto{% if forloop.counter == 4 %} sm:hidden lg:block{% elif forloop.counter > 4 %} sm:hidden{% endif %}">
+      <a class="glightbox group block rounded-xl outline-none focus-visible:ring-4 focus-visible:ring-brand-500" href="{{ video.embed_url }}" data-type="external" data-gallery="shelf-{{ collection.slug }}" data-title="{{ video.title }}" aria-label="Видео: {{ video.title }}">
+        <span class="relative block aspect-video overflow-hidden rounded-xl bg-sand-200">
+          {% picture video "card_small 480w, card 800w" sizes="(min-width: 1152px) 262px, (min-width: 1024px) calc((100vw - 104px) / 4), (min-width: 640px) calc((100vw - 80px) / 3), 256px" alt="" width=800 height=450 loading=forloop.parentloop.first|yesno:",lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105" %}
+          <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span>
+          {% if video.duration %}<span class="video-duration">{{ video.duration|duration }}</span>{% endif %}
+        </span>
+        <h3 class="mt-2 line-clamp-2 font-semibold leading-snug [text-wrap:pretty] group-hover:text-brand-700">{{ video.title }}</h3>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endfor %}

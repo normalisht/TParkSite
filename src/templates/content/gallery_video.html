@@ -14,9 +14,13 @@
 </section>
 
 <div class="mx-auto max-w-6xl px-4">
-  {% if collections %}{% text "gallery.collections_title" as shelf_title %}{% include "content/partials/video_collections.html" with title=shelf_title %}{% endif %}
-  <section class="pt-10 md:pt-12">
-    <h2 class="mb-4 text-2xl font-bold md:mb-6 md:text-3xl">{% text "gallery.all_videos_title" %}</h2>
+  {% if collections %}
+  {% if variant_collections == "2" %}{% include "content/partials/video_collections_chips.html" %}
+  {% elif variant_collections == "3" %}{% include "content/partials/video_collections_shelves.html" %}
+  {% else %}{% text "gallery.collections_title" as shelf_title %}{% include "content/partials/video_collections.html" with title=shelf_title %}{% endif %}
+  {% endif %}
+  <section class="{% if variant_collections == "2" and collections %}pt-6 md:pt-8{% else %}pt-10 md:pt-12{% endif %}">
+    <h2 class="mb-4 text-2xl font-bold md:mb-6 md:text-3xl{% if variant_collections == "2" and collections %} sr-only{% endif %}">{% text "gallery.all_videos_title" %}</h2>
     {% include "content/partials/video_grid.html" with gallery="video" %}
   </section>
 </div>
