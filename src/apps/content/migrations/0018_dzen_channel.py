@@ -1,5 +1,7 @@
 from django.db import migrations
 
+# dzen_import — живой модуль: если в его Video(...) появится новое обязательное поле, на старой базе миграция упадёт —
+# тогда заморозьте здесь копию логики.
 from apps.content.dzen_import import import_channel, load_channel
 
 

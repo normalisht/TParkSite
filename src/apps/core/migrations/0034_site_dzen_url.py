@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='sitesettings',
             name='dzen_url',
-            field=models.URLField(blank=True, help_text='Ссылка на канал в Дзене: кнопка в «Связаться», в подвале и на «Контактах». Пусто — кнопки нет.', max_length=500, verbose_name='Дзен'),
+            field=models.URLField(blank=True, help_text='Ссылка на канал в Дзене: кнопка в «Связаться», в подвале, на «Контактах» и «Канал на Дзене» в галерее на вкладке «Видео». Пусто — кнопок нет.', max_length=500, verbose_name='Дзен'),
         ),
         migrations.AlterField(
             model_name='contactchannel',

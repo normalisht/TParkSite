@@ -210,7 +210,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return span.innerHTML.replaceAll('"', "&quot;");
   };
   // «Открыть на Дзене» под плеером — только у ролика с адресом на Дзене (data-dzen-* карточки). Адрес проверяем и здесь:
-  // перенос со старого сайта пишет его в базу без валидации поля.
+  // перенос канала Дзена (dzen_import.py) пишет его в базу без full_clean().
   const DZEN_PAGE = /^https:\/\/dzen\.ru\//;
   const dzenLink = ({ dzenUrl, dzenLabel }) =>
     DZEN_PAGE.test(dzenUrl || "")

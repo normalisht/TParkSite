@@ -159,6 +159,7 @@ def service_detail(request, slug):
             "photos": photos,
             "category": category,
             "related": related,
+            # Карточки без тегов: ссылка на эту же услугу лишняя, а теги подборок стоили бы запросов.
             "videos": list(service.videos.published()[:SERVICE_VIDEOS]),
             "breadcrumbs": crumbs,
             "seo": seo,

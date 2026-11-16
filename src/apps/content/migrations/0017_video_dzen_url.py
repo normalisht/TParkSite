@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='video',
             name='dzen_url',
-            field=models.URLField(blank=True, help_text='Ссылка «Открыть на Дзене» под плеером в просмотре ролика. Пусто — сайт возьмёт адрес с Дзена вместе с названием; без адреса ссылки нет.', max_length=255, validators=[apps.content.dzen.validate_dzen_page_url], verbose_name='Ролик на Дзене'),
+            field=models.URLField(blank=True, help_text='Ссылка «Открыть на Дзене» под плеером в просмотре ролика. Пусто — при добавлении или смене ролика сайт возьмёт адрес с Дзена вместе с названием; без адреса ссылки нет.', max_length=255, validators=[apps.content.dzen.validate_dzen_page_url], verbose_name='Ролик на Дзене'),
         ),
     ]
