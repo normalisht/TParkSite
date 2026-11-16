@@ -1,17 +1,25 @@
+from django import forms
 from django.contrib import admin, messages
 from django.core.exceptions import PermissionDenied
+from django.db.models import Count
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import path, reverse
 from django.utils import timezone
 from django.utils.formats import localize_input
+from django.utils.html import format_html
+from unfold.admin import TabularInline
 from unfold.decorators import action
+from unfold.forms import PaginationInlineFormSet
+from unfold.widgets import UnfoldAdminTextareaWidget
 
-from apps.content.models import Event, GalleryPhoto, Partner, Review
+from apps.content.dzen import DzenEmbedURLField, DzenFetchError, download_poster, fetch_video, validate_embed_url
+from apps.content.models import Event, GalleryPhoto, Partner, Review, Video, VideoCollection, VideoCollectionItem
 from apps.content.yandex import ReviewFetchError, fetch_review
 from apps.core.admin_utils import (
     SEO_FIELDSET,
     DuplicateAdminMixin,
+    OrderedInlineMixin,
     SeoGenerateMixin,
     SiteModelAdmin,
     TrashAdminMixin,
@@ -20,6 +28,7 @@ from apps.core.admin_utils import (
     thumbnail_html,
 )
 from apps.core.bulk_upload import BulkUploadForm, append_images
+from apps.core.models import next_order
 
 
 class EventPeriodFilter(admin.SimpleListFilter):
@@ -189,3 +198,206 @@ class GalleryPhotoAdmin(OrderedPhotoAdmin):
             "form": form,
         }
         return render(request, "admin/bulk_upload.html", context)
+
+
+DZEN_ERROR = (
+    "Не удалось получить данные ролика с Дзена: {} Попробуйте позже или заполните название и загрузите обложку вручную."
+)
+
+
+class VideoAdminForm(forms.ModelForm):
+    """При новом или сменённом коде ролика берёт с Дзена название, описание, длительность и обложку (`self.dzen`,
+    `self.dzen_poster`). Заполняет только поля, которые администратор не задал сам: у новой записи — пустые,
+    при смене ролика — все, кроме изменённых в этой же отправке."""
+
+    class Meta:
+        model = Video
+        fields = "__all__"
+        help_texts = {
+            "embed_url": (
+                "На Дзене под видео «⋯» → «Поделиться» → «Встроить», скопируйте код целиком и вставьте сюда. "
+                "Название, описание и обложку можно не заполнять — сайт возьмёт их с Дзена."
+            ),
+            "title": "Пусто — название ролика на Дзене.",
+            "description": "Пусто — описание ролика на Дзене.",
+            "poster": "Пусто — обложка ролика на Дзене. Можно загрузить свою, лучше 16:9.",
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.dzen = None
+        self.dzen_poster = None
+        self.dzen_checked = False
+        if "title" in self.fields:
+            self.fields["title"].required = False  # пустое заполнится с Дзена; без Дзена проверяет clean()
+
+    def _admin_value(self, cleaned, name: str) -> bool:
+        """Значение поля задал администратор — данными Дзена его не заменяем."""
+        return bool(cleaned.get(name)) and (self.instance._state.adding or name in self.changed_data)
+
+    def clean_embed_url(self):
+        # Валидатор модели срабатывает только после clean(): чужую ссылку отсекаем до запроса к Дзену.
+        value = self.cleaned_data["embed_url"]
+        validate_embed_url(value)
+        return value
+
+    def clean(self):
+        cleaned = super().clean()
+        if "embed_url" not in self.fields or "embed_url" in self._errors:
+            return cleaned
+        if self.instance._state.adding or "embed_url" in self.changed_data:
+            self._fill_from_dzen(cleaned)
+        if not cleaned.get("title") and "title" not in self._errors:
+            self.add_error("title", "Заполните название.")
+        if not cleaned.get("poster") and "poster" not in self._errors:
+            self.add_error("poster", "Загрузите обложку: без неё ролик не показать на сайте.")
+        return cleaned
+
+    def _fill_from_dzen(self, cleaned) -> None:
+        self.dzen_checked = True
+        own_title = self._admin_value(cleaned, "title")
+        own_poster = self._admin_value(cleaned, "poster")
+        try:
+            self.dzen = fetch_video(cleaned["embed_url"])
+        except DzenFetchError as exc:
+            # Без Дзена сохранить можно, только если название и обложку администратор задал сам.
+            if not (own_title and own_poster):
+                self.add_error("embed_url", DZEN_ERROR.format(exc))
+            return
+        if not own_title:
+            cleaned["title"] = self.dzen.title
+        if not self._admin_value(cleaned, "description"):
+            cleaned["description"] = self.dzen.description
+        if own_poster:
+            return
+        try:
+            if not self.dzen.thumbnail_url:
+                raise DzenFetchError("У ролика на Дзене нет обложки — загрузите её вручную.")
+            self.dzen_poster = download_poster(self.dzen.thumbnail_url)
+        except DzenFetchError as exc:
+            self.add_error("poster", str(exc))
+            return
+        cleaned["poster"] = self.dzen_poster
+
+    def save(self, commit=True):
+        if self.dzen_checked:
+            self.instance.duration = self.dzen.duration if self.dzen else None
+        return super().save(commit)
+
+
+class AppendToCollectionFormSet(PaginationInlineFormSet):
+    """Ролик, добавленный в подборку из формы ролика, встаёт в конец подборки (а не в начало с order=0)."""
+
+    def save_new(self, form, commit=True):
+        form.instance.order = next_order(VideoCollectionItem, collection=form.instance.collection)
+        return super().save_new(form, commit)
+
+
+class VideoCollectionItemInline(TabularInline):
+    model = VideoCollectionItem
+    fk_name = "video"
+    formset = AppendToCollectionFormSet
+    extra = 0
+    autocomplete_fields = ["collection"]
+    fields = ["collection"]
+    verbose_name = "Подборка"
+    verbose_name_plural = "Подборки"
+
+
+@admin.register(Video)
+class VideoAdmin(OrderedPhotoAdmin):
+    help_intro = (
+        "Ролики с Дзена для вкладки «Видео» в галерее. Вставьте код «Встроить» — название, описание и обложку "
+        "сайт возьмёт с Дзена; новые ролики встают в конец — отметьте их и выберите «Поставить в начало»."
+    )
+    help_anchor = "gallery"
+    form = VideoAdminForm
+    formfield_overrides = {DzenEmbedURLField: {"widget": UnfoldAdminTextareaWidget(attrs={"rows": 3})}}
+    fields = ["embed_url", "title", "description", "poster", "is_published"]
+    inlines = [VideoCollectionItemInline]
+    list_display = ["preview", "title", "collections_list", "is_published"]
+    list_display_links = ["preview", "title"]
+    list_editable = ["is_published"]
+    list_filter = ["is_published", "collections"]
+    search_fields = ["title"]
+    list_per_page = 400  # все ролики на одной странице: перетаскивание работает только в пределах страницы
+    actions = ["move_to_top"]
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related("collections")
+
+    @admin.display(description="Обложка")
+    def preview(self, obj):
+        image = thumbnail_html(obj, "card_small", 96)
+        if not obj.duration_text:
+            return image
+        return format_html('{}<div class="mt-1 text-xs tabular-nums">▶ {}</div>', image, obj.duration_text)
+
+    @admin.display(description="Подборки")
+    def collections_list(self, obj):
+        return ", ".join(collection.title for collection in obj.collections.all()) or "—"
+
+    @admin.action(description="Поставить в начало", permissions=["change"])
+    def move_to_top(self, request, queryset):
+        moved = move_to_top(Video, queryset)
+        messages.success(request, f"Поставлено в начало: {moved}.")
+
+
+class CollectionVideoInline(OrderedInlineMixin, TabularInline):
+    model = VideoCollectionItem
+    fk_name = "collection"
+    extra = 0
+    ordering_field = "order"
+    hide_ordering_field = True
+    autocomplete_fields = ["video"]
+    fields = ["video", "order"]
+    verbose_name = "Ролик"
+    verbose_name_plural = "Ролики подборки"
+
+
+class VideoCollectionAdminForm(forms.ModelForm):
+    class Meta:
+        model = VideoCollection
+        fields = "__all__"
+        help_texts = {
+            "cover": "Квадратная плитка подборки. Пусто — обложка первого ролика подборки.",
+            "description": "Под названием на странице подборки. Необязательно.",
+        }
+
+
+@admin.register(VideoCollection)
+class VideoCollectionAdmin(SeoGenerateMixin, OrderedPhotoAdmin):
+    help_intro = (
+        "Подборки роликов для вкладки «Видео» в галерее, у каждой — своя страница. "
+        "Ролики добавляются внизу формы подборки, порядок — перетаскиванием."
+    )
+    help_anchor = "gallery"
+    form = VideoCollectionAdminForm
+    fieldsets = (
+        (
+            "Основное",
+            {"classes": ["tab"], "fields": ["title", "slug", "description", "cover", "is_published"]},
+        ),
+        SEO_FIELDSET,
+    )
+    seo_source_fields = ("title", "description")
+    slug_source_fields = ("title",)
+    inlines = [CollectionVideoInline]
+    list_display = ["preview", "title", "video_count", "is_published"]
+    list_display_links = ["preview", "title"]
+    list_editable = ["is_published"]
+    search_fields = ["title"]
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).annotate(video_total=Count("items"))
+
+    @admin.display(description="Обложка")
+    def preview(self, obj):
+        if obj.cover:
+            return thumbnail_html(obj, "cover_square")
+        video = obj.cover_video
+        return thumbnail_html(video, "square") if video else "—"
+
+    @admin.display(description="Роликов", ordering="video_total")
+    def video_count(self, obj):
+        return obj.video_total

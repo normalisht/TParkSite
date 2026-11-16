@@ -294,6 +294,8 @@ UNFOLD = {
                     _nav("Мероприятия", "event", "admin:content_event_changelist"),
                     _nav("Отзывы", "reviews", "admin:content_review_changelist"),
                     _nav("Галерея", "photo_library", "admin:content_galleryphoto_changelist"),
+                    _nav("Видео", "smart_display", "admin:content_video_changelist"),
+                    _nav("Подборки видео", "video_library", "admin:content_videocollection_changelist"),
                     _nav("Партнёры", "handshake", "admin:content_partner_changelist"),
                 ],
             },
