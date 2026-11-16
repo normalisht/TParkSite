@@ -79,13 +79,7 @@ class CategorySitemap(ModelSitemap):
 
 class ServiceSitemap(ModelSitemap):
     def items(self):
-        # Только услуги, которые видно через навигацию: со своей страницей и хотя бы в одной опубликованной категории.
-        return (
-            Service.objects.published()
-            .filter(has_page=True, category_links__category__is_published=True)
-            .distinct()
-            .order_by("id")
-        )
+        return Service.objects.with_open_page().order_by("id")
 
 
 class InfoPageSitemap(ModelSitemap):

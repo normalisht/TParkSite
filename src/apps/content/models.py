@@ -292,6 +292,20 @@ class Video(OrderedModel):
     collections = models.ManyToManyField(
         "VideoCollection", through="VideoCollectionItem", related_name="videos", blank=True
     )
+    show_collection_tags = models.BooleanField(
+        "Показывать подборки на карточке",
+        default=True,
+        help_text="Под описанием ролика — ссылки на его подборки. Снимите, чтобы не показывать их у этого ролика; "
+        "ссылки на услуги останутся.",
+    )
+    services = models.ManyToManyField(
+        "catalog.Service",
+        verbose_name="Услуги",
+        related_name="videos",
+        blank=True,
+        help_text="Ссылки на страницы услуг под описанием ролика. Видны только услуги, чья страница открыта на сайте: "
+        "опубликованные, с отдельной страницей, в опубликованной категории.",
+    )
     card, card_avif = image_specs("poster", 800, 450)
     card_small, card_small_avif = image_specs("poster", 480, 270)
     square, square_avif = image_specs("poster", 400, 400)

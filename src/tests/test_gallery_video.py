@@ -6,6 +6,7 @@ import pytest
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
 
+from apps.catalog.models import Category, CategoryService, Service
 from apps.content.models import GalleryPhoto, VideoCollectionItem
 from apps.core.images import safe_spec_url
 
@@ -19,6 +20,22 @@ def add(collection, *videos):
 
 def _cards(html):
     return re.findall(r'<a class="glightbox[^>]*>', html)
+
+
+def tags(html, title):
+    """Теги карточки ролика в сетке: [(адрес, текст)]. Сетка идёт после полок — берём последнее вхождение."""
+    card = html.rsplit(f'aria-label="Видео: {title}"', 1)[1].split("<li data-video-card", 1)[0]
+    found = re.search(r"<ul data-video-tags[^>]*>(.*?)</ul>", card, re.DOTALL)
+    return re.findall(r'<a href="([^"]+)"[^>]*>([^<]*)</a>', found.group(1)) if found else []
+
+
+def make_service(name, *, category_published=True, **kwargs):
+    kwargs.setdefault("has_page", True)
+    service = Service.objects.create(name=name, **kwargs)
+    if category_published is not None:
+        category = Category.objects.create(name=f"Категория {name}", is_published=category_published)
+        CategoryService.objects.create(category=category, service=service)
+    return service
 
 
 def test_tabs_hidden_without_videos(client, make_image, make_video):
@@ -74,9 +91,9 @@ def test_collections_shelf_and_chips(client, make_video, make_collection):
     add(hidden, a)
     add(empty, make_video(is_published=False))
     html = client.get("/gallery/video/").content.decode()
-    assert html.count(f'href="{shown.get_absolute_url()}"') == 3  # полка + чипы двух роликов
+    assert html.count(f'href="{shown.get_absolute_url()}"') == 3  # «Смотреть все» + теги двух роликов
     assert hidden.get_absolute_url() not in html and empty.get_absolute_url() not in html
-    assert "Подборки" in html and "Все видео" in html
+    assert "Смотреть все" in html and "Все видео" in html
 
 
 def test_collection_page_order_and_count(client, make_video, make_collection):
@@ -152,7 +169,8 @@ def test_video_counter(client, make_video, make_collection):
     first, second = make_collection("Первая"), make_collection("Вторая")
     add(first, *videos)
     add(second, videos[0])
-    assert "3 видео · 2 подборки" in client.get("/gallery/video/").content.decode()
+    text = re.sub(r"<[^>]+>", "", client.get("/gallery/video/").content.decode())
+    assert "3 видео · 2 подборки" in text
 
 
 def test_videos_after_page_size_hidden(client, make_video):
@@ -210,3 +228,146 @@ def test_video_pages_etag_304(client, make_video, make_collection, path):
 
 def test_csp_allows_dzen_frames(settings):
     assert "https://dzen.ru" in settings.SECURE_CSP_REPORT_ONLY["frame-src"]
+
+
+def test_shelves_show_collections_in_order(client, make_video, make_collection):
+    first = make_collection("Услуги", description="Чем заняться в парке")
+    second = make_collection("Эмоции")
+    videos = [make_video(title=f"Ролик {n}") for n in range(8)]
+    add(first, *reversed(videos))
+    add(second, videos[0])
+    html = client.get("/gallery/video/").content.decode()
+    shelves = re.findall(r'<section data-video-shelf="([^"]+)"(.*?)</section>', html, re.DOTALL)
+    assert [slug for slug, _ in shelves] == [first.slug, second.slug]
+    body = shelves[0][1]
+    assert "Услуги" in body and "Чем заняться в парке" in body and ">8<" in body
+    assert f'href="{first.get_absolute_url()}"' in body and "Смотреть все" in body
+    titles = re.findall(r'aria-label="Видео: ([^"]+)"', body)
+    assert titles == [f"Ролик {n}" for n in range(7, 1, -1)]  # первые 6 в порядке подборки
+    assert body.count(f'data-gallery="shelf-{first.slug}"') == 6
+    assert re.findall(r'aria-label="Видео: ([^"]+)"', shelves[1][1]) == ["Ролик 0"]
+
+
+def test_collection_tags_hidden_when_unchecked(client, make_video, make_collection):
+    c, other = make_collection("Услуги"), make_collection("Эмоции")
+    shown, hidden = make_video(title="Альфа"), make_video(title="Бета", show_collection_tags=False)
+    add(c, shown, hidden)
+    add(other, hidden)
+    html = client.get("/gallery/video/").content.decode()
+    assert tags(html, "Альфа") == [(c.get_absolute_url(), "Услуги")]
+    assert tags(html, "Бета") == []
+    assert "data-video-tags" not in html.rsplit('aria-label="Видео: Бета"', 1)[1].split("<li data-video-card", 1)[0]
+    assert tags(client.get(other.get_absolute_url()).content.decode(), "Бета") == []
+
+
+def test_collection_page_excludes_current_collection_tag(client, make_video, make_collection):
+    c, other = make_collection("Услуги"), make_collection("Эмоции")
+    video = make_video(title="Альфа")
+    add(c, video)
+    add(other, video)
+    assert tags(client.get(c.get_absolute_url()).content.decode(), "Альфа") == [(other.get_absolute_url(), "Эмоции")]
+
+
+def test_service_tags_link_to_service_pages(client, make_video, make_collection):
+    c = make_collection("Услуги")
+    video = make_video(title="Альфа")
+    add(c, video)
+    zipline, banya = make_service("Зиплайн"), make_service("Баня")
+    video.services.add(zipline, banya)
+    html = client.get("/gallery/video/").content.decode()
+    assert tags(html, "Альфа") == [
+        (c.get_absolute_url(), "Услуги"),
+        (banya.get_absolute_url(), "Баня"),
+        (zipline.get_absolute_url(), "Зиплайн"),
+    ]
+    assert client.get(banya.get_absolute_url()).status_code == 200
+
+
+def test_unpublished_or_pageless_service_tag_hidden(client, make_video):
+    video = make_video(title="Альфа")
+    video.services.add(
+        make_service("Открытая"),
+        make_service("Снятая", is_published=False),
+        make_service("Без страницы", has_page=False),
+        make_service("В черновой категории", category_published=False),
+        make_service("Без категории", category_published=None),
+    )
+    html = client.get("/gallery/video/").content.decode()
+    assert [text for _, text in tags(html, "Альфа")] == ["Открытая"]
+
+
+def test_service_tags_shown_when_collection_tags_off(client, make_video, make_collection):
+    c = make_collection("Услуги")
+    video = make_video(title="Альфа", show_collection_tags=False)
+    add(c, video)
+    service = make_service("Зиплайн")
+    video.services.add(service)
+    for path in ("/gallery/video/", c.get_absolute_url()):
+        assert tags(client.get(path).content.decode(), "Альфа") == [(service.get_absolute_url(), "Зиплайн")]
+
+
+@pytest.mark.parametrize("path", ["/gallery/video/", "/gallery/video/pervaia/"])
+def test_video_tab_query_count_constant(client, make_video, make_collection, path):
+    def count_queries():
+        with CaptureQueriesContext(connection) as ctx:
+            assert client.get(path).status_code == 200
+        return len(ctx.captured_queries)
+
+    v = make_video()
+    v.services.add(make_service("Зиплайн"))
+    first = make_collection("Первая")
+    add(first, v)
+    add(make_collection("Вторая"), v)
+    count_queries()  # первый показ ещё и записывает версию страницы для Last-Modified
+    small = count_queries()
+    for n in range(4):
+        extra = make_video()
+        extra.services.add(make_service(f"Услуга {n}"), make_service(f"Ещё услуга {n}"))
+        add(make_collection(f"Ещё {n}"), extra, v)
+        VideoCollectionItem.objects.create(collection=first, video=extra, order=n + 1)
+    count_queries()
+    assert count_queries() == small
+
+
+def test_video_tab_image_loading(client, make_video, make_collection):
+    """Полка первой подборки — первый экран: её первая обложка — LCP; ниже сгиба — lazy."""
+    first, second = make_collection("Первая"), make_collection("Вторая")
+    videos = [make_video(title=f"Ролик {n}") for n in range(6)]
+    add(first, *videos)
+    add(second, *videos)
+    html = client.get("/gallery/video/").content.decode()
+    imgs = re.findall(r"<img [^>]*>", html.split('data-video-shelf="', 1)[1])
+    assert html.count('fetchpriority="high"') == 1 and 'fetchpriority="high"' in imgs[0]
+    assert ['loading="lazy"' in img for img in imgs[:6]] == [False] * 4 + [True] * 2
+    assert all('loading="lazy"' in img for img in imgs[6:])  # вторая полка и «Все видео»
+
+
+def test_collection_page_image_loading(client, make_video, make_collection):
+    c, other = make_collection("Первая"), make_collection("Вторая")
+    videos = [make_video(title=f"Ролик {n}") for n in range(5)]
+    add(c, *videos)
+    add(other, videos[0])
+    html = client.get(c.get_absolute_url()).content.decode()
+    grid, bottom = html.split("<li data-video-card", 1)[1].split("Другие подборки", 1)
+    imgs = re.findall(r"<img [^>]*>", grid)
+    assert html.count('fetchpriority="high"') == 1 and 'fetchpriority="high"' in imgs[0]
+    assert ['loading="lazy"' in img for img in imgs] == [False] * 3 + [True] * 2
+    assert all('loading="lazy"' in img for img in re.findall(r"<img [^>]*>", bottom))
+
+
+def test_collection_counter_not_link_colored(client, make_video, make_collection):
+    c = make_collection("Первая")
+    add(c, make_video())
+    html = client.get(c.get_absolute_url()).content.decode()
+    counter = re.search(r'<span class="([^"]*)">1 видео</span>', html)
+    assert counter and "brand" not in counter.group(1)
+
+
+@pytest.mark.parametrize("path", ["/gallery/video/", "/gallery/video/pervaia/"])
+def test_design_switch_removed(client, make_video, make_collection, settings, path):
+    settings.DEBUG = True
+    add(make_collection("Первая"), make_video(), make_video())
+    add(make_collection("Вторая"), make_video())
+    plain = client.get(path).content.decode()
+    assert client.get(f"{path}?card=2&collections=1").content.decode() == plain
+    assert "?card=" not in plain and "collections=" not in plain

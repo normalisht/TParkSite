@@ -1,16 +1,17 @@
 {% load site_tags %}
-{# Карточка ролика: ссылка открывает просмотр (GLightbox, плеер Дзена — только по клику), подборки — отдельными ссылками под ней. sizes — сетка в 1/2/3 колонки (content/partials/video_grid.html). #}
+{# Карточка ролика: ссылка открывает просмотр (GLightbox, плеер Дзена — только по клику), теги (подборки, затем услуги) — отдельными ссылками под ней. sizes — сетка в 1/2/3 колонки (content/partials/video_grid.html). #}
 <a class="glightbox group block rounded-xl outline-none focus-visible:ring-4 focus-visible:ring-brand-500" href="{{ video.embed_url }}" data-type="external" data-gallery="{{ gallery }}" data-title="{{ video.title }}" aria-label="Видео: {{ video.title }}">
   <span class="relative block aspect-video overflow-hidden rounded-xl bg-sand-200">
-    {% picture video "card_small 480w, card 800w" sizes="(min-width: 1152px) 357px, (min-width: 1024px) calc((100vw - 80px) / 3), (min-width: 640px) calc(50vw - 28px), calc(100vw - 32px)" alt="" width=800 height=450 loading=loading class="h-full w-full object-cover transition duration-500 group-hover:scale-105" %}
+    {% picture video "card_small 480w, card 800w" sizes="(min-width: 1152px) 357px, (min-width: 1024px) calc((100vw - 80px) / 3), (min-width: 640px) calc(50vw - 28px), calc(100vw - 32px)" alt="" width=800 height=450 loading=loading fetchpriority=fetchpriority class="h-full w-full object-cover transition duration-500 group-hover:scale-105" %}
     <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span>
     {% if video.duration %}<span class="video-duration">{{ video.duration|duration }}</span>{% endif %}
   </span>
   <{{ heading|default:"h3" }} class="mt-3 line-clamp-2 font-semibold leading-snug [text-wrap:pretty] group-hover:text-brand-700">{{ video.title }}</{{ heading|default:"h3" }}>
   {% if video.description %}<p class="mt-1 line-clamp-2 text-sm text-ink/65">{{ video.description }}</p>{% endif %}
 </a>
-{% if video.shown_collections %}
-<ul class="mt-2 flex flex-wrap gap-1.5">
-  {% for collection in video.shown_collections %}<li><a href="{{ collection.get_absolute_url }}{{ variant_query }}" class="inline-flex rounded-full bg-brand-50 px-3 py-1 text-sm font-semibold text-brand-800 transition hover:bg-brand-100">{{ collection.title }}</a></li>{% endfor %}
+{% if video.collection_tags or video.service_tags %}
+<ul data-video-tags class="mt-2 flex flex-wrap gap-1.5">
+  {% for collection in video.collection_tags %}<li><a href="{{ collection.get_absolute_url }}" class="inline-flex rounded-full bg-brand-50 px-3 py-1 text-sm font-semibold text-brand-800 transition hover:bg-brand-100">{{ collection.title }}</a></li>{% endfor %}
+  {% for service in video.service_tags %}<li><a href="{{ service.get_absolute_url }}" class="inline-flex rounded-full bg-brand-50 px-3 py-1 text-sm font-semibold text-brand-800 transition hover:bg-brand-100">{{ service.name }}</a></li>{% endfor %}
 </ul>
 {% endif %}

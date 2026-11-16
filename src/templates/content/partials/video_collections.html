@@ -1,13 +1,13 @@
-{% load site_tags %}
-{# Полка подборок: квадратные обложки (своя или первого ролика), лента со свайпом на телефоне, с sm — сетка по 160+ px. title — заголовок из «Текстов сайта». #}
+{% load site_tags site_texts %}
+{# «Другие подборки» внизу страницы подборки: квадратные обложки (своя или первого ролика), лента со свайпом на телефоне, с sm — сетка по 160+ px. Всегда ниже первого экрана — обложки lazy. #}
 <section class="pt-10 md:pt-12">
-  <h2 class="text-2xl font-bold md:text-3xl">{{ title|nobr }}</h2>
+  <h2 class="text-2xl font-bold md:text-3xl">{% text "gallery.other_collections_title" %}</h2>
   <ul class="scroll-strip mt-4 sm:grid sm:grid-cols-[repeat(auto-fill,minmax(10rem,1fr))] sm:gap-4 md:mt-6">
     {% for collection in collections %}
     <li class="w-40 shrink-0 snap-start scroll-ml-4 sm:w-auto">
-      <a href="{{ collection.get_absolute_url }}{{ variant_query }}" class="group block rounded-xl outline-none focus-visible:ring-4 focus-visible:ring-brand-500">
+      <a href="{{ collection.get_absolute_url }}" class="group block rounded-xl outline-none focus-visible:ring-4 focus-visible:ring-brand-500">
         <span class="relative block aspect-square overflow-hidden rounded-xl bg-sand-200">
-          {% if collection.cover %}{% picture collection "cover_square" alt="" width=400 height=400 loading=forloop.counter|lazy_after:6 class="h-full w-full object-cover transition duration-500 group-hover:scale-105" %}{% else %}{% picture collection.cover_video "square" alt="" width=400 height=400 loading=forloop.counter|lazy_after:6 class="h-full w-full object-cover transition duration-500 group-hover:scale-105" %}{% endif %}
+          {% if collection.cover %}{% picture collection "cover_square" alt="" width=400 height=400 loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105" %}{% else %}{% picture collection.cover_video "square" alt="" width=400 height=400 loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-105" %}{% endif %}
           <span class="video-duration"><svg viewBox="0 0 24 24" class="h-3.5 w-3.5 fill-current" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>{{ collection.video_count }}<span class="sr-only"> видео</span></span>
         </span>
         <span class="mt-2 line-clamp-2 font-semibold leading-snug [text-wrap:pretty] group-hover:text-brand-700">{{ collection.title }}</span>

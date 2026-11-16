@@ -5,6 +5,7 @@ from django.core.files.base import ContentFile
 from django.urls import reverse
 from PIL import Image
 
+from apps.catalog.models import Service
 from apps.content.dzen import DzenFetchError, DzenVideo
 from apps.content.models import Video, VideoCollectionItem
 
@@ -62,6 +63,7 @@ def video_data(collections=(), **fields):
         "title": "",
         "description": "",
         "is_published": "on",
+        "show_collection_tags": "on",
         "collection_items-TOTAL_FORMS": str(len(collections)),
         "collection_items-INITIAL_FORMS": "0",
     }
@@ -288,7 +290,25 @@ def test_help_explains_video(admin_client):
         "Рекламу и рекомендации",
         "удалите его и здесь",
         "Подборки видео",
+        "Показывать подборки на карточке",
+        "«Отдельная страница»",
+        "своя полка",
     ):
         assert phrase in gallery, phrase
     assert reverse("admin:content_video_changelist") in gallery
     assert reverse("admin:content_videocollection_changelist") in gallery
+
+
+def test_video_form_saves_services_and_checkbox(admin_client, fake_dzen):
+    zipline, banya = Service.objects.create(name="Зиплайн"), Service.objects.create(name="Баня")
+    response = post_add(
+        admin_client, embed_url=EMBED, services=[str(zipline.pk), str(banya.pk)], show_collection_tags=""
+    )
+    assert response.status_code == 302, form_errors(response)
+    video = Video.objects.get()
+    assert set(video.services.all()) == {zipline, banya}
+    assert video.show_collection_tags is False
+    response = admin_client.get(reverse("admin:content_video_change", args=[video.pk]))
+    form = response.context["adminform"].form
+    assert "Autocomplete" in type(form.fields["services"].widget.widget).__name__
+    assert "show_collection_tags" in form.fields

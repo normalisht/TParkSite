@@ -1,4 +1,5 @@
 from django.db import models, transaction
+from django.db.models import Exists, OuterRef
 from django.urls import reverse
 
 from apps.catalog.prices import format_price
@@ -132,6 +133,14 @@ class CategoryPhoto(OrderedModel):
         return f"Фото #{self.pk}"
 
 
+class ServiceQuerySet(PublishedQuerySet):
+    def with_open_page(self):
+        """Услуги, чья страница видна посетителю через навигацию: опубликованные, со своей страницей и хотя бы в одной
+        опубликованной категории (sitemap, теги роликов)."""
+        published_link = CategoryService.objects.filter(service=OuterRef("pk"), category__is_published=True)
+        return self.published().filter(Exists(published_link), has_page=True)
+
+
 class Service(TrashableModel, SeoModel):
     name = models.CharField("Название", max_length=128)
     slug = models.SlugField("Адрес страницы", max_length=255, unique=True, blank=True, help_text=SLUG_HELP)
@@ -164,7 +173,7 @@ class Service(TrashableModel, SeoModel):
         "Отдельная страница", default=False, help_text="Карточка в категории ведёт на страницу услуги."
     )
 
-    objects = PublishedQuerySet.as_manager()
+    objects = ServiceQuerySet.as_manager()
 
     class Meta:
         verbose_name = "Услуга"

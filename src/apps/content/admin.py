@@ -313,7 +313,8 @@ class VideoAdmin(OrderedPhotoAdmin):
     help_anchor = "gallery"
     form = VideoAdminForm
     formfield_overrides = {DzenEmbedURLField: {"widget": UnfoldAdminTextareaWidget(attrs={"rows": 3})}}
-    fields = ["embed_url", "title", "description", "poster", "is_published"]
+    fields = ["embed_url", "title", "description", "poster", "services", "show_collection_tags", "is_published"]
+    autocomplete_fields = ["services"]
     inlines = [VideoCollectionItemInline]
     list_display = ["preview", "title", "collections_list", "is_published"]
     list_display_links = ["preview", "title"]
@@ -360,15 +361,18 @@ class VideoCollectionAdminForm(forms.ModelForm):
         model = VideoCollection
         fields = "__all__"
         help_texts = {
-            "cover": "Квадратная плитка подборки. Пусто — обложка первого ролика подборки.",
-            "description": "Под названием на странице подборки. Необязательно.",
+            "cover": (
+                "Квадратная: в шапке страницы подборки и в блоке «Другие подборки». "
+                "Пусто — обложка первого ролика подборки."
+            ),
+            "description": "Под названием полки подборки на вкладке «Видео» и на странице подборки. Необязательно.",
         }
 
 
 @admin.register(VideoCollection)
 class VideoCollectionAdmin(SeoGenerateMixin, OrderedPhotoAdmin):
     help_intro = (
-        "Подборки роликов для вкладки «Видео» в галерее, у каждой — своя страница. "
+        "Подборки роликов: на вкладке «Видео» в галерее у каждой — своя полка, а ещё своя страница. "
         "Ролики добавляются внизу формы подборки, порядок — перетаскиванием."
     )
     help_anchor = "gallery"

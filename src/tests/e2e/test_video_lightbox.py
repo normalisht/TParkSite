@@ -109,3 +109,19 @@ def test_photo_gallery_still_opens_images(live_server, browser, make_image):
     page.locator(".gslide.current .gslide-image img").wait_for()
     page.locator(".gnext").click()
     page.locator(".gslide.current .gslide-title", has_text="Фото 1").wait_for()
+
+
+def test_shelf_lists_only_its_videos(live_server, browser, make_video, make_collection):
+    from apps.content.models import VideoCollectionItem
+
+    shelf = make_collection("Услуги")
+    for order, name in enumerate(("one", "two")):
+        VideoCollectionItem.objects.create(
+            collection=shelf, video=make_video(title=name, embed_url=f"https://dzen.ru/embed/{name}"), order=order
+        )
+    make_video(title="three", embed_url="https://dzen.ru/embed/three")
+    page, _ = open_video_tab(browser, live_server)
+    page.locator(f'[data-video-shelf="{shelf.slug}"] a[aria-label="Видео: two"]').click()
+    page.locator('.gslide.current iframe[src="https://dzen.ru/embed/two"]').wait_for()
+    page.locator(".gnext").click()  # в полке два ролика: «вперёд» возвращает к первому, а не к «three»
+    page.locator('.gslide.current iframe[src="https://dzen.ru/embed/one"]').wait_for()

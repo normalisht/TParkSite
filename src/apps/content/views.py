@@ -1,11 +1,11 @@
-from django.conf import settings
+from django.db.models import Prefetch, prefetch_related_objects
 from django.http import Http404
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.formats import date_format
-from django.utils.http import urlencode
 
+from apps.catalog.models import Service
 from apps.content.models import Event, GalleryPhoto, Partner, Review, Video, VideoCollection, VideoCollectionItem
 from apps.core import structured_data as ld
 from apps.core.images import safe_spec_url
@@ -17,6 +17,7 @@ from apps.core.seo import absolute_url, make_seo, page_seo
 PAST_EVENTS_SHOWN = 6
 RELATED_EVENTS = 3
 GALLERY_PAGE = 24
+SHELF_VIDEOS = 6  # на ПК в полке видно 4 (на планшете 3), остальные — свайпом на телефоне и по «Смотреть все»
 
 
 def page_crumbs(title: str) -> list[tuple[str, str]]:
@@ -143,7 +144,7 @@ def video_crumbs(*tail: tuple[str, str]) -> list[tuple[str, str]]:
 
 
 def shown_collections(**exclude) -> list[VideoCollection]:
-    """Подборки для полки: обложки-ролики подставлены одним запросом — иначе `cover_video` у каждой подборки
+    """Подборки для полки обложек: обложки-ролики подставлены одним запросом — иначе `cover_video` у каждой подборки
     загружал бы все её ролики."""
     collections = list(VideoCollection.objects.shown().with_first_video().exclude(**exclude))
     covers = Video.objects.in_bulk({c.first_video_id for c in collections if not c.cover})
@@ -153,49 +154,43 @@ def shown_collections(**exclude) -> list[VideoCollection]:
     return collections
 
 
-def attach_collections(videos: list[Video], collections: list[VideoCollection]) -> list[Video]:
-    """Чипы подборок на карточках: только показанные подборки, в их порядке; связи — одним запросом."""
-    position = {c.pk: i for i, c in enumerate(collections)}
-    links: dict[int, list[VideoCollection]] = {}
-    pairs = VideoCollectionItem.objects.filter(video__in=videos, collection__in=position).values_list(
-        "video_id", "collection_id"
+def collection_videos(videos: list[Video], collections: list[VideoCollection]) -> dict[int, list[Video]]:
+    """Ролики каждой подборки из списка `videos`, в порядке подборки, — одним запросом на все подборки."""
+    by_pk = {video.pk: video for video in videos}
+    result: dict[int, list[Video]] = {c.pk: [] for c in collections}
+    pairs = VideoCollectionItem.objects.filter(video__in=videos, collection__in=collections).values_list(
+        "collection_id", "video_id"
     )
-    for video_id, collection_id in pairs:
-        links.setdefault(video_id, []).append(collections[position[collection_id]])
+    for collection_id, video_id in pairs:  # порядок связей — Meta.ordering: order, id
+        result[collection_id].append(by_pk[video_id])
+    return result
+
+
+def attach_tags(videos: list[Video], collections: list[VideoCollection], links: dict[int, list[Video]]) -> list[Video]:
+    """Теги карточек: подборки из `collections` (в их порядке; у ролика со снятой галочкой — ни одной) и услуги
+    с открытой страницей — фиксированным числом запросов на весь список."""
+    tags: dict[int, list[VideoCollection]] = {video.pk: [] for video in videos}
+    for collection in collections:
+        for video in links[collection.pk]:
+            tags[video.pk].append(collection)
     for video in videos:
-        video.shown_collections = sorted(links.get(video.pk, []), key=lambda c: position[c.pk])
+        video.collection_tags = tags[video.pk] if video.show_collection_tags else []
+    open_services = Service.objects.with_open_page()
+    prefetch_related_objects(videos, Prefetch("services", queryset=open_services, to_attr="service_tags"))
     return videos
-
-
-DESIGN_VARIANTS = ("1", "2", "3")
-SHELF_VIDEOS = 6
-
-
-def design_variants(request) -> dict:
-    """Временный переключатель вариантов дизайна вкладки «Видео» (?card=, ?collections=, только при DEBUG) —
-    удаляется, когда заказчик выберет вариант."""
-    picked = {name: request.GET.get(name) for name in ("card", "collections")} if settings.DEBUG else {}
-    picked = {name: value for name, value in picked.items() if value in DESIGN_VARIANTS}
-    return {
-        "variant_card": picked.get("card", "1"),
-        "variant_collections": picked.get("collections", "1"),
-        "variant_query": "?" + urlencode(picked) if picked else "",
-    }
 
 
 def gallery_video(request):
     videos = list(Video.objects.published())
     if not videos:
         raise Http404
-    collections = shown_collections()
-    variants = design_variants(request)
-    if variants["variant_collections"] == "3":
-        for collection in collections:
-            collection.shelf_videos = collection.shown_videos()[:SHELF_VIDEOS]
+    collections = list(VideoCollection.objects.shown())
+    links = collection_videos(videos, collections)
+    for collection in collections:
+        collection.shelf_videos = links[collection.pk][:SHELF_VIDEOS]
     crumbs = video_crumbs(("Видео", ""))
     context = {
-        **variants,
-        "videos": attach_collections(videos, collections),
+        "videos": attach_tags(videos, collections, links),
         "collections": collections,
         "page_size": GALLERY_PAGE,
         "has_videos": True,
@@ -214,7 +209,6 @@ def video_collection(request, slug):
     if not collection.cover:
         collection.cover_video = videos[0]
     other_collections = shown_collections(pk=collection.pk)
-    variants = design_variants(request)
     image = safe_spec_url(collection, "cover_og") or safe_spec_url(collection.cover_video, "og")
     seo = make_seo(
         collection.title,
@@ -231,10 +225,8 @@ def video_collection(request, slug):
         "content/video_collection.html",
         {
             "collection": collection,
-            "videos": attach_collections(videos, other_collections),
+            "videos": attach_tags(videos, other_collections, collection_videos(videos, other_collections)),
             "other_collections": other_collections,
-            **variants,
-            "all_collections": shown_collections() if variants["variant_collections"] == "2" else [],
             "page_size": GALLERY_PAGE,
             "breadcrumbs": crumbs,
             "seo": seo,
