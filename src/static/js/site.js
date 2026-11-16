@@ -219,7 +219,11 @@ document.addEventListener("DOMContentLoaded", () => {
       })),
       loop: true,
     });
-    // При закрытии GLightbox удаляет окно вместе с iframe, остаётся перелистывание.
+    // При закрытии GLightbox удаляет окно вместе с iframe, остаётся перелистывание. Уходящий ролик убираем в начале
+    // анимации, иначе его звук идёт ещё ~0,5 с; slide_changed ниже дочищает остальное при быстром листании.
+    lightbox.on("slide_before_change", ({ prev }) => {
+      prev.slideNode?.querySelectorAll(".video-frame iframe").forEach((iframe) => iframe.remove());
+    });
     // Слайд берём у окна, а не из события: при открытии в событии его ещё нет, а при быстром листании он уже другой.
     lightbox.on("slide_changed", () => {
       const slide = lightbox.getActiveSlide();

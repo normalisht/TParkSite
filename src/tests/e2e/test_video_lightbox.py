@@ -81,6 +81,24 @@ def test_video_iframe_unloaded_on_next_and_close(live_server, browser, make_vide
     assert page.locator("iframe").count() == 0
 
 
+def test_previous_video_removed_before_slide_animation(live_server, browser, make_video):
+    for name in ("one", "two"):
+        make_video(title=name, embed_url=f"https://dzen.ru/embed/{name}")
+    page, _ = open_video_tab(browser, live_server)
+    page.locator('a[aria-label="Видео: one"]').click()
+    page.locator(CURRENT_IFRAME).wait_for()
+    page.wait_for_timeout(500)
+    # Звук прежнего ролика не должен звучать во время перелистывания (~0,5 с): iframe убран в первые 100 мс.
+    gone = page.evaluate(
+        """() => new Promise((resolve) => {
+            document.querySelector(".gnext").click();
+            setTimeout(() => resolve(!document.querySelector('iframe[src="https://dzen.ru/embed/one"]')), 100);
+        })"""
+    )
+    assert gone
+    page.locator('.gslide.current iframe[src="https://dzen.ru/embed/two"]').wait_for()
+
+
 def test_caption_below_frame_on_phone(live_server, browser, make_video):
     make_video(title="Ролик с длинным названием, которое на телефоне займёт пару строк")
     make_video()
