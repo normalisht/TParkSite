@@ -467,7 +467,8 @@ def test_channel_button_from_settings(client, make_video, make_collection, path)
     site.save()
     [link] = channel_links(client.get(path).content.decode())
     assert f'href="{CHANNEL}"' in link and 'target="_blank"' in link and 'rel="noopener"' in link
-    assert "img/social/dzen" in link and "Канал на Дзене" in link
+    assert "img/social/dzen" in link and ">Дзен</a>" in link
+    assert "btn btn-ghost" in link
     site.dzen_url = ""
     site.save()
     assert channel_links(client.get(path).content.decode()) == []
