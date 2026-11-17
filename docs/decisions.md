@@ -1,6 +1,6 @@
 # Переписывание сайта Т-Парка: договорённости
 
-Журнал принятых решений по новой версии. Из него собирается спецификация. Текущий функционал описан в [current-functionality.md](current-functionality.md), старый код лежит в `old_version/`.
+Журнал принятых решений по новой версии. Из него собирается спецификация. Старый функционал описан в [current-functionality.md](current-functionality.md), старый код доступен в истории Git.
 
 Статус: спецификация утверждена, реализация — по плану [superpowers/plans/2026-10-08-django-rewrite.md](superpowers/plans/2026-10-08-django-rewrite.md) в ветке `django-rewrite`. Полная спецификация: [superpowers/specs/2026-10-08-django-rewrite-design.md](superpowers/specs/2026-10-08-django-rewrite-design.md) — она первична; ниже краткий журнал решений.
 

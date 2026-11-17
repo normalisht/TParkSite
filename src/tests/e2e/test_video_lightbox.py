@@ -151,6 +151,21 @@ WATCH = "https://dzen.ru/video/watch/6af4c9206275f93a7e1ff96b"
 DZEN_LINK = ".gslide.current .gslide-description a.video-dzen-link"
 
 
+def test_shelf_open_on_dzen_link_follows_current_video(live_server, browser, make_video, make_collection):
+    from apps.content.models import VideoCollectionItem
+
+    shelf = make_collection("Услуги")
+    for order, (name, url) in enumerate((("one", WATCH), ("two", ""))):
+        video = make_video(title=name, embed_url=f"https://dzen.ru/embed/{name}", dzen_url=url)
+        VideoCollectionItem.objects.create(collection=shelf, video=video, order=order)
+    page, _ = open_video_tab(browser, live_server)
+    page.locator(f'[data-video-shelf="{shelf.slug}"] a[aria-label="Видео: one"]').click()
+    expect(page.locator(DZEN_LINK)).to_have_attribute("href", WATCH)
+    page.locator(".gnext").click()
+    page.locator('.gslide.current iframe[src="https://dzen.ru/embed/two"]').wait_for()
+    expect(page.locator(DZEN_LINK)).to_have_count(0)
+
+
 @pytest.mark.parametrize("viewport", [DESKTOP, PHONE], ids=["desktop", "phone"])
 def test_open_on_dzen_link_under_player(live_server, browser, make_video, viewport):
     make_video(title="С адресом", embed_url="https://dzen.ru/embed/one", dzen_url=WATCH)

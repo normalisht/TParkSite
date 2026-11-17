@@ -1,6 +1,7 @@
 {% load site_tags site_texts %}
 {# Полки подборок на вкладке «Видео»: заголовок-ссылка на подборку, описание, «Смотреть все →» и лента первых роликов (на ПК видно 4, на планшете 3, на телефоне — свайп). У каждой полки свой просмотр (data-gallery). Первая полка — первый экран: её первые 4 обложки без lazy, первая — LCP. #}
 {% text "gallery.see_all" as see_all %}
+{% text "gallery.open_on_dzen" as dzen_label %}
 {% for collection in collections %}
 <section data-video-shelf="{{ collection.slug }}" class="pt-10 md:pt-12">
   <div class="flex items-baseline justify-between gap-4">
@@ -12,7 +13,7 @@
   <ul class="scroll-strip mt-4 sm:grid sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
     {% for video in collection.shelf_videos %}
     <li class="w-64 shrink-0 snap-start scroll-ml-4 sm:w-auto{% if forloop.counter == 4 %} sm:hidden lg:block{% elif forloop.counter > 4 %} sm:hidden{% endif %}">
-      <a class="glightbox group block rounded-xl outline-none focus-visible:ring-4 focus-visible:ring-brand-500" href="{{ video.embed_url }}" data-type="external" data-gallery="shelf-{{ collection.slug }}" data-title="{{ video.title }}" aria-label="Видео: {{ video.title }}">
+      <a class="glightbox group block rounded-xl outline-none focus-visible:ring-4 focus-visible:ring-brand-500" href="{{ video.embed_url }}" data-type="external" data-gallery="shelf-{{ collection.slug }}" data-title="{{ video.title }}"{% if video.dzen_url %} data-dzen-url="{{ video.dzen_url }}" data-dzen-label="{{ dzen_label }}"{% endif %} aria-label="Видео: {{ video.title }}">
         <span class="relative block aspect-video overflow-hidden rounded-xl bg-sand-200">
           {% picture video "card_small 480w, card 800w" sizes="(min-width: 1152px) 262px, (min-width: 1024px) calc((100vw - 104px) / 4), (min-width: 640px) calc((100vw - 80px) / 3), 256px" alt="" width=800 height=450 loading=forloop.counter|lazy_after:eager fetchpriority=forloop.first|eager_first:later_shelf|yesno:"high," class="h-full w-full object-cover transition duration-500 group-hover:scale-105" %}
           <span class="video-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span>

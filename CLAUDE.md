@@ -4,12 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Сайт Т-Парка (t-camp.ru) на Python 3.14 + Django 6.1: публичная витрина (шаблоны + Tailwind) и админка Unfold. Старая Flask-версия — в `old_version/` (только для справки и импорта, не менять; исключена из ruff и pre-commit). Спецификация — `docs/superpowers/specs/2026-10-08-django-rewrite-design.md`, журнал решений — `docs/decisions.md`, старый функционал — `docs/current-functionality.md`. Весь пользовательский текст — на русском.
+Сайт Т-Парка (t-camp.ru) на Python 3.14 + Django 6.1: публичная витрина (шаблоны + Tailwind) и админка Unfold. Старая Flask-версия доступна в истории Git. Спецификация — `docs/superpowers/specs/2026-10-08-django-rewrite-design.md`, журнал решений — `docs/decisions.md`, старый функционал — `docs/current-functionality.md`. Весь пользовательский текст — на русском.
 
 ## Layout
 
 - `src/` — весь Django-проект: `pyproject.toml`/`uv.lock`, `manage.py`, `config/`, `apps/`, `templates/`, `static/`, `tailwind/`, `tests/`. Dev-окружение (`.venv`, `.env` из `src/.env.example`, по умолчанию `db.sqlite3` и `media/`) тоже живёт в `src/`. Копия реального контента — в корне, `current_content/` (`db.sqlite3` + `media/`): подключается через `DATABASE_PATH`/`MEDIA_ROOT` в `src/.env`.
-- Корень — инфраструктура: `Dockerfile`, `compose.yaml`, `docker/`, `scripts/`, `.env.example` (продакшен, для compose), `.pre-commit-config.yaml`, `docs/`, `old_version/`.
+- Корень — инфраструктура: `Dockerfile`, `compose.yaml`, `docker/`, `scripts/`, `.env.example` (продакшен, для compose), `.pre-commit-config.yaml`, `docs/`.
 
 ## Commands
 
@@ -27,7 +27,7 @@ uv run pytest                             # все тесты (settings: config.
 uv run pytest tests/test_pages.py::test_info_page   # один тест
 uv run pytest --cov                       # с покрытием (make coverage; порог — fail_under в pyproject.toml)
 uv run ruff check . && uv run ruff format .
-uv run manage.py import_legacy --db ../old_version/T_Park.db --images <папка images со старого сервера> [--flush]
+uv run manage.py import_legacy --db <путь к базе старого сайта> --images <папка images со старого сервера> [--flush]
 ```
 
 pytest в строгом режиме (`strict = true`: неизвестный маркер, дубль id в `parametrize`, прошедший xfail — ошибка), любое предупреждение — ошибка (`filterwarnings = ["error", …]`): незакрытые файлы и соединения закрывать (`with Image.open(...)`, `closing(sqlite3.connect(...))`), а не глушить. У пакетов, чьи шаблоны или внутренности мы копируем (Unfold, prose-editor, imagekit, simple-history), в `pyproject.toml` верхняя граница версии — обновление только намеренно, со сверкой копий.
@@ -35,7 +35,7 @@ pytest в строгом режиме (`strict = true`: неизвестный �
 Из корня репозитория:
 
 ```bash
-uv run --project src pre-commit run --all-files   # ruff в pre-commit закреплён той же версией, что в src/uv.lock; docs/ и old_version/ исключены
+uv run --project src pre-commit run --all-files   # ruff в pre-commit закреплён той же версией, что в src/uv.lock; docs/ исключены
 docker compose -f compose.dev.yaml up --build --renew-anon-volumes  # локально в Docker: http://localhost:8000, DEBUG=1, src/ примонтирован (hot reload + Tailwind watch); -V — .venv из нового образа
 docker compose -f compose.dev.yaml exec tpark-dev python manage.py createsuperuser
 docker compose up -d --build                      # продакшен (корневой .env из .env.example, нужна внешняя сеть PROXY_NETWORK); обновление — `make up` (сборка, бэкап работающего сайта, запуск)
