@@ -298,7 +298,7 @@ class Video(OrderedModel):
     is_published = models.BooleanField("Опубликовано", default=True)
     updated_at = models.DateTimeField(auto_now=True)
     collections = models.ManyToManyField(
-        "VideoCollection", through="VideoCollectionItem", related_name="videos", blank=True
+        "VideoCollection", verbose_name="Подборки", through="VideoCollectionItem", related_name="videos", blank=True
     )
     show_collection_tags = models.BooleanField(
         "Показывать подборки на карточке",
@@ -403,8 +403,10 @@ class VideoCollection(SeoModel, OrderedModel):
 
 
 class VideoCollectionItem(models.Model):
-    collection = models.ForeignKey(VideoCollection, on_delete=models.CASCADE, related_name="items")
-    video = models.ForeignKey(Video, on_delete=models.CASCADE, related_name="collection_items")
+    collection = models.ForeignKey(
+        VideoCollection, verbose_name="Подборка", on_delete=models.CASCADE, related_name="items"
+    )
+    video = models.ForeignKey(Video, verbose_name="Видео", on_delete=models.CASCADE, related_name="collection_items")
     order = models.PositiveIntegerField("Порядок", default=0)
 
     class Meta:
