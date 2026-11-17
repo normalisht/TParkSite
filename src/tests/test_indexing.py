@@ -11,7 +11,7 @@ from django.urls import reverse
 from django.utils.http import http_date
 
 from apps.catalog.models import Category, Service
-from apps.content.models import Event
+from apps.content.models import Event, VideoCollection, VideoCollectionItem
 from apps.core import indexnow
 from apps.core.models import InfoPage, PageVersion, SiteSettings
 
@@ -127,6 +127,21 @@ def test_unpublished_and_trashed_pages_are_sent(indexnow_on, django_capture_on_c
     with django_capture_on_commit_callbacks(execute=True):
         event.move_to_trash()
     assert indexnow_on == ["https://t-camp.ru/info/rules/", f"https://t-camp.ru{event.get_absolute_url()}"]
+
+
+def test_video_collection_is_sent_only_with_published_video(
+    indexnow_on, django_capture_on_commit_callbacks, make_video
+):
+    with django_capture_on_commit_callbacks(execute=True):
+        collection = VideoCollection.objects.create(title="Сплавы", slug="splavy")
+    assert indexnow_on == []  # без опубликованных роликов страница подборки — 404
+    hidden = make_video(is_published=False)
+    VideoCollectionItem.objects.create(collection=collection, video=hidden)
+    _save(collection, django_capture_on_commit_callbacks, title="Сплавы летом")
+    assert indexnow_on == []
+    VideoCollectionItem.objects.create(collection=collection, video=make_video(), order=1)
+    _save(collection, django_capture_on_commit_callbacks, title="Сплавы осенью")
+    assert indexnow_on == [f"https://t-camp.ru{reverse('content:video_collection', args=['splavy'])}"]
 
 
 def test_slug_change_sends_old_and_new_address(indexnow_on, django_capture_on_commit_callbacks):

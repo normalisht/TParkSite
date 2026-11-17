@@ -176,6 +176,7 @@ class SiteSettingsAdmin(SiteModelAdmin):
                     "max_url",
                     "instagram_url",
                     "instagram_show_logo",
+                    "dzen_url",
                     "reviews_url",
                     "special_days_shown",
                 ],
@@ -225,7 +226,7 @@ class SiteSettingsAdmin(SiteModelAdmin):
                     "og_image",
                     *[
                         (f"seo_{page}_title", f"seo_{page}_description")
-                        for page in ("home", "events", "about", "reviews", "gallery", "contacts")
+                        for page in ("home", "events", "about", "reviews", "gallery", "video", "contacts")
                     ],
                 ],
             },

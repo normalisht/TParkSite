@@ -12,6 +12,7 @@ from apps.core.seo import absolute_url, make_seo, page_seo
 
 HOME_REVIEWS = 8
 HOME_EVENTS = 3
+SERVICE_VIDEOS = 3
 # Категория, из которой перешли на страницу услуги; в robots.txt — Clean-param, canonical — без него.
 CATEGORY_PARAM = "category"
 
@@ -158,6 +159,8 @@ def service_detail(request, slug):
             "photos": photos,
             "category": category,
             "related": related,
+            # Карточки без тегов: ссылка на эту же услугу лишняя, а теги подборок стоили бы запросов.
+            "videos": list(service.videos.published()[:SERVICE_VIDEOS]),
             "breadcrumbs": crumbs,
             "seo": seo,
             "structured_data": [

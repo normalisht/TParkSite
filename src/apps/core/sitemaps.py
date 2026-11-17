@@ -3,7 +3,7 @@ from django.db.models import Max
 from django.urls import reverse
 
 from apps.catalog.models import Category, Service
-from apps.content.models import Event
+from apps.content.models import Event, Video, VideoCollection
 from apps.core.models import InfoPage, SiteSettings
 
 
@@ -14,11 +14,13 @@ class StaticSitemap(Sitemap):
         "content:about",
         "content:reviews",
         "content:gallery",
+        "content:gallery_video",
         "content:contacts",
     ]
 
     def items(self):
-        return self.PAGES
+        # Без опубликованных роликов вкладки «Видео» нет (404) — и пункта тоже.
+        return [page for page in self.PAGES if page != "content:gallery_video" or self._get_lastmods()[page]]
 
     def location(self, item):
         return reverse(item)
@@ -26,9 +28,12 @@ class StaticSitemap(Sitemap):
     def lastmod(self, item):
         # Sitemap зовёт lastmod дважды на страницу (для заголовка Last-Modified и для самой записи), а Sitemap
         # создаётся на каждый запрос: считаем даты один раз и кладём в экземпляр.
+        return self._get_lastmods()[item]
+
+    def _get_lastmods(self) -> dict:
         if not hasattr(self, "_lastmods"):
             self._lastmods = self._compute_lastmods()
-        return self._lastmods[item]
+        return self._lastmods
 
     @staticmethod
     def _newest(queryset):
@@ -38,8 +43,9 @@ class StaticSitemap(Sitemap):
         """Дата изменения каждой статической страницы по тому, из чего она собрана.
 
         Тексты «О нас» и «Контакты» живут в настройках сайта; главная — настройки, опубликованные категории и
-        мероприятия; «Мероприятия» — настройки и видимые мероприятия. У отзывов и галереи своей даты изменения
-        нет, поэтому для них lastmod не отдаём: ложная дата хуже её отсутствия.
+        мероприятия; «Мероприятия» — настройки и видимые мероприятия; «Видео» — новейший опубликованный ролик.
+        У отзывов и галереи своей даты изменения нет, поэтому для них lastmod не отдаём: ложная дата хуже её
+        отсутствия.
         """
         settings_at = SiteSettings.load().updated_at
         events_at = self._newest(Event.objects.published().visible())
@@ -55,6 +61,7 @@ class StaticSitemap(Sitemap):
             "content:contacts": settings_at,
             "content:reviews": None,
             "content:gallery": None,
+            "content:gallery_video": self._newest(Video.objects.published()),
         }
 
 
@@ -72,13 +79,7 @@ class CategorySitemap(ModelSitemap):
 
 class ServiceSitemap(ModelSitemap):
     def items(self):
-        # Только услуги, которые видно через навигацию: со своей страницей и хотя бы в одной опубликованной категории.
-        return (
-            Service.objects.published()
-            .filter(has_page=True, category_links__category__is_published=True)
-            .distinct()
-            .order_by("id")
-        )
+        return Service.objects.with_open_page().order_by("id")
 
 
 class InfoPageSitemap(ModelSitemap):
@@ -91,10 +92,21 @@ class EventSitemap(ModelSitemap):
         return Event.objects.published().visible().order_by("-date", "-id")
 
 
+class VideoCollectionSitemap(ModelSitemap):
+    def items(self):
+        # Страница подборки — это и её ролики: правка или снятие ролика сдвигает дату (снятый тоже, его updated_at —
+        # момент снятия). Добавление и удаление связи двигают updated_at самой подборки (apps/content/signals.py).
+        return VideoCollection.objects.shown().annotate(videos_updated_at=Max("items__video__updated_at"))
+
+    def lastmod(self, obj):
+        return max(obj.updated_at, obj.videos_updated_at)  # у показанной подборки ролики есть всегда
+
+
 SITEMAPS = {
     "static": StaticSitemap,
     "categories": CategorySitemap,
     "services": ServiceSitemap,
     "info": InfoPageSitemap,
     "events": EventSitemap,
+    "video_collections": VideoCollectionSitemap,
 }

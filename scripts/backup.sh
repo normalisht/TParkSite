@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
-# Бэкап продакшена: снимок SQLite + архив медиа. Запуск из cron на хосте, например:
+# Бэкап продакшена: снимок SQLite + архив медиа. Снимков БД хранится BACKUP_KEEP (14), архив медиа — только
+# в BACKUP_MEDIA_KEEP (1, не меньше 1) новейших копиях: видео и фото занимают много места на небольшом диске.
+# Запуск из cron на хосте, например:
 #   15 3 * * * cd /srv/tpark && ./scripts/backup.sh >> backups/backup.log 2>&1
 # Сайт без Docker (systemd, make service-*) — с ключом --host: ./scripts/backup.sh --host
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 KEEP="${BACKUP_KEEP:-14}"
+MEDIA_KEEP="${BACKUP_MEDIA_KEEP:-1}"
+[ "$MEDIA_KEEP" -ge 1 ] || MEDIA_KEEP=1  # 0 удалил бы и только что созданный архив медиа
 DEST="backups/$(date +%Y-%m-%d_%H%M)"
 mkdir -p "$DEST"
 
@@ -22,5 +26,8 @@ else
   docker compose exec -T tpark-web tar -czf - -C /data media > "$DEST/media.tar.gz"
 fi
 
-ls -1dt backups/20*/ | tail -n +$((KEEP + 1)) | xargs -r rm -rf
+# Порядок по имени, не по mtime: удаление файла меняет mtime папки и сбило бы «новейшие».
+# Только после успешного создания архива (set -e): новейшая копия всегда сохраняет свой media.tar.gz.
+ls -1dr backups/20*/ | tail -n +$((MEDIA_KEEP + 1)) | while read -r d; do rm -f "${d}media.tar.gz"; done
+ls -1dr backups/20*/ | tail -n +$((KEEP + 1)) | xargs -r rm -rf
 echo "Бэкап готов: $DEST"

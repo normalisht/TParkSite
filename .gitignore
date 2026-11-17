@@ -22,6 +22,7 @@ __pycache__/
 /deploy/nginx-site.conf.bak
 /backups/
 /data/
+/output/
 /.superpowers/
 
 # Редакторы и ОС

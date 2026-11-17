@@ -113,6 +113,87 @@ html.cookie-open .contact-fab { display: none; }
   .glightbox-container.glightbox-clean .gnext svg { width: 20px; }
 }
 
+/* Просмотр ролика (site.js: слайд inline с .video-frame) — рамка 16:9 по размеру окна, подпись под ней белым, и на
+   телефоне тоже: там GLightbox кладёт подпись поверх медиа. Без слоя и с !important — vendored-CSS и инлайн-стили
+   GLightbox иначе перебьют. */
+.glightbox-container .ginner-container:has(.video-frame) {
+  --video-width: min(1100px, calc(100vw - 32px), calc((100dvh - 160px) * 16 / 9));
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: auto !important;
+  max-width: none !important;
+}
+.glightbox-container .gslide-media:has(.video-frame) {
+  width: var(--video-width) !important;
+  height: auto !important;
+  max-width: none;
+  max-height: none;
+  overflow: visible;
+  background: none;
+  flex: none;
+}
+.glightbox-container .ginlined-content:has(> .video-frame) { padding: 0; overflow: visible; }
+.video-frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 12px;
+  background-color: #000;
+  box-shadow: 0 20px 60px rgb(0 0 0 / 0.5);
+}
+.video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.glightbox-container .ginner-container:has(.video-frame) .gslide-description {
+  position: static !important;
+  width: var(--video-width) !important;
+  max-width: none !important;
+  max-height: none;
+  height: auto !important;
+  flex: none;
+  padding: 12px 4px 0;
+  background: none;
+}
+/* Подпись и «Открыть на Дзене» (.gslide-desc): на ПК в одну строку, ссылка справа; на телефоне — друг под другом. */
+.glightbox-container .ginner-container:has(.video-frame) .gdesc-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 24px;
+  padding: 0;
+}
+.glightbox-container .ginner-container:has(.video-frame) .gslide-title {
+  flex: 1 1 0;
+  min-width: 0;
+  margin: 0;
+  color: #fff;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  line-height: 1.4;
+}
+.glightbox-container .ginner-container:has(.video-frame) .gslide-desc {
+  flex: none;
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.4;
+}
+.glightbox-container .ginner-container:has(.video-frame) .video-dzen-link {
+  display: inline-block;
+  margin: -10px 0;
+  padding: 10px 0; /* зона нажатия ≥ 44 px без лишнего зазора под подписью */
+  color: var(--color-brand-300);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.glightbox-container .ginner-container:has(.video-frame) .video-dzen-link:hover { color: var(--color-brand-100); }
+@media (max-width: 768px) {
+  .glightbox-container .ginner-container:has(.video-frame) .gdesc-inner { flex-direction: column; align-items: center; }
+  .glightbox-container .ginner-container:has(.video-frame) .gslide-title { font-size: 14px; text-align: center; }
+  .glightbox-container .ginner-container:has(.video-frame) .gslide-desc { font-size: 14px; }
+}
+
 /* Слайдер фото: точки в цвет бренда, стрелки на тёмной подложке — видны и на светлых фото. Без слоя: иначе vendored-CSS перебьёт. */
 .js-slider {
   --swiper-theme-color: var(--color-brand-500);
@@ -277,6 +358,19 @@ html[data-season="autumn"] .season-particles::after {
   /* Лента карточек со свайпом на телефоне (с sm — сетка, колонки и отступы задаёт шаблон). Прокрутка по x включает
      обрезку и по y, поэтому py-2/-my-2 — запас под обводку, тень и кольцо фокуса карточек, не меняющий раскладку. */
   .scroll-strip { @apply no-scrollbar -mx-4 -my-2 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 py-2 sm:mx-0 sm:my-0 sm:overflow-visible sm:px-0 sm:py-0; }
+
+  /* Карточка видео (content/partials/video_card.html): кнопка ▶ по центру обложки и плашка длительности.
+     Треугольник тёмный: белый на оранжевом не дотягивает до контраста 3:1. */
+  .video-play {
+    @apply pointer-events-none absolute inset-0 m-auto flex h-11 w-11 items-center justify-center rounded-full bg-brand-500 text-ink transition duration-200 md:h-14 md:w-14;
+    box-shadow: 0 4px 14px rgb(0 0 0 / .25);
+  }
+  .video-play svg { @apply h-1/2 w-1/2 fill-current; }
+  .group:hover .video-play { @apply scale-[1.08] bg-brand-600; }
+  .video-duration {
+    @apply pointer-events-none absolute right-2 bottom-2 inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[13px] leading-5 font-semibold text-white tabular-nums;
+    background: rgb(28 25 25 / .75);
+  }
 
   /* Длинный отзыв свёрнут до ~8 строк с плавным затуханием; «Читать полностью» снимает класс, высоту анимирует
      компонент reviewCard (static/js/review_card.js), затухание — переход --review-fade (100% — затухания нет). */

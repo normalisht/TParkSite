@@ -208,6 +208,7 @@ if not DEBUG:
 # уникальной и сломал бы ETag/304. JSON-LD (type="application/ld+json") — блок данных, CSP его не касается.
 # Alpine (стандартная сборка) вычисляет выражения через new Function — нужен 'unsafe-eval'; уйти от него можно
 # только на CSP-сборку Alpine (отдельная задача). Метрика: tag.js и Вебвизор — с mc.yandex.ru/.com.
+# Плеер Дзена — iframe в просмотре видео галереи.
 YANDEX_METRIKA = ["https://mc.yandex.ru", "https://mc.yandex.com"]
 SECURE_CSP_REPORT_ONLY = {
     "default-src": [CSP.SELF],
@@ -215,7 +216,7 @@ SECURE_CSP_REPORT_ONLY = {
     "style-src": [CSP.SELF, CSP.UNSAFE_INLINE],
     "img-src": [CSP.SELF, "data:", *YANDEX_METRIKA],
     "connect-src": [CSP.SELF, *YANDEX_METRIKA, "wss://mc.yandex.com", "wss://mc.yandex.ru"],
-    "frame-src": [*(f"https://{host}" for host in sorted(WIDGET_HOSTS)), *YANDEX_METRIKA],
+    "frame-src": [*(f"https://{host}" for host in sorted(WIDGET_HOSTS)), *YANDEX_METRIKA, "https://dzen.ru"],
     "font-src": [CSP.SELF],
     "frame-ancestors": [CSP.NONE],
     "base-uri": [CSP.SELF],
@@ -294,6 +295,8 @@ UNFOLD = {
                     _nav("Мероприятия", "event", "admin:content_event_changelist"),
                     _nav("Отзывы", "reviews", "admin:content_review_changelist"),
                     _nav("Галерея", "photo_library", "admin:content_galleryphoto_changelist"),
+                    _nav("Видео", "smart_display", "admin:content_video_changelist"),
+                    _nav("Подборки видео", "video_library", "admin:content_videocollection_changelist"),
                     _nav("Партнёры", "handshake", "admin:content_partner_changelist"),
                 ],
             },

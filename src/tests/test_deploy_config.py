@@ -229,7 +229,7 @@ def test_service_commands_run_as_site_user():
 def test_backup_rotation_touches_only_dated_folders():
     # Папки вроде backups/legacy-source/ ротация удалять не должна: только backups/YYYY-MM-DD_HHMM.
     script = (ROOT / "scripts" / "backup.sh").read_text(encoding="utf-8")
-    assert "ls -1dt backups/20*/" in script
+    assert "ls -1dr backups/20*/" in script
     assert "backups/*/" not in script
 
 

@@ -1,4 +1,5 @@
 import io
+import itertools
 from datetime import date
 
 import pytest
@@ -44,5 +45,31 @@ def make_image():
         Image.new("RGB", size, "orange").save(buffer, fmt)
         content_type = {"JPEG": "image/jpeg", "PNG": "image/png", "WEBP": "image/webp", "GIF": "image/gif"}[fmt]
         return SimpleUploadedFile(name, buffer.getvalue(), content_type=content_type)
+
+    return _make
+
+
+@pytest.fixture
+def make_video(make_image):
+    counter = itertools.count(1)
+
+    def _make(**kwargs):
+        from apps.content.models import Video
+
+        n = next(counter)
+        kwargs.setdefault("embed_url", f"https://dzen.ru/embed/v{n}")
+        kwargs.setdefault("title", f"Видео {n}")
+        kwargs.setdefault("poster", make_image())
+        return Video.objects.create(**kwargs)
+
+    return _make
+
+
+@pytest.fixture
+def make_collection():
+    def _make(title="Подборка", **kwargs):
+        from apps.content.models import VideoCollection
+
+        return VideoCollection.objects.create(title=title, **kwargs)
 
     return _make

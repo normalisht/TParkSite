@@ -189,7 +189,72 @@ document.addEventListener("DOMContentLoaded", () => {
     columnQueries.forEach((query) => query.addEventListener("change", layout));
   });
 
-  if (window.GLightbox && document.querySelector(".glightbox")) {
-    GLightbox({ selector: ".glightbox", loop: true });
+  const VIDEO_LINK = '.glightbox[data-type="external"]';
+  const PHOTO_LINK = `.glightbox:not(${VIDEO_LINK})`;
+  if (window.GLightbox && document.querySelector(PHOTO_LINK)) {
+    GLightbox({ selector: PHOTO_LINK, loop: true });
   }
+
+  // Ролики Дзена (content/partials/video_card.html): слайд — пустая рамка, iframe создаём сами и только у открытого слайда.
+  // Слайд external не годится: GLightbox ставит iframe лишь src (allow после загрузки не действует, нужна перезагрузка)
+  // и заранее грузит соседние слайды; iframe ушедшего слайда остался бы играть за кадром — его убираем.
+  const videoGalleries = new Map();
+  document.querySelectorAll(VIDEO_LINK).forEach((link) => {
+    const name = link.dataset.gallery;
+    videoGalleries.set(name, [...(videoGalleries.get(name) || []), link]);
+  });
+  // Кавычки тоже: результат попадает и в значение атрибута.
+  const escapeHtml = (text) => {
+    const span = document.createElement("span");
+    span.textContent = text;
+    return span.innerHTML.replaceAll('"', "&quot;");
+  };
+  // «Открыть на Дзене» под плеером — только у ролика с адресом на Дзене (data-dzen-* карточки). Адрес проверяем и здесь:
+  // перенос канала Дзена (dzen_import.py) пишет его в базу без full_clean().
+  const DZEN_PAGE = /^https:\/\/dzen\.ru\//;
+  const dzenLink = ({ dzenUrl, dzenLabel }) =>
+    DZEN_PAGE.test(dzenUrl || "")
+      ? `<a class="video-dzen-link" href="${escapeHtml(dzenUrl)}" target="_blank" rel="noopener">${escapeHtml(dzenLabel || "")}</a>`
+      : "";
+  if (window.GLightbox) videoGalleries.forEach((links) => {
+    const lightbox = GLightbox({
+      elements: links.map((link) => ({
+        type: "inline",
+        content: '<div class="video-frame"></div>',
+        title: escapeHtml(link.dataset.title || ""), // подпись GLightbox вставляет как HTML, а название приходит с Дзена
+        description: dzenLink(link.dataset),
+        width: "auto",
+        height: "auto",
+      })),
+      loop: true,
+      moreLength: 0, // иначе на телефоне GLightbox обрезает описание и прячет ссылку за «See more»
+    });
+    // При закрытии GLightbox удаляет окно вместе с iframe, остаётся перелистывание. Уходящий ролик убираем в начале
+    // анимации, иначе его звук идёт ещё ~0,5 с; slide_changed ниже дочищает остальное при быстром листании.
+    lightbox.on("slide_before_change", ({ prev }) => {
+      prev.slideNode?.querySelectorAll(".video-frame iframe").forEach((iframe) => iframe.remove());
+    });
+    // Слайд берём у окна, а не из события: при открытии в событии его ещё нет, а при быстром листании он уже другой.
+    lightbox.on("slide_changed", () => {
+      const slide = lightbox.getActiveSlide();
+      lightbox.slidesContainer.querySelectorAll(".video-frame iframe").forEach((iframe) => {
+        if (!slide.contains(iframe)) iframe.remove();
+      });
+      const frame = slide.querySelector(".video-frame");
+      if (!frame || frame.querySelector("iframe")) return;
+      const link = links[lightbox.index];
+      const iframe = document.createElement("iframe");
+      iframe.allow = "autoplay; fullscreen; picture-in-picture; encrypted-media";
+      iframe.allowFullscreen = true;
+      iframe.title = link.dataset.title || "";
+      iframe.src = link.href;
+      frame.append(iframe);
+    });
+    links.forEach((link, index) =>
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
+        lightbox.openAt(index);
+      }),
+    );
+  });
 });

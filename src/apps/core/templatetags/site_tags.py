@@ -6,6 +6,7 @@ from django import template
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 
+from apps.content.dzen import format_duration
 from apps.core.images import lightbox_url as _lightbox_url
 from apps.core.images import picture_html, safe_spec_url
 from apps.core.seo import plaintext as _plaintext
@@ -44,6 +45,12 @@ def lightbox_url(photo) -> str:
 @register.filter
 def plaintext(value, limit: int = 160) -> str:
     return _plaintext(value, int(limit))
+
+
+@register.filter
+def duration(seconds) -> str:
+    """Длительность ролика: `925` → «15:25», от часа — «1:02:05»; неизвестна — пусто."""
+    return format_duration(seconds)
 
 
 _JSON_ESCAPES = {ord("<"): "\\u003C", ord(">"): "\\u003E", ord("&"): "\\u0026"}

@@ -85,9 +85,10 @@ tailwind: ## Собрать CSS Tailwind
 collectstatic: tailwind ## Собрать статику (как в продакшене)
 	$(MANAGE) collectstatic --noinput
 
-import-legacy: ## Импорт со старого сайта: make import-legacy IMAGES=<папка> [FLUSH=1]
+import-legacy: ## Импорт со старого сайта: make import-legacy DB=<база> IMAGES=<папка> [FLUSH=1]
+	@test -n "$(DB)" || (echo "Укажите DB=<путь к базе старого сайта>" && exit 1)
 	@test -n "$(IMAGES)" || (echo "Укажите IMAGES=<папка images со старого сервера>" && exit 1)
-	$(MANAGE) import_legacy --db ../old_version/T_Park.db --images $(abspath $(IMAGES)) $(if $(FLUSH),--flush)
+	$(MANAGE) import_legacy --db $(abspath $(DB)) --images $(abspath $(IMAGES)) $(if $(FLUSH),--flush)
 
 ## --- Локально в Docker ---
 

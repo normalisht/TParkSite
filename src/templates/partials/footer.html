@@ -15,6 +15,7 @@
         {% elif channel == "vk" %}<a href="{{ site.vk_url }}" class="flex h-11 w-11 items-center justify-center rounded-full bg-white ring-2 ring-transparent transition hover:ring-brand-300" target="_blank" rel="noopener" aria-label="ВКонтакте"><img src="{% static "img/social/vk.svg" %}" alt="" width="24" height="24" loading="lazy" class="h-6 w-6"></a>
         {% elif channel == "max" %}<a href="{{ site.max_url }}" class="flex h-11 w-11 items-center justify-center rounded-full bg-white ring-2 ring-transparent transition hover:ring-brand-300" target="_blank" rel="noopener" aria-label="MAX"><img src="{% static "img/social/max.svg" %}" alt="" width="24" height="24" loading="lazy" class="h-6 w-6"></a>
         {% elif channel == "instagram" and site.instagram_show_logo %}<a href="{{ site.instagram_url }}" class="flex h-11 w-11 items-center justify-center rounded-full bg-white ring-2 ring-transparent transition hover:ring-brand-300" target="_blank" rel="noopener" aria-label="Instagram"><img src="{% static "img/social/instagram.webp" %}" alt="" width="24" height="24" loading="lazy" class="h-6 w-6"></a>
+        {% elif channel == "dzen" %}<a href="{{ site.dzen_url }}" class="flex h-11 w-11 items-center justify-center rounded-full bg-white ring-2 ring-transparent transition hover:ring-brand-300" target="_blank" rel="noopener" aria-label="Дзен"><img src="{% static "img/social/dzen.svg" %}" alt="" width="24" height="24" loading="lazy" class="h-6 w-6"></a>
         {% endif %}
         {% endfor %}
       </div>

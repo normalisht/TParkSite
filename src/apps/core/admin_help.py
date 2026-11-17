@@ -26,7 +26,7 @@ HELP_SECTIONS = (
     HelpSection("catalog", "Каталог: группы, категории, услуги"),
     HelpSection("events", "Мероприятия"),
     HelpSection("reviews", "Отзывы"),
-    HelpSection("gallery", "Галерея и партнёры"),
+    HelpSection("gallery", "Галерея, видео и партнёры"),
     HelpSection("settings", "Настройки сайта"),
     HelpSection("announcements", "Плашка под шапкой"),
     HelpSection("special-days", "Особые дни"),

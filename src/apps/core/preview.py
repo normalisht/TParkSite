@@ -9,11 +9,15 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.cache import add_never_cache_headers
 
+from apps.core.models import TrashableModel
+
 
 def get_for_view(request, queryset, **lookup):
     """(запись, черновик ли). `queryset` — без фильтра публикации (например, `Service.objects.filter(has_page=True)`);
-    запись в корзине — 404 всем."""
-    obj = get_object_or_404(queryset.filter(deleted_at__isnull=True), **lookup)
+    запись в корзине — 404 всем (у моделей без корзины, как подборки видео, фильтра нет)."""
+    if issubclass(queryset.model, TrashableModel):
+        queryset = queryset.filter(deleted_at__isnull=True)
+    obj = get_object_or_404(queryset, **lookup)
     if obj.is_published:
         return obj, False
     opts = obj._meta

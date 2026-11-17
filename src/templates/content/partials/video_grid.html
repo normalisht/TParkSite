@@ -1,0 +1,12 @@
+{% load site_tags %}
+{# Все карточки в HTML (просмотр листает весь список); после первой порции — hidden, браузер не грузит их lazy-обложки. Сетка на первом экране: первые 3 обложки без lazy, первая — LCP; below_fold — сетка ниже первого экрана, все обложки lazy. #}
+<div x-data="{ shown: {{ page_size }}, total: {{ videos|length }} }">
+  {% with eager=below_fold|yesno:"0,3" %}
+  <ul class="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+    {% for video in videos %}
+    <li data-video-card{% if forloop.counter > page_size %} hidden :hidden="shown <= {{ forloop.counter0 }}"{% endif %}>{% include "content/partials/video_card.html" with loading=forloop.counter|lazy_after:eager fetchpriority=forloop.first|eager_first:below_fold|yesno:"high," %}</li>
+    {% endfor %}
+  </ul>
+  {% endwith %}
+  {% if videos|length > page_size %}{% include "content/partials/load_more.html" %}{% endif %}
+</div>

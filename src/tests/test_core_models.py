@@ -147,3 +147,17 @@ def test_founder_text_migration_drops_repeated_heading():
     importlib.import_module("apps.core.migrations.0015_founder_text_heading").forwards(django_apps, None)
     site.refresh_from_db()
     assert site.founder_text == "<ul><li>Педагог</li></ul>"
+
+
+def test_dzen_migration_fills_only_empty_url():
+    migration = importlib.import_module("apps.core.migrations.0035_dzen_url_default")
+    site = SiteSettings.load()
+    SiteSettings.objects.filter(pk=site.pk).update(dzen_url="")
+    migration.fill_dzen_url(django_apps, None)
+    site.refresh_from_db()
+    assert site.dzen_url == migration.DZEN_URL
+    site.dzen_url = "https://dzen.ru/id/other"
+    site.save()
+    migration.fill_dzen_url(django_apps, None)
+    site.refresh_from_db()
+    assert site.dzen_url == "https://dzen.ru/id/other"

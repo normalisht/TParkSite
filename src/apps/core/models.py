@@ -157,6 +157,13 @@ class SiteSettings(models.Model):
     max_url = models.URLField(
         "MAX", max_length=500, blank=True, help_text="Ссылка на профиль или канал в MAX. Пусто — кнопки нет."
     )
+    dzen_url = models.URLField(
+        "Дзен",
+        max_length=500,
+        blank=True,
+        help_text="Ссылка на канал в Дзене: кнопка в «Связаться», в подвале, на «Контактах» и «Канал на Дзене» "
+        "в галерее на вкладке «Видео». Пусто — кнопок нет.",
+    )
     instagram_url = models.URLField(
         "Instagram",
         max_length=500,
@@ -282,6 +289,7 @@ class SiteSettings(models.Model):
     seo_about_title, seo_about_description = _seo_pair("О нас")
     seo_reviews_title, seo_reviews_description = _seo_pair("Отзывы")
     seo_gallery_title, seo_gallery_description = _seo_pair("Галерея")
+    seo_video_title, seo_video_description = _seo_pair("Видео")
     seo_contacts_title, seo_contacts_description = _seo_pair("Контакты")
 
     # Вебмастер и Метрика
@@ -381,6 +389,7 @@ class ContactChannel(models.Model):
         VK = "vk", "ВКонтакте"
         MAX = "max", "MAX"
         INSTAGRAM = "instagram", "Instagram"
+        DZEN = "dzen", "Дзен"
 
     settings = models.ForeignKey(SiteSettings, on_delete=models.CASCADE, related_name="contact_channels")
     kind = models.CharField("Соцсеть", max_length=20, choices=Kind.choices, unique=True)

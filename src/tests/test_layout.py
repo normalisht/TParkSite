@@ -45,6 +45,7 @@ def test_touch_targets_are_large_enough(client):
 
     site = SiteSettings.load()
     site.vk_url = "https://vk.com/tpark"
+    site.dzen_url = ""  # миграция заполняет адрес канала, а тут считаем только две иконки
     site.save()
     Phone.objects.create(settings=site, number="9029856594", is_whatsapp=True)
     html = client.get("/").content.decode()
@@ -85,6 +86,13 @@ def test_vk_icon_is_official_mark():
     svg = (SOCIAL_ICONS / "vk.svg").read_text()
     assert 'viewBox="0 0 48 48"' in svg and 'fill="#0077FF"' in svg
     assert 'd="M25.54 34.58c-10.94 0-17.18-7.5-17.44-19.98h5.48' in svg
+
+
+def test_dzen_icon_is_official_mark():
+    """Знак Дзена — favicon самого сайта (zen.yandex.ru/logo-redesign-48.svg): тёмный скруглённый квадрат и белая звезда."""
+    svg = (SOCIAL_ICONS / "dzen.svg").read_text()
+    assert 'viewBox="0 0 48 48"' in svg and 'fill="#202022"' in svg and 'fill="white"' in svg
+    assert 'd="M42.0005 23.6447C42.0005 23.4648' in svg
 
 
 def test_meta_and_telegram_icons_are_official_marks():

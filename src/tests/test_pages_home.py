@@ -583,3 +583,24 @@ def test_home_cards_in_row_share_aspect(client):
     aspects = [tile.aspect for tile in category_tiles(list(range(5)))]
     assert aspects == ["lg:aspect-[16/9]"] * 2 + [""] * 3
     assert client.get("/").content.decode().count("lg:aspect-[16/9]") == 2
+
+
+def test_contact_links_include_dzen(client):
+    site = SiteSettings.load()
+    site.dzen_url = ""
+    site.save()
+    Phone.objects.create(settings=site, number="9029856594")
+    assert "Дзен" not in _contact_menu(client.get("/").content.decode())  # ссылка не указана — кнопки нет
+    site.dzen_url = "https://dzen.ru/id/abc"
+    site.save()
+    html = client.get("/").content.decode()
+    assert 'href="https://dzen.ru/id/abc"' in _contact_menu(html)
+    assert 'href="https://dzen.ru/id/abc"' in html.split("<footer", 1)[1]
+    assert 'href="https://dzen.ru/id/abc"' in client.get("/contacts/").content.decode()
+    assert "img/social/dzen" in html
+
+
+def test_dzen_channel_follows_saved_order_and_is_ensured():
+    site = SiteSettings.load()
+    ContactChannel.ensure_for(site)
+    assert ContactChannel.objects.filter(kind="dzen").exists()
