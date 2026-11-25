@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.formats import date_format
 
+from apps.catalog.context_processors import menu
 from apps.catalog.models import Service
 from apps.content.models import Event, GalleryPhoto, Partner, Review, Video, VideoCollection, VideoCollectionItem
 from apps.core import structured_data as ld
@@ -94,11 +95,15 @@ def about(request):
     seo = page_seo("about")
     seo["image"] = absolute_url(request, safe_spec_url(site, "about_og"))
     crumbs = page_crumbs("О нас")
+    groups = {group.pk for group in menu(request)["menu_groups"]}
+    formats = list(site.park_formats.select_related("category_group"))
+    for park_format in formats:
+        park_format.page_url = park_format.category_group.home_url if park_format.category_group_id in groups else ""
     return render(
         request,
         "content/about.html",
         {
-            "formats": list(site.park_formats.select_related("category")),
+            "formats": formats,
             "facts": list(site.founder_facts.all()),
             "route": route_links(site.latitude, site.longitude),
             "photos": GalleryPhoto.strip_photos("about"),

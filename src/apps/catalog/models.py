@@ -3,7 +3,7 @@ from django.db.models import Exists, OuterRef
 from django.urls import reverse
 
 from apps.catalog.prices import format_price
-from apps.core.fields import HtmlField, full_spec, image_spec, image_specs, og_spec, photo_field
+from apps.core.fields import HtmlField, full_spec, image_spec, image_specs, logo_spec, og_spec, photo_field
 from apps.core.files import clone_file
 from apps.core.indexnow import remember_page_change
 from apps.core.models import COPY_SUFFIX, OrderedModel, PublishedQuerySet, SeoModel, TrashableModel, next_order
@@ -18,6 +18,19 @@ class CategoryGroup(TrashableModel, OrderedModel):
     name = models.CharField(
         "Название", max_length=128, help_text="Заголовок раздела в меню «Услуги» в шапке и блока на главной."
     )
+    logo = photo_field(
+        "Логотип",
+        "catalog/group-logos",
+        size=(3000, 1000),
+        fmt=None,
+        width_field="logo_width",
+        height_field="logo_height",
+        help_text="Горизонтальное изображение. Лучше загрузить PNG с прозрачным фоном высотой от 126 px. "
+        "На главной логотип будет слева от названия на компьютере и над названием на телефоне.",
+    )
+    logo_width = models.PositiveIntegerField(null=True, editable=False)
+    logo_height = models.PositiveIntegerField(null=True, editable=False)
+    logo_img = logo_spec("logo", 126)
     categories = models.ManyToManyField(
         "Category",
         related_name="groups",
@@ -39,6 +52,14 @@ class CategoryGroup(TrashableModel, OrderedModel):
 
     def __str__(self):
         return self.name
+
+    @property
+    def home_anchor(self) -> str:
+        return f"group-{self.pk}"
+
+    @property
+    def home_url(self) -> str:
+        return reverse("catalog:home", fragment=self.home_anchor)
 
 
 class Category(TrashableModel, SeoModel, OrderedModel):

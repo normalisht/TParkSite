@@ -103,13 +103,22 @@ class SizedProcessedImageField(ProcessedImageField):
     attr_class = _NamedProcessedImageFieldFile
 
 
+class _ResizeToFitWithTransparency(ResizeToFit):
+    def process(self, image):
+        # При уменьшении pilkit переводит палитру в RGB и теряет прозрачность.
+        if image.mode == "P" and "transparency" in image.info:
+            image = image.convert("RGBA")
+        return super().process(image)
+
+
 def photo_field(verbose_name: str, prefix: str, *, size=(1920, 1080), fmt="JPEG", **kwargs):
     kwargs.setdefault("blank", True)
     field_class = SizedProcessedImageField if "width_field" in kwargs else ProcessedImageField
+    resize = _ResizeToFitWithTransparency if fmt is None else ResizeToFit
     return field_class(
         verbose_name=verbose_name,
         upload_to=UploadTo(prefix),
-        processors=[ResizeToFit(*size, upscale=False)],
+        processors=[resize(*size, upscale=False)],
         format=fmt,
         options={"quality": 85},
         validators=[validate_image_upload],

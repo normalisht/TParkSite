@@ -4,7 +4,10 @@ from pathlib import Path
 
 import pytest
 from django.conf import settings
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.urls import reverse
 from django.utils import timezone
+from PIL import Image
 
 from apps.catalog.models import Category, CategoryGroup
 from apps.catalog.tiles import category_tiles
@@ -32,6 +35,37 @@ def test_home_shows_only_published_categories(client):
     assert "Активный отдых" in html and "Байдарки" in html
     assert "Скрытая" not in html
     assert "Пустая группа" not in html
+
+
+def test_group_logo_upload_and_clear(admin_client, client, django_capture_on_commit_callbacks):
+    group = CategoryGroup.objects.create(name="Групповые приключения")
+    category = Category.objects.create(name="Квесты", is_published=True)
+    group.categories.add(category)
+    url = reverse("admin:catalog_categorygroup_change", args=[group.pk])
+    fields = {"name": group.name, "categories": [str(category.pk)], "is_published": "on"}
+    logo = Path(settings.BASE_DIR) / "static/img/logo-header.png"
+    response = admin_client.post(url, {**fields, "logo": SimpleUploadedFile(logo.name, logo.read_bytes(), "image/png")})
+    assert response.status_code == 302
+    group.refresh_from_db()
+    html = client.get("/").content.decode()
+    match = re.search(r'<img src="(/media/CACHE/[^"]+/catalog/group-logos/[^"]+\.webp)" alt=""', html)
+    assert match
+    assert match[1] == group.logo_img.url
+    assert match[1] not in _header(html)
+    source, thumbnail = Path(group.logo.path), Path(group.logo_img.path)
+    with Image.open(thumbnail) as image:
+        assert image.height == 126
+        assert image.getchannel("A").getextrema() == (0, 255)
+
+    with django_capture_on_commit_callbacks(execute=True):
+        assert admin_client.post(url, {**fields, "logo-clear": "on"}).status_code == 302
+    group.refresh_from_db()
+    assert not group.logo
+    assert not source.exists()
+    assert not thumbnail.exists()
+    html = client.get("/").content.decode()
+    assert "Групповые приключения</h2>" in html
+    assert match[1] not in html
 
 
 @pytest.mark.parametrize("show", [True, False])

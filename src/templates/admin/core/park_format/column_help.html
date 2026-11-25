@@ -1,0 +1,13 @@
+<span x-data="{ hovered: false, pinned: false }"
+      x-on:keydown.escape.window="hovered = pinned = false">
+    <button type="button" x-ref="trigger" class="cursor-help material-symbols-outlined ml-2 text-icon"
+            aria-label="Подсказка — {{ field.label|capfirst }}" aria-controls="park-formats-help-{{ field.name }}"
+            x-bind:aria-expanded="hovered || pinned" x-on:mouseenter="hovered = true"
+            x-on:mouseleave="hovered = false" x-on:click="pinned = !pinned">help</button>
+    <template x-teleport="body">
+        <p id="park-formats-help-{{ field.name }}" x-cloak x-show="hovered || pinned"
+           x-anchor.bottom-start.offset.4="$refs.trigger"
+           x-on:click.outside="if (!$refs.trigger.contains($event.target)) pinned = false"
+           class="bg-white border border-base-200 p-3 rounded-default shadow-lg text-sm w-56 whitespace-normal break-words z-50 dark:bg-base-800 dark:border-base-700">{{ field.help_text|striptags }}</p>
+    </template>
+</span>

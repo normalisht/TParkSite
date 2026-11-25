@@ -5,7 +5,7 @@ from django.contrib import admin
 from django.urls import reverse
 from django.utils import timezone
 
-from apps.catalog.models import Category, CategoryService, Service, ServicePhoto
+from apps.catalog.models import Category, CategoryGroup, CategoryService, Service, ServicePhoto
 from apps.core.admin_utils import TrashAdminMixin
 from apps.core.models import InfoPage, SiteSettings
 from apps.core.trash import purge_expired
@@ -335,12 +335,12 @@ def test_settings_label_trashed_choices(admin_client):
     site.privacy_page = page
     site.save()
     page.move_to_trash()
-    Category.objects.create(name="Старая").move_to_trash()
+    CategoryGroup.objects.create(name="Старая").move_to_trash()
     response = admin_client.get(reverse("admin:core_sitesettings_change", args=[site.pk]))
     form = response.context["adminform"].form
     assert "Политика (в корзине)" in _labels(form.fields["privacy_page"])
     formats = next(f for f in response.context["inline_admin_formsets"] if f.formset.prefix == "park_formats")
-    assert "Старая (в корзине)" in _labels(formats.formset.form.base_fields["category"])
+    assert "Старая (в корзине)" in _labels(formats.formset.form.base_fields["category_group"])
 
 
 def test_slug_taken_by_trashed_record_explains(admin_client, service):
