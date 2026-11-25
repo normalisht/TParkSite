@@ -34,6 +34,7 @@ def _settings_post(phones):
         "address": "село Восход",
         "vk_url": "",
         "special_days_shown": "3",
+        "metrika_consent_version": "1",
         "phones-TOTAL_FORMS": str(len(phones)),
         "phones-INITIAL_FORMS": str(sum(1 for p in phones if p.get("id"))),
         "phones-MIN_NUM_FORMS": "0",
@@ -49,6 +50,18 @@ def _settings_post(phones):
                 data[f"phones-{i}-{key}"] = str(value)
         data[f"phones-{i}-settings"] = "1"
     return data
+
+
+def test_admin_can_increase_metrika_consent_version_but_cannot_reuse_older_version(admin_client):
+    site = SiteSettings.load()
+    url = reverse("admin:core_sitesettings_change", args=[site.pk])
+    assert admin_client.post(url, {**_settings_post([]), "metrika_consent_version": "2"}).status_code == 302
+    response = admin_client.post(url, _settings_post([]))
+    assert response.status_code == 200
+    form = response.context["adminform"].form
+    assert form.errors["metrika_consent_version"] == ["Укажите текущую версию согласия или более новую."]
+    site.refresh_from_db()
+    assert site.metrika_consent_version == 2
 
 
 def test_about_format_admin_saves_group_and_own_logo(admin_client, make_image):

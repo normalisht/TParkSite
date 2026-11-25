@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from django.contrib import admin
 from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
@@ -8,6 +10,7 @@ from django.db.models import Case, When
 from django.forms.models import BaseInlineFormSet, ModelForm
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils.html import format_html, strip_tags
 from django.utils.text import format_lazy
 from unfold.admin import StackedInline, TabularInline
 from unfold.forms import AdminPasswordChangeForm, UserChangeForm, UserCreationForm
@@ -28,6 +31,7 @@ from apps.core.maps import MapEmbedURLField
 from apps.core.models import (
     Announcement,
     ContactChannel,
+    CookieConsentEvent,
     FounderFact,
     InfoPage,
     ParkFormat,
@@ -159,9 +163,22 @@ class SeasonInline(StackedInline):
         return "Показывается на сайте" if seasons.pick(Season.objects.all()) == obj else "Не показывается"
 
 
+class SiteSettingsForm(ModelForm):
+    class Meta:
+        model = SiteSettings
+        fields = "__all__"
+
+    def clean_metrika_consent_version(self):
+        version = self.cleaned_data["metrika_consent_version"]
+        if version < self.instance.metrika_consent_version:
+            raise ValidationError("Укажите текущую версию согласия или более новую.")
+        return version
+
+
 @admin.register(SiteSettings)
 class SiteSettingsAdmin(SiteModelAdmin):
     help_anchor = "settings"  # списка нет — сразу форма, вводная не нужна
+    form = SiteSettingsForm
     inlines = [PhoneInline, ContactChannelInline, SeasonInline, ParkFormatInline, FounderFactInline]
     # Unfold ставит URL-полям <input type="url">: браузер не пропустит вставленный код <iframe>.
     formfield_overrides = {MapEmbedURLField: {"widget": UnfoldAdminTextareaWidget(attrs={"rows": 3})}}
@@ -183,7 +200,10 @@ class SiteSettingsAdmin(SiteModelAdmin):
                 ],
             },
         ),
-        ("Логотип и политика", {"classes": ["tab"], "fields": ["header_logo", "privacy_page"]}),
+        (
+            "Логотип и политика",
+            {"classes": ["tab"], "fields": ["header_logo", "privacy_page", "metrika_consent_version"]},
+        ),
         (
             "Главная",
             {"classes": ["tab"], "description": texts_hint(Page.HOME), "fields": ["home_intro", "home_show_events"]},
@@ -270,6 +290,57 @@ class SiteSettingsAdmin(SiteModelAdmin):
         Season.ensure_for(site)  # после импорта со сбросом записей сезонов нет, а добавить их нельзя
         ContactChannel.ensure_for(site)
         return super().change_view(request, object_id, form_url, extra_context)
+
+
+@admin.register(CookieConsentEvent)
+class CookieConsentEventAdmin(SiteModelAdmin):
+    help_anchor = "settings"
+    help_intro = "История согласий на необязательные cookie и их отзывов с редакциями, которые видел посетитель."
+    list_display = ["created_at", "action", "receipt", "consent_version"]
+    list_filter = ["action", "created_at"]
+    list_select_related = ["document"]
+    search_fields = ["receipt"]
+    readonly_fields = ["created_at", "action", "receipt", "consent_version", "notice", "policy", "webvisor"]
+    fields = readonly_fields
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def get_search_results(self, request, queryset, search_term):
+        if not search_term:
+            return queryset, False
+        try:
+            receipt = UUID(search_term.strip())
+        except ValueError:
+            return queryset.none(), False
+        return queryset.filter(receipt=receipt), False
+
+    @admin.display(description="Версия согласия")
+    def consent_version(self, obj):
+        return obj.document.version
+
+    @admin.display(description="Текст плашки")
+    def notice(self, obj):
+        return self._snapshot_text(obj.document.payload["notice"])
+
+    @admin.display(description="Политика конфиденциальности")
+    def policy(self, obj):
+        policy = obj.document.payload["policy"]
+        return self._snapshot_text("\n".join((policy["url"], policy["title"], policy["lead"], policy["body"])))
+
+    @admin.display(description="Запись сеансов (Вебвизор)", boolean=True)
+    def webvisor(self, obj):
+        return obj.document.payload["webvisor"]
+
+    @staticmethod
+    def _snapshot_text(value):
+        return format_html('<pre class="whitespace-pre-wrap">{}</pre>', strip_tags(value))
 
 
 @admin.register(Announcement)

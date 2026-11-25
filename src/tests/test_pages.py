@@ -343,7 +343,7 @@ def test_footer_legal_links_without_pages(client):
 def test_footer_legal_links_separated(client):
     InfoPage.objects.create(title="Политика конфиденциальности", body="<p>x</p>", show_in_footer=True)
     InfoPage.objects.create(title="Правила безопасности", body="<p>y</p>", show_in_footer=True)
-    assert _footer(client).count("·") == 2
+    assert _footer(client).count('<span aria-hidden="true">·</span>') == 2
 
 
 def test_footer_links_in_admin_order(client):

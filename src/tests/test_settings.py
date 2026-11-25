@@ -92,11 +92,12 @@ def test_admin_login_still_works_with_conditional_get(client, django_user_model)
 
 
 def _enable_metrika(settings):
-    from apps.core.models import SiteSettings
+    from apps.core.models import InfoPage, SiteSettings
 
     settings.DEBUG = False
     site = SiteSettings.load()
     site.yandex_metrika_id = "12345"
+    site.privacy_page = InfoPage.objects.create(title="Политика конфиденциальности")
     site.save()
 
 

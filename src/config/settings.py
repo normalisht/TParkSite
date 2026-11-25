@@ -306,6 +306,10 @@ UNFOLD = {
                 "items": [
                     _nav("Настройки сайта", "settings", "admin:core_sitesettings_changelist"),
                     _nav("Тексты сайта", "text_fields", "admin:texts_sitetext_changelist"),
+                    {
+                        **_nav("Журнал согласий на cookie", "fact_check", "admin:core_cookieconsentevent_changelist"),
+                        "permission": lambda request: request.user.has_perm("core.view_cookieconsentevent"),
+                    },
                     _nav("Плашки", "campaign", "admin:core_announcement_changelist"),
                     _nav("Особые дни", "event_busy", "admin:core_specialday_changelist"),
                     _nav("Инфо-страницы", "description", "admin:core_infopage_changelist"),

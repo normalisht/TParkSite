@@ -56,9 +56,12 @@
     {% endif %}
   </div>
   <div class="border-t border-white/10">
-    <p class="mx-auto flex max-w-6xl flex-wrap gap-x-2 px-4 pt-5 text-sm text-white/70 {% if phones %}pb-20 lg:pb-5{% else %}pb-5{% endif %}">
+    <p class="mx-auto flex max-w-6xl flex-wrap items-center gap-x-2 px-4 pt-5 text-sm text-white/70 {% if phones %}pb-20 lg:pb-5{% else %}pb-5{% endif %}">
       <span>© {% now "Y" %} Т-Парк</span>
       {% for page in footer_pages %}<span aria-hidden="true">·</span><a href="{{ page.get_absolute_url }}" class="hover:text-brand-300">{{ page.title }}</a>{% endfor %}
+      <button type="button" hidden data-metrika-settings aria-controls="cookie-notice" aria-expanded="false" class="min-h-11 whitespace-nowrap hover:text-brand-300">
+        <span aria-hidden="true" class="mr-2">·</span>Настройки cookie
+      </button>
     </p>
   </div>
 </footer>
