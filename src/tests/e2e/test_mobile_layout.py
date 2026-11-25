@@ -5,15 +5,18 @@
 """
 
 from datetime import timedelta
+from io import BytesIO
 
 import pytest
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils import timezone
+from PIL import Image, ImageChops, ImageDraw
 
 pytest.importorskip("playwright")
 
 from apps.catalog.models import Category, CategoryGroup, CategoryService, Service
 from apps.content.models import Event, GalleryPhoto, Review
-from apps.core.models import Phone, SiteSettings
+from apps.core.models import ParkFormat, Phone, SiteSettings
 
 pytestmark = [pytest.mark.e2e, pytest.mark.django_db(transaction=True)]
 
@@ -296,6 +299,61 @@ def _passes_through(values, start, end):
     return any(low < value < high for value in values) and values[-1] == end
 
 
+@pytest.mark.parametrize(("width", "logo_height"), [(390, 62), (1360, 80)])
+def test_about_formats_use_colored_cards_with_left_aligned_logos(live_server, browser, make_image, width, logo_height):
+    site = SiteSettings.load()
+    site.park_formats.all().delete()
+    for order in range(4):
+        ParkFormat.objects.create(
+            settings=site,
+            order=order,
+            name=f"Т-Формат {order}",
+            caption=f"Описание формата {order}",
+            logo=make_image(f"format-{order}.png", size=(480, 140), fmt="PNG"),
+        )
+
+    page = browser.new_page(viewport={"width": width, "height": 1000})
+    try:
+        page.goto(live_server.url + "/about/")
+        logos = page.get_by_role("img", name="Т-Формат", exact=False)
+        assert logos.count() == 4
+        cards = logos.locator("..").evaluate_all(
+            """cards => cards.map(card => {
+                const logo = card.querySelector('img');
+                const caption = card.querySelector('p');
+                const bounds = card.getBoundingClientRect();
+                return {
+                    x: bounds.x,
+                    y: bounds.y,
+                    tone: getComputedStyle(card).backgroundColor,
+                    logoHeight: logo.clientHeight,
+                    logoWidth: logo.clientWidth,
+                    logoPosition: getComputedStyle(logo).objectPosition,
+                    captionLeft: caption.getBoundingClientRect().left,
+                    logoLeft: logo.getBoundingClientRect().left,
+                    captionTop: caption.getBoundingClientRect().top,
+                    logoBottom: logo.getBoundingClientRect().bottom,
+                };
+            })"""
+        )
+        assert len({card["tone"] for card in cards}) == 4
+        for card in cards:
+            assert card["logoHeight"] == logo_height
+            assert card["logoWidth"] <= 180
+            assert card["logoPosition"] == "0% 50%"
+            assert card["captionLeft"] == card["logoLeft"]
+            assert card["captionTop"] >= card["logoBottom"]
+        if width < 640:
+            assert len({card["x"] for card in cards}) == 1
+            assert len({card["y"] for card in cards}) == 4
+        else:
+            assert len({card["x"] for card in cards}) == 4
+            assert len({card["y"] for card in cards}) == 1
+        assert not page.evaluate(FIND_OVERFLOW)
+    finally:
+        page.close()
+
+
 def test_about_biography_opens_and_closes_smoothly(live_server, browser):
     site = SiteSettings.load()
     site.founder_text = "<ul>" + "<li><p>Педагог, тренер, инструктор по туризму.</p></li>" * 8 + "</ul>"
@@ -316,6 +374,27 @@ def test_about_biography_opens_and_closes_smoothly(live_server, browser):
     assert any(0 < value < full / 2 for value in closing), closing
     page.wait_for_function("!document.querySelector('details[data-smooth]').open")
     context.close()
+
+
+def test_about_format_opens_home_at_group_below_sticky_header(live_server, page):
+    group = CategoryGroup.objects.create(name="Группа для перехода")
+    group.categories.add(Category.objects.create(name="Категория группы", is_published=True))
+    ParkFormat.objects.create(
+        settings=SiteSettings.load(), name="Формат для перехода", caption="Описание", category_group=group
+    )
+
+    page.set_viewport_size({"width": 390, "height": 800})
+    page.emulate_media(reduced_motion="reduce")
+    page.goto(live_server.url + "/about/")
+    page.get_by_role("link", name="Формат для перехода").click()
+    page.wait_for_url(f"**/#group-{group.pk}")
+    page.wait_for_function(
+        """() => {
+            const heading = document.querySelector(':target h2')?.getBoundingClientRect();
+            const header = document.querySelector('header').getBoundingClientRect();
+            return heading && scrollY > 0 && heading.top >= header.bottom && heading.bottom < innerHeight;
+        }"""
+    )
 
 
 def test_services_panel_fades_in(live_server, browser, content):
@@ -468,6 +547,54 @@ def test_category_card_titles_keep_words_whole(live_server, browser, width):
     assert page.locator(".category-card h3").count() == 4
     assert page.evaluate(FIND_BROKEN_WORDS) == []
     context.close()
+
+
+@pytest.mark.parametrize(("decoration_top", "cropped"), [(16, True), (86, True), (16, False)])
+def test_group_logo_positions(live_server, page, decoration_top, cropped):
+    group = CategoryGroup.objects.create(name="Групповые приключения")
+    group.categories.add(Category.objects.create(name="Квесты", is_published=True))
+    canvas = Image.new("RGBA", (768, 240))
+    draw = ImageDraw.Draw(canvas)
+    draw.rectangle((16, 86, 99, 106), fill="#014660")
+    draw.rectangle((46, 107, 70, 215), fill="#014660")
+    draw.rectangle((200, decoration_top, 550, 215), fill="#F8BA2A")
+    if cropped:
+        canvas = canvas.crop((16, 16, 745, 226))
+    with BytesIO() as source:
+        canvas.save(source, "PNG")
+        group.logo = SimpleUploadedFile("logo.png", source.getvalue(), "image/png")
+    group.save()
+    page.goto(live_server.url + "/")
+    title = page.get_by_role("heading", name=group.name, exact=True)
+    logo = title.locator("..").locator("img")
+    assert logo.count() == 1
+    page.evaluate("document.fonts.ready")
+
+    for width in (320, 390, 768, 1280):
+        page.set_viewport_size({"width": width, "height": 800})
+        mark, heading = logo.bounding_box(), title.bounding_box()
+        assert 0 <= mark["x"] < mark["x"] + mark["width"] <= width
+        if width < 768:
+            assert mark["y"] + mark["height"] < heading["y"]
+            assert abs(mark["x"] + mark["width"] / 2 - (heading["x"] + heading["width"] / 2)) <= 1
+        else:
+            assert mark["x"] + mark["width"] < heading["x"]
+            logo.evaluate("(image) => image.decode()")
+            logo_top, logo_bottom = _first_letter_bounds(logo, round(mark["width"] * 0.12))
+            title_top, title_bottom = _first_letter_bounds(title, 13)
+            assert abs(logo_bottom - title_bottom) <= 1.5
+            assert logo_bottom - logo_top == pytest.approx(24, abs=1)
+            assert logo_bottom - logo_top > title_bottom - title_top
+
+
+def _first_letter_bounds(locator, width):
+    top = locator.bounding_box()["y"]
+    with Image.open(BytesIO(locator.screenshot(scale="css"))) as screenshot:
+        image = screenshot.convert("RGB").crop((0, 0, width, screenshot.height))
+    background = Image.new("RGB", image.size, image.getpixel((width - 1, 0)))
+    ink = ImageChops.difference(image, background).convert("L").point(lambda value: 255 if value >= 100 else 0)
+    _, first, _, last = ink.getbbox()
+    return top + first, top + last
 
 
 # По каждой карточке с переносом: поле справа от текста и число строк (с заданной компонентом шириной и без неё).

@@ -51,6 +51,32 @@ def _settings_post(phones):
     return data
 
 
+def test_about_format_admin_saves_group_and_own_logo(admin_client, make_image):
+    site = SiteSettings.load()
+    group = CategoryGroup.objects.create(name="Группа формата")
+    url = reverse("admin:core_sitesettings_change", args=[site.pk])
+    response = admin_client.post(
+        url,
+        {
+            **_settings_post([]),
+            "park_formats-TOTAL_FORMS": "1",
+            "park_formats-0-name": "Т-Формат",
+            "park_formats-0-caption": "Тренировки",
+            "park_formats-0-category_group": str(group.pk),
+            "park_formats-0-logo": make_image("logo.png", fmt="PNG"),
+            "park_formats-0-order": "0",
+        },
+    )
+
+    assert response.status_code == 302
+    park_format = site.park_formats.get(name="Т-Формат")
+    assert park_format.category_group == group
+    assert park_format.logo and park_format.logo.storage.exists(park_format.logo.name)
+    response = admin_client.get(url)
+    formats = next(f for f in response.context["inline_admin_formsets"] if f.formset.prefix == "park_formats")
+    assert "category" not in formats.formset.form.base_fields
+
+
 def test_two_whatsapp_flags_rejected(admin_client):
     SiteSettings.load()
     url = reverse("admin:core_sitesettings_change", args=[1])

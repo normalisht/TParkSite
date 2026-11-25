@@ -97,7 +97,8 @@ class ParkFormatInline(TrashLabelsMixin, OrderedInlineMixin, TabularInline):
     tab = True
     ordering_field = "order"
     hide_ordering_field = True
-    fields = ["name", "caption", "description", "category", "order"]
+    template_before = "admin/core/park_format/mobile_help.html"
+    fields = ["name", "caption", "description", "category_group", "logo", "order"]
 
 
 class FounderFactInline(OrderedInlineMixin, TabularInline):

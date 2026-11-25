@@ -1,0 +1,11 @@
+<details class="mb-3 lg:hidden">
+    <summary class="cursor-pointer font-semibold">Подсказки по полям</summary>
+    <dl class="mt-2 text-sm">
+        {% for field in inline_admin_formset.fields %}
+            {% if field.help_text and not field.widget.is_hidden %}
+                <dt class="mt-2 font-semibold">{{ field.label|capfirst }}</dt>
+                <dd>{{ field.help_text|striptags }}</dd>
+            {% endif %}
+        {% endfor %}
+    </dl>
+</details>

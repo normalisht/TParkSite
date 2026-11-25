@@ -11,6 +11,7 @@ from django.utils.formats import date_format
 
 from apps.core import about_defaults, seasons
 from apps.core.fields import INFO_HTML_EXTENSIONS, HtmlField, image_specs, logo_spec, og_spec, photo_field
+from apps.core.images import safe_spec_url
 from apps.core.maps import MapEmbedURLField
 from apps.core.seasons import format_day_month, validate_day_month, validate_site_link
 from apps.core.slugs import SLUG_HELP, unique_slug
@@ -421,18 +422,34 @@ class ContactChannel(models.Model):
 
 class ParkFormat(models.Model):
     settings = models.ForeignKey(SiteSettings, on_delete=models.CASCADE, related_name="park_formats")
-    name = models.CharField("Название", max_length=32, help_text="Например: T-park.")
-    caption = models.CharField("Подпись", max_length=128, help_text="Например: тренинг-парк.")
-    description = models.CharField("Описание", max_length=255, blank=True, help_text="Одна-две фразы, необязательно.")
-    category = models.ForeignKey(
-        "catalog.Category",
-        verbose_name="Ссылка на категорию",
+    name = models.CharField("Название", max_length=32, help_text="Показывается, если нет логотипа. Например, T-park.")
+    caption = models.CharField(
+        "Подпись", max_length=128, help_text="Короткая подпись под логотипом или названием. Например, «Тренинг-парк»."
+    )
+    description = models.CharField(
+        "Описание",
+        max_length=255,
+        blank=True,
+        help_text="Дополнительный текст под подписью. Можно оставить пустым.",
+    )
+    category_group = models.ForeignKey(
+        "catalog.CategoryGroup",
+        verbose_name="Группа категорий",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="+",
-        help_text="Карточка станет ссылкой, если категория опубликована.",
+        help_text="Плашка ведёт к этой группе на главной, если группа там видна. "
+        "Логотип группы подставится, если у карточки нет своего.",
     )
+    logo = photo_field(
+        "Логотип",
+        "about/format-logos",
+        size=(3000, 1000),
+        fmt=None,
+        help_text="Свой логотип карточки. Имеет приоритет перед логотипом группы. Лучше PNG с прозрачным фоном.",
+    )
+    logo_img = logo_spec("logo", 240)
     order = models.PositiveIntegerField("Порядок", default=0, db_index=True)
 
     class Meta:
@@ -444,9 +461,13 @@ class ParkFormat(models.Model):
         return self.name
 
     @property
-    def url(self) -> str:
-        category = self.category
-        return category.get_absolute_url() if category and category.is_published else ""
+    def logo_url(self) -> str:
+        if url := safe_spec_url(self, "logo_img"):
+            return url
+        group = self.category_group
+        if group and group.is_published and not group.in_trash:
+            return safe_spec_url(group, "logo_img")
+        return ""
 
 
 class FounderFact(models.Model):

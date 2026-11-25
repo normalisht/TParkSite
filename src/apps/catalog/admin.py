@@ -122,7 +122,10 @@ class ServiceAdminForm(BulkPhotosForm):
 
 @admin.register(CategoryGroup)
 class CategoryGroupAdmin(TrashAdminMixin, SiteModelAdmin):
-    help_intro = "Разделы меню «Услуги» в шапке и блоки категорий на главной. Порядок — перетаскиванием."
+    help_intro = (
+        "Разделы меню «Услуги» в шапке и блоки категорий на главной. "
+        "У группы может быть логотип. Порядок — перетаскиванием."
+    )
     help_anchor = "catalog"
     list_display = ["name", "is_published"]
     list_editable = ["is_published"]
@@ -130,7 +133,7 @@ class CategoryGroupAdmin(TrashAdminMixin, SiteModelAdmin):
     ordering_field = "order"
     hide_ordering_field = True
     filter_horizontal = ["categories"]
-    fields = ["name", "categories", "is_published"]
+    fields = ["name", "logo", "categories", "is_published"]
     actions_list = ["trash"]
 
 

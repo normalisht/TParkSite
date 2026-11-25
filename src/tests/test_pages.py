@@ -8,6 +8,7 @@ from django.utils import timezone
 
 from apps.catalog.models import Category, CategoryGroup, CategoryPhoto, CategoryService, Service, ServicePhoto
 from apps.content.models import Event, GalleryPhoto, Partner, Review
+from apps.core.images import safe_spec_url
 from apps.core.models import FounderFact, InfoPage, ParkFormat, Phone, SiteSettings
 
 pytestmark = pytest.mark.django_db
@@ -199,20 +200,83 @@ def test_about_page_sections(client):
     site.founder_text = "<ul><li>Педагог</li></ul>"
     site.safety_page = InfoPage.objects.create(title="Правила безопасности", body="<p>Каски</p>")
     site.save()
-    published = Category.objects.create(name="Верёвочный парк", is_published=True)
-    hidden = Category.objects.create(name="Черновик", is_published=False)
-    ParkFormat.objects.create(settings=site, name="T-park", caption="Тренинг-парк", category=published, order=0)
-    ParkFormat.objects.create(settings=site, name="T-camp", caption="Тренинговый лагерь", category=hidden, order=1)
+    ParkFormat.objects.create(settings=site, name="Т-Формат", caption="Тренинг-парк")
     FounderFact.objects.create(settings=site, value="1000+", label="тренингов провёл")
 
     html = client.get("/about/").content.decode()
     assert site.about_motto in html
     assert "Природа и тренинг" in html and "Педагог" in html
-    assert "T-park" in html and "T-camp" in html and "1000+" in html
-    assert published.get_absolute_url() in html
-    assert hidden.get_absolute_url() not in html
+    assert "Т-Формат" in html and "1000+" in html
     assert site.safety_page.get_absolute_url() in html
     assert '"founder"' in html and "Дмитрий Сергеев" in html
+
+
+@pytest.mark.parametrize("group_state", ["visible", "unpublished", "no_categories", "hidden_category", "trashed", None])
+def test_about_format_links_only_to_visible_home_group(client, group_state):
+    group = None
+    if group_state is not None:
+        group = CategoryGroup.objects.create(
+            name="Группа перехода",
+            is_published=group_state != "unpublished",
+        )
+        if group_state == "trashed":
+            group.move_to_trash()
+        if group_state != "no_categories":
+            group.categories.add(
+                Category.objects.create(name="Категория группы", is_published=group_state != "hidden_category")
+            )
+    ParkFormat.objects.create(
+        settings=SiteSettings.load(), name="Т-Формат", caption="Описание карточки", category_group=group
+    )
+    about_html = client.get("/about/").content.decode()
+    assert "Описание карточки" in about_html
+    assert "Подробнее" not in about_html
+    if group_state == "visible":
+        assert f'<a href="/#group-{group.pk}"' in about_html
+        assert f'<section id="group-{group.pk}"' in client.get("/").content.decode()
+    else:
+        assert 'href="/#group-' not in about_html
+
+
+@pytest.mark.parametrize(
+    ("group_state", "has_own_logo", "expected_source"),
+    [
+        ("published", True, "own"),
+        ("published", False, "group"),
+        ("empty", True, "own"),
+        ("unpublished", True, "own"),
+        ("trashed", False, None),
+        (None, True, "own"),
+        (None, False, None),
+    ],
+)
+def test_about_format_logo_sources(client, make_image, group_state, has_own_logo, expected_source):
+    group = None
+    if group_state:
+        group = CategoryGroup.objects.create(
+            name="Группа для логотипа",
+            logo=make_image("group.png", fmt="PNG") if group_state != "empty" else "",
+            is_published=group_state not in {"unpublished", "trashed"},
+            deleted_at=timezone.now() if group_state == "trashed" else None,
+        )
+    park_format = ParkFormat.objects.create(
+        settings=SiteSettings.load(),
+        name="T-demo",
+        caption="Формат парка",
+        category_group=group,
+        logo=make_image("format.png", fmt="PNG") if has_own_logo else "",
+    )
+
+    html = client.get("/about/").content.decode()
+
+    assert "Формат парка" in html
+    if expected_source:
+        owner = group if expected_source == "group" else park_format
+        logo_url = safe_spec_url(owner, "logo_img")
+        assert logo_url and f'<img src="{logo_url}" alt="T-demo"' in html
+        assert ">T-demo</p>" not in html
+    else:
+        assert ">T-demo</p>" in html
 
 
 def test_about_founder_text_in_details(client):

@@ -80,6 +80,50 @@ def test_settings_tabs_fit_phone(admin_page, live_server):
     assert page.evaluate(CLIPPED_TABS) == []
 
 
+@pytest.mark.parametrize("width", [390, 1440])
+def test_settings_format_column_help_opens(admin_page, live_server, width):
+    page = admin_page
+    page.set_viewport_size({"width": width, "height": 850})
+    page.goto(f"{live_server.url}/admin/core/sitesettings/1/change/#park_formats")
+    if width < 1024:
+        page.get_by_text("Подсказки по полям", exact=True).click()
+    else:
+        button = page.get_by_role("button", name="Подсказка — Группа категорий")
+        button.hover()
+        tooltip = page.locator("#park-formats-help-category_group")
+        tooltip.wait_for(state="visible", timeout=500)
+        button.click()
+        page.mouse.move(1, 1)
+        assert button.get_attribute("aria-expanded") == "true"
+    page.get_by_text("Плашка ведёт к этой группе на главной", exact=False).locator("visible=true").wait_for()
+
+
+def test_settings_format_column_help_wraps_beside_sidebar(admin_page, live_server):
+    page = admin_page
+    page.set_viewport_size({"width": 1440, "height": 850})
+    page.add_init_script("localStorage.setItem('sidebarWidth', '360')")
+    page.goto(f"{live_server.url}/admin/core/sitesettings/1/change/#park_formats")
+    sidebar = page.locator("#nav-sidebar").bounding_box()
+    assert sidebar and sidebar["width"] == 360
+
+    for field, label in [("name", "Название"), ("category_group", "Группа категорий"), ("logo", "Логотип")]:
+        page.get_by_role("button", name=f"Подсказка — {label}", exact=True).hover()
+        tooltip = page.locator(f"#park-formats-help-{field}")
+        tooltip.wait_for()
+        layout = tooltip.evaluate(
+            """el => {
+                const range = document.createRange();
+                range.selectNodeContents(el);
+                const {left, right} = el.getBoundingClientRect();
+                return {left, right, lines: range.getClientRects().length};
+            }"""
+        )
+        assert layout["lines"] > 1 and sidebar["x"] + sidebar["width"] <= layout["left"] < layout["right"] <= 1440, (
+            field,
+            layout,
+        )
+
+
 def test_seo_tab_switches_and_survives_save(admin_page, live_server):
     from apps.catalog.models import Service
 
