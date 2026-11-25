@@ -27,7 +27,7 @@
     {% with link=format.page_url logo=format.logo_url %}
     <{% if link %}a href="{{ link }}"{% else %}div{% endif %} class="{% cycle 'review-tone-green' 'review-tone-warm' 'review-tone-heather' 'review-tone-sand' %} block rounded-2xl bg-(--rv-bg) px-5 py-3.5 sm:p-6{% if link %} transition hover:-translate-y-1 hover:shadow-lg{% endif %}">
       {% if logo %}
-      <img src="{{ logo }}" alt="{{ format.name }}" class="h-[62px] w-full max-w-[180px] object-contain object-left sm:h-20" loading="lazy" decoding="async">
+      <img src="{{ logo }}" alt="{{ format.name }}" class="h-[54px] w-full max-w-[160px] object-contain object-left sm:h-20 sm:max-w-[180px]" loading="lazy" decoding="async">
       {% else %}
       <p class="text-3xl font-extrabold text-(--rv-avatar-fg)">{{ format.name }}</p>
       {% endif %}

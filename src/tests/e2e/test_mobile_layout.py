@@ -299,8 +299,8 @@ def _passes_through(values, start, end):
     return any(low < value < high for value in values) and values[-1] == end
 
 
-@pytest.mark.parametrize(("width", "logo_height"), [(390, 62), (1360, 80)])
-def test_about_formats_use_colored_cards_with_left_aligned_logos(live_server, browser, make_image, width, logo_height):
+@pytest.mark.parametrize(("width", "logo_size"), [(320, (160, 54)), (390, (160, 54)), (1360, (180, 80))])
+def test_about_formats_use_colored_cards_with_left_aligned_logos(live_server, browser, make_image, width, logo_size):
     site = SiteSettings.load()
     site.park_formats.all().delete()
     for order in range(4):
@@ -338,8 +338,7 @@ def test_about_formats_use_colored_cards_with_left_aligned_logos(live_server, br
         )
         assert len({card["tone"] for card in cards}) == 4
         for card in cards:
-            assert card["logoHeight"] == logo_height
-            assert card["logoWidth"] <= 180
+            assert (card["logoWidth"], card["logoHeight"]) == logo_size
             assert card["logoPosition"] == "0% 50%"
             assert card["captionLeft"] == card["logoLeft"]
             assert card["captionTop"] >= card["logoBottom"]
@@ -547,6 +546,24 @@ def test_category_card_titles_keep_words_whole(live_server, browser, width):
     assert page.locator(".category-card h3").count() == 4
     assert page.evaluate(FIND_BROKEN_WORDS) == []
     context.close()
+
+
+def test_group_title_without_logo_is_centered(live_server, page):
+    group = CategoryGroup.objects.create(name="Групповые приключения")
+    group.categories.add(Category.objects.create(name="Квесты", is_published=True))
+    page.goto(live_server.url + "/")
+    title = page.get_by_role("heading", name=group.name, exact=True)
+    page.evaluate("document.fonts.ready")
+
+    for width in (320, 768, 1280):
+        page.set_viewport_size({"width": width, "height": 800})
+        center = title.evaluate("""(heading) => {
+            const range = document.createRange();
+            range.selectNodeContents(heading);
+            const text = range.getBoundingClientRect();
+            return text.left + text.width / 2;
+        }""")
+        assert center == pytest.approx(width / 2, abs=1)
 
 
 @pytest.mark.parametrize(("decoration_top", "cropped"), [(16, True), (86, True), (16, False)])
