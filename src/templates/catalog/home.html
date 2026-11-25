@@ -29,7 +29,7 @@
 <section id="{{ group.home_anchor }}" class="scroll-mt-20 mx-auto max-w-6xl px-4 pt-10 md:pt-16">
   {# У фирменных PNG до базовой линии букв 10 px от низа холста высотой 210 px. #}
   {% picture group "logo_img" alt="" width=group.logo_width height=group.logo_height decoding="async" loading=forloop.counter|lazy_after:1 class="h-[38px] w-auto object-contain md:inline-block md:h-11 md:translate-y-[10%] md:object-bottom md:align-baseline md:[&[width='729'][height='210']]:h-[38.5px] md:[&[width='729'][height='210']]:translate-y-[4.76%]" as logo %}
-  <div class="mb-4 md:mb-6{% if logo %} flex flex-col items-center gap-[5px] text-center md:flex-row md:items-baseline md:gap-4 md:text-left{% endif %}">
+  <div class="mb-4 text-center md:mb-6{% if logo %} flex flex-col items-center gap-[5px] md:flex-row md:items-baseline md:gap-4 md:text-left{% endif %}">
     {% if logo %}
     <div class="max-w-full md:max-w-[33%] md:shrink-0">{{ logo }}</div>
     {% endif %}
