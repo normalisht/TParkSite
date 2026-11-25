@@ -463,7 +463,7 @@ def test_hours_note_needs_hours(client):
 
 
 def _cookie_notice(html: str) -> str:
-    return html.split('aria-label="Уведомление о cookie"', 1)[1].split("</section>", 1)[0]
+    return html.split('aria-label="Настройки cookie"', 1)[1].split("</section>", 1)[0]
 
 
 def test_cookie_notice_with_metrika_links_to_privacy(client):
@@ -474,30 +474,34 @@ def test_cookie_notice_with_metrika_links_to_privacy(client):
     Phone.objects.create(settings=site, number="9029856594")
     html = client.get("/").content.decode()
     notice = _cookie_notice(html)
-    assert "Мы используем cookie и Яндекс Метрику" in notice
+    assert "необязательные cookie" in notice
+    assert "Яндекс Метрику" in notice
     assert f'href="{site.privacy_page.get_absolute_url()}"' in notice
-    assert "Понятно" in notice
-    # Баннер скрыт до инициализации Alpine, а доступ к localStorage защищён от приватного режима.
-    assert "x-cloak" in html.split('aria-label="Уведомление о cookie"', 1)[0].rsplit("<section", 1)[1]
-    assert "cookie-ok" in html and "try" in html
-    assert html.index("Уведомление о cookie") < html.index('class="contact-fab')
+    assert "Принять" in notice
+    assert "Отклонить" in notice
+    assert "hidden" in html.split('aria-label="Настройки cookie"', 1)[0].rsplit("<section", 1)[1]
+    assert "data-metrika-settings" in html
+    assert "mc.yandex.ru" not in html
+    assert html.count(f'href="{site.privacy_page.get_absolute_url()}"') == 2
+    assert html.index('aria-label="Настройки cookie"') < html.index('class="contact-fab')
     # Класс нужен правилу в tailwind/source.css: баннер прячется, пока открыто мобильное меню.
     assert 'class="cookie-notice fixed ' in html
 
 
-def test_cookie_notice_without_privacy_page_has_no_link(client):
+def test_no_metrika_without_published_privacy_page(client):
     site = SiteSettings.load()
     site.yandex_metrika_id = "12345"
     site.save()
-    notice = _cookie_notice(client.get("/").content.decode())
-    assert "<a " not in notice
-    assert "Понятно" in notice
-
-
-def test_no_cookie_notice_without_metrika(client):
     html = client.get("/").content.decode()
-    assert "Уведомление о cookie" not in html
-    assert "cookie-ok" not in html
+    assert "data-counter-id" not in html
+    assert "data-metrika-allow" not in html
+
+
+def test_cookie_controls_are_hidden_until_a_recorded_consent_is_found(client):
+    html = client.get("/").content.decode()
+    assert 'hidden aria-label="Настройки cookie"' in html
+    assert "hidden data-metrika-settings" in html
+    assert "data-metrika-allow" not in html
 
 
 def test_contact_button_hidden_while_cookie_notice_open():

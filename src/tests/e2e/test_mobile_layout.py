@@ -16,7 +16,7 @@ pytest.importorskip("playwright")
 
 from apps.catalog.models import Category, CategoryGroup, CategoryService, Service
 from apps.content.models import Event, GalleryPhoto, Review
-from apps.core.models import ParkFormat, Phone, SiteSettings
+from apps.core.models import InfoPage, ParkFormat, Phone, SiteSettings
 
 pytestmark = [pytest.mark.e2e, pytest.mark.django_db(transaction=True)]
 
@@ -466,6 +466,7 @@ def test_contact_button_slides_under_mobile_menu(live_server, browser, content):
 def test_cookie_notice_slides_under_mobile_menu(live_server, browser, content):
     site = SiteSettings.load()
     site.yandex_metrika_id = "12345678"
+    site.privacy_page = InfoPage.objects.create(title="Политика конфиденциальности")
     site.save()
     context = browser.new_context(viewport={"width": 375, "height": 800}, is_mobile=True, has_touch=True)
     page = context.new_page()
@@ -481,7 +482,6 @@ def test_contact_button_icon_morphs(live_server, browser, content):
     page = context.new_page()
     page.goto(live_server.url + "/")
     page.wait_for_load_state("networkidle")
-    page.evaluate("try { localStorage.setItem('cookie-ok', '1') } catch (e) {}")
     phone = ".contact-fab button .icon:nth-child(1)"
     values = _frames(page, ".contact-fab button", phone, "opacity")
     assert _passes_through(values, 1, 0), values

@@ -1,7 +1,9 @@
 import re
+from importlib import import_module
 from pathlib import Path
 
 import pytest
+from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import User
@@ -50,7 +52,7 @@ def test_history_page_opens(admin_client, site_text):
 
 
 def test_registry_keys_unique_and_pages_known():
-    assert len(TEXTS) == len(BY_KEY) == 63
+    assert len(TEXTS) == len(BY_KEY) == 65
     assert {item.page for item in TEXTS} <= set(Page.values)
 
 
@@ -59,6 +61,19 @@ def test_migration_created_all_texts_with_initial_version():
     initial = SiteText.history.filter(history_type="+")
     assert initial.count() == len(TEXTS)
     assert set(initial.values_list("history_change_reason", flat=True)) == {"Начальный текст"}
+
+
+def test_cookie_copy_migration_updates_defaults_and_preserves_edit():
+    migration = import_module("apps.texts.migrations.0011_cookie_notice_copy")
+    for key, (previous, _) in migration.COPY_UPDATES.items():
+        SiteText.objects.filter(key=key).update(text=previous)
+    SiteText.objects.filter(key="common.cookie_refuse").update(text="Мой вариант отказа")
+
+    migration.update_defaults(apps, None)
+
+    assert SiteText.current("common.cookie_text") == BY_KEY["common.cookie_text"].default
+    assert SiteText.current("common.cookie_allow") == "Принять"
+    assert SiteText.current("common.cookie_refuse") == "Мой вариант отказа"
 
 
 def test_sync_keeps_edits_restores_labels_and_missing_rows():

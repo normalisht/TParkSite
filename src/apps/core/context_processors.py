@@ -1,7 +1,10 @@
 from django.conf import settings
+from django.db.models import Q
 from django.templatetags.static import static
+from django.utils.functional import SimpleLazyObject
 
 from apps.core import seasons
+from apps.core.cookie_consent import WEBVISOR, current_document, published_privacy_page
 from apps.core.images import safe_spec_url
 from apps.core.models import (
     HEADER_LOGO_HEIGHT,
@@ -52,9 +55,11 @@ def _site_context(request):
     today = seasons.today()
     # Сезонное оформление (apps/core/seasons.py): одна выборка на запрос, None — обычное.
     season = seasons.pick(settings_obj.seasons.all(), today)
-    privacy_page, safety_page = (
-        page if page and page.is_published else None for page in (settings_obj.privacy_page, settings_obj.safety_page)
-    )
+    privacy_page = published_privacy_page(settings_obj)
+    safety_page = settings_obj.safety_page
+    footer_pages = Q(show_in_footer=True)
+    if privacy_page:
+        footer_pages |= Q(pk=privacy_page.pk)
     return {
         "site": settings_obj,
         "season": season,
@@ -68,9 +73,8 @@ def _site_context(request):
         "special_days": SpecialDay.objects.shown(today, settings_obj.special_days_shown),
         # Политика (баннер cookie) и правила (плашка на «О нас»): только опубликованные страницы.
         "privacy_page": privacy_page,
-        "safety_page": safety_page,
-        # Инфо-страницы с галочкой «В подвале»; запрос — только при выводе подвала (в админке его нет).
-        "footer_pages": InfoPage.objects.published().filter(show_in_footer=True).only("title", "slug"),
+        "safety_page": safety_page if safety_page and safety_page.is_published else None,
+        "footer_pages": InfoPage.objects.published().filter(footer_pages).only("title", "slug"),
         "whatsapp_phone": whatsapp_phone,
         "telegram_phone": telegram_phone,
         # Какие кнопки связи показывать и в каком порядке.
@@ -89,7 +93,9 @@ def _site_context(request):
         "default_og_image": absolute_url(request, safe_spec_url(settings_obj, "og_card")),
         # Адрес страницы без параметров (utm и т. п.): канонический для поисковиков.
         "canonical_url": request.build_absolute_uri(request.path),
-        "metrika_enabled": bool(settings_obj.yandex_metrika_id) and not settings.DEBUG,
+        "metrika_enabled": bool(settings_obj.yandex_metrika_id and privacy_page) and not settings.DEBUG,
+        "metrika_document": SimpleLazyObject(lambda: current_document(request)),
+        "metrika_webvisor": WEBVISOR,
         # Тема первого сообщения в WhatsApp; страницы услуг, категорий и мероприятий задают свою.
         "contact_topic": "",
     }

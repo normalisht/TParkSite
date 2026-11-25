@@ -1,3 +1,4 @@
+import json
 import re
 from datetime import date, datetime, timedelta
 
@@ -8,6 +9,7 @@ from django.db.models import Max, Q
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.formats import date_format
+from django.utils.functional import cached_property
 
 from apps.core import about_defaults, seasons
 from apps.core.fields import INFO_HTML_EXTENSIONS, HtmlField, image_specs, logo_spec, og_spec, photo_field
@@ -244,8 +246,17 @@ class SiteSettings(models.Model):
         blank=True,
         related_name="+",
         help_text=(
-            "Инфо-страница, на которую ведёт ссылка в баннере cookie. Пока не указана или не опубликована — ссылки нет. "
-            "Ссылка в подвале — галочкой «В подвале» у самой страницы."
+            "Опубликованная инфо-страница показывается в баннере cookie и подвале. "
+            "Пока страница не выбрана или не опубликована, Метрика выключена."
+        ),
+    )
+    metrika_consent_version = models.PositiveIntegerField(
+        "Версия согласия на Метрику",
+        default=1,
+        validators=[MinValueValidator(1)],
+        help_text=(
+            "Увеличьте номер при существенных изменениях в веб-аналитике или правилах обработки её данных. "
+            "Ранее согласившиеся посетители увидят плашку снова, отказ сохранится."
         ),
     )
 
@@ -333,6 +344,51 @@ class SiteSettings(models.Model):
         from apps.core.request_cache import cached_on_request
 
         return cached_on_request(request, "site_settings", cls.load)
+
+
+class CookieConsentDocument(models.Model):
+    fingerprint = models.CharField(max_length=64, primary_key=True)
+    version = models.CharField(max_length=64)
+    archive = models.TextField()
+
+    class Meta:
+        verbose_name = "редакция согласия на cookie"
+        verbose_name_plural = "редакции согласия на cookie"
+
+    def __str__(self):
+        return self.version
+
+    @cached_property
+    def payload(self):
+        return json.loads(self.archive)
+
+
+class CookieConsentEvent(models.Model):
+    class Action(models.TextChoices):
+        ALLOW = "allow", "Согласие"
+        REVOKE = "revoke", "Отзыв"
+
+    receipt = models.UUIDField("Идентификатор браузера")
+    document = models.ForeignKey(CookieConsentDocument, on_delete=models.PROTECT)
+    action = models.CharField("Действие", max_length=6, choices=Action.choices)
+    created_at = models.DateTimeField("Время", auto_now_add=True)
+    attempt = models.UUIDField(unique=True, null=True, editable=False)
+
+    class Meta:
+        verbose_name = "запись о согласии на cookie"
+        verbose_name_plural = "Журнал согласий на cookie"
+        ordering = ["-pk"]
+        indexes = [models.Index(fields=["receipt", "-id"])]
+
+    def __str__(self):
+        return f"{self.get_action_display()} — {self.receipt}"
+
+
+class CancelledCookieConsentAttempt(models.Model):
+    attempt = models.UUIDField(primary_key=True)
+
+    def __str__(self):
+        return str(self.attempt)
 
 
 class Phone(models.Model):

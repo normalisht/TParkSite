@@ -268,6 +268,7 @@ def test_metrika_and_verification(client, settings):
     assert "yandex-verification" not in html
     site = SiteSettings.load()
     site.yandex_metrika_id = "12345678"
+    site.privacy_page = InfoPage.objects.create(title="Политика конфиденциальности")
     site.yandex_verification = "abc123"
     site.google_verification = "g-456"
     site.save()
@@ -276,7 +277,7 @@ def test_metrika_and_verification(client, settings):
     assert '<meta name="yandex-verification" content="abc123">' in html
     assert '<meta name="google-site-verification" content="g-456">' in html
     settings.DEBUG = True
-    assert "mc.yandex.ru" not in client.get("/").content.decode()
+    assert "data-counter-id" not in client.get("/").content.decode()
 
 
 def test_default_og_image(client, make_image):
@@ -422,6 +423,7 @@ def test_metrika_tracks_contact_clicks(client, settings):
     settings.DEBUG = False
     site = SiteSettings.load()
     site.yandex_metrika_id = "12345"
+    site.privacy_page = InfoPage.objects.create(title="Политика конфиденциальности")
     site.save()
     html = client.get("/").content.decode()
     assert 'js/metrika.js"' in html and 'data-counter-id="12345"' in html

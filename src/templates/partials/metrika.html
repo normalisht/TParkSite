@@ -1,3 +1,5 @@
-{% load static %}{# Счётчик Яндекс Метрики: код — в static/js/metrika.js (без inline-скриптов, чтобы работал CSP); номер — в настройках сайта (вкладка «Вебмастер и Метрика»). #}
-<script defer src="{% static 'js/metrika.js' %}" data-counter-id="{{ site.yandex_metrika_id }}"></script>
-<noscript><div><img src="https://mc.yandex.ru/watch/{{ site.yandex_metrika_id }}" style="position:absolute; left:-9999px;" alt=""></div></noscript>
+{% load static %}
+<script defer src="{% static 'js/metrika.js' %}"{% if metrika_enabled %} data-counter-id="{{ site.yandex_metrika_id }}"
+        data-consent-version="{{ metrika_document.version }}" data-consent-document="{{ metrika_document.fingerprint }}"
+        data-webvisor="{{ metrika_webvisor|yesno:'true,false' }}"{% endif %}
+        data-consent-url="{% url 'core:cookie_consent' %}"></script>

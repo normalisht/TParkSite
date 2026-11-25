@@ -39,10 +39,10 @@
   {% include "partials/site_banner.html" %}
   <main id="content" tabindex="-1" class="flex-1 outline-none">{% block content %}{% endblock %}</main>
   {% include "partials/footer.html" %}
-  {% if metrika_enabled %}{% include "partials/cookie_notice.html" %}{% endif %}
+  {% if metrika_enabled %}{% include "partials/cookie_notice.html" %}{% else %}{% include "partials/cookie_notice.html" with withdrawal_only=True %}{% endif %}
   {% include "partials/contact_button.html" %}
   {% block vendor_js %}{% endblock %}
   <script defer src="{% static 'js/site.js' %}"></script>
-  {% if metrika_enabled %}{% include "partials/metrika.html" %}{% endif %}
+  {% include "partials/metrika.html" %}
 </body>
 </html>

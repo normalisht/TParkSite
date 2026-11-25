@@ -1,23 +1,22 @@
-{% comment %}
-  Уведомление о cookie: только уведомление, Метрика грузится сразу. Показывается, пока нет localStorage["cookie-ok"];
-  доступ к хранилищу — в try/catch (приватный режим): если оно недоступно, баннер виден, а «Понятно» закрывает его до перезагрузки.
-  Пока баннер открыт, у <html> класс cookie-open — по нему прячется плавающая «Связаться» (tailwind/source.css).
-{% endcomment %}
 {% load site_texts %}
-<section x-data="{
-           open: (() => { try { return !localStorage.getItem('cookie-ok') } catch (e) { return true } })(),
-           accept() { try { localStorage.setItem('cookie-ok', '1') } catch (e) {} this.open = false }
-         }"
-         x-effect="document.documentElement.classList.toggle('cookie-open', open)"
-         x-show="open" x-cloak
-         aria-label="Уведомление о cookie"
-         class="cookie-notice fixed inset-x-0 bottom-0 z-[55] border-t border-ink/10 bg-white px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-4px_16px_rgba(0,0,0,0.08)]">
+<section id="cookie-notice" hidden aria-label="Настройки cookie"
+         class="cookie-notice fixed inset-x-0 bottom-0 z-[55] max-h-dvh overflow-y-auto border-t border-ink/10 bg-white px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-4px_16px_rgba(0,0,0,0.08)]">
   <div class="mx-auto flex max-w-6xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
-    <p class="text-sm text-ink/75">
-      {% text "common.cookie_text" %}
-      {% if privacy_page %}Подробнее — в <a href="{{ privacy_page.get_absolute_url }}" class="underline hover:text-brand-600">политике конфиденциальности</a>.{% endif %}
-    </p>
-    <button type="button" class="btn btn-primary shrink-0"
-            @click="accept()">Понятно</button>
+    <div class="text-sm text-ink/75">
+      <p>{% if withdrawal_only %}Веб-аналитика сейчас отключена. Вы можете отозвать ранее выданное согласие.
+        {% else %}{% text "common.cookie_text" %}
+        {% endif %}{% if privacy_page %}Подробнее — в <a href="{{ privacy_page.get_absolute_url }}" class="underline hover:text-brand-600">политике конфиденциальности</a>.{% endif %}</p>
+      <p hidden data-metrika-status class="mt-1 font-semibold"></p>
+      <p hidden data-consent-error role="alert" class="mt-1 font-semibold"></p>
+    </div>
+    <div class="flex flex-wrap justify-end gap-2 sm:shrink-0">
+      {% if withdrawal_only %}
+      <button type="button" class="btn btn-ghost" data-consent-close>Закрыть</button>
+      <button type="button" class="btn btn-ghost" data-metrika-refuse>Отозвать согласие</button>
+      {% else %}
+      <button type="button" class="btn btn-ghost" data-metrika-refuse>{% text "common.cookie_refuse" %}</button>
+      <button type="button" class="btn btn-primary" data-metrika-allow>{% text "common.cookie_allow" %}</button>
+      {% endif %}
+    </div>
   </div>
 </section>
