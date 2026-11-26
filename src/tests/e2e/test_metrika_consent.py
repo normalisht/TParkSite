@@ -20,6 +20,26 @@ def metrika_site():
     return site
 
 
+@pytest.mark.parametrize("host", ["vk.ru", "vk.com"])
+def test_metrika_tracks_vk_contact_click(live_server, browser, metrika_site, host):
+    metrika_site.vk_url = f"https://{host}/tparkprotva"
+    metrika_site.save(update_fields=["vk_url"])
+    with browser.new_context() as context:
+        context.route(
+            "https://mc.yandex.ru/**", lambda route: route.fulfill(content_type="text/javascript", body=METRIKA_STUB)
+        )
+        page = context.new_page()
+        page.goto(live_server.url + "/contacts/")
+        page.get_by_role("button", name="Принять").click()
+        page.wait_for_function("window.metrikaCalls?.some((call) => call[1] === 'init')")
+
+        page.evaluate("document.addEventListener('click', (event) => event.preventDefault(), {once: true})")
+        page.get_by_role("main").get_by_role("link", name="ВКонтакте").click()
+        assert page.evaluate("window.metrikaCalls.filter((call) => call[1] === 'reachGoal')") == [
+            [12345, "reachGoal", "vk"]
+        ]
+
+
 def test_metrika_requires_consent_and_stops_after_refusal(live_server, browser, metrika_site):
     with browser.new_context(viewport={"width": 320, "height": 700}, is_mobile=True, has_touch=True) as context:
         requests = []

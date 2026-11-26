@@ -7,6 +7,8 @@ import pytest
 
 pytest.importorskip("playwright")
 
+from playwright.sync_api import expect
+
 from apps.content.models import Review
 
 pytestmark = [pytest.mark.e2e, pytest.mark.django_db(transaction=True)]
@@ -117,6 +119,17 @@ def _card_heights(page):
     return page.locator(".swiper-slide article").evaluate_all(
         "(els) => els.map((el) => el.getBoundingClientRect().height)"
     )
+
+
+def test_home_review_carousel_keeps_russian_button_names(live_server, browser):
+    Review.objects.bulk_create([Review(text="Понравилось!") for _ in range(3)])
+    with browser.new_context(viewport={"width": 390, "height": 844}) as context:
+        page = context.new_page()
+        page.goto(live_server.url)
+        carousel = page.locator(".js-carousel-wrap")
+        expect(carousel.locator(".swiper-initialized")).to_be_visible()
+        expect(carousel.get_by_role("button", name="Предыдущие отзывы", exact=True)).to_be_visible()
+        expect(carousel.get_by_role("button", name="Следующие отзывы", exact=True)).to_be_visible()
 
 
 def test_home_carousel_neighbours_do_not_stretch(live_server, browser):

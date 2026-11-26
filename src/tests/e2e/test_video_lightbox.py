@@ -68,18 +68,19 @@ def test_video_iframe_unloaded_on_next_and_close(live_server, browser, make_vide
     page, hits = open_video_tab(browser, live_server)
     page.locator('a[aria-label="Видео: one"]').click()
     page.locator(CURRENT_IFRAME).wait_for()
+    lightbox = page.get_by_role("dialog")
 
-    page.locator(".gnext").click()
+    lightbox.get_by_role("button", name="Следующее видео", exact=True).click()
     page.locator('.gslide.current iframe[src="https://dzen.ru/embed/two"]').wait_for()
     assert page.locator('iframe[src^="https://dzen.ru/"]').count() == 1
 
-    page.locator(".gprev").click()
+    lightbox.get_by_role("button", name="Предыдущее видео", exact=True).click()
     page.locator('.gslide.current iframe[src="https://dzen.ru/embed/one"]').wait_for()
     assert page.locator('iframe[src^="https://dzen.ru/"]').count() == 1
     assert hits.count("https://dzen.ru/embed/one") == 2  # вернулись — ролик загружен заново
 
-    page.keyboard.press("Escape")
-    page.locator(".glightbox-container").wait_for(state="detached")
+    lightbox.get_by_role("button", name="Закрыть", exact=True).click()
+    expect(lightbox).to_have_count(0)
     assert page.locator("iframe").count() == 0
 
 
