@@ -4,6 +4,9 @@ import pytest
 
 pytest.importorskip("playwright")
 
+from playwright.sync_api import expect
+
+from apps.catalog.models import Category, CategoryPhoto
 from apps.content.models import GalleryPhoto
 
 pytestmark = [pytest.mark.e2e, pytest.mark.django_db(transaction=True)]
@@ -21,10 +24,28 @@ def test_strip_photo_opens_lightbox_and_pages(live_server, browser, make_image, 
     lightbox.wait_for(state="visible")
     assert page.url == live_server.url + url  # остались на странице
     assert lightbox.locator(".gslide-description").first.inner_text().strip() == "Фото 0"
-    page.locator(".gnext").click()
+    lightbox.get_by_role("button", name="Следующее фото", exact=True).click()
     page.locator(".gslide.current .gslide-title", has_text="Фото 1").wait_for()
     page.keyboard.press("Escape")
     lightbox.wait_for(state="detached")
+
+
+def test_category_photo_slider_and_lightbox_have_russian_controls(live_server, browser, make_image):
+    category = Category.objects.create(name="Сплавы", is_published=True)
+    for order in range(3):
+        CategoryPhoto.objects.create(category=category, image=make_image(), order=order)
+    with browser.new_context(reduced_motion="reduce") as context:
+        page = context.new_page()
+        page.goto(live_server.url + category.get_absolute_url())
+        slider = page.locator(".js-slider")
+        for name in ("Предыдущее фото", "Следующее фото", "Перейти к фото 2"):
+            expect(slider.get_by_role("button", name=name, exact=True)).to_be_visible()
+
+        slider.locator(".swiper-slide-active img").click()
+        lightbox = page.get_by_role("dialog")
+        expect(lightbox.get_by_role("button", name="Предыдущее фото", exact=True)).to_be_visible()
+        lightbox.get_by_role("button", name="Закрыть", exact=True).click()
+        expect(lightbox).to_have_count(0)
 
 
 @pytest.mark.parametrize("url", ["/", "/about/", "/reviews/"])

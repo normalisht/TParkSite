@@ -8,6 +8,17 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   };
 
+  const createLightbox = (options, media = "фото") => {
+    const lightbox = GLightbox(options);
+    // GLightbox создаёт кнопки при каждом открытии окна.
+    lightbox.on("open", () => {
+      lightbox.modal.querySelector(".gclose").setAttribute("aria-label", "Закрыть");
+      lightbox.prevButton.setAttribute("aria-label", `Предыдущее ${media}`);
+      lightbox.nextButton.setAttribute("aria-label", `Следующее ${media}`);
+    });
+    return lightbox;
+  };
+
   const SLIDE_DELAY = 5_000; // смена фото раз в 5 секунд
   const USER_PAUSE = 20_000; // после ручной прокрутки — пауза 20 секунд
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -82,6 +93,13 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         : { el: pagination, clickable: true },
       navigation: nav(el),
+      a11y: {
+        prevSlideMessage: "Предыдущее фото",
+        nextSlideMessage: "Следующее фото",
+        firstSlideMessage: "Это первое фото",
+        lastSlideMessage: "Это последнее фото",
+        paginationBulletMessage: "Перейти к фото {{index}}",
+      },
       autoplay: autoplay && { delay: SLIDE_DELAY, disableOnInteraction: false },
     });
 
@@ -96,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Нажатие на фото — полноэкранный просмотр. Клик после свайпа Swiper гасит сам, кнопки и точки — не слайд.
     if (window.GLightbox) {
-      const lightbox = GLightbox({
+      const lightbox = createLightbox({
         elements: [...slides].map((slide) => ({ href: slide.dataset.full, type: "image" })),
         loop: true,
       });
@@ -141,6 +159,12 @@ document.addEventListener("DOMContentLoaded", () => {
       slidesPerView: 1.1,
       breakpoints: { 768: { slidesPerView: 2.1 }, 1024: { slidesPerView: 3 } },
       navigation: nav(el),
+      a11y: {
+        prevSlideMessage: "Предыдущие отзывы",
+        nextSlideMessage: "Следующие отзывы",
+        firstSlideMessage: "Это первый отзыв",
+        lastSlideMessage: "Это последний отзыв",
+      },
       on: { init: showPosition, slideChange: showPosition },
     });
   });
@@ -192,7 +216,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const VIDEO_LINK = '.glightbox[data-type="external"]';
   const PHOTO_LINK = `.glightbox:not(${VIDEO_LINK})`;
   if (window.GLightbox && document.querySelector(PHOTO_LINK)) {
-    GLightbox({ selector: PHOTO_LINK, loop: true });
+    createLightbox({ selector: PHOTO_LINK, loop: true });
   }
 
   // Ролики Дзена (content/partials/video_card.html): слайд — пустая рамка, iframe создаём сами и только у открытого слайда.
@@ -217,7 +241,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ? `<a class="video-dzen-link" href="${escapeHtml(dzenUrl)}" target="_blank" rel="noopener">${escapeHtml(dzenLabel || "")}</a>`
       : "";
   if (window.GLightbox) videoGalleries.forEach((links) => {
-    const lightbox = GLightbox({
+    const lightbox = createLightbox({
       elements: links.map((link) => ({
         type: "inline",
         content: '<div class="video-frame"></div>',
@@ -228,7 +252,7 @@ document.addEventListener("DOMContentLoaded", () => {
       })),
       loop: true,
       moreLength: 0, // иначе на телефоне GLightbox обрезает описание и прячет ссылку за «See more»
-    });
+    }, "видео");
     // При закрытии GLightbox удаляет окно вместе с iframe, остаётся перелистывание. Уходящий ролик убираем в начале
     // анимации, иначе его звук идёт ещё ~0,5 с; slide_changed ниже дочищает остальное при быстром листании.
     lightbox.on("slide_before_change", ({ prev }) => {
